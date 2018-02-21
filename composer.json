@@ -1,12 +1,12 @@
 {
   "name":"metabolism/wordpress-loader",
   "license": "AGPL-3.0",
-  "version": "1.0.0",
+  "version": "1.0.x",
   "description": "Wordpress Scaffolder using WordpressLoader Framework",
   "require": {
     "php" : ">=5.6.0",
-    "metabolism/wordpress-core-installer": "1.*",
-    "metabolism/package-actions": "1.*",
+    "metabolism/wordpress-core-installer": "1.0.x-dev",
+    "metabolism/package-actions": "1.0.x-dev",
     "johnpbloch/wordpress-core": "4.9.*",
     "symfony/routing":"3.4.*",
     "symfony/config": "3.4.*",
