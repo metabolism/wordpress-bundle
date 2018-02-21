@@ -41,8 +41,8 @@
           "../../../src/WordpressBundle/uploads": "web/uploads",
           "../../../src/WordpressBundle/plugins": "web/plugins",
           "tools/ajax.php": "web/ajax.php",
-          "src/tools/theme": "src/WordpressBundle/themes/rocket",
-          "src/tools/mu-plugins/rocket.php": "src/WordpressBundle/mu-plugins/rocket.php"
+          "tools/theme": "src/WordpressBundle/themes/rocket",
+          "tools/mu-plugins/rocket.php": "src/WordpressBundle/mu-plugins/rocket.php"
         }
       },
       "remove": {
