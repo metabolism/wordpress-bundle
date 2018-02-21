@@ -1,0 +1,75 @@
+{
+  "name":"metabolism/wordpress-loader",
+  "license": "AGPL-3.0",
+  "version": "1.0.0",
+  "description": "Wordpress Scaffolder using WordpressLoader Framework",
+  "require": {
+    "php" : ">=5.6.0",
+    "metabolism/wordpress-core-installer": "1.*",
+    "metabolism/package-actions": "1.*",
+    "johnpbloch/wordpress-core": "4.9.*",
+    "symfony/routing":"3.4.*",
+    "symfony/config": "3.4.*",
+    "symfony/yaml": "3.4.*",
+    "ifsnop/mysqldump-php":"2.*",
+    "dflydev/dot-access-data": "1.*",
+    "wpackagist-plugin/timber-library": "1.*",
+    "elliotcondon/advanced-custom-fields-pro": "5.*",
+    "gummi/acf-component-field": "1.*"
+  },
+  "require-dev":{
+    "symfony/var-dumper": "*"
+  },
+  "extra": {
+    "post-package-install": {
+      "create": {
+        "metabolism/wordpress-loader": {
+          "src/WordpressBundle/uploads": 777,
+          "src/WordpressBundle/languages": 777,
+          "src/WordpressBundle/acf-json": 777
+        }
+      },
+      "copy": {
+        "metabolism/wordpress-loader": {
+          "tools/wp-config.php": "web/wp-config.php",
+          "doc/wordpress.sample.yml": "config/wordpress.yml"
+        }
+      },
+      "symlink": {
+        "metabolism/wordpress-loader": {
+          "doc": "doc/wordpress",
+          "../../../src/WordpressBundle/uploads": "web/uploads",
+          "../../../src/WordpressBundle/plugins": "web/plugins",
+          "tools/ajax.php": "web/ajax.php",
+          "src/tools/theme": "src/WordpressBundle/themes/rocket",
+          "src/tools/mu-plugins/rocket.php": "src/WordpressBundle/mu-plugins/rocket.php"
+        }
+      },
+      "remove": {
+        "metabolism/wordpress-loader": [
+          "config/silex.yml"
+        ],
+        "johnpbloch/wordpress-core": [
+          "wp-content",
+          "wp-config-sample.php"
+        ]
+      }
+    },
+    "post-package-update": {
+      "remove": {
+        "johnpbloch/wordpress-core": [
+          "wp-content",
+          "wp-config-sample.php"
+        ]
+      }
+    },
+    "branch-alias": {
+      "dev-1.0.x": "1.0.x-dev"
+    }
+  },
+  "autoload" : {
+    "psr-4" : {
+      "Metabolism\\WordpressLoader\\" : "src/"
+    }
+  }
+}

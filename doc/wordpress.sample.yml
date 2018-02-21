@@ -1,0 +1,82 @@
+domain_name: rocket
+
+remove_menu_page:
+  edit.php
+  edit-comments.php
+
+#define:
+#  disallow_file_edit: false
+
+remove_submenu_page:
+  themes.php: customize.php?return=%2Fedition%2Fwp-admin%2F
+
+# multisite:
+#  subdomain_install: true
+#  shared_media: true
+
+options:
+  gmap_api_key: AIzaSyDEv5UrZbosf5H8MFSFLvoVS7djfsTCQFc
+
+image_sizes:
+  full-hd: 1920 1080 1
+
+theme_support:
+  - post_thumbnails
+
+menus:
+  footer: Footer
+  header: Header
+
+post_types:
+
+  guide:
+    menu_icon: book
+    has_archive: 'guide-voyage'
+    capability_type: post
+    rewrite:
+      slug: 'guide-voyage/%type%'
+    supports:
+      - title
+      - excerpt
+      - thumbnail
+    labels:
+      name:           'Guides'
+      singular_name:  'Guide'
+      all_items:      'Tous les guides'
+      edit_item:      'Editer le guide'
+      view_item:      'Voir le guide'
+      update_item:    'Mettre à jour le guide'
+      add_new_item:   'Ajouter un guide'
+      new_item_name:  'Nouveau guide'
+      search_items:   'Rechercher un guide'
+      popular_items:  'Guides populaires'
+      not_found:      'Aucun guide trouvé'
+
+
+taxonomies:
+
+  guide_category:
+    object_type:
+      - guide
+    rewrite:
+      slug: 'guide-voyage'
+    labels:
+      name:           'Catégories'
+      singular_name:  'Catégorie'
+      all_items:      'Toutes les catégories'
+      edit_item:      'Editer la catégorie'
+      view_item:      'Voir la catégorie'
+      update_item:    'Mettre à jour la catégorie'
+      add_new_item:   'Ajouter une catégorie'
+      new_item_name:  'Nouvelle catégorie'
+      search_items:   'Rechercher une catégorie'
+      popular_items:  'Catégories populaires'
+      not_found:      'Aucune catégorie trouvée'
+
+options_page:
+  - 'Personnalisation'
+
+page_templates:
+  coming_soon: 'Coming Soon'
+  not_found: '404'
+
