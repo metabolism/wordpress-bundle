@@ -9,120 +9,68 @@ namespace Metabolism\WordpressLoader\Model;
 use Symfony\Component\Routing\Matcher\UrlMatcher,
     Symfony\Component\Routing\RequestContext,
     Symfony\Component\Routing\RouteCollection,
-    Symfony\Component\Routing\Loader\YamlFileLoader;
+    Symfony\Component\Routing\Loader\YamlFileLoader,
+	Symfony\Component\Config\FileLocator,
+	Symfony\Component\HttpKernel\Controller\ControllerResolver,
+	Symfony\Component\HttpKernel\Controller\ArgumentResolver,
+	Symfony\Component\HttpFoundation\Request,
+	Symfony\Component\HttpFoundation\Response;
+
 
 use Metabolism\WordpressLoader\Model\RouteModel as Route;
 
 class RouterModel {
 
 
-    protected $routes, $locale, $errors;
+    protected $routes;
 
     public function __construct()
     {
-    	$loader = new YamlFileLoader();
+	    $this->routes = new RouteCollection();
 
-        $this->routes = new RouteCollection();
-        $this->routes->addCollection( $loader->load('config/routing.yml') );
+	    if( !file_exists(BASE_URI.'config/routing.yml') ){
+
+		    $loader = new YamlFileLoader(new FileLocator(BASE_URI));
+		    $this->routes->addCollection( $loader->load('config/routing.yml') );
+		    $this->routes->addPrefix(BASE_PATH);
+	    }
     }
-
-
-    /**
-     * Set locale
-     */
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-    }
-
-
-    /**
-     * Get current url path
-     * @return string
-     */
-    private function get_current_url()
-    {
-        $current_url = ltrim(esc_url_raw(add_query_arg([])), '/');
-
-	    $home_path = trim(parse_url(home_url(), PHP_URL_PATH), '/');
-	    if ($home_path && strpos($current_url, $home_path) === 0)
-		    $current_url = ltrim(substr($current_url, strlen($home_path)), '/');
-
-	    $query_var_pos = strpos($current_url, '?');
-
-	   if( $query_var_pos === false )
-		   return '/'.$current_url;
-	   else
-		   return '/'.substr($current_url, 0, $query_var_pos);
-    }
-
-
-	/**
-	 * Get ordered paramerters
-	 * @return array
-	 */
-	private function getClosureArgs( $func ){
-
-		$closure    = &$func;
-		$reflection = new \ReflectionFunction($closure);
-		$arguments  = $reflection->getParameters();
-
-		$args = [];
-
-		foreach ($arguments as $arg)
-			$args[] = $arg->getName();
-
-		return $args;
-	}
 
 
     /**
      * Define route manager
      * @return bool|mixed
      */
-    public function solve()
+    public function resolve()
     {
-	    $current_url = $this->get_current_url();
+	    $request = Request::createFromGlobals();
 
-        $request_context = new RequestContext('/');
-        $matcher = new UrlMatcher($this->routes, $request_context);
+	    $context = new RequestContext();
+	    $context->fromRequest($request);
 
-        $resource = $matcher->match($current_url);
+	    $matcher = new UrlMatcher($this->routes, $context);
 
-        if( $resource and isset($resource['_controller']) )
-        {
-            $controller = $resource['_controller'];
-            $args = $this->getClosureArgs($controller);
+	    $controllerResolver = new ControllerResolver();
+	    $argumentResolver = new ArgumentResolver();
 
-	        $resource['locale'] = $this->locale;
-
-	        $params = [];
-
-            foreach ($args as $arg)
-	            $params[] = isset($resource[$arg])?$resource[$arg]:null;
-
-            return call_user_func_array($controller, $params);
-        }
-        else
-            return false;
-    }
-
-
-	/**
-	 * Define error manager
-	 * @param $code
-	 * @return Route
-	 * @internal param $pattern
-	 * @internal param $controller
-	 */
-    public function error($code)
-    {
-	    if( isset($this->errors[$code] ) )
+	    try
 	    {
-		    $controller = $this->errors[$code];
-		    return call_user_func_array($controller, [$this->locale]);
+		    $request->attributes->add($matcher->match($request->getPathInfo()));
+
+		    $controller = $controllerResolver->getController($request);
+		    $arguments = $argumentResolver->getArguments($request, $controller);
+
+		    $response = call_user_func_array($controller, $arguments);
 	    }
-	    else
-	    	return false;
+	    catch (Routing\Exception\ResourceNotFoundException $e)
+	    {
+		    $response = new Response('Not Found', 404);
+	    }
+	    catch (Exception $e) {
+		    $response = new Response('An error occurred', 500);
+	    }
+
+	    $response->send();
     }
+
 }

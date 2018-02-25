@@ -10,6 +10,8 @@
     "johnpbloch/wordpress-core": "4.9.*",
     "symfony/routing":"3.4.*",
     "symfony/config": "3.4.*",
+    "symfony/http-foundation": "3.4.*",
+    "symfony/http-kernel": "3.4.*",
     "symfony/yaml": "3.4.*",
     "ifsnop/mysqldump-php":"2.*",
     "dflydev/dot-access-data": "1.*",
@@ -40,26 +42,12 @@
           "doc": "doc/wordpress",
           "../../../src/WordpressBundle/uploads": "web/uploads",
           "../../../src/WordpressBundle/plugins": "web/plugins",
-          "tools/ajax.php": "web/ajax.php",
-          "tools/theme": "src/WordpressBundle/themes/rocket",
-          "tools/mu-plugins/rocket.php": "src/WordpressBundle/mu-plugins/rocket.php"
+          "tools/mu-plugin.php": "src/WordpressBundle/mu-plugins/wordpress-loader.php"
         }
       },
       "remove": {
         "metabolism/wordpress-loader": [
           "config/silex.yml"
-        ],
-        "johnpbloch/wordpress-core": [
-          "wp-content",
-          "wp-config-sample.php"
-        ]
-      }
-    },
-    "post-package-update": {
-      "remove": {
-        "johnpbloch/wordpress-core": [
-          "wp-content",
-          "wp-config-sample.php"
         ]
       }
     },

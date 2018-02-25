@@ -65,6 +65,10 @@ class ContextHelper
 		$this->context['options'] = $this->options;
 		$this->context['posts_per_page'] = get_option( 'posts_per_page' );
 
+		if( is_single() or is_page() )
+			$this->addPost();
+		elseif( is_archive() )
+			$this->addPosts();
 	}
 
 

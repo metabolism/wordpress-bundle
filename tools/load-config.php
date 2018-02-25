@@ -51,6 +51,9 @@ foreach (['global', 'wordpress', 'local'] as $config)
 
 $config = new Data($data);
 
+global $_config;
+$_config = $config;
+
 
 /**
 * Set debug default
@@ -108,17 +111,18 @@ elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED
 
 $base_uri = ( $isSecure ? 'https' : 'http' ) . '://'.$_SERVER['HTTP_HOST'];
 
+define( 'WP_SUBFOLDER', is_dir(BASE_URI.'/web/edition') ? '/edition': '' );
 
 if (!defined('BASE_PATH'))
 {
-    $request_uri = explode('/edition', strtok($_SERVER["REQUEST_URI"],'?'));
+    $request_uri = explode(WP_SUBFOLDER, strtok($_SERVER["REQUEST_URI"],'?'));
     define( 'BASE_PATH', $request_uri[0]);
 }
 
 if( !defined('WP_HOME') )
 	define( 'WP_HOME', $base_uri.BASE_PATH);
 
-define( 'WP_SITEURL', WP_HOME.'/edition');
+define( 'WP_SITEURL', WP_HOME.WP_SUBFOLDER);
 define( 'COOKIE_DOMAIN', $_SERVER[ 'HTTP_HOST' ] );
 
 
@@ -168,18 +172,16 @@ if (!defined('DISALLOW_FILE_EDIT'))
 if (!defined('WP_POST_REVISIONS'))
 	define( 'WP_POST_REVISIONS', 3);
 
-define( 'WP_DEFAULT_THEME', 'rocket');
-
 
 /**
  * Bootstrap WordPress
  */
 
 if (!defined('WP_USE_THEMES'))
-    define( 'WP_USE_THEMES', true);
+    define( 'WP_USE_THEMES', false);
 
 if (!defined('CMS_URI'))
-    define( 'CMS_URI', BASE_URI.'/web/edition');
+    define( 'CMS_URI', BASE_URI.'/web'.WP_SUBFOLDER);
 
 if (!defined('ABSPATH'))
     define( 'ABSPATH', CMS_URI .'/');

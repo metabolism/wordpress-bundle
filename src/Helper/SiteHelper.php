@@ -2,7 +2,7 @@
 
 namespace Metabolism\WordpressLoader\Helper;
 
-use FrontBundle\Application;
+use Metabolism\WordpressLoader\Controller\FrontController;
 
 use Metabolism\WordpressLoader\Helper\Manifest;
 use Metabolism\WordpressLoader\Traits\SingletonTrait,
@@ -13,12 +13,10 @@ use Timber\Timber,
     Timber\Menu as TimberMenu;
 
 
-class ThemeHelper extends Site
+class SiteHelper extends Site
 {
-    use SingletonTrait;
-
     public $theme_name = 'rocket';
-	private $app;
+	private $app, $config;
 
     public function __construct()
     {
@@ -33,7 +31,8 @@ class ThemeHelper extends Site
 	    add_action( 'wp_footer', [$this, 'footerAction']);
 
 	    /** @var Application $app */
-	    $this->app = Application::getInstance();
+	    global $_config;
+	    $this->config = $_config;
     }
 
 
@@ -41,7 +40,7 @@ class ThemeHelper extends Site
     {
 	    if( WP_DEBUG )
 		    Timber::render( 'component/header.debug.twig', [
-		    	'config'    => $this->app->config->export(),
+		    	'config'    => $this->config->export(),
 			    'framework' => 'wordpress'
 		    ]);
     }
@@ -49,12 +48,10 @@ class ThemeHelper extends Site
 
     public function footerAction()
     {
-	    echo $this->manifest->getScripts();
-
 	    if( WP_DEBUG )
 		    Timber::render( 'component/footer.debug.twig', [
-		    	'config'      =>$this->app->config->export(),
-			    'environment' => $this->app->config->get('environment', 'production'),
+		    	'config'      =>$this->config->export(),
+			    'environment' => $this->config->get('environment', 'production'),
 			    'last_update' => strtotime(shell_exec('git log -1 --format=%cd')),
 			    'base_url'    => get_option('home'),
 			    'cookies'     => $_COOKIE,
@@ -74,21 +71,14 @@ class ThemeHelper extends Site
             $languages = [];
 
         $context = array_merge($context, [
-
-            'project' => [
-                'name'        => get_bloginfo('name'),
-                'description' => get_bloginfo('description')
-            ],
             'debug'            => WP_DEBUG,
-            'environment'      => $this->app->config->get('environment', 'production'),
+            'environment'      => $this->config->get('environment', 'production'),
             'locale'           => count($language) ? $language[0] : 'en',
             'languages'        => $languages,
             'is_admin'         => current_user_can('manage_options'),
             'body_class'       => get_bloginfo('language') . ' ' . implode(' ', get_body_class()),
-            'is_child_theme'   => is_child_theme(),
             'base_url'         => get_bloginfo('url'),
-            'maintenance_mode' => wp_maintenance_mode(),
-            'ajax_url'         => get_bloginfo('url').'/ajax.php'
+            'maintenance_mode' => wp_maintenance_mode()
         ]);
 
         $menus = get_registered_nav_menus();
@@ -109,62 +99,31 @@ class ThemeHelper extends Site
 	        'footer' => $context['wp_footer']
 	    ];
 
-        $context['page_title']  = empty($context['wp_title'])?get_bloginfo('name'):$context['wp_title'];
+        $context['page_title']  = empty($context['wp_title']) ? get_bloginfo('name') : $context['wp_title'];
 
         return $context;
     }
 
 
-    public function addToTwig($twig)
+    public function fetch($path, $context=[], $expires=false)
     {
-        if ( class_exists( '\\FrontBundle\\Helper\\TwigHelper' ) )
-            $twig->addExtension( new \FrontBundle\Helper\TwigHelper( get_option('home') ) );
-        elseif ( class_exists( '\\Metabolism\WordpressLoader\\Helper\\TwigHelper' ) )
-            $twig->addExtension( new \Metabolism\WordpressLoader\Helper\TwigHelper( get_option('home') ) );
+	    $context = array_merge(Timber::get_context(), $context);
+	    $response = \Timber::fetch('page/' . $path, $context, $expires);
 
-        return $twig;
+	    if( !$response )
+	    	wp_die('Page ' . $path. ' not found');
+
+	    return $response;
     }
 
 
-    public function run() {
+    public function addToTwig($twig)
+    {
+        if ( class_exists( '\FrontBundle\Helper\TwigHelper' ) )
+            $twig->addExtension( new \FrontBundle\Helper\TwigHelper( get_option('home') ) );
+        elseif ( class_exists( '\Metabolism\WordpressLoader\Helper\TwigHelper' ) )
+            $twig->addExtension( new \Metabolism\WordpressLoader\Helper\TwigHelper( get_option('home') ) );
 
-        try {
-
-            if (class_exists('Timber')) {
-
-                $context = Timber::get_context();
-
-                if( $this->app ) {
-
-	                $route = false;
-
-	                //clean context
-	                unset($context['posts'], $context['request'], $context['theme'], $context['wp_head'], $context['wp_footer'], $context['wp_title']);
-
-	                if (!is_404())
-		                $route = $this->app->solve();
-
-	                if (!$route)
-		                $route = $this->app->getErrorPage(404);
-
-	                $page = $route[0];
-	                $context = (count($route) > 1 and is_array($route[1])) ? array_merge($context, $route[1]) : $context;
-
-	                if( WP_DEBUG_TWIG && strpos($page, '.css') == -1 && strpos($page, '.json') == -1 )
-		                echo "<!-- page/.$page. -->\n";
-
-	                Timber::render('page/' . $page, $context);
-                }
-                else {
-
-	                wp_redirect(wp_login_url());
-                }
-            }
-
-        } catch (Error $exception) {
-
-            echo    "<h1>We are very sorry but this website is currently not available</h1>" .
-                "<hr>" . "<p>Message : </p><pre>" . $exception->getMessage() . "</pre>";
-        }
+        return $twig;
     }
 }
