@@ -1,22 +1,14 @@
 <?php
 
-namespace Metabolism\WordpressLoader\Model;
+namespace Metabolism\WordpressLoader\Plugin;
 
-use Metabolism\WordpressLoader\Traits\SingletonTrait;
-
-class TermsModel{
-
-	use SingletonTrait;
+class TermsPlugin{
 
 	public function wp_terms_checklist_args( $args )
 	{
-		add_action( 'admin_footer', [$this, 'adminFooter'] );
-
 		$args['checked_ontop'] = false;
-
 		return $args;
 	}
-
 
 	function adminFooter() {
 		?>
@@ -74,4 +66,16 @@ class TermsModel{
 				unset($topCat->children);
 		}
 	}
+
+
+	public function __construct($config)
+	{
+		// When viewing admin
+		if( is_admin() )
+		{
+			add_action( 'admin_footer', [$this, 'adminFooter'] );
+			add_filter( 'wp_terms_checklist_args', [$this, 'wp_terms_checklist_args'] );
+		}
+	}
 }
+

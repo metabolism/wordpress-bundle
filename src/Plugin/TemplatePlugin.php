@@ -20,7 +20,7 @@ namespace Metabolism\WordpressLoader\Plugin{
 
 			$this->config = $config;
 
-			$templates = $this->config->get('page_templates', []);
+			$templates = $this->config->get('page_template', []);
 
 			if( !$templates or empty($templates) )
 				return;

@@ -19,7 +19,7 @@ class BaseController {
 	 * @param $controller
 	 * @return Route
 	 */
-	protected function render($path, $context=[], $status=200, $headers=[])
+	public function render($path, $context=[], $status=200, $headers=[])
 	{
 		if( class_exists('\FrontBundle\Helper\SiteHelper') )
 			$site = new \FrontBundle\Helper\SiteHelper();
@@ -30,19 +30,19 @@ class BaseController {
 	}
 
 
-	protected function error($data, $status=500, $headers=[])
+	public function error($data, $status=500, $headers=[])
 	{
 		return new JsonResponse($data, $status, $headers);
 	}
 
 
-	protected function json($data, $status=200, $headers=[])
+	public function json($data, $status=200, $headers=[])
 	{
 		return new JsonResponse($data, $status, $headers);
 	}
 
 
-	protected function file($file, $status=200, $headers=[], $public=true)
+	public function file($file, $status=200, $headers=[], $public=true)
 	{
 		return new BinaryFileResponse($file, $status, $headers, $public);
 	}

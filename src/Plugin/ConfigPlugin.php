@@ -2,12 +2,6 @@
 
 namespace Metabolism\WordpressLoader\Plugin;
 
-use Dflydev\DotAccessData\Data as DotAccessData;
-
-use Metabolism\WordpressLoader\Model\CustomPostTypeModel as CustomPostType,
-	Metabolism\WordpressLoader\Model\MenuModel as Menu,
-	Metabolism\WordpressLoader\Model\TaxonomyModel as Taxonomy;
-
 /**
  * Class Metabolism\WordpressLoader Framework
  */
@@ -52,17 +46,41 @@ class ConfigPlugin {
 	 */
 	public function addPostTypes()
 	{
-		foreach ( $this->config->get('post_types', []) as $slug => $data )
+		$default_args = [
+			'public' => true,
+			'has_archive' => true
+		];
+
+		foreach ( $this->config->get('post_type', []) as $post_type => $args )
 		{
-			$data = new DotAccessData($data);
-
-			$label = __(ucfirst($this->config->get('taxonomies.'.$slug.'.name', $slug.'s')), $this->bo_domain_name);
-
-			if( $slug != 'post' )
+			if( $post_type != 'post' && $post_type != 'page' )
 			{
-				$post_type = new CustomPostType($label, $slug);
-				$post_type->hydrate($data);
-				$post_type->register();
+				$args = array_merge($default_args, $args);
+				$name = str_replace('_', ' ', $post_type);
+
+				$labels = [
+					'name' => ucfirst($name).'s',
+					'singular_name' => ucfirst($name),
+					'all_items' =>'All '.$name.'s',
+					'edit_item' => 'Edit '.$name,
+					'view_item' => 'View '.$name,
+					'update_item' => 'Update '.$name,
+					'add_new_item' => 'Add a new '.$name,
+					'new_item_name' => 'New '.$name,
+					'search_items' => 'Search '.$name,
+					'popular_items' => 'Populars '.$name,
+					'not_found' => ucfirst($name).' not found'
+				];
+
+				if( isset($args['labels']) )
+					$args['labels'] = array_merge($labels, $args['labels']);
+				else
+					$args['labels'] = $labels;
+
+				if( isset($args['menu_icon']) )
+					$args['menu_icon'] = 'dashicons-'.$args['menu_icon'];
+
+				register_post_type($post_type, $args);
 			}
 		};
 	}
@@ -94,9 +112,9 @@ class ConfigPlugin {
 	 */
 	public function addMenus()
 	{
-		foreach ($this->config->get('menus', []) as $slug => $name)
+		foreach ($this->config->get('menu', []) as $location => $description)
 		{
-			new Menu($name, $slug);
+			register_nav_menu($location, __($description, $this->bo_domain_name));
 		}
 	}
 
@@ -107,14 +125,41 @@ class ConfigPlugin {
 	 */
 	public function addTaxonomies()
 	{
-		foreach ( $this->config->get('taxonomies', []) as $slug => $data )
-		{
-			$data = new DotAccessData($data);
-			$label = __(ucfirst( $this->config->get('taxonomies.'.$slug.'.name', $slug.'s')), $this->bo_domain_name);
+		$default_args = [
+			'public' => true
+		];
 
-			$taxonomy = new Taxonomy($label, $slug);
-			$taxonomy->hydrate($data);
-			$taxonomy->register();
+		foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args )
+		{
+			$args = array_merge($default_args, $args);
+			$name = str_replace('_', ' ', $taxonomy);
+
+			$labels = [
+				'name' => ucfirst($name),
+				'all_items' => 'All '.$name.'s',
+				'singular_name' => ucfirst($name),
+				'add_new_item' => 'Add a '.$name,
+				'edit_item' => 'Edit '.$name,
+				'not_found' => ucfirst($name).' not found',
+				'search_items' => 'Search in '.$name.'s'
+			];
+
+			if( isset($args['labels']) )
+				$args['labels'] = array_merge($labels, $args['labels']);
+			else
+				$args['labels'] = $labels;
+
+			if( isset($args['object_type']) )
+			{
+				$object_type = $args['object_type'];
+				unset($args['object_type']);
+			}
+			else
+			{
+				$object_type = 'post';
+			}
+
+			register_taxonomy($taxonomy, $object_type, $args);
 		}
 	}
 

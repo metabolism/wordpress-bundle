@@ -16,8 +16,8 @@ use Symfony\Component\Routing\Matcher\UrlMatcher,
 	Symfony\Component\HttpFoundation\Request,
 	Symfony\Component\HttpFoundation\Response;
 
-
 use Metabolism\WordpressLoader\Model\RouteModel as Route;
+use Metabolism\WordpressLoader\Controller\BaseController;
 
 class RouterModel {
 
@@ -28,11 +28,46 @@ class RouterModel {
     {
 	    $this->routes = new RouteCollection();
 
-	    if( !file_exists(BASE_URI.'config/routing.yml') ){
-
+	    if( file_exists(BASE_URI.'/config/routing.yml') )
+	    {
 		    $loader = new YamlFileLoader(new FileLocator(BASE_URI));
 		    $this->routes->addCollection( $loader->load('config/routing.yml') );
 		    $this->routes->addPrefix(BASE_PATH);
+
+		    $this->wordpressRewrite();
+	    }
+    }
+
+
+    protected function wordpressRewrite(){
+
+	    $routeIterator = $this->routes->getIterator();
+
+	    global $_config;
+
+	    foreach ($routeIterator as $name => $route) {
+
+		    if( $wordpress = $route->getDefault('wordpress') )
+		    {
+			    $wordpress = explode(':', $wordpress);
+			    $path = explode('/', $route->getPath());
+
+			    $id  = array_shift($path);
+			    $key = $wordpress[0].'.'.$id;
+
+			    if( $wordpress[1] == 'single' )
+			    	$key .= 'rewrite.slug';
+			    if( $wordpress[1] == 'archive' )
+				    $key .= 'has_archive';
+
+			    $rewrite_slug = $_config->get($key, $id);
+
+			    if( $rewrite_slug != $id )
+			    {
+				    $path[0] = $rewrite_slug;
+				    $route->setPath( implode('/', $path));
+			    }
+		    }
 	    }
     }
 
@@ -55,12 +90,24 @@ class RouterModel {
 
 	    try
 	    {
-		    $request->attributes->add($matcher->match($request->getPathInfo()));
+	    	$match = $matcher->match($request->getPathInfo());
+
+	    	$template = isset($match['template']) ? $match['template'] : false;
+
+		    $request->attributes->add($match);
 
 		    $controller = $controllerResolver->getController($request);
 		    $arguments = $argumentResolver->getArguments($request, $controller);
 
-		    $response = call_user_func_array($controller, $arguments);
+		    if( $controller )
+		    {
+			    $response = call_user_func_array($controller, $arguments);
+		    }
+		    elseif( $template )
+		    {
+			    $controller = new BaseController();
+			    $response = $controller->render($template);
+		    }
 	    }
 	    catch (Routing\Exception\ResourceNotFoundException $e)
 	    {

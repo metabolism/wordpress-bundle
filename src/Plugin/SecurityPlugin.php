@@ -67,6 +67,14 @@ class SecurityPlugin {
 		remove_action('wp_head', 'wp_oembed_add_discovery_links');
 		remove_action('template_redirect', 'rest_output_link_header', 11 );
 		remove_action('template_redirect', 'wp_shortlink_header', 11 );
+
+		add_filter('wp_headers', function($headers) {
+
+			if(isset($headers['X-Pingback']))
+				unset($headers['X-Pingback']);
+
+			return $headers;
+		});
 	}
 
 
@@ -87,6 +95,15 @@ class SecurityPlugin {
 
 			add_action( 'after_setup_theme', [$this, 'cleanHeader']);
 			add_action( 'wp_footer', [$this, 'cleanFooter']);
+
+			add_action('init', function()
+			{
+				if( class_exists( 'WPSEO_Frontend' ) )
+				{
+					if( method_exists( 'WPSEO_Frontend', 'debug_mark' ) )
+						remove_action( 'wpseo_head', [\WPSEO_Frontend::get_instance(), 'debug_mark'], 2);
+				}
+			});
 		}
 	}
 }

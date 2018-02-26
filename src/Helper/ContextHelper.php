@@ -6,9 +6,10 @@
 namespace Metabolism\WordpressLoader\Helper;
 
 use Metabolism\WordpressLoader\Helper\ACFHelper as ACF;
+use Metabolism\WordpressLoader\Plugin\TermsPlugin as Terms;
+
 use Metabolism\WordpressLoader\Model\PostModel as Post,
 	Metabolism\WordpressLoader\Model\QueryModel as Query,
-	Metabolism\WordpressLoader\Model\TermsModel as Terms,
 	Metabolism\WordpressLoader\Model\TermModel as Term;
 
 use Timber\Timber;

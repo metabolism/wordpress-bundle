@@ -2,8 +2,6 @@
 
 namespace Metabolism\WordpressLoader\Controller;
 
-use Metabolism\WordpressLoader\Model\TermsModel as Terms;
-
 /**
  * Class Metabolism\WordpressLoader Framework
  */
@@ -33,7 +31,6 @@ class AdminController {
 
 		// Remove image sizes for thumbnails
 		add_filter( 'intermediate_image_sizes_advanced', [$this, 'intermediateImageSizesAdvanced'] );
-		add_filter( 'wp_terms_checklist_args', [Terms::getInstance(), 'wp_terms_checklist_args'] );
 	}
 
 	/**
