@@ -1,13 +1,10 @@
-# Rocker Wordpress
+# Wordpress Bundle for Symfony 3.X
 
 INTRODUCTION
 ------------
 
-A Wordpress core application ready to dev.
+Use Wordpress as a backend for a Symfony application
 
-SUMMARY
-----------
-* [Changelog](doc/changelog)
         
 Features
 -----------
@@ -18,7 +15,7 @@ Features
 MAINTAINERS
 -----------
 
-This project is the full property of Metabolism Agency ( http://metabolism.fr )
+This project is made by Metabolism ( http://metabolism.fr )
 
 Current maintainers:
  * Jérôme Barbato - jerome@metabolism.fr

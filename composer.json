@@ -3,6 +3,7 @@
   "license": "AGPL-3.0",
   "version": "1.0.x",
   "description": "Wordpress SF bundle",
+  "license": "GPL-3.0-or-later",
   "require": {
     "php" : ">=5.6.0",
     "metabolism/wordpress-core-installer": "1.0.x-dev",
