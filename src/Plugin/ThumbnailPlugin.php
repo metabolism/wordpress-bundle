@@ -64,7 +64,9 @@ class ThumbnailPlugin {
 	 */
 	public function __construct($config) {
 
-		if( !is_admin() )
+		$show_thumbnails = $this->config->get('show-thumbnails', []);
+
+		if( !is_admin() or empty($show_thumbnails) )
 			return;
 
 		$this->config = $config;
@@ -77,7 +79,7 @@ class ThumbnailPlugin {
 
 			foreach ( $available_post_types as $post_type )
 			{
-				if( in_array($post_type, $this->config->get('show-thumbnails', []) ) )
+				if( in_array($post_type, $show_thumbnails ) )
 				{
 					add_action( "manage_{$post_type}_posts_custom_column" ,  [ $this, 'custom_columns' ], 2 );
 					add_filter( "manage_{$post_type}_posts_columns" ,        [ $this, 'add_thumb_column' ] );
@@ -90,7 +92,7 @@ class ThumbnailPlugin {
 
 			foreach ( $taxonomies as $taxonomy )
 			{
-				if( in_array($taxonomy, $this->config->get('show-thumbnails', []) ) )
+				if( in_array($taxonomy, $show_thumbnails ) )
 				{
 					add_action( "manage_{$taxonomy}_posts_custom_column" ,  [ $this, 'custom_columns' ], 2, 2 );
 					add_filter( "manage_{$taxonomy}_posts_columns" ,        [ $this, 'add_thumb_column' ] );
