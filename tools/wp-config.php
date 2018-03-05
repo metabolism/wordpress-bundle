@@ -3,7 +3,7 @@
 /**
  * Wordpress configuration file
  *
- * You may want to edit app/config/wordpress.yml to change :
+ * You may want to edit config/wordpress.yml to change :
  *   Database settings
  *   Authentication Keys
  *   Debug mode
@@ -16,7 +16,7 @@
  *   Options page
  *   Page templates
  *
- *  to define other constants, please use a define section in your app/config/local.yml file
+ *  to define other constants, please use a define section in your config/local.yml file
  *  see local.sample.yml
  */
 
@@ -27,5 +27,5 @@ if( !defined('AUTOLOAD') && !defined('ABSPATH') ){
 	exit;
 }
 
-// load yml config files
-include dirname(__DIR__) . '/vendor/metabolism/wordpress-loader/tools/load-config.php';
+// load configuration from wordpress-bundle
+include dirname(__DIR__) . '/vendor/metabolism/wordpress-bundle/tools/load-config.php';

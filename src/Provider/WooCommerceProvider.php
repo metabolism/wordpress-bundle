@@ -3,16 +3,16 @@
  * User: Paul Coudeville <paul@metabolism.fr>
  */
 
-namespace Metabolism\WordpressLoader\Provider;
+namespace Metabolism\WordpressBundle\Provider;
 
-use Metabolism\WordpressLoader\Traits\SingletonTrait;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 use Timber\Timber;
 
 /**
  * Class WooCommerceProvider
  *
- * @package Metabolism\WordpressLoader\Provider
+ * @package Metabolism\WordpressBundle\Provider
  */
 class WooCommerceProvider
 {

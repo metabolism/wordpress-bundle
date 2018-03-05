@@ -4,11 +4,11 @@
  * Route middleware to easily implement multi-langue
  * todo: check to find a better way...
  */
-namespace Metabolism\WordpressLoader\Helper;
+namespace Metabolism\WordpressBundle\Helper;
 
-use Metabolism\WordpressLoader\Model\PostModel as Post,
-	Metabolism\WordpressLoader\Model\TermModel as Term,
-	Metabolism\WordpressLoader\Model\ImageModel as Image;
+use Metabolism\WordpressBundle\Entity\Post,
+	Metabolism\WordpressBundle\Entity\Term,
+	Metabolism\WordpressBundle\Entity\Image;
 
 use Timber\User;
 

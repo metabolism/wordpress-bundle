@@ -159,7 +159,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 # 1.2.5 - 2017-08-08
 ### Added
-* WordpressLoader Term model
+* WordpressBundle Term model
 * allow submenu page removal
 ### Changed
 * ACF depth recursion max to 4

@@ -1,12 +1,12 @@
 <?php
 
-namespace Metabolism\WordpressLoader\Helper;
+namespace Metabolism\WordpressBundle\Helper;
 
-use Metabolism\WordpressLoader\Plugin\MediaPlugin as Media;
+use Metabolism\WordpressBundle\Plugin\MediaPlugin as Media;
 
 
 /**
- * Class Metabolism\WordpressLoader Framework
+ * Class Metabolism\WordpressBundle Framework
  */
 class FormHelper {
 

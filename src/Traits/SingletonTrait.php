@@ -4,12 +4,12 @@
  */
 
 
-namespace Metabolism\WordpressLoader\Traits;
+namespace Metabolism\WordpressBundle\Traits;
 
 /**
  * Class SingletonTrait
  *
- * @package Metabolism\WordpressLoader\Application
+ * @package Metabolism\WordpressBundle\Application
  */
 trait SingletonTrait {
 

@@ -1,13 +1,13 @@
 <?php
 
-namespace Metabolism\WordpressLoader\Plugin;
+namespace Metabolism\WordpressBundle\Plugin;
 
 /**
- * Class Metabolism\WordpressLoader Framework
+ * Class Metabolism\WordpressBundle Framework
  */
 class ConfigPlugin {
 
-	protected $config, $bo_domain_name;
+	protected $config;
 
 
 	/**
@@ -15,7 +15,10 @@ class ConfigPlugin {
 	 */
 	public function ACFInit()
 	{
-		acf_update_setting('google_api_key', $this->config->get('options.gmap_api_key', ''));
+		$acf_settings = $this->config->get('acf', []);
+
+		foreach ($acf_settings as $name=>$value)
+			acf_update_setting($name, $value);
 	}
 	
 	
@@ -114,7 +117,7 @@ class ConfigPlugin {
 	{
 		foreach ($this->config->get('menu', []) as $location => $description)
 		{
-			register_nav_menu($location, __($description, $this->bo_domain_name));
+			register_nav_menu($location, __($description, 'wordpress-bundle'));
 		}
 	}
 
@@ -171,7 +174,7 @@ class ConfigPlugin {
 	{
 		global $wp_rewrite;
 
-		$wp_rewrite->set_permalink_structure('/%postname%');
+		$wp_rewrite->set_permalink_structure($this->config->get('permalink_structure', '/%postname%'));
 
 		update_option( 'rewrite_rules', FALSE );
 
@@ -182,8 +185,6 @@ class ConfigPlugin {
 	public function __construct($config)
 	{
 		$this->config = $config;
-
-		$this->bo_domain_name = 'bo_'.$this->config->get('domain_name', 'customer');
 
 
 		if( $jpeg_quality = $this->config->get('jpeg_quality') )

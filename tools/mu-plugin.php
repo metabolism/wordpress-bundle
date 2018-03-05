@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WordpressLoader loader
+ * Plugin Name: WordpressBundle loader
  * Description: Load wordpress yml configuration
  * Version: 1.0.0
  * Author: Metabolism
@@ -17,15 +17,15 @@ include __DIR__.'../../src/Plugin/autoload.php';
 
 if( is_admin() )
 {
-	if( class_exists('\AdminBundle\Controller\AdminController') )
-		new \AdminBundle\Controller\AdminController();
+	if( class_exists('\App\AdminController') )
+		new \App\AdminController();
 	else
-		new \Metabolism\WordpressLoader\Controller\AdminController();
+		new \Metabolism\WordpressBundle\Controller\AdminController();
 }
 else
 {
-	if( class_exists('\FrontBundle\Controller\FrontController') )
-		new \FrontBundle\Controller\FrontController();
+	if( class_exists('\App\FrontController') )
+		new \App\FrontController();
 	else
-		new \Metabolism\WordpressLoader\Controller\FrontController();
+		new \Metabolism\WordpressBundle\Controller\FrontController();
 }

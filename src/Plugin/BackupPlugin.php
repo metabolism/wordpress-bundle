@@ -1,11 +1,11 @@
 <?php
 
-namespace Metabolism\WordpressLoader\Plugin;
+namespace Metabolism\WordpressBundle\Plugin;
 
 use Ifsnop\Mysqldump as IMysqldump;
 
 /**
- * Class Metabolism\WordpressLoader Framework
+ * Class Metabolism\WordpressBundle Framework
  */
 class BackupPlugin {
 
@@ -106,7 +106,9 @@ class BackupPlugin {
 
 		if ( current_user_can('administrator') && (!$all || is_super_admin()) )
 		{
-			$rootPath = BASE_URI. '/src/WordpressBundle/uploads/';
+			$folder = wp_upload_dir();
+			$rootPath = $folder['basedir'];
+
 			$backup   = $rootPath.'backup-'.date('Ymd').'.zip';
 
 			$this->dumpDatabase($rootPath.'bdd.sql');

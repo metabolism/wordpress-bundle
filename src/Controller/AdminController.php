@@ -1,9 +1,9 @@
 <?php
 
-namespace Metabolism\WordpressLoader\Controller;
+namespace Metabolism\WordpressBundle\Controller;
 
 /**
- * Class Metabolism\WordpressLoader Framework
+ * Class Metabolism\WordpressBundle Framework
  */
 class AdminController {
 

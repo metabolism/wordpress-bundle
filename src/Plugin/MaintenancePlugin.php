@@ -1,11 +1,11 @@
 <?php
 
 // bad design but required by to make wp style function
-namespace Metabolism\WordpressLoader\Plugin {
+namespace Metabolism\WordpressBundle\Plugin {
 
 
 /**
- * Class Metabolism\WordpressLoader Framework
+ * Class Metabolism\WordpressBundle Framework
  */
 	class MaintenancePlugin {
 

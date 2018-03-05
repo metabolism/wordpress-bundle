@@ -11,10 +11,10 @@ if( defined('WPINC') ){
 		{
 			$classname = str_replace('.php', '', $plugin);
 
-			if( class_exists('\AdminBundle\Plugin\\'.$classname) )
-				$classname = '\AdminBundle\Plugin\\'.$classname;
+			if( class_exists('\App\Plugin\\'.$classname) )
+				$classname = '\App\Plugin\\'.$classname;
 			else
-				$classname = '\Metabolism\WordpressLoader\Plugin\\'.$classname;
+				$classname = '\Metabolism\WordpressBundle\Plugin\\'.$classname;
 
 			new $classname($_config);
 		}

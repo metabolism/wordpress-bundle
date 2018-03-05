@@ -1,10 +1,10 @@
 <?php
 
-namespace Metabolism\WordpressLoader\Plugin;
+namespace Metabolism\WordpressBundle\Plugin;
 
 
 /**
- * Class Metabolism\WordpressLoader Framework
+ * Class Metabolism\WordpressBundle Framework
  */
 class SecurityPlugin {
 

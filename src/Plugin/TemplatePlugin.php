@@ -1,6 +1,6 @@
 <?php
 
-namespace Metabolism\WordpressLoader\Plugin{
+namespace Metabolism\WordpressBundle\Plugin{
 
 	class TemplatePlugin {
 

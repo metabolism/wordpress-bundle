@@ -1,10 +1,10 @@
 <?php
 
-namespace Metabolism\WordpressLoader\Plugin;
+namespace Metabolism\WordpressBundle\Plugin;
 
 
 /**
- * Class Metabolism\WordpressLoader Framework
+ * Class Metabolism\WordpressBundle Framework
  */
 class MediaPlugin {
 
@@ -235,10 +235,11 @@ class MediaPlugin {
 	 */
 	private function getThumbnails($all=false)
 	{
-		$folder = BASE_URI. '/src/WordpressBundle/uploads/';
+		$folder = wp_upload_dir();
+		$folder = $folder['basedir'];
 
 		if( is_multisite() && get_current_blog_id() != 1 && !$this->config->get('multisite.shared_media') && !$all )
-			$folder = BASE_URI. '/src/WordpressBundle/uploads/sites/' . get_current_blog_id() . '/';
+			$folder = $folder. '/sites/' . get_current_blog_id() . '/';
 
 		$file_list = [];
 
@@ -293,10 +294,32 @@ class MediaPlugin {
 		return $dirs;
 	}
 
-	
+	public static function add_relative_upload_dir_key( $arr )
+	{
+		$home_url = get_home_url();
+
+		$wp_upload_dir = explode('/', str_replace($home_url, '', $arr['baseurl']));
+		$path = [];
+
+		foreach ($wp_upload_dir as $segment)
+		{
+			if($segment == '..' and count($path))
+				array_pop($path);
+			else
+				$path[] = $segment;
+		}
+
+		$arr['relative'] = implode('/', $path);
+
+		return $arr;
+	}
+
+
 	public function __construct($config)
 	{
 		$this->config = $config;
+
+		add_filter('upload_dir', [$this, 'add_relative_upload_dir_key'], 10, 2);
 
 		if( $this->config->get('multisite.shared_media') and is_multisite() )
 			add_filter( 'upload_dir', [$this, 'uploadDir'], 11 );

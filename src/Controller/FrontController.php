@@ -1,11 +1,10 @@
 <?php
 
-namespace Metabolism\WordpressLoader\Controller;
+namespace Metabolism\WordpressBundle\Controller;
 
-use Metabolism\WordpressLoader\Model\RouterModel as Router;
 
 /**
- * Class Metabolism\WordpressLoader Framework
+ * Class Metabolism\WordpressBundle Framework
  */
 class FrontController {
 
@@ -15,33 +14,6 @@ class FrontController {
 	public static $languages_folder;
 
 	public static $domain_name = 'default';
-
-	protected $router;
-
-
-	/**
-	 * Application Constructor
-	 */
-	public function setup()
-	{
-		if( defined('WP_INSTALLING') and WP_INSTALLING )
-			return;
-
-		$this->loadConfig();
-		$this->registerFilters();
-
-		$this->router = new Router();
-
-		add_action( 'init', [$this, 'redirect']);
-
-		add_action( 'shutdown', function( $code )
-		{
-			if( !headers_sent() )
-				$this->router->resolve();
-		});
-
-		add_action( 'pre_get_posts', [$this, 'preGetPosts'] );
-	}
 
 
 	/**
@@ -128,20 +100,21 @@ class FrontController {
 
 		$this->config = $_config;
 
-		self::$domain_name      = $this->config->get('domain_name', 'customer');
+		self::$domain_name      = $this->config->get('domain_name', 'app');
 		self::$languages_folder = WP_CONTENT_DIR . '/languages';
 	}
 
 
 	public function __construct()
 	{
-		if( !defined('WPINC') )
-		{
-			include CMS_URI.'/wp-blog-header.php';
-		}
-		else
-		{
-			$this->setup();
-		}
+		if( defined('WP_INSTALLING') and WP_INSTALLING )
+			return;
+
+		$this->loadConfig();
+		$this->registerFilters();
+
+		add_action( 'init', [$this, 'redirect']);
+
+		add_action( 'pre_get_posts', [$this, 'preGetPosts'] );
 	}
 }

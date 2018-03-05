@@ -1,52 +1,41 @@
 {
-  "name":"metabolism/wordpress-loader",
+  "name":"metabolism/wordpress-bundle",
   "license": "AGPL-3.0",
   "version": "1.0.x",
-  "description": "Wordpress Scaffolder using WordpressLoader Framework",
+  "description": "Wordpress SF bundle",
   "require": {
     "php" : ">=5.6.0",
     "metabolism/wordpress-core-installer": "1.0.x-dev",
     "metabolism/package-actions": "1.0.x-dev",
     "johnpbloch/wordpress-core": "4.9.*",
-    "symfony/routing":"3.4.*",
-    "symfony/config": "3.4.*",
-    "symfony/http-foundation": "3.4.*",
-    "symfony/http-kernel": "3.4.*",
-    "symfony/yaml": "3.4.*",
     "ifsnop/mysqldump-php":"2.*",
-    "dflydev/dot-access-data": "1.*",
-    "wpackagist-plugin/timber-library": "1.*",
     "elliotcondon/advanced-custom-fields-pro": "5.*",
     "gummi/acf-component-field": "1.*"
-  },
-  "require-dev":{
-    "symfony/var-dumper": "*"
   },
   "extra": {
     "post-package-install": {
       "create": {
-        "metabolism/wordpress-loader": {
-          "src/WordpressBundle/uploads": 777,
-          "src/WordpressBundle/languages": 777,
-          "src/WordpressBundle/acf-json": 777
+        "metabolism/wordpress-bundle": {
+          "vendor/wordpress/uploads": 777,
+          "vendor/wordpress/upgrade": 777,
+          "vendor/wordpress/languages": 777,
+          "config/acf-json": 777
         }
       },
       "copy": {
-        "metabolism/wordpress-loader": {
+        "metabolism/wordpress-bundle": {
           "tools/wp-config.php": "web/wp-config.php",
           "doc/wordpress.sample.yml": "config/wordpress.yml"
         }
       },
       "symlink": {
-        "metabolism/wordpress-loader": {
-          "doc": "doc/wordpress",
-          "../../../src/WordpressBundle/uploads": "web/uploads",
-          "../../../src/WordpressBundle/plugins": "web/plugins",
-          "tools/mu-plugin.php": "src/WordpressBundle/mu-plugins/wordpress-loader.php"
+        "metabolism/wordpress-bundle": {
+          "doc": "doc/wordpress-bundle",
+          "tools/mu-plugin.php": "vendor/wordpress/mu-plugins/wordpress-bundle.php"
         }
       },
       "remove": {
-        "metabolism/wordpress-loader": [
+        "metabolism/wordpress-bundle": [
           "config/silex.yml"
         ]
       }
@@ -57,7 +46,7 @@
   },
   "autoload" : {
     "psr-4" : {
-      "Metabolism\\WordpressLoader\\" : "src/"
+      "Metabolism\\WordpressBundle\\" : "src/"
     }
   }
 }

@@ -3,23 +3,24 @@
  * User: Paul Coudeville <paul@metabolism.fr>
  */
 
-namespace Metabolism\WordpressLoader\Model;
+namespace Metabolism\WordpressBundle\Entity;
 
-use Metabolism\WordpressLoader\Helper\ACFHelper as ACF;
-use Metabolism\WordpressLoader\Model\TermModel as Term,
-	Metabolism\WordpressLoader\Model\PostModel as Post;
+use Metabolism\WordpressBundle\Helper\ACFHelper;
+
+use Metabolism\WordpressBundle\Entity\Term,
+	Metabolism\WordpressBundle\Entity\Post;
 
 /**
  * Class Post
  * @see \Timber\Post
  *
- * @package Metabolism\WordpressLoader\Model
+ * @package Metabolism\WordpressBundle\Entity
  */
-class QueryModel
+class Query
 {
 	public static function get_fields($id)
 	{
-		$post = new ACF($id);
+		$post = new ACFHelper($id);
 		return $post->get();
 	}
 
