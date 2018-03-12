@@ -39,6 +39,24 @@ class EditorPlugin {
 		return $mce_buttons;
 	}
 
+
+	public function archiveButton($wp_admin_bar)
+	{
+		if( is_post_type_archive() )
+		{
+			$object = get_queried_object();
+
+			$args = [
+				'id'    => 'edit',
+				'title' => __('Edit Posts'),
+				'href'  => get_admin_url( null, '/edit.php?post_type='.$object->name ),
+				'meta'   => ['class' => 'ab-item']
+			];
+
+			$wp_admin_bar->add_node( $args );
+		}
+	}
+
 	
 	public function __construct($config)
 	{
@@ -48,6 +66,7 @@ class EditorPlugin {
 			// Remove image sizes for thumbnails
 			add_filter( 'mce_buttons', [$this, 'TinyMceButtons']);
 			add_filter( 'wp_editor_settings', [$this, 'editorSettings'], 10, 2);
+			add_action( 'admin_bar_menu', [$this, 'archiveButton']);
 		}
 	}
 }

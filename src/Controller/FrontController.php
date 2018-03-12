@@ -114,6 +114,7 @@ class FrontController {
 		$this->registerFilters();
 
 		add_action( 'init', [$this, 'redirect']);
+		add_action( 'init', '_wp_admin_bar_init', 0 );
 
 		add_action( 'pre_get_posts', [$this, 'preGetPosts'] );
 	}

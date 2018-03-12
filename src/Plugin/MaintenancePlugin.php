@@ -31,20 +31,6 @@ namespace Metabolism\WordpressBundle\Plugin {
 
 			add_action( 'admin_bar_menu', function( $wp_admin_bar )
 			{
-				if( !is_admin() && is_post_type_archive() )
-				{
-					$object = get_queried_object();
-
-					$args = [
-						'id'    => 'edit',
-						'title' => __('Edit Posts'),
-						'href'  => get_admin_url( null, '/edit.php?post_type='.$object->name ),
-						'meta'   => ['class' => 'ab-item']
-					];
-
-					$wp_admin_bar->add_node( $args );
-				}
-
 				$args = [
 					'id'    => 'maintenance',
 					'title' => __('Maintenance mode').' : '.( get_option( 'maintenance_field', false) ? __('On') : __('Off')),

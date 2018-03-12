@@ -83,6 +83,15 @@ class ConfigPlugin {
 				if( isset($args['menu_icon']) )
 					$args['menu_icon'] = 'dashicons-'.$args['menu_icon'];
 
+				$slug = get_option( $post_type. '_rewrite_slug' );
+				$archive = get_option( $post_type. '_rewrite_archive' );
+
+				if( !is_null($slug) and !empty($slug) )
+					$args['rewrite'] = ['slug'=>$slug];
+
+				if( !is_null($archive) and !empty($archive) )
+					$args['has_archive'] = $archive;
+
 				register_post_type($post_type, $args);
 			}
 		};
@@ -182,10 +191,35 @@ class ConfigPlugin {
 	}
 
 
+	public function LoadPermalinks()
+	{
+		foreach ( $this->config->get('post_type', []) as $post_type => $args )
+		{
+			foreach( ['slug', 'archive'] as $type)
+			{
+				if( $type == 'slug' or $this->config->get('post_type.'.$post_type.'has_archive') )
+				{
+					if( isset( $_POST[$post_type. '_rewrite_'.$type] ) )
+						update_option( $post_type. '_rewrite_'.$type, sanitize_title_with_dashes( $_POST[$post_type. '_rewrite_'.$type] ) );
+
+					add_settings_field( $post_type. '_rewrite_'.$type, __( ucfirst($post_type).' '.$type ),function () use($post_type, $type)
+					{
+						$value = get_option( $post_type. '_rewrite_'.$type );
+						if( is_null($value) || empty($value))
+							$value = $this->config->get('post_type.'.$post_type.($type=='slug'?'.rewrite.slug':'has_archive'), $post_type);
+
+						echo '<input type="text" value="' . esc_attr( $value ) . '" name="'.$post_type.'_rewrite_'.$type.'" placeholder="'.$post_type.'" id="'.$post_type.'_rewrite_'.$type.'" class="regular-text" />';
+
+					}, 'permalink', 'optional' );
+				}
+			}
+		}
+	}
+
+
 	public function __construct($config)
 	{
 		$this->config = $config;
-
 
 		if( $jpeg_quality = $this->config->get('jpeg_quality') )
 			add_filter( 'jpeg_quality', function() use ($jpeg_quality){ return $jpeg_quality; });
@@ -197,7 +231,7 @@ class ConfigPlugin {
 			$this->addTaxonomies();
 			$this->addMenus();
 			$this->setPermalink();
-
+			
 			if( is_admin() )
 			{
 				$this->addOptionPages();
@@ -210,6 +244,8 @@ class ConfigPlugin {
 		{
 			// Setup ACF Settings
 			add_action( 'acf/init', [$this, 'ACFInit'] );
+
+			add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
 
 			// Removes or add pages
 			add_action( 'admin_menu', [$this, 'adminMenu']);

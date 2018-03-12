@@ -13,7 +13,6 @@ use Metabolism\WordpressBundle\Entity\Post,
 	Metabolism\WordpressBundle\Entity\Term,
 	Metabolism\WordpressBundle\Entity\Menu;
 
-use Timber\Timber;
 
 /**
  * Trait ContextTrait
@@ -33,20 +32,12 @@ Trait ContextTrait
 	 */
 	public function __construct()
 	{
-		$this->loadWordpress();
-
 		$options = new ACFHelper('options');
 		$this->options = $options->get();
 
 		$this->addSite();
 		$this->addMenu();
 		$this->addCurrentPost();
-	}
-
-
-	private function loadWordpress()
-	{
-		include EDITION_URI.'/wp-blog-header.php';
 	}
 
 
@@ -67,11 +58,33 @@ Trait ContextTrait
 
 		$blog_language = get_bloginfo('language');
 		$language = explode('-', $blog_language);
+		$languages = [];
 
-		if( function_exists('wpml_get_active_languages_filter') )
-			$languages = wpml_get_active_languages_filter('','skip_missing=N&orderby=KEY&order=DIR&link_empty_to=str');
-		else
-			$languages = [];
+		if( defined('ICL_LANGUAGE_CODE') )
+		{
+			$languages = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc' );
+		}
+		elseif(  defined('MSLS_PLUGIN_VERSION') and is_multisite() )
+		{
+			$sites = get_sites(['public'=>1]);
+			$current_blog_id = get_current_blog_id();
+
+			if( !function_exists('format_code_lang') )
+				require_once(ABSPATH . 'wp-admin/includes/ms.php');
+
+			foreach($sites as $site)
+			{
+				$lang = get_blog_option($site->blog_id, 'WPLANG');
+				$lang = empty($lang)?'en':(explode('_', $lang)[0]);
+				$languages[] = [
+					'id' => $site->blog_id,
+					'active' => $current_blog_id==$site->blog_id,
+					'name' => format_code_lang($lang),
+					'url' => get_home_url($site->blog_id, '/'),
+					'language_code' => $lang
+				];
+			}
+		}
 
 		$this->data = [
 			'debug'            => WP_DEBUG,
@@ -81,7 +94,7 @@ Trait ContextTrait
 			'languages'        => $languages,
 			'is_admin'         => current_user_can('manage_options'),
 			'body_class'       => $blog_language . ' ' . implode(' ', get_body_class()),
-			'home_url'         => home_url(),
+			'home_url'         => home_url('/'),
 			'maintenance_mode' => wp_maintenance_mode(),
 			'charset'          => get_bloginfo('charset')
 		];

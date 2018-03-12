@@ -4,7 +4,7 @@ namespace Metabolism\WordpressBundle\Plugin;
 
 class ThumbnailPlugin {
 
-	protected $is_woocommerce_active, $config;
+	protected $is_woocommerce_active;
 
 	public function custom_columns( $column ) {
 
@@ -64,12 +64,10 @@ class ThumbnailPlugin {
 	 */
 	public function __construct($config) {
 
-		$show_thumbnails = $this->config->get('show-thumbnails', []);
+		$show_thumbnails = $config->get('show-thumbnails', []);
 
 		if( !is_admin() or empty($show_thumbnails) )
 			return;
-
-		$this->config = $config;
 
 		add_action( 'admin_init', function(){
 

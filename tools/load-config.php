@@ -47,7 +47,13 @@ foreach (['global', 'wordpress', 'local'] as $config_file)
     $file = BASE_URI . '/config/' . $config_file . '.yml';
 
     if (file_exists($file))
-        $data = array_merge($data, Yaml::parseFile($file));
+    {
+	    $config = Yaml::parseFile($file);
+	    if( !is_array($config))
+	    	die($file.' is not valid');
+
+	    $data = array_merge($data, $config);
+    }
 }
 
 $_config = new Data($data);
@@ -73,12 +79,7 @@ foreach ($_config->get('define', []) as $constant=>$value)
  */
 define( 'WP_ENV', $_config->get('environment', 'production'));
 define( 'WP_DEBUG', $_config->get('debug.php_error', 0));
-define( 'WP_DEBUG_TWIG', $_config->get('debug.twig', 0));
 define( 'WC_TEMPLATE_DEBUG_MODE', $_config->get('debug.woocommerce', 0) );
-
-if( $_config->get('cache.http', 0) and !WP_DEBUG )
-    define( 'WP_CACHE', true);
-
 
 /**
  * Enable multisite
@@ -185,11 +186,8 @@ if (!defined('WP_POST_REVISIONS'))
 if (!defined('WP_USE_THEMES'))
     define( 'WP_USE_THEMES', false);
 
-if (!defined('EDITION_URI'))
-    define( 'EDITION_URI', BASE_URI.'/web'.WP_SUBFOLDER);
-
 if (!defined('ABSPATH'))
-    define( 'ABSPATH', EDITION_URI .'/');
+    define( 'ABSPATH', BASE_URI.'/web'.WP_SUBFOLDER .'/');
 
 
 /**
