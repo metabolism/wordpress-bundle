@@ -15,6 +15,7 @@ class FrontController {
 
 	public static $domain_name = 'default';
 
+	private $config;
 
 	/**
 	 * Redirect to admin

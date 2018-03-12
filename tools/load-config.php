@@ -58,7 +58,6 @@ foreach (['global', 'wordpress', 'local'] as $config_file)
 
 $_config = new Data($data);
 
-
 /**
 * Set debug default
 */

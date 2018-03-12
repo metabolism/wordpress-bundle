@@ -13,19 +13,19 @@ $page = end($uri);
 if( in_array( $page, ['wp-login.php', 'wp-register.php'] ) )
 	return;
 
-include __DIR__.'../../src/Plugin/autoload.php';
+Metabolism\WordpressBundle\Plugin\Loader::all();
 
 if( is_admin() )
 {
 	if( class_exists('\App\AdminController') )
-		new \App\AdminController();
+		new App\AdminController();
 	else
-		new \Metabolism\WordpressBundle\Controller\AdminController();
+		new Metabolism\WordpressBundle\Controller\AdminController();
 }
 else
 {
 	if( class_exists('\App\FrontController') )
-		new \App\FrontController();
+		new App\FrontController();
 	else
-		new \Metabolism\WordpressBundle\Controller\FrontController();
+		new Metabolism\WordpressBundle\Controller\FrontController();
 }

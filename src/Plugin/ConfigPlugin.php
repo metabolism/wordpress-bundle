@@ -219,6 +219,7 @@ class ConfigPlugin {
 
 	public function __construct($config)
 	{
+
 		$this->config = $config;
 
 		if( $jpeg_quality = $this->config->get('jpeg_quality') )

@@ -1,8 +1,10 @@
 domain_name: rocket
 
+#wp_controller: MainController
+
 remove_menu_page:
-  edit.php
-  edit-comments.php
+  - edit.php
+  - edit-comments.php
 
 #define:
 #  disallow_file_edit: false
@@ -13,9 +15,12 @@ remove_submenu_page:
 # multisite:
 #  subdomain_install: true
 #  shared_media: true
+#  multilangue: true
+
 
 options:
   gmap_api_key: AIzaSyDEv5UrZbosf5H8MFSFLvoVS7djfsTCQFc
+#  bugherd_api: '4aqgcywlfqs9lmoibogghw'
 
 image_sizes:
   full-hd: 1920 1080 1
@@ -27,14 +32,12 @@ menus:
   footer: Footer
   header: Header
 
-post_types:
+post_type:
 
   guide:
     menu_icon: book
-    has_archive: 'guide-voyage'
+    has_archive: true
     capability_type: post
-    rewrite:
-      slug: 'guide-voyage/%type%'
     supports:
       - title
       - excerpt
@@ -53,13 +56,11 @@ post_types:
       not_found:      'Aucun guide trouvé'
 
 
-taxonomies:
+taxonomy:
 
   guide_category:
     object_type:
       - guide
-    rewrite:
-      slug: 'guide-voyage'
     labels:
       name:           'Catégories'
       singular_name:  'Catégorie'
