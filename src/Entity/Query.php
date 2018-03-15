@@ -94,7 +94,7 @@ class Query
 	}
 
 
-	public static function get_post($args=[], $fields=[])
+	public static function get_post($args=[])
 	{
 		if( empty($args) )
 			return new Post();
@@ -104,7 +104,7 @@ class Query
 
 		$args['posts_per_page'] = 1;
 
-		$posts = self::get_posts($args, $fields);
+		$posts = self::get_posts($args);
 
 		if( count($posts) )
 			return $posts[0];
@@ -113,15 +113,15 @@ class Query
 	}
 
 
-	public static function get_posts($args=[], $fields=[])
+	public static function get_posts($args=[])
 	{
-		$query = self::wp_query($args, $fields);
+		$query = self::wp_query($args);
 
 		return $query->posts;
 	}
 
 
-	public static function wp_query($args=[], $fields=[])
+	public static function wp_query($args=[])
 	{
 		global $wp_query;
 
@@ -137,6 +137,7 @@ class Query
 			if( !isset($args['posts_per_page']) and !isset($args['numberposts']))
 				$args['posts_per_page'] = get_option( 'posts_per_page' );
 
+
 			$args['fields'] = 'ids';
 			$query = new \WP_Query( $args );
 		}
@@ -146,28 +147,7 @@ class Query
 
 		foreach ($query->posts as &$post)
 		{
-			if( !empty($fields) )
-			{
-				$id   = $post;
-				$post = [];
-
-				if( is_array($fields) )
-				{
-					foreach ($fields as $key)
-					{
-						$post[$key] = get_field($key, $id);
-					}
-				}
-				else
-				{
-					$post = get_field($fields, $id);
-				}
-
-			}
-			else
-			{
-				$post = new Post( $post );
-			}
+			$post = new Post( $post );
 		}
 
 		return $query;

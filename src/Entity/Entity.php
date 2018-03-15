@@ -20,6 +20,8 @@ class Entity
 		'guid', 'filter', 'post_content_filtered', 'url', 'name'
 	];
 
+	public $ID;
+
 	public function import( $info, $remove=false, $force = false )
 	{
 		$info = self::normalize($info, $remove);

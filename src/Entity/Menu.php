@@ -7,8 +7,7 @@ namespace Metabolism\WordpressBundle\Entity;
 
 
 /**
- * Class Post
- * @see \Timber\Term
+ * Class Menu
  *
  * @package Metabolism\WordpressBundle\Entity
  */
@@ -33,8 +32,8 @@ class Menu extends Entity
 	}
 
 
-	protected function get( $menu_id ) {
-
+	protected function get( $menu_id )
+	{
 		$menu = wp_get_nav_menu_items($menu_id);
 
 		if ( $menu )
@@ -53,8 +52,8 @@ class Menu extends Entity
 		}
 	}
 
-	private function orderItems(&$menu){
-
+	protected function orderItems(&$menu)
+	{
 		$ordered_menu = [];
 
 		foreach ($menu as $item)

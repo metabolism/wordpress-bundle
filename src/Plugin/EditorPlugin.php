@@ -8,6 +8,9 @@ namespace Metabolism\WordpressBundle\Plugin;
  */
 class EditorPlugin {
 
+	private $config;
+
+
 	/**
 	 * Add custom post type for taxonomy archive page
 	 */
@@ -57,16 +60,52 @@ class EditorPlugin {
 		}
 	}
 
+
+	public function adminMenu()
+	{
+		foreach ( $this->config->get('remove_menu_page', []) as $menu )
+		{
+			remove_menu_page($menu);
+		}
+
+		remove_submenu_page('themes.php', 'themes.php' );
+
+		foreach ( $this->config->get('remove_submenu_page', []) as $menu=>$submenu )
+		{
+			remove_submenu_page($menu, $submenu);
+		}
+
+		global $submenu;
+
+		if ( isset( $submenu[ 'themes.php' ] ) )
+		{
+			foreach ( $submenu[ 'themes.php' ] as $index => $menu_item )
+			{
+				if ( in_array( 'Customize', $menu_item ) )
+					unset( $submenu[ 'themes.php' ][ $index ] );
+			}
+
+			if( empty($submenu[ 'themes.php' ]) )
+				remove_menu_page('themes.php');
+		}
+	}
+
 	
 	public function __construct($config)
 	{
-		// When viewing admin
+		$this->config = $config;
+
+		add_action( 'wp_before_admin_bar_render', function() {
+			global $wp_admin_bar;
+			$wp_admin_bar->remove_menu('customize');
+		} );
+
 		if( is_admin() )
 		{
-			// Remove image sizes for thumbnails
 			add_filter( 'mce_buttons', [$this, 'TinyMceButtons']);
 			add_filter( 'wp_editor_settings', [$this, 'editorSettings'], 10, 2);
 			add_action( 'admin_bar_menu', [$this, 'archiveButton']);
+			add_action( 'admin_menu', [$this, 'adminMenu']);
 		}
 	}
 }

@@ -1,0 +1,41 @@
+# https://codex.wordpress.org/Function_Reference/register_post_type
+
+labels:
+  name: Posts #general name for the post type, usually plural.
+  singular_name: Post #name for one object of this post type.
+  add_new: Add New #the add new text.
+  add_new_item: Add New Post
+  edit_item: Edit Post
+  new_item: New Post
+  view_item: View Post
+  view_items: View Posts  #Label for viewing post type archives.
+  search_items: Search Posts
+  not_found: No posts found
+  not_found_in_trash: No posts found in Trash
+  parent_item_colon: Parent Page:
+  all_items: All Posts #String for the submenu.
+  archives: Post Archives #String for use with archives in nav menus.
+  attributes: Post Attributes #Label for the attributes meta box.
+  insert_into_item: Insert into post #String for the media frame button.
+  uploaded_to_this_item: Uploaded to this post #String for the media frame filter.
+  featured_image: Featured Image
+  set_featured_image: Set featured image
+  remove_featured_image: Remove featured image
+  use_featured_image: Use as featured image
+  menu_name: Posts
+  filter_items_list: #String for the table views hidden heading.
+  items_list_navigation: #String for the table pagination hidden heading.
+  items_list: #String for the table hidden heading.
+  name_admin_bar: Post #String for use in New in Admin menu bar. Default is the same as `singular_name`.
+
+description: #A short descriptive summary of what the post type is.
+public: true
+with_front: true
+exclude_from_search: false
+publicly_queryable: true
+show_ui: true
+show_in_nav_menus: true
+show_in_menu: true
+show_in_admin_bar: true
+menu_position: 25 #5 - below Posts, 10 - below Media, 15 - below Links, 20 - below Pages, 25 - below comments, 60 - below first separator, 65 - below Plugins, 70 - below Users, 75 - below Tools, 80 - below Settings, 100 - below second separator
+menu_icon: #https://developer.wordpress.org/resource/dashicons/

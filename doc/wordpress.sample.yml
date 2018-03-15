@@ -1,13 +1,21 @@
 domain_name: rocket
 
-#wp_controller: MainController
+# bind custom post type permalink structure to controller
+extra_permastructs:
+  controller: MainController
 
 remove_menu_page:
-  - edit.php
-  - edit-comments.php
-
-#define:
-#  disallow_file_edit: false
+  - edit.php #Posts
+  - edit-comments.php #Comments
+#  - edit.php?post_type=page #Pages
+#  - index.php #Dashboard
+#  - jetpack #Jetpack
+#  - upload.php #Media
+#  - themes.php #Appearance
+#  - plugins.php #Plugins
+#  - users.php #Users
+#  - tools.php #Tools
+#  - options-general.php #Settings
 
 remove_submenu_page:
   themes.php: customize.php?return=%2Fedition%2Fwp-admin%2F
@@ -17,25 +25,26 @@ remove_submenu_page:
 #  shared_media: true
 #  multilangue: true
 
+#define:
+#  disallow_file_edit: false
 
 options:
   gmap_api_key: AIzaSyDEv5UrZbosf5H8MFSFLvoVS7djfsTCQFc
 #  bugherd_api: '4aqgcywlfqs9lmoibogghw'
 
-image_sizes:
-  full-hd: 1920 1080 1
-
-theme_support:
+support:
+  - templates
   - post_thumbnails
+#  - woocommerce
 
-menus:
+menu:
   footer: Footer
   header: Header
 
 post_type:
 
   guide:
-    menu_icon: book
+    menu_icon: book #https://developer.wordpress.org/resource/dashicons/
     has_archive: true
     capability_type: post
     supports:
@@ -77,7 +86,7 @@ taxonomy:
 options_page:
   - 'Personnalisation'
 
-page_templates:
+page_template:
   coming_soon: 'Coming Soon'
   not_found: '404'
 

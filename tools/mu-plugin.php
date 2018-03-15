@@ -17,15 +17,15 @@ Metabolism\WordpressBundle\Plugin\Loader::all();
 
 if( is_admin() )
 {
-	if( class_exists('\App\AdminController') )
-		new App\AdminController();
+	if( class_exists('App\Controller\AdminController') )
+		new App\Controller\AdminController();
 	else
 		new Metabolism\WordpressBundle\Controller\AdminController();
 }
 else
 {
-	if( class_exists('\App\FrontController') )
-		new App\FrontController();
+	if( class_exists('App\Controller\FrontController') )
+		new App\Controller\FrontController();
 	else
 		new Metabolism\WordpressBundle\Controller\FrontController();
 }

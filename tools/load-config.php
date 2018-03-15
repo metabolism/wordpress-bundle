@@ -152,6 +152,18 @@ define( 'NONCE_SALT', $_config->get('salt.nonce','gelPRQb4NzO=4pOG_5YnuN(5G~YJCI
 
 
 /**
+ * Redefine cookie name without wordpress
+ */
+define( 'COOKIEHASH',           md5( WP_SITEURL )    );
+define( 'USER_COOKIE',          'app_user_'      . COOKIEHASH );
+define( 'PASS_COOKIE',          'app_pass_'      . COOKIEHASH );
+define( 'AUTH_COOKIE',          'app_'           . COOKIEHASH );
+define( 'SECURE_AUTH_COOKIE',   'app_sec_'       . COOKIEHASH );
+define( 'LOGGED_IN_COOKIE',     'app_logged_in_' . COOKIEHASH );
+define( 'TEST_COOKIE',          'app_test_cookie'             );
+
+
+/**
  * Custom Content Directory
  */
 if (!defined('WP_CONTENT_DIR'))

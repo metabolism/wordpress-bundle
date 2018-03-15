@@ -12,7 +12,6 @@ use Metabolism\WordpressBundle\Helper\NormalizationHelper as Normalization;
 
 /**
  * Class Post
- * @see \Timber\Post
  *
  * @package Metabolism\WordpressBundle\Entity
  */

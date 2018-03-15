@@ -2,6 +2,8 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
+use Metabolism\WordpressBundle\Helper\TableHelper;
+
 /**
  * Class Metabolism\WordpressBundle Framework
  */
@@ -20,27 +22,6 @@ class ConfigPlugin {
 		foreach ($acf_settings as $name=>$value)
 			acf_update_setting($name, $value);
 	}
-	
-	
-	/**
-	 * Adds or remove pages from menu admin.
-	 */
-	public function adminMenu()
-	{
-		//clean interface
-		foreach ( $this->config->get('remove_menu_page', []) as $menu )
-		{
-			remove_menu_page($menu);
-		}
-
-		remove_submenu_page('themes.php', 'themes.php' );
-
-		//clean interface
-		foreach ( $this->config->get('remove_submenu_page', []) as $menu=>$submenu )
-		{
-			remove_submenu_page($menu, $submenu);
-		}
-	}
 
 
 	/**
@@ -53,6 +34,8 @@ class ConfigPlugin {
 			'public' => true,
 			'has_archive' => true
 		];
+
+		$is_admin = is_admin();
 
 		foreach ( $this->config->get('post_type', []) as $post_type => $args )
 		{
@@ -93,6 +76,22 @@ class ConfigPlugin {
 					$args['has_archive'] = $archive;
 
 				register_post_type($post_type, $args);
+
+				if( $is_admin && isset($args['columns']) )
+				{
+					add_filter ( 'manage_'.$post_type.'_posts_columns', function ( $columns ) use ( $args )
+					{
+						return array_merge ( $columns, $args['columns'] );
+					});
+
+					add_action ( 'manage_'.$post_type.'_posts_custom_column', function ( $column, $post_id ) use ( $args )
+					{
+						if( isset($args['columns'][$column]) )
+							echo get_post_meta( $post_id, $column, true );
+
+					}, 10, 2 );
+
+				}
 			}
 		};
 	}
@@ -137,6 +136,7 @@ class ConfigPlugin {
 	 */
 	public function addTaxonomies()
 	{
+
 		$default_args = [
 			'public' => true
 		];
@@ -175,6 +175,21 @@ class ConfigPlugin {
 		}
 	}
 
+	/**
+	 * Adds User role
+	 * @see Taxonomy
+	 */
+	public function addRoles()
+	{
+		global $wp_roles;
+
+		foreach ( $this->config->get('role', []) as $role => $args )
+		{
+			if( !isset($wp_roles->roles[$role]))
+				add_role($role, $args['display_name'], $args['capabilities']);
+		}
+	}
+
 
 	/**
 	 * Set permalink stucture
@@ -197,7 +212,11 @@ class ConfigPlugin {
 		{
 			foreach( ['slug', 'archive'] as $type)
 			{
-				if( $type == 'slug' or $this->config->get('post_type.'.$post_type.'has_archive') )
+				if(
+					($type == 'slug' and (!isset($args['public']) or $args['public']) )
+					or
+					($type == 'archive' and $args['has_archive'] )
+				)
 				{
 					if( isset( $_POST[$post_type. '_rewrite_'.$type] ) )
 						update_option( $post_type. '_rewrite_'.$type, sanitize_title_with_dashes( $_POST[$post_type. '_rewrite_'.$type] ) );
@@ -217,6 +236,41 @@ class ConfigPlugin {
 	}
 
 
+	public function addTableViews()
+	{
+
+		add_action('admin_menu', function() {
+
+			foreach ( $this->config->get('table', []) as $table => $args )
+			{
+				$default_args = [
+					'page_title' => ucfirst($table),
+					'menu_title' => ucfirst($table),
+					'capability' => 'activate_plugins',
+					'singular'   => $table,
+					'menu_icon'  => 'editor-table',
+					'plural'     => $table.'s',
+					'per_page'   => 20,
+					'position'   => 30
+				];
+
+				$args = array_merge($default_args, $args);
+
+				$args['menu_icon'] = 'dashicons-'.$args['menu_icon'];
+
+				add_menu_page($args['page_title'], $args['menu_title'], $args['capability'], 'table_'.$table, function() use($table, $args)
+				{
+					$table = new TableHelper($table, $args);
+
+					$table->prepare_items();
+					$table->display();
+
+				}, $args['menu_icon'], $args['position']);
+			}
+		});
+	}
+
+
 	public function __construct($config)
 	{
 
@@ -230,7 +284,9 @@ class ConfigPlugin {
 		{
 			$this->addPostTypes();
 			$this->addTaxonomies();
+			$this->addRoles();
 			$this->addMenus();
+			$this->addTableViews();
 			$this->setPermalink();
 			
 			if( is_admin() )
@@ -248,15 +304,12 @@ class ConfigPlugin {
 
 			add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
 
-			// Removes or add pages
-			add_action( 'admin_menu', [$this, 'adminMenu']);
+			$support = $this->config->get('support', []);
 
-			$theme_support = $this->config->get('theme_support', []);
-
-			if( in_array('post_thumbnails', $theme_support ) )
+			if( in_array('post_thumbnails', $support ) )
 				add_theme_support( 'post-thumbnails' );
 
-			if( in_array('woocommerce', $theme_support ) )
+			if( in_array('woocommerce', $support ) )
 				add_theme_support( 'woocommerce' );
 
 			add_post_type_support( 'page', 'excerpt' );

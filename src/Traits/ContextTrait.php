@@ -7,6 +7,7 @@ namespace Metabolism\WordpressBundle\Traits;
 
 use Metabolism\WordpressBundle\Helper\ACFHelper;
 use Metabolism\WordpressBundle\Plugin\TermsPlugin;
+use Metabolism\WordpressBundle\Provider\WooCommerceProvider;
 
 use Metabolism\WordpressBundle\Entity\Post,
 	Metabolism\WordpressBundle\Entity\Query,
@@ -24,7 +25,7 @@ use Metabolism\WordpressBundle\Entity\Post,
  */
 Trait ContextTrait
 {
-	public $options;
+	public $has_templates, $config;
 
 
 	/**
@@ -32,12 +33,22 @@ Trait ContextTrait
 	 */
 	public function __construct()
 	{
-		$options = new ACFHelper('options');
-		$this->options = $options->get();
+		global $_config;
+		$this->config = $_config;
+
+		$this->has_templates = $_config->get('support.templates');
 
 		$this->addSite();
 		$this->addMenu();
-		$this->addCurrentPost();
+		$this->addOptions();
+		$this->addCurrent();
+	}
+
+
+	protected function addOptions()
+	{
+		$options = new ACFHelper('options');
+		$this->data['options'] = $options->get();
 	}
 
 
@@ -54,8 +65,6 @@ Trait ContextTrait
 
 	public function addSite()
 	{
-		global $_config;
-
 		$blog_language = get_bloginfo('language');
 		$language = explode('-', $blog_language);
 		$languages = [];
@@ -88,53 +97,68 @@ Trait ContextTrait
 
 		$this->data = [
 			'debug'            => WP_DEBUG,
-			'environment'      => $_config->get('environment', 'production'),
+			'environment'      => $this->config->get('environment', 'production'),
 			'locale'           => count($language) ? $language[0] : 'en',
 			'language'         => $blog_language,
 			'languages'        => $languages,
 			'is_admin'         => current_user_can('manage_options'),
-			'body_class'       => $blog_language . ' ' . implode(' ', get_body_class()),
 			'home_url'         => home_url('/'),
-			'maintenance_mode' => wp_maintenance_mode(),
-			'charset'          => get_bloginfo('charset')
+			'maintenance_mode' => wp_maintenance_mode()
 		];
+
+		if( $this->has_templates )
+		{
+			$wp_title = wp_title(' ', false);
+
+			$this->data = array_merge($this->data, [
+				'body_class' => $blog_language . ' ' . implode(' ', get_body_class()),
+				'maintenance_mode' => wp_maintenance_mode(),
+				'posts_per_page' => get_option( 'posts_per_page' ),
+				'page_title' => empty($wp_title) ? get_bloginfo('name') : $wp_title,
+				'system' => [
+					'head'   => $this->getOutput('wp_head'),
+					'footer' => $this->getOutput('wp_footer')
+				]
+			]);
+		}
 
 		if (class_exists('WooCommerce'))
 		{
 			$wcProvider = WooCommerceProvider::getInstance();
 			$wcProvider->globalContext($this->data);
 		}
-
-		$this->data['system'] = [
-			'head'   => $this->getOutput('wp_head'),
-			'footer' => $this->getOutput('wp_footer')
-		];
-
-		$wp_title = wp_title(' ', false);
-
-		$this->data['page_title']  = empty($wp_title) ? get_bloginfo('name') : $wp_title;
-
-		$this->data['options'] = $this->options;
-		$this->data['posts_per_page'] = get_option( 'posts_per_page' );
 	}
 
 
 	public function addMenu()
 	{
 		$menus = get_registered_nav_menus();
-		$this->data['menus'] = [];
+		$this->data['menu'] = [];
 
 		foreach ( $menus as $location => $description )
-			$this->data['menus'][$location] = new Menu($location);
+		{
+			$menu = new Menu($location);
+
+			if( $menu->id )
+				$this->data['menu'][$location] = new Menu($location);
+		}
 	}
 
 
-	public function addCurrentPost()
+	public function addCurrent()
 	{
-		if( is_single() or is_page() )
+		if( (is_single() or is_page()) and !is_attachment() )
+		{
 			$this->addPost();
-		elseif( is_archive() )
+			return true;
+		}
+		elseif( is_archive() or is_search() )
+		{
 			$this->addPosts();
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -151,14 +175,19 @@ Trait ContextTrait
 		if( is_null($id) )
 			$id = get_the_ID();
 
-		$post = new Post($id);
+		if( $id )
+		{
+			$post = new Post($id);
 
-		if( $callback and is_callable($callback) )
-			call_user_func($callback, $post);
+			if( $callback and is_callable($callback) )
+				call_user_func($callback, $post);
 
-		$this->data[$key] = $post;
+			$this->data[$key] = $post;
 
-		return $this->data[$key];
+			return $this->data[$key];
+		}
+
+		return false;
 	}
 
 
@@ -208,8 +237,10 @@ Trait ContextTrait
 	 * Add post entry to context with current Post instance
 	 *
 	 * @see Post
-	 * @param array  $args
-	 * @param string $key
+	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters
+	 * @param string $key the key name to store data
+	 * @param bool $found_posts include found posts value
+	 * @param bool $callback execute a function for each result via array_map
 	 */
 	public function addPosts($args=[], $key='posts', $found_posts=false, $callback=false)
 	{
@@ -261,7 +292,8 @@ Trait ContextTrait
 	 */
 	public function addPagination($args=[])
 	{
-		$this->data['pagination'] = Timber::get_pagination($args);
+		//todo: pagination
+		$this->data['pagination'] = false;
 	}
 
 

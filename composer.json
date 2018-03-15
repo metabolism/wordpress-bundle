@@ -17,7 +17,7 @@
     "post-package-install": {
       "create": {
         "metabolism/wordpress-bundle": {
-          "vendor/wordpress/uploads": 777,
+          "web/uploads": 777,
           "vendor/wordpress/upgrade": 777,
           "vendor/wordpress/languages": 777,
           "config/acf-json": 777

@@ -48,8 +48,7 @@ class Image extends Entity
 	{
 		$metadata = wp_get_attachment_metadata($id);
 
-		$metadata['file']  = $this->uploadDir().'/'.$metadata['file'];
-		$metadata['src']  = BASE_PATH.$metadata['file'];
+		$metadata['src']  = BASE_PATH.$this->uploadDir().'/'.$metadata['file'];
 		$metadata['meta'] = $metadata['image_meta'];
 		$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
 
