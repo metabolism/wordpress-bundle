@@ -1,6 +1,5 @@
 {
   "name":"metabolism/wordpress-bundle",
-  "license": "AGPL-3.0",
   "version": "1.0.x",
   "description": "Wordpress SF bundle",
   "license": "GPL-3.0-or-later",
