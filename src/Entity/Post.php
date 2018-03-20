@@ -8,7 +8,6 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use Metabolism\WordpressBundle\Entity\Image;
 use Metabolism\WordpressBundle\Entity\Term;
-use Metabolism\WordpressBundle\Helper\NormalizationHelper as Normalization;
 
 /**
  * Class Post

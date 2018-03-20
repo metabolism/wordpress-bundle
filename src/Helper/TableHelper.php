@@ -7,19 +7,24 @@ if(!class_exists('WP_List_Table'))
 
 class TableHelper extends \WP_List_Table {
 
-	private $table, $args, $fields;
+	private $table, $args, $fields, $column_title;
 
 	function __construct($table, $args)
 	{
 		global $wpdb;
 
 		$this->table = $table;
-		$this->args  = $args;
+		$this->column_title = isset($args['columns']['title'])?$args['columns']['title']:'Title';
 
 		$structure = $wpdb->get_col( "DESCRIBE {$wpdb->prefix}{$this->table}", 0 );
+
 		if(!$structure || !is_array($structure) || !in_array('id', $structure))
 			wp_die("Field `id` is missing from table {$wpdb->prefix}{$this->table}");
 
+		if( isset($args['columns']['title']) )
+			unset($args['columns']['title']);
+
+		$this->args  = $args;
 
 		parent::__construct( array(
 			'singular'  => $args['singular'],
@@ -70,7 +75,7 @@ class TableHelper extends \WP_List_Table {
 
 	function get_columns()
 	{
-		return array_merge(['cb' => '<input type="checkbox" />', 'title'=>__('Title')], $this->args['columns']);
+		return array_merge(['cb' => '<input type="checkbox" />', 'title'=>__($this->column_title)], $this->args['columns']);
 	}
 
 
