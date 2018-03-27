@@ -296,20 +296,9 @@ class MediaPlugin {
 
 	public static function add_relative_upload_dir_key( $arr )
 	{
-		$home_url = get_home_url();
-
-		$wp_upload_dir = explode('/', str_replace($home_url, '', $arr['baseurl']));
-		$path = [];
-
-		foreach ($wp_upload_dir as $segment)
-		{
-			if($segment == '..' and count($path))
-				array_pop($path);
-			else
-				$path[] = $segment;
-		}
-
-		$arr['relative'] = implode('/', $path);
+		$arr['url'] = str_replace('edition/../', '', $arr['url']);
+		$arr['baseurl'] = str_replace('edition/../', '', $arr['baseurl']);
+		$arr['relative'] = str_replace(get_home_url(), '', $arr['baseurl']);
 
 		return $arr;
 	}
