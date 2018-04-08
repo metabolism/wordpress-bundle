@@ -1,14 +1,15 @@
 {
   "name":"metabolism/wordpress-bundle",
   "version": "1.0.x",
-  "description": "Wordpress SF bundle",
+  "description": "Wordpress bundle for Symfony 4.0",
   "license": "GPL-3.0-or-later",
   "require": {
-    "php" : ">=5.6.0",
+    "php" : ">=7.1.0",
     "metabolism/wordpress-core-installer": "1.0.x-dev",
     "metabolism/package-actions": "1.0.x-dev",
     "johnpbloch/wordpress-core": "4.9.*",
     "ifsnop/mysqldump-php":"2.*",
+    "dflydev/dot-access-data":"2.*",
     "elliotcondon/advanced-custom-fields-pro": "5.*",
     "gummi/acf-component-field": "1.*"
   },
@@ -25,13 +26,8 @@
       "copy": {
         "metabolism/wordpress-bundle": {
           "tools/wp-config.php": "web/wp-config.php",
-          "doc/wordpress.sample.yml": "config/wordpress.yml"
-        }
-      },
-      "symlink": {
-        "metabolism/wordpress-bundle": {
-          "doc": "doc/wordpress-bundle",
-          "tools/mu-plugin.php": "vendor/wordpress/mu-plugins/wordpress-bundle.php"
+          "doc/wordpress.sample.yml": "config/wordpress.yml",
+          "tools/mu-plugin.php": "web/mu-plugins/wordpress-bundle.php"
         }
       },
       "remove": {
