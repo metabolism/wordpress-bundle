@@ -27,13 +27,8 @@
         "metabolism/wordpress-bundle": {
           "tools/wp-config.php": "web/wp-config.php",
           "doc/wordpress.sample.yml": "config/wordpress.yml",
-          "tools/mu-plugin.php": "web/mu-plugins/wordpress-bundle.php"
+          "tools/mu-plugin.php": "web/wp-bundle/mu-plugins/wordpress-bundle.php"
         }
-      },
-      "remove": {
-        "metabolism/wordpress-bundle": [
-          "config/silex.yml"
-        ]
       }
     },
     "branch-alias": {

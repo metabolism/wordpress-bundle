@@ -43,7 +43,12 @@ foreach ($wp_rewrite->extra_permastructs as $name=>$permastruct)
 foreach ($wp_post_types as $wp_post_type)
 {
 	if( $wp_post_type->has_archive )
-		$addRoute($wp_post_type->name.'_archive', $wp_post_type->has_archive, true);
+	{
+		if( is_string($wp_post_type->has_archive) )
+			$addRoute($wp_post_type->name.'_archive', $wp_post_type->has_archive, true);
+		else
+			$addRoute($wp_post_type->name.'_archive', $wp_post_type->query_var, true);
+	}
 }
 
 foreach (['author_structure', 'search_structure', 'page_structure'] as $name)

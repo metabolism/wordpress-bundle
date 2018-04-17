@@ -318,10 +318,19 @@ class ACFHelper
 					{
 						$layout = $this->layoutAsKeyValue($object['sub_fields']);
 
-						foreach ($object['value'] as $value)
+						//todo: find a better way to detect acf-component-field plugin
+						if( isset($object['appearances']) and in_array('hide-outer-boundary', $object['appearances']) and count($object['value']) == 1 )
 						{
-							$value = $this->bindLayoutFields($value, $layout);
-							$objects[$object['name']][] = $this->clean($value);
+							$value = $this->bindLayoutFields($object['value'][0], $layout);
+							$objects[$object['name']] = $this->clean($value);
+						}
+						else
+						{
+							foreach ($object['value'] as $value)
+							{
+								$value = $this->bindLayoutFields($value, $layout);
+								$objects[$object['name']][] = $this->clean($value);
+							}
 						}
 					}
 

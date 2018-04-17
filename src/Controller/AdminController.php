@@ -79,8 +79,8 @@ class AdminController {
 	 */
 	public function networkSiteURL($url)
 	{
-		if( WP_SUBFOLDER && strpos($url,WP_SUBFOLDER) === false )
-			return str_replace('/wp-admin', WP_SUBFOLDER.'/wp-admin', $url);
+		if( WP_FOLDER && strpos($url,WP_FOLDER) === false )
+			return str_replace('/wp-admin', WP_FOLDER.'/wp-admin', $url);
 		else
 			return $url;
 	}
@@ -91,8 +91,8 @@ class AdminController {
 	 */
 	public function optionSiteURL($url)
 	{
-		if( WP_SUBFOLDER )
-			return strpos($url, WP_SUBFOLDER) === false ? $url.WP_SUBFOLDER : $url;
+		if( WP_FOLDER )
+			return strpos($url, WP_FOLDER) === false ? $url.WP_FOLDER : $url;
 		else
 			return $url;
 	}

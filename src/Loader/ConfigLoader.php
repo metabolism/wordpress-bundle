@@ -98,12 +98,12 @@ class ConfigLoader {
 
 		$base_uri = ( $isSecure ? 'https' : 'http' ) . '://'.trim($_SERVER['HTTP_HOST'], '/');
 
-		define( 'WP_SUBFOLDER', is_dir(BASE_URI.'/web/edition') ? '/edition': '' );
+		define( 'WP_FOLDER', '/edition' );
 
 		if( !defined('WP_HOME') )
 			define( 'WP_HOME', $base_uri);
 
-		define( 'WP_SITEURL', WP_HOME.WP_SUBFOLDER);
+		define( 'WP_SITEURL', WP_HOME.WP_FOLDER);
 
 		define( 'COOKIE_DOMAIN', $_SERVER[ 'HTTP_HOST' ] );
 
@@ -156,20 +156,20 @@ class ConfigLoader {
 		 * Custom Content Directory
 		 */
 		if (!defined('WP_CONTENT_DIR'))
-			define( 'WP_CONTENT_DIR', BASE_URI . '/vendor/wordpress');
+			define( 'WP_CONTENT_DIR', BASE_URI . '/web/wp-bundle');
 
 		if (!defined('UPLOADS'))
 			define( 'UPLOADS', '../uploads');
 
 		if (!defined('WP_PLUGIN_DIR'))
-			define('WP_PLUGIN_DIR', BASE_URI.'/web/plugins');
+			define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins');
 
 		if (!defined('WPMU_PLUGIN_DIR'))
-			define('WPMU_PLUGIN_DIR', BASE_URI.'/web/mu-plugins');
+			define('WPMU_PLUGIN_DIR', WP_CONTENT_DIR.'/mu-plugins');
 
 
 		if (!defined('WP_CONTENT_URL'))
-			define( 'WP_CONTENT_URL', WP_HOME );
+			define( 'WP_CONTENT_URL', WP_HOME.'/wp-bundle' );
 
 
 		/**
@@ -190,6 +190,6 @@ class ConfigLoader {
 			define( 'WP_USE_THEMES', false);
 
 		if (!defined('ABSPATH'))
-			define( 'ABSPATH', BASE_URI.'/web'.WP_SUBFOLDER .'/');
+			define( 'ABSPATH', BASE_URI.'/web'.WP_FOLDER .'/');
 	}
 }

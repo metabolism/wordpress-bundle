@@ -36,7 +36,7 @@ Trait ContextTrait
 		global $_config;
 		$this->config = $_config;
 
-		$this->has_templates = $_config->get('support.templates');
+		$this->has_templates = in_array('templates', $_config->get('support', []));
 
 		$this->addSite();
 		$this->addMenu();

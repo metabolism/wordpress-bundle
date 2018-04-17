@@ -22,7 +22,7 @@ class FrontController {
 	 */
 	public function redirect()
 	{
-		if( rtrim($_SERVER['REQUEST_URI'], '/') == WP_SUBFOLDER ){
+		if( rtrim($_SERVER['REQUEST_URI'], '/') == WP_FOLDER ){
 
 			wp_redirect(is_user_logged_in() ? admin_url() : wp_login_url());
 

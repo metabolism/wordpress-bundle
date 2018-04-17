@@ -39,7 +39,8 @@ class Term extends Entity
 
 		if( is_int($pid) && $term = get_term($pid) )
 		{
-			$term->excerpt = strip_tags(term_description($id),'<b><i><strong><em><br>');
+			$term->excerpt = strip_tags(term_description($pid),'<b><i><strong><em><br>');
+			$term->link = get_term_link($pid);
 		}
 
 		return $term;

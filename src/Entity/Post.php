@@ -17,6 +17,7 @@ use Metabolism\WordpressBundle\Entity\Term;
 class Post extends Entity
 {
 	public $excerpt, $thumbnail;
+	private $_next, $_prev;
 
 	/**
 	 * Post constructor.
@@ -24,6 +25,8 @@ class Post extends Entity
 	 * @param null $id
 	 */
 	public function __construct($id = null) {
+
+		$_next = $_prev = null;
 
 		if( is_object($id) )
 		{
@@ -55,6 +58,40 @@ class Post extends Entity
 		}
 
 		return $post;
+	}
+
+
+	public function next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
+
+		if( !is_null($this->_next) )
+			return $this->_next;
+
+		global $post;
+		$old_global = $post;
+
+		$_next = get_next_post($in_same_term , $excluded_terms, $taxonomy);
+
+		if( $_next )
+			$this->_next = new Post($_next->ID);
+
+		return $this->_next;
+	}
+
+
+	public function prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
+
+		if( !is_null($this->_next) )
+			return $this->_next;
+
+		global $post;
+		$old_global = $post;
+
+		$_next = get_previous_post($in_same_term , $excluded_terms, $taxonomy);
+
+		if( $_next )
+			$this->_next = new Post($_next->ID);
+
+		return $this->_next;
 	}
 
 
@@ -91,6 +128,7 @@ class Post extends Entity
 			foreach ($terms as &$term)
 				$term = new Term($term);
 		}
+
 		return $terms;
 	}
 }
