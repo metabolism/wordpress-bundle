@@ -29,7 +29,7 @@ class Image extends Entity
 	}
 
 
-	public function uploadDir($field)
+	private function uploadDir($field)
 	{
 		if ( !self::$wp_upload_dir )
 			self::$wp_upload_dir = wp_upload_dir();
@@ -44,14 +44,17 @@ class Image extends Entity
 	protected function get($id)
 	{
 		$metadata = wp_get_attachment_metadata($id);
-
-		$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
-		$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
-		$metadata['meta'] = $metadata['image_meta'];
-		$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
-
 		$post = get_post($id, ARRAY_A);
 		$post_meta = get_post_meta($id);
+
+		if( !empty($metadata) )
+		{
+			$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
+			$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
+			$metadata['meta'] = $metadata['image_meta'];
+			$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
+		}
+
 
 		foreach($post_meta as $key=>$value)
 		{
@@ -70,9 +73,14 @@ class Image extends Entity
 			}
 		}
 
+		if( !empty($metadata) )
+			unset($metadata['sizes'], $metadata['image_meta']);
 
-		unset($metadata['sizes'], $metadata['image_meta'], $post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
+		unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
 
-		return array_merge($post, $metadata);
+		if( is_array($metadata) )
+			return array_merge($post, $metadata);
+		else
+			return $post;
 	}
 }
