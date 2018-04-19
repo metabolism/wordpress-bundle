@@ -19,20 +19,21 @@ class SVGPlugin {
 		return $data;
 	}
 
-	public function fileIsDisplayableImage( $result , $path ) {
-
+	public function fileIsDisplayableImage( $result , $path )
+	{
 		return pathinfo( $path , PATHINFO_EXTENSION ) == 'svg' || $result;
 	}
 
-	public function uploadMimes( $mimes ) {
-
+	public function uploadMimes( $mimes )
+	{
 		$mimes['svg'] = 'image/svg+xml';
 		$mimes['svgz'] = 'image/svg+xml';
 
 		return $mimes;
 	}
 
-	public function fixMimeTypeSvg( $data = null, $file = null, $filename = null, $mimes = null ) {
+	public function fixMimeTypeSvg( $data = null, $file = null, $filename = null, $mimes = null )
+	{
 		$ext = isset( $data['ext'] ) ? $data['ext'] : '';
 		if ( strlen( $ext ) < 1 ) {
 			$exploded = explode( '.', $filename );

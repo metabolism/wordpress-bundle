@@ -64,6 +64,9 @@ class Entity
 		if( is_object($object) )
 			$object = get_object_vars($object);
 
+		if( !is_array($object) )
+			return false;
+
 		if( isset($object['url']) )
 			$object['link'] = $object['url'];
 
