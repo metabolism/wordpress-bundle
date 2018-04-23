@@ -1,7 +1,7 @@
 {
   "name":"metabolism/wordpress-bundle",
   "version": "1.0.x",
-  "description": "Wordpress bundle for Symfony 4.0",
+  "description": "Wordpress bundle for Symfony 4+",
   "license": "GPL-3.0-or-later",
   "require": {
     "php" : ">=7.1.0",
@@ -19,8 +19,8 @@
       "create": {
         "metabolism/wordpress-bundle": {
           "web/uploads": 777,
-          "vendor/wordpress/upgrade": 777,
-          "vendor/wordpress/languages": 777,
+          "web/wp-bundle/upgrade": 777,
+          "web/wp-bundle/languages": 777,
           "config/acf-json": 777
         }
       },
