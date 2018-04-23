@@ -8,31 +8,29 @@ namespace Metabolism\WordpressBundle\Helper;
 
 use Metabolism\WordpressBundle\Entity\Post,
 	Metabolism\WordpressBundle\Entity\Term,
+	Metabolism\WordpressBundle\Entity\User,
 	Metabolism\WordpressBundle\Entity\Image;
-
-use Timber\User;
 
 class ACFHelper
 {
-	private $raw_objects, $objects, $debug;
+	private $raw_objects, $objects;
 
-	protected static $MAX_DEPTH = 3;
+	protected static $MAX_DEPTH = 2;
 	protected static $DEPTH = 0;
 	protected static $CACHE = [];
 
-	public function __construct($post_id, $debug=false)
+	public function __construct( $post_id )
 	{
-		if( function_exists('get_field_objects') )
-			$this->raw_objects = get_field_objects($post_id);
+		if( self::$DEPTH > self::$MAX_DEPTH )
+		{
+			$this->objects = [];
+		}
 		else
-			$this->raw_objects = [];
-
-		if( $debug )
-			print_r( $this->raw_objects);
-
-		$this->debug = $debug;
-
-		$this->objects = $this->clean( $this->raw_objects);
+		{
+			++self::$DEPTH;
+			$this->objects = $this->getCache('objects', $post_id);
+			--self::$DEPTH;
+		}
 	}
 
 
@@ -160,6 +158,17 @@ class ACFHelper
 			case 'term':
 				$value = new Term( $id );
 				break;
+
+			case 'objects':
+
+				if( function_exists('get_field_objects') )
+					$this->raw_objects = get_field_objects($id);
+				else
+					$this->raw_objects = [];
+
+				$value = $this->clean( $this->raw_objects);
+
+				break;
 		}
 
 		self::$CACHE[$type][$id] = $value;
@@ -168,15 +177,12 @@ class ACFHelper
 	}
 
 
-	public function clean($raw_objects, $check_depth=true, $debug=false)
+	public function clean($raw_objects)
 	{
 		$objects = [];
 
-		if( !$raw_objects or !is_array($raw_objects) or ( $check_depth and  self::$DEPTH > self::$MAX_DEPTH ) )
+		if( !$raw_objects or !is_array($raw_objects) )
 			return $objects;
-
-		if( $check_depth )
-			++self::$DEPTH;
 
 		// Start analyzing
 
@@ -384,7 +390,7 @@ class ACFHelper
 					$layout = $this->layoutAsKeyValue($object['sub_fields']);
 					$value = $this->bindLayoutFields($object['value'], $layout);
 
-					$objects[$object['name']] = $this->clean($value, false);
+					$objects[$object['name']] = $this->clean($value);
 
 					break;
 
@@ -394,9 +400,6 @@ class ACFHelper
 					break;
 			}
 		}
-
-		if (self::$DEPTH > 0 and $check_depth)
-			--self::$DEPTH;
 
 		return $objects;
 	}
