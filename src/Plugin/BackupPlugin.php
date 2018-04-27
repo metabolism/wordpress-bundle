@@ -109,12 +109,12 @@ class BackupPlugin {
 			$folder = wp_upload_dir();
 			$rootPath = $folder['basedir'];
 
-			$backup   = $rootPath.'backup-'.date('Ymd').'.zip';
+			$backup   = $rootPath.'/backup-'.date('Ymd').'.zip';
 
-			$this->dumpDatabase($rootPath.'bdd.sql');
+			$this->dumpDatabase($rootPath.'/bdd.sql');
 			$this->dumpFolder($rootPath, $backup);
 
-			unlink($rootPath.'bdd.sql');
+			unlink($rootPath.'/bdd.sql');
 
 			return $backup;
 		}
