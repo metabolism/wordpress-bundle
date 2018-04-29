@@ -106,6 +106,9 @@ Trait ContextTrait
 			'maintenance_mode' => wp_maintenance_mode()
 		];
 
+		if( is_multisite() )
+			$this->data['network_home_url'] = trim(network_home_url(), '/');
+
 		if( $this->has_templates )
 		{
 			$wp_title = wp_title(' ', false);
@@ -149,13 +152,11 @@ Trait ContextTrait
 	{
 		if( (is_single() or is_page()) and !is_attachment() )
 		{
-			$this->addPost();
-			return true;
+			return $this->addPost();
 		}
 		elseif( is_archive() or is_search() )
 		{
-			$this->addPosts();
-			return true;
+			return $this->addPosts();
 		}
 
 		return false;

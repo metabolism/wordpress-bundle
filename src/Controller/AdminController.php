@@ -60,9 +60,6 @@ class AdminController {
 	{
 		add_filter('woocommerce_template_path', function($array){ return '../../../woocommerce/'; });
 
-		add_filter('acf/settings/save_json', function(){ return $this::$acf_folder; });
-		add_filter('acf/settings/load_json', function(){ return [$this::$acf_folder]; });
-
 		add_filter('wp_calculate_image_srcset_meta', '__return_null');
 		add_filter('update_right_now_text', function($text){
 			return substr($text, 0, strpos($text, '%1$s')+4);
@@ -108,7 +105,6 @@ class AdminController {
 		$this->config = $_config;
 
 		self::$bo_domain_name   = 'bo_'.$this->config->get('domain_name', 'customer');
-		self::$acf_folder       = BASE_URI . '/config/acf-json';
 		self::$languages_folder = BASE_URI . '/config/languages';
 	}
 

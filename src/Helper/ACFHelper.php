@@ -131,7 +131,7 @@ class ACFHelper
 				break;
 
 			case 'file':
-				$value = apply_filters('rewrite_upload_url', wp_get_attachment_url( $id ));
+				$value = wp_get_attachment_url( $id );
 				break;
 
 			case 'product':
