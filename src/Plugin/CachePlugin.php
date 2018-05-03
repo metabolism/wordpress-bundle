@@ -8,31 +8,52 @@ namespace Metabolism\WordpressBundle\Plugin {
  */
 	class CachePlugin
 	{
+
+		private $noticeMessage,  $errorMessage;
+
 		/**
 		 * Add maintenance button and checkbox
 		 */
-		public function clearCache()
+		public function purgeCache($postId=false)
 		{
-			if( class_exists('\App\Entity\HTTPCache') )
-			{
-				$cache = new \App\Entity\HTTPCache();
-				$cache->clear();
-			}
+			if( $postId )
+				$url = get_permalink($postId);
+			else
+				$url = get_home_url(null, '*');
+
+			$this->purgeUrl($url);
+		}
+
+
+		public function purgeMessage()
+		{
+			if( !empty($this->noticeMessage) )
+				echo '<div id="message" class="updated fade"><p><strong>' . __('Cache purge') . '</strong><br />' . $this->noticeMessage . '</p></div>';
+
+			if( !empty($this->errorMessage) )
+				echo '<div id="message" class="error fade"><p><strong>' . __('Cache purge') . '</strong><br />' . $this->errorMessage . '</p></div>';
 		}
 
 
 		/**
 		 * Add maintenance button and checkbox
 		 */
-		public function deleteCache($ID)
+		private function purgeUrl($url)
 		{
-			if( class_exists('\App\Entity\HTTPCache') )
-			{
-				$permalink = get_permalink( $ID );
+			$args = ['method' => 'PURGE', 'headers' => ['Host' => $_SERVER['HTTP_HOST']], 'sslverify' => false];
 
-				$cache = new \App\Entity\HTTPCache();
-				$cache->delete($permalink);
+			$url = str_replace($_SERVER['HTTP_HOST'], $_SERVER['SERVER_ADDR'], $url);
+
+			$response = wp_remote_request($url, $args);
+
+			if ($response instanceof WP_Error) {
+				$this->errorMessage = $url.' : '.$response->get_error_code().' '.$response->get_error_message();
+			} else {
+				$this->noticeMessage = $url.' : '.$response['response']['code'].' '.$response['response']['message'];
 			}
+
+
+			add_action('admin_notices', [$this, 'purgeMessage'], 999);
 		}
 
 
@@ -45,8 +66,8 @@ namespace Metabolism\WordpressBundle\Plugin {
 			{
 				$args = [
 					'id'    => 'cache',
-					'title' => __('Clear cache'),
-					'href'  => '?clear_cache'
+					'title' => __('Purge cache'),
+					'href'  => get_admin_url().'?purge_cache'
 				];
 
 				$wp_admin_bar->add_node( $args );
@@ -57,11 +78,21 @@ namespace Metabolism\WordpressBundle\Plugin {
 
 		public function __construct($config)
 		{
-			if( isset($_GET['clear_cache']) )
-				$this->clearCache();
+			$env = $_SERVER['APP_ENV'] ?? 'dev';
+			$debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env));
+
+			if( $debug )
+				return;
+
+			if( isset($_GET['purge_cache']) )
+				$this->purgeCache();
 
 			add_action( 'init', [$this, 'addClearCacheButton']);
-			add_action( 'save_post', [$this, 'deleteCache'] );
+
+			$actions = ['save_post', 'deleted_post', 'trashed_post', 'edit_post', 'delete_attachment'];
+
+			foreach ($actions as $action)
+				add_action( $action, [$this, 'purgeCache']);
 		}
 	}
 }
