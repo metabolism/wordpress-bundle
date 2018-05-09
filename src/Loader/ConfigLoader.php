@@ -144,12 +144,13 @@ class ConfigLoader {
 		 * Redefine cookie name without wordpress
 		 */
 		define( 'COOKIEHASH',           md5( WP_SITEURL )    );
-		define( 'USER_COOKIE',          'app_user_'      . COOKIEHASH );
-		define( 'PASS_COOKIE',          'app_pass_'      . COOKIEHASH );
-		define( 'AUTH_COOKIE',          'app_'           . COOKIEHASH );
-		define( 'SECURE_AUTH_COOKIE',   'app_sec_'       . COOKIEHASH );
-		define( 'LOGGED_IN_COOKIE',     'app_logged_in_' . COOKIEHASH );
-		define( 'TEST_COOKIE',          'app_test_cookie'             );
+
+		define( 'USER_COOKIE',          $_SERVER['COOKIE_PREFIX'].'_user_'      . COOKIEHASH );
+		define( 'PASS_COOKIE',          $_SERVER['COOKIE_PREFIX'].'_pass_'      . COOKIEHASH );
+		define( 'AUTH_COOKIE',          $_SERVER['COOKIE_PREFIX'].'_'           . COOKIEHASH );
+		define( 'SECURE_AUTH_COOKIE',   $_SERVER['COOKIE_PREFIX'].'_sec_'       . COOKIEHASH );
+		define( 'LOGGED_IN_COOKIE',     $_SERVER['COOKIE_PREFIX'].'_logged_in_' . COOKIEHASH );
+		define( 'TEST_COOKIE',          'test_cookie_'.COOKIEHASH                            );
 
 
 		/**
