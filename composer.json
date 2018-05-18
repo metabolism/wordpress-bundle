@@ -1,7 +1,7 @@
 {
   "name":"metabolism/wordpress-bundle",
   "version": "1.0.x",
-  "description": "Wordpress bundle for Symfony 4+",
+  "description": "Wordpress bundle for Symfony 4.0.*",
   "license": "GPL-3.0-or-later",
   "require": {
     "php" : ">=7.1.0",
@@ -28,7 +28,8 @@
         "metabolism/wordpress-bundle": {
           "tools/wp-config.php": "web/wp-config.php",
           "doc/wordpress.sample.yml": "config/wordpress.yml",
-          "tools/mu-plugin.php": "web/wp-bundle/mu-plugins/wordpress-bundle.php"
+          "tools/mu-plugin.php": "web/wp-bundle/mu-plugins/wordpress-bundle.php",
+          "tools/acf-component-field": "web/wp-bundle/plugins/acf-component-field"
         }
       }
     },

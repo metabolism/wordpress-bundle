@@ -23,6 +23,14 @@ class ConfigPlugin {
 			acf_update_setting($name, $value);
 	}
 
+	/**
+	 * Add settings to acf
+	 */
+	public function plural($name)
+	{
+		return substr($name, -1) == 's' ? $name : (substr($name, -1) == 'y' ? substr($name, 0, -1).'ies' : $name.'s');
+	}
+
 
 	/**
 	 * Adds specific post types here
@@ -32,7 +40,8 @@ class ConfigPlugin {
 	{
 		$default_args = [
 			'public' => true,
-			'has_archive' => true
+			'has_archive' => true,
+			'menu_position' => 25
 		];
 
 		$is_admin = is_admin();
@@ -45,16 +54,16 @@ class ConfigPlugin {
 				$name = str_replace('_', ' ', $post_type);
 
 				$labels = [
-					'name' => ucfirst($name).'s',
+					'name' => ucfirst($this->plural($name)),
 					'singular_name' => ucfirst($name),
-					'all_items' =>'All '.$name.'s',
+					'all_items' =>'All '.$this->plural($name),
 					'edit_item' => 'Edit '.$name,
 					'view_item' => 'View '.$name,
 					'update_item' => 'Update '.$name,
 					'add_new_item' => 'Add a new '.$name,
 					'new_item_name' => 'New '.$name,
-					'search_items' => 'Search '.$name,
-					'popular_items' => 'Populars '.$name,
+					'search_items' => 'Search in '.$this->plural($name),
+					'popular_items' => 'Popular '.$this->plural($name),
 					'not_found' => ucfirst($name).' not found'
 				];
 
@@ -77,21 +86,41 @@ class ConfigPlugin {
 
 				register_post_type($post_type, $args);
 
-				if( $is_admin && isset($args['columns']) )
+				if( $is_admin )
 				{
-					add_filter ( 'manage_'.$post_type.'_posts_columns', function ( $columns ) use ( $args )
+					if( isset($args['columns']) )
 					{
-						return array_merge ( $columns, $args['columns'] );
-					});
+						add_filter ( 'manage_'.$post_type.'_posts_columns', function ( $columns ) use ( $args )
+						{
+							return array_merge ( $columns, $args['columns'] );
+						});
 
-					add_action ( 'manage_'.$post_type.'_posts_custom_column', function ( $column, $post_id ) use ( $args )
+						add_action ( 'manage_'.$post_type.'_posts_custom_column', function ( $column, $post_id ) use ( $args )
+						{
+							if( isset($args['columns'][$column]) )
+								echo get_post_meta( $post_id, $column, true );
+
+						}, 10, 2 );
+
+					}
+
+					if( isset($args['has_options']) && function_exists('acf_add_options_page') )
 					{
-						if( isset($args['columns'][$column]) )
-							echo get_post_meta( $post_id, $column, true );
+						if( is_bool($args['has_options']) )
+						{
+							$args = [
+								'page_title' 	=> ucfirst($name).' archive options',
+								'menu_title' 	=> 'Archive options'
+							];
+						}
 
-					}, 10, 2 );
+						$args['menu_slug'] = 'options_'.$post_type;
+						$args['parent_slug'] = 'edit.php?post_type='.$post_type;
 
+						acf_add_options_sub_page($args);
+					}
 				}
+
 			}
 		};
 	}
@@ -147,14 +176,17 @@ class ConfigPlugin {
 			$name = str_replace('_', ' ', $taxonomy);
 
 			$labels = [
-				'name' => ucfirst($name),
-				'all_items' => 'All '.$name.'s',
+				'name' => ucfirst($this->plural($name)),
+				'all_items' => 'All '.$this->plural($name),
 				'singular_name' => ucfirst($name),
 				'add_new_item' => 'Add a '.$name,
 				'edit_item' => 'Edit '.$name,
 				'not_found' => ucfirst($name).' not found',
-				'search_items' => 'Search in '.$name.'s'
+				'search_items' => 'Search in '.$this->plural($name)
 			];
+
+			if(!isset($args['hierarchical']) )
+				$args['hierarchical'] = true;
 
 			if( isset($args['labels']) )
 				$args['labels'] = array_merge($labels, $args['labels']);
