@@ -1,12 +1,12 @@
 {
   "name":"metabolism/wordpress-bundle",
-  "version": "1.0.x",
+  "version": "4.0.0",
   "description": "Wordpress bundle for Symfony 4.0.*",
   "license": "GPL-3.0-or-later",
   "require": {
     "php" : ">=7.1.0",
-    "metabolism/wordpress-core-installer": "1.0.x-dev",
-    "metabolism/package-actions": "1.0.x-dev",
+    "metabolism/wordpress-core-installer": "1.0.*",
+    "metabolism/package-actions": "1.0.*",
     "johnpbloch/wordpress-core": "4.9.*",
     "ifsnop/mysqldump-php":"2.*",
     "dflydev/dot-access-data":"2.*",
@@ -34,7 +34,8 @@
       }
     },
     "branch-alias": {
-      "dev-1.0.x": "1.0.x-dev"
+      "dev-3.4.x": "3.4.x-dev",
+      "dev-4.0.x": "4.0.x-dev"
     }
   },
   "autoload" : {
