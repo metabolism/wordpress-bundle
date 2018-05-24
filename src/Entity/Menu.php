@@ -52,15 +52,26 @@ class Menu extends Entity
 		}
 	}
 
+
 	protected function orderItems(&$menu)
 	{
 		$ordered_menu = [];
 
 		foreach ($menu as $item)
-			$ordered_menu[$item->menu_order] = Entity::normalize( $item, 'post_');
+			$ordered_menu[$item->ID] = Entity::normalize( $item, 'post_');
+
+		foreach ($ordered_menu as $item)
+		{
+			if( $item['menu_item_parent'] != 0 )
+			{
+				$ordered_menu[$item['menu_item_parent']]['children'][] = $item;
+				unset($ordered_menu[$item['ID']]);
+			}
+		}
 
 		$menu = array_values($ordered_menu);
 	}
+
 
 	/**
 	 * @internal
