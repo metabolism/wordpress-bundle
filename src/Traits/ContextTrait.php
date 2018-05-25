@@ -47,8 +47,14 @@ Trait ContextTrait
 
 	protected function addOptions()
 	{
-		$options = new ACFHelper('options');
-		$this->data['options'] = $options->get();
+		$this->data['options'] = $this->getFields('options');
+	}
+
+
+	protected function getFields($id)
+	{
+		$fields = new ACFHelper($id);
+		return $fields->get();
 	}
 
 
@@ -154,7 +160,11 @@ Trait ContextTrait
 		{
 			return $this->addPost();
 		}
-		elseif( is_archive() or is_search() )
+		elseif( is_archive() )
+		{
+			return ['term'=>$this->addTerm(), 'posts'=>$this->addPosts()];
+		}
+		elseif( is_search() )
 		{
 			return $this->addPosts();
 		}
@@ -164,7 +174,7 @@ Trait ContextTrait
 
 
 	/**
-	 * Add post entry to context with current Post instance
+	 * Add post entry to context
 	 *
 	 * @see Post
 	 * @param null $id
@@ -184,6 +194,40 @@ Trait ContextTrait
 				call_user_func($callback, $post);
 
 			$this->data[$key] = $post;
+
+			return $this->data[$key];
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Add term entry to context
+	 *
+	 * @see Post
+	 * @param null $id
+	 * @param string $key
+	 * @return mixed
+	 */
+	public function addTerm($id = null, $key='term', $callback=false)
+	{
+		if( is_null($id) )
+		{
+			global $wp_query;
+			$cat_obj = $wp_query->get_queried_object();
+
+			$id = $cat_obj->term_id;
+		}
+
+		if( $id )
+		{
+			$term = new Term($id);
+
+			if( $callback and is_callable($callback) )
+				call_user_func($callback, $term);
+
+			$this->data[$key] = $term;
 
 			return $this->data[$key];
 		}
@@ -302,11 +346,8 @@ Trait ContextTrait
 	 * Add post entry to context with current Post instance
 	 * @see Post
 	 */
-	public function addTerms($args=[], $key=false, $sort=true)
+	public function addTerms($args=[], $key='terms', $sort=true)
 	{
-		if( !$key )
-			$key = $args['taxonomy'];
-
 		if( $sort )
 			$this->data[$key] = TermsPlugin::sortHierarchically( Query::get_terms($args));
 		else
@@ -324,26 +365,6 @@ Trait ContextTrait
 
 
 	/**
-	 * Add post entry to context with current Post instance
-	 * @see Post
-	 */
-	public function addTerm($field, $value, $taxonomy='', $key=false)
-	{
-		$term = get_term_by($field, $value, $taxonomy);
-
-		if( !$term )
-			return false;
-
-		if( !$key )
-			$key = $field;
-
-		$this->data[$key] = new Term( $term->term_id );
-
-		return $this->data[$key];
-	}
-
-
-	/**
 	 * Add push_customized_study entry to context with customized study component content
 	 *
 	 */
@@ -351,8 +372,24 @@ Trait ContextTrait
 	{
 		$breadcrumb = [];
 
-		$breadcrumb[] = ['title' => 'Accueil', 'url' => get_home_url()];
+		$breadcrumb[] = ['title' => __('Home'), 'link' => get_home_url()];
 
-		$this->data['breadcrumb'] = array_merge($breadcrumb, $data);
+		$breadcrumb = array_merge($breadcrumb, $data);
+
+		if( (is_single() or is_page()) and !is_attachment() )
+		{
+			$post = $this->get('post');
+			$breadcrumb[] = ['title' => $post->title];
+		}
+		elseif( is_archive() )
+		{
+			$term = $this->get('term');
+			$breadcrumb[] = ['title' => $term->title];
+		}
+
+
+		$this->data['breadcrumb'] = $breadcrumb;
+		
+		return $this->data['breadcrumb'];
 	}
 }

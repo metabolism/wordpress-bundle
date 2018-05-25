@@ -95,6 +95,30 @@ class Post extends Entity
 	}
 
 
+	public function get_term( $tax='category' ) {
+
+		$term = false;
+
+		if ( class_exists('WPSEO_Primary_Term') )
+		{
+			$wpseo_primary_term = new WPSEO_Primary_Term( $tax, $this->ID );
+
+			if( $wpseo_primary_term )
+				$term = $wpseo_primary_term->get_primary_term();
+		}
+		else {
+			$terms = get_the_terms($this->ID, $tax);
+			if( count($terms) )
+				$term = $terms[0];
+		}
+
+		if( $term )
+			return new Term( $term->term_id );
+		else
+			return false;
+	}
+
+
 	public function get_terms( $tax = '', $merge = true ) {
 
 		$taxonomies = array();
