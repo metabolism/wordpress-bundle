@@ -204,6 +204,15 @@ class ACFHelper
 
 					break;
 
+				case 'latest_posts';
+
+					$objects[$object['name']] = [];
+
+					foreach($object['value'] as $post)
+						$objects[$object['name']][] = $this->getCache('post', $post->ID);
+
+					break;
+
 				case 'image';
 
 					if( empty($object['value']) )

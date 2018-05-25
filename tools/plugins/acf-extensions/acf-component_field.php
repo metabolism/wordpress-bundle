@@ -10,10 +10,10 @@ defined('ABSPATH') or die('No script kiddies please!');
 *
 * @since       1.0.0
 * @version     1.0.14
-* @class       acf_field_component_field
+* @class       acf_field_component
 * @extends     acf_field_repeater
 */
-class acf_field_component_field extends acf_field_flexible_content
+class acf_field_component extends acf_field_flexible_content
 {
     /**
      * Constructor

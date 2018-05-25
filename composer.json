@@ -27,8 +27,8 @@
         "metabolism/wordpress-bundle": {
           "tools/wp-config.php": "web/wp-config.php",
           "doc/wordpress.sample.yml": "config/wordpress.yml",
-          "tools/mu-plugin.php": "web/wp-bundle/mu-plugins/wordpress-bundle.php",
-          "tools/acf-component-field": "web/wp-bundle/plugins/acf-component-field"
+          "tools/mu-plugins/wp-bundle.php": "web/wp-bundle/mu-plugins/wp-bundle.php",
+          "tools/plugins/acf-extensions": "web/wp-bundle/plugins/acf-extensions"
         }
       }
     },

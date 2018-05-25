@@ -29,7 +29,11 @@ class Term extends Entity
 		}
 
 		$term = $this->get($id);
+
 		$this->import($term);
+
+		if( $term->taxonomy )
+			$this->addCustomFields($term->taxonomy.'_'.$id);
 	}
 
 

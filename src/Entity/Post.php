@@ -108,7 +108,8 @@ class Post extends Entity
 			if ( in_array($tax, ['all', 'any', '']) )
 			{
 				$taxonomies = get_object_taxonomies($this->type);
-			} else
+			}
+			else
 			{
 				$taxonomies = [$tax];
 			}
