@@ -37,6 +37,24 @@ class NoticePlugin {
 	}
 
 
+	/**
+	 * Add debug info
+	 */
+	public function debugInfo(){
+
+		add_action( 'admin_bar_menu', function( $wp_admin_bar )
+		{
+			$args = [
+				'id'    => 'debug',
+				'title' => __('Debug').' : '.( WP_DEBUG ? __('On') : __('Off'))
+			];
+
+			$wp_admin_bar->add_node( $args );
+
+		}, 999 );
+	}
+
+
 	public function __construct($config)
 	{
 		$this->config = $config;
@@ -44,6 +62,9 @@ class NoticePlugin {
 		if( is_admin() )
 		{
 			add_action( 'admin_notices', [$this, 'adminNotices']);
+
+			if( WP_DEBUG )
+				add_action( 'init', [$this, 'debugInfo']);
 		}
 	}
 }
