@@ -51,9 +51,6 @@ class ConfigLoader {
 		 */
 		$env = $_SERVER['APP_ENV'] ?? 'dev';
 
-		if( $env == 'production' )
-			$_config->set('debug', false);
-
 
 		/**
 		 * Define constant
@@ -66,8 +63,9 @@ class ConfigLoader {
 		 * Define basic environment
 		 */
 		define( 'WP_ENV', $env);
-		define( 'WP_DEBUG', $env != 'production');
-		define( 'WC_TEMPLATE_DEBUG_MODE', $env != 'production' );
+		define( 'WP_DEBUG', $env === 'dev');
+		define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
+		define( 'WC_TEMPLATE_DEBUG_MODE', WP_DEBUG );
 
 		/**
 		 * Enable multisite
