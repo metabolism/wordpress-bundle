@@ -10,7 +10,6 @@
     "johnpbloch/wordpress-core": "4.9.*",
     "ifsnop/mysqldump-php":"2.*",
     "dflydev/dot-access-data":"2.*",
-    "elliotcondon/advanced-custom-fields-pro": "5.*",
     "enshrined/svg-sanitize": "0.*"
   },
   "extra": {

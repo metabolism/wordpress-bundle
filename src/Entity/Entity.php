@@ -46,15 +46,18 @@ class Entity
 
 
 	/**
-	 * Add ACF custom fields as members of the post
+	 * Add custom fields as members of the post
 	 */
 	protected function addCustomFields( $id )
 	{
-		$custom_fields = new ACF( $id );
-
-		foreach ($custom_fields->get() as $name => $value )
+		if( class_exists('ACF') )
 		{
-			$this->$name = $value;
+			$custom_fields = new ACF( $id );
+
+			foreach ($custom_fields->get() as $name => $value )
+			{
+				$this->$name = $value;
+			}
 		}
 	}
 

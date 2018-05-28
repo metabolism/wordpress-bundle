@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 ##4.0.1
+####Removed
+- ACF dependency
 ####Bugfix
 - menu children not showing up in tree
 ####Added

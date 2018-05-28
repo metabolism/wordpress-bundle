@@ -10,38 +10,19 @@ class NoticePlugin {
 
 	protected $config;
 
-	/**
-	 * Check if ACF and Timber are enabled
-	 */
-	public function pluginsLoaded()
-	{
-		$notices = [];
-
-		if ( !class_exists( 'acf' ) )
-			$notices[] = '<div class="error"><p>Advanced Custom Fields not activated. Make sure you activate the plugin in <a href="' . esc_url( admin_url( 'plugins.php#acf' ) ) . '">' . esc_url( admin_url( 'plugins.php' ) ) . '</a></p></div>';
-
-		if( !empty($notices) )
-		{
-			add_action( 'admin_notices', function() use($notices)
-			{
-				echo implode('<br/>', $notices );
-			});
-		}
-	}
-
 
 	/**
 	 * Check symlinks and forders
 	 */
 	public function adminNotices(){
 
-		if( !$this->config->get('debug.message') )
+		if( !WP_DEBUG )
 			return;
 
 		$notices = [];
 
 		//check folder wright
-		foreach (['vendor/wordpress/languages', 'web/uploads', 'vendor/wordpress/upgrade', 'config/acf-json'] as $folder ){
+		foreach (['web/wp-bundle/languages', 'web/uploads', 'web/wp-bundle/upgrade', 'config/acf-json'] as $folder ){
 
 			$path = BASE_URI.'/'.$folder;
 
@@ -62,7 +43,6 @@ class NoticePlugin {
 
 		if( is_admin() )
 		{
-			add_action( 'plugins_loaded', [$this, 'pluginsLoaded']);
 			add_action( 'admin_notices', [$this, 'adminNotices']);
 		}
 	}

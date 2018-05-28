@@ -53,9 +53,13 @@ class ACFHelper
 		foreach ($raw_layouts as $layout){
 
 			$layouts[$layout['name']] = [];
-			$subfields = $layout['sub_fields'];
-			foreach ($subfields as $subfield){
-				$layouts[$layout['name']][$subfield['name']] = $subfield;
+
+			if( isset($layout['sub_fields']) )
+			{
+				$subfields = $layout['sub_fields'];
+				foreach ($subfields as $subfield){
+					$layouts[$layout['name']][$subfield['name']] = $subfield;
+				}
 			}
 		}
 

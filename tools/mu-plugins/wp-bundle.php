@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: WordpressBundle loader
- * Description: Load wordpress yml configuration
+ * Plugin Name: Wordpress Bundle
+ * Description: Configure Wordpress using yml and add various plugins
  * Version: 1.0.0
  * Author: Metabolism
  * Author URI: http://www.metabolism.fr
