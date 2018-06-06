@@ -81,13 +81,13 @@ namespace Metabolism\WordpressBundle\Plugin {
 			$env = $_SERVER['APP_ENV'] ?? 'dev';
 			$debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env));
 
-			if( $debug )
-				return;
-
 			if( isset($_GET['purge_cache']) )
 				$this->purgeCache();
 
-			add_action( 'init', [$this, 'addClearCacheButton']);
+			if( !$debug )
+				add_action( 'init', [$this, 'addClearCacheButton']);
+
+			add_action( 'purge_cache', [$this, 'purgeCache']);
 
 			$actions = ['save_post', 'deleted_post', 'trashed_post', 'edit_post', 'delete_attachment'];
 

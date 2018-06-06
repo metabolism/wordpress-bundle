@@ -64,6 +64,7 @@ class ConfigPlugin {
 					'new_item_name' => 'New '.$name,
 					'search_items' => 'Search in '.$this->plural($name),
 					'popular_items' => 'Popular '.$this->plural($name),
+					'view_items' => 'View '.$this->plural($name),
 					'not_found' => ucfirst($name).' not found'
 				];
 
@@ -240,6 +241,8 @@ class ConfigPlugin {
 
 	public function LoadPermalinks()
 	{
+		$updated = false;
+
 		foreach ( $this->config->get('post_type', []) as $post_type => $args )
 		{
 			foreach( ['slug', 'archive'] as $type)
@@ -251,7 +254,10 @@ class ConfigPlugin {
 				)
 				{
 					if( isset( $_POST[$post_type. '_rewrite_'.$type] ) )
+					{
 						update_option( $post_type. '_rewrite_'.$type, sanitize_title_with_dashes( $_POST[$post_type. '_rewrite_'.$type] ) );
+						$updated = true;
+					}
 
 					add_settings_field( $post_type. '_rewrite_'.$type, __( ucfirst($post_type).' '.$type ),function () use($post_type, $type)
 					{
@@ -264,6 +270,15 @@ class ConfigPlugin {
 					}, 'permalink', 'optional' );
 				}
 			}
+		}
+
+
+		if( $updated )
+		{
+			global $wp_rewrite;
+			$wp_rewrite->flush_rules( true );
+
+			do_action('purge_cache');
 		}
 	}
 

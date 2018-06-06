@@ -218,7 +218,8 @@ Trait ContextTrait
 			global $wp_query;
 			$cat_obj = $wp_query->get_queried_object();
 
-			$id = $cat_obj->term_id;
+			if( $cat_obj && isset($cat_obj->term_id))
+				$id = $cat_obj->term_id;
 		}
 
 		if( $id )
@@ -366,7 +367,7 @@ Trait ContextTrait
 
 
 	/**
-	 * Add push_customized_study entry to context with customized study component content
+	 * Add breadcrumd entries
 	 *
 	 */
 	public function addBreadcrumb($data=[])
@@ -380,14 +381,17 @@ Trait ContextTrait
 		if( (is_single() or is_page()) and !is_attachment() )
 		{
 			$post = $this->get('post');
-			$breadcrumb[] = ['title' => $post->title];
+
+			if( $post )
+				$breadcrumb[] = ['title' => $post->title];
 		}
 		elseif( is_archive() )
 		{
 			$term = $this->get('term');
-			$breadcrumb[] = ['title' => $term->title];
-		}
 
+			if( $term )
+				$breadcrumb[] = ['title' => $term->title];
+		}
 
 		$this->data['breadcrumb'] = $breadcrumb;
 		
