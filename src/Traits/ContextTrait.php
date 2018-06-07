@@ -350,17 +350,30 @@ Trait ContextTrait
 	 */
 	public function addTerms($args=[], $key='terms', $sort=true)
 	{
-		if( $sort )
-			$this->data[$key] = TermsPlugin::sortHierarchically( Query::get_terms($args));
+		$raw_terms = Query::get_terms($args);
+		$terms = [];
+
+		if( isset($args['taxonomy'], $args['group']) && is_array($args['taxonomy']) && $args['group']) {
+
+			foreach ($raw_terms as $term)
+				$terms[$term->taxonomy][$term->term_id] = $term;
+
+			if( $sort ){
+
+				foreach ($terms as &$term_group)
+					$term_group = TermsPlugin::sortHierarchically( $term_group );
+			}
+		}
 		else
 		{
-			$raw_terms = Query::get_terms($args);
-			$terms = [];
+			if( $sort )
+				$raw_terms = TermsPlugin::sortHierarchically( $raw_terms );
+
 			foreach ($raw_terms as $term)
 				$terms[$term->term_id] = $term;
-
-			$this->data[$key] = $terms;
 		}
+
+		$this->data[$key] = $terms;
 
 		return $this->data[$key];
 	}

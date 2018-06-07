@@ -173,38 +173,46 @@ class ConfigPlugin {
 
 		foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args )
 		{
-			$args = array_merge($default_args, $args);
-			$name = str_replace('_', ' ', $taxonomy);
+			if( $taxonomy != 'type' && $taxonomy != 'category' && $taxonomy != 'tag' ) {
 
-			$labels = [
-				'name' => ucfirst($this->plural($name)),
-				'all_items' => 'All '.$this->plural($name),
-				'singular_name' => ucfirst($name),
-				'add_new_item' => 'Add a '.$name,
-				'edit_item' => 'Edit '.$name,
-				'not_found' => ucfirst($name).' not found',
-				'search_items' => 'Search in '.$this->plural($name)
-			];
+				$args = array_merge($default_args, $args);
+				$name = str_replace('_', ' ', isset($args['name']) ? $args['name'] : $taxonomy);
 
-			if(!isset($args['hierarchical']) )
-				$args['hierarchical'] = true;
+				$labels = [
+					'name' => ucfirst($this->plural($name)),
+					'all_items' => 'All ' . $this->plural($name),
+					'singular_name' => ucfirst($name),
+					'add_new_item' => 'Add a ' . $name,
+					'edit_item' => 'Edit ' . $name,
+					'not_found' => ucfirst($name) . ' not found',
+					'search_items' => 'Search in ' . $this->plural($name)
+				];
 
-			if( isset($args['labels']) )
-				$args['labels'] = array_merge($labels, $args['labels']);
-			else
-				$args['labels'] = $labels;
+				$slug = get_option( $taxonomy. '_rewrite_slug' );
 
-			if( isset($args['object_type']) )
-			{
-				$object_type = $args['object_type'];
-				unset($args['object_type']);
+				if( !is_null($slug) and !empty($slug) )
+					$args['rewrite'] = ['slug'=>$slug];
+
+				if (!isset($args['hierarchical']))
+					$args['hierarchical'] = true;
+
+				if (!isset($args['show_admin_column']))
+					$args['show_admin_column'] = true;
+
+				if (isset($args['labels']))
+					$args['labels'] = array_merge($labels, $args['labels']);
+				else
+					$args['labels'] = $labels;
+
+				if (isset($args['object_type'])) {
+					$object_type = $args['object_type'];
+					unset($args['object_type']);
+				} else {
+					$object_type = 'post';
+				}
+
+				register_taxonomy($taxonomy, $object_type, $args);
 			}
-			else
-			{
-				$object_type = 'post';
-			}
-
-			register_taxonomy($taxonomy, $object_type, $args);
 		}
 	}
 
@@ -243,23 +251,21 @@ class ConfigPlugin {
 	{
 		$updated = false;
 
-		foreach ( $this->config->get('post_type', []) as $post_type => $args )
+		add_settings_section('custom_post_type_rewrite', 'Custom post type', false,'permalink');
+
+		foreach ( get_post_types(['public'=> true, '_builtin' => false], 'objects') as $post_type=>$args )
 		{
 			foreach( ['slug', 'archive'] as $type)
 			{
-				if(
-					($type == 'slug' and (!isset($args['public']) or $args['public']) )
-					or
-					($type == 'archive' and $args['has_archive'] )
-				)
+				if( $type == 'slug' or ($type == 'archive' and $args->has_archive ))
 				{
-					if( isset( $_POST[$post_type. '_rewrite_'.$type] ) )
+					if( isset( $_POST[$post_type. '_rewrite_'.$type] ) && !empty($_POST[$post_type. '_rewrite_'.$type]) )
 					{
 						update_option( $post_type. '_rewrite_'.$type, sanitize_title_with_dashes( $_POST[$post_type. '_rewrite_'.$type] ) );
 						$updated = true;
 					}
 
-					add_settings_field( $post_type. '_rewrite_'.$type, __( ucfirst($post_type).' '.$type ),function () use($post_type, $type)
+					add_settings_field( $post_type. '_rewrite_'.$type, __( ucfirst(str_replace('_', ' ', $post_type)).' '.$type ),function () use($post_type, $type)
 					{
 						$value = get_option( $post_type. '_rewrite_'.$type );
 						if( is_null($value) || empty($value))
@@ -267,9 +273,30 @@ class ConfigPlugin {
 
 						echo '<input type="text" value="' . esc_attr( $value ) . '" name="'.$post_type.'_rewrite_'.$type.'" placeholder="'.$post_type.'" id="'.$post_type.'_rewrite_'.$type.'" class="regular-text" />';
 
-					}, 'permalink', 'optional' );
+					}, 'permalink', 'custom_post_type_rewrite' );
 				}
 			}
+		}
+
+		add_settings_section('custom_taxonomy_rewrite', 'Custom taxonomy', false,'permalink');
+
+		foreach ( get_taxonomies(['public'=> true, '_builtin' => false], 'objects') as $taxonomy=>$args )
+		{
+			if( isset( $_POST[$taxonomy. '_rewrite_slug'] ) && !empty($_POST[$taxonomy. '_rewrite_slug']) )
+			{
+				update_option( $taxonomy. '_rewrite_slug', sanitize_title_with_dashes( $_POST[$taxonomy. '_rewrite_slug'] ) );
+				$updated = true;
+			}
+
+			add_settings_field( $taxonomy. '_rewrite_slug', __( ucfirst(str_replace('_', ' ', $taxonomy)) ),function () use($taxonomy)
+			{
+				$value = get_option( $taxonomy. '_rewrite_slug' );
+				if( is_null($value) || empty($value))
+					$value = $this->config->get('taxonomy.'.$taxonomy.'.rewrite.slug', $taxonomy);
+
+				echo '<input type="text" value="' . esc_attr( $value ) . '" name="'.$taxonomy.'_rewrite_slug" placeholder="'.$taxonomy.'" id="'.$taxonomy.'_rewrite_slug" class="regular-text" />';
+
+			}, 'permalink', 'custom_taxonomy_rewrite' );
 		}
 
 

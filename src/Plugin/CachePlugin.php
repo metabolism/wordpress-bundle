@@ -85,14 +85,14 @@ namespace Metabolism\WordpressBundle\Plugin {
 				$this->purgeCache();
 
 			if( !$debug )
+			{
 				add_action( 'init', [$this, 'addClearCacheButton']);
 
+				foreach (['save_post', 'deleted_post', 'trashed_post', 'edit_post', 'delete_attachment'] as $action)
+					add_action( $action, [$this, 'purgeCache']);
+			}
+
 			add_action( 'purge_cache', [$this, 'purgeCache']);
-
-			$actions = ['save_post', 'deleted_post', 'trashed_post', 'edit_post', 'delete_attachment'];
-
-			foreach ($actions as $action)
-				add_action( $action, [$this, 'purgeCache']);
 		}
 	}
 }

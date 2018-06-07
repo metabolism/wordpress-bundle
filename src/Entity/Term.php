@@ -47,6 +47,8 @@ class Term extends Entity
 			$term->link = get_term_link($pid);
 		}
 
+		$term->current = get_queried_object_id() == $pid;
+
 		return $term;
 	}
 
