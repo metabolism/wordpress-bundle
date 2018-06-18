@@ -518,7 +518,7 @@ Trait ContextTrait
 		}
 
 		$this->data['breadcrumb'] = $breadcrumb;
-
+		
 		return $this->data['breadcrumb'];
 	}
 }

@@ -199,12 +199,13 @@ class ACFHelper
 
 				case 'clone';
 
-					$layout = reset($object['sub_fields']);
-					$value = reset($object['value']);
+					foreach ($object['sub_fields'] as &$sub_field)
+					{
+						if( isset($object['value'][$sub_field['name']]))
+							$sub_field['value'] = $object['value'][$sub_field['name']];
+					}
 
-					$layout['value'] = $value;
-					$value = $this->clean([$layout]);
-					$objects[$object['name']] = reset($value);
+					$objects[$object['name']] = $this->clean($object['sub_fields']);
 
 					break;
 
@@ -337,19 +338,10 @@ class ACFHelper
 					{
 						$layout = $this->layoutAsKeyValue($object['sub_fields']);
 
-						//todo: find a better way to detect acf-component-field plugin
-						if( isset($object['appearances']) and in_array('hide-outer-boundary', $object['appearances']) and count($object['value']) == 1 )
+						foreach ($object['value'] as $value)
 						{
-							$value = $this->bindLayoutFields($object['value'][0], $layout);
-							$objects[$object['name']] = $this->clean($value);
-						}
-						else
-						{
-							foreach ($object['value'] as $value)
-							{
-								$value = $this->bindLayoutFields($value, $layout);
-								$objects[$object['name']][] = $this->clean($value);
-							}
+							$value = $this->bindLayoutFields($value, $layout);
+							$objects[$object['name']][] = $this->clean($value);
 						}
 					}
 

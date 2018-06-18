@@ -28,9 +28,8 @@ remove_submenu_page:
 #define:
 #  disallow_file_edit: false
 
-options:
-  gmap_api_key: AIzaSyDEv5UrZbosf5H8MFSFLvoVS7djfsTCQFc
-#  bugherd_api: '4aqgcywlfqs9lmoibogghw'
+#options
+gmap_api_key: AIzaSyDEv5UrZbosf5H8MFSFLvoVS7djfsTCQFc
 
 support:
   - templates

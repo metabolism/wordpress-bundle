@@ -1,0 +1,35 @@
+# https://codex.wordpress.org/Function_Reference/register_taxonomy
+
+labels:
+  name: Taxonomies #general name for the post type, usually plural.
+  singular_name: Taxonomy #name for one object of this post type.
+  add_new: Add New #the add new text.
+  menu_name: Taxonomies
+  all_items: All Taxonomies #String for the submenu.
+  edit_item: Edit Taxonomy
+  view_item: View Taxonomy
+  update_item: Update Taxonomy
+  add_new_item: Add New Taxonomy
+  new_item_name: New Taxonomy
+  parent_item: Parent Taxonomy #The parent item text.
+  parent_item_colon: Parent Taxonomy : #The same as parent_item, but with colon : in the end
+  search_items: Search Taxonomy
+  popular_items: Popular Taxonomy
+  separate_items_with_commas: Separate tags with commas
+  add_or_remove_items: Add or remove Taxonomy
+  choose_from_most_used: Choose from the most used tags
+  not_found: No taxonomies found
+
+description: #A short descriptive summary of what the post type is.
+public: true
+with_front: true
+exclude_from_search: false
+publicly_queryable: true
+show_ui: true
+show_in_nav_menus: true
+show_in_menu: true
+show_in_admin_bar: true
+show_in_quick_edit: true
+show_admin_column: false
+hierarchical: false
+rewrite: true

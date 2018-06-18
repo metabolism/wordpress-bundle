@@ -119,7 +119,7 @@ class Post extends Entity
 	}
 
 
-	public function get_terms( $tax = '', $merge = true ) {
+	public function get_terms( $tax = '' ) {
 
 		$taxonomies = array();
 
@@ -139,7 +139,7 @@ class Post extends Entity
 			}
 		}
 
-		$term_class_objects = array();
+		$term_array = [];
 
 		foreach ( $taxonomies as $taxonomy )
 		{
@@ -150,10 +150,10 @@ class Post extends Entity
 
 			$terms = wp_get_post_terms($this->ID, $taxonomy, ['fields' => 'ids']);
 
-			foreach ($terms as &$term)
-				$term = new Term($term);
+			foreach ($terms as $term)
+				$term_array[$term] = new Term($term);
 		}
 
-		return $terms;
+		return $term_array;
 	}
 }

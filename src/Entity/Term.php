@@ -45,6 +45,7 @@ class Term extends Entity
 		{
 			$term->excerpt = strip_tags(term_description($pid),'<b><i><strong><em><br>');
 			$term->link = get_term_link($pid);
+			$term->ID = $term->term_id;
 		}
 
 		$term->current = get_queried_object_id() == $pid;
