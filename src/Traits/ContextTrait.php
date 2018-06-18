@@ -124,7 +124,8 @@ Trait ContextTrait
 				'body_class' => $blog_language . ' ' . implode(' ', get_body_class()),
 				'maintenance_mode' => wp_maintenance_mode(),
 				'posts_per_page' => get_option( 'posts_per_page' ),
-				'page_title' => empty($wp_title) ? get_bloginfo('name') : $wp_title,
+				'page_title' => empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title,
+				'tagline' => get_bloginfo('description'),
 				'system' => [
 					'head'   => $this->getOutput('wp_head'),
 					'footer' => $this->getOutput('wp_footer')

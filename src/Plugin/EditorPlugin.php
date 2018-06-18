@@ -45,7 +45,7 @@ class EditorPlugin {
 
 	public function archiveButton($wp_admin_bar)
 	{
-		if( is_post_type_archive() )
+		if( !is_admin() and is_post_type_archive() )
 		{
 			$object = get_queried_object();
 
