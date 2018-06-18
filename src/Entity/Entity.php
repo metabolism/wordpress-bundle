@@ -16,15 +16,15 @@ use Metabolism\WordpressBundle\Helper\ACFHelper as ACF;
 class Entity
 {
 	public static $remove = [
-		'xfn', 'db_id', 'comment_count', 'post_mime_type', 'ping_status', 'to_ping', 'pinged', 'comment_status',
-		'guid', 'filter', 'post_content_filtered', 'url', 'name'
+		'xfn', 'db_id', 'post_mime_type', 'ping_status', 'to_ping', 'pinged',
+		'guid', 'filter', 'post_content_filtered', 'url', 'name', 'author_IP', 'agent'
 	];
 
 	public $ID;
 
-	public function import( $info, $remove=false, $force = false )
+	public function import( $info, $remove=false , $replace=false )
 	{
-		$info = self::normalize($info, $remove);
+		$info = self::normalize($info, $remove, $replace);
 
 		if ( is_object($info) )
 			$info = get_object_vars($info);
@@ -36,9 +36,7 @@ class Entity
 				if ( $key === '' || ord($key[0]) === 0 )
 					continue;
 
-				if ( !empty($key) && $force )
-					$this->$key = $value;
-				else if ( !empty($key) && !method_exists($this, $key) )
+				if ( !empty($key) && !method_exists($this, $key) )
 					$this->$key = $value;
 			}
 		}
@@ -101,8 +99,8 @@ class Entity
 
 		foreach($object as $key=>$value)
 		{
-			if( strpos($key, 'post_') === 0 ){
-				$object[str_replace('post_','', $key)] = $value;
+			if($replace && strpos($key, $replace) === 0 ){
+				$object[str_replace($replace,'', $key)] = $value;
 				unset($object[$key]);
 			}
 		}

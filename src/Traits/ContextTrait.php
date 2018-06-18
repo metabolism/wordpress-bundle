@@ -5,6 +5,7 @@
 
 namespace Metabolism\WordpressBundle\Traits;
 
+use Metabolism\WordpressBundle\Entity\Comment;
 use Metabolism\WordpressBundle\Helper\ACFHelper;
 use Metabolism\WordpressBundle\Plugin\TermsPlugin;
 use Metabolism\WordpressBundle\Provider\WooCommerceProvider;
@@ -71,7 +72,11 @@ Trait ContextTrait
 
 	public function addSite()
 	{
+		global $wp_query;
+
 		$blog_language = get_bloginfo('language');
+		$queried_object_id = $wp_query->get_queried_object_id();
+
 		$language = explode('-', $blog_language);
 		$languages = [];
 
@@ -116,27 +121,30 @@ Trait ContextTrait
 		if( is_multisite() )
 			$this->data['network_home_url'] = trim(network_home_url(), '/');
 
-		if( $this->has_templates )
+		$this->data = array_merge($this->data, [
+			'maintenance_mode' => wp_maintenance_mode(),
+			'tagline' => get_bloginfo('description'),
+			'posts_per_page' => get_option( 'posts_per_page' )
+		]);
+
+		if( $this->has_templates && $queried_object_id)
 		{
 			$wp_title = wp_title(' ', false);
 
 			$this->data = array_merge($this->data, [
 				'body_class' => $blog_language . ' ' . implode(' ', get_body_class()),
-				'maintenance_mode' => wp_maintenance_mode(),
-				'posts_per_page' => get_option( 'posts_per_page' ),
 				'page_title' => empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title,
-				'tagline' => get_bloginfo('description'),
 				'system' => [
 					'head'   => $this->getOutput('wp_head'),
 					'footer' => $this->getOutput('wp_footer')
 				]
 			]);
-		}
 
-		if (class_exists('WooCommerce'))
-		{
-			$wcProvider = WooCommerceProvider::getInstance();
-			$wcProvider->globalContext($this->data);
+			if (class_exists('WooCommerce'))
+			{
+				$wcProvider = WooCommerceProvider::getInstance();
+				$wcProvider->globalContext($this->data);
+			}
 		}
 	}
 
@@ -521,5 +529,43 @@ Trait ContextTrait
 		$this->data['breadcrumb'] = $breadcrumb;
 		
 		return $this->data['breadcrumb'];
+	}
+
+
+	/**
+	 * Add comments entries
+	 * See : https://codex.wordpress.org/get_comments
+	 *
+	 */
+	public function addComments($args=[], $key='post')
+	{
+		$args['fields'] = 'ids';
+
+		if( !isset($args['include_unapproved']))
+			$args['include_unapproved'] = false;
+
+		if( !isset($args['number']))
+			$args['number'] = 5;
+
+
+		$comments = get_comments($args);
+
+		foreach ($comments as &$comment)
+		{
+			$comment = new Comment($comment);
+		}
+
+		if( isset($this->data[$key]))
+		{
+			if( is_array($this->data[$key]) )
+				$this->data[$key]['comments'] = $comments;
+			else
+				$this->data[$key]->comments = $comments;
+
+		}
+		else
+			$this->data[$key] = $comments;
+
+		return $comments;
 	}
 }

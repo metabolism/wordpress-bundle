@@ -14,7 +14,7 @@ $_locale = ($_config->get('multisite.multilangue') && !$_config->get('multisite.
 
 $collection = new RouteCollection();
 
-$addRoute = function( $name, $struct, $is_archive=false ) use($controller_name, $_locale, $collection, $wp_rewrite)
+$addRoute = function( $name, $struct, $is_archive=false, $method='GET' ) use($controller_name, $_locale, $collection, $wp_rewrite)
 {
 	$name = str_replace('_structure', '', $name);
 
@@ -29,11 +29,14 @@ $addRoute = function( $name, $struct, $is_archive=false ) use($controller_name, 
 	if( $is_archive )
 	{
 		$route = new Route( $_locale.$path.'/'.$wp_rewrite->pagination_base.'/{page}', ['_controller'=>$controller]);
+		$route->setMethods($method);
+
 		$collection->add('wp_'.$name.'_paged', $route);
 	}
 };
 
 $addRoute('front', '');
+$addRoute( 'comment', '/comment', false, 'POST');
 
 foreach ($wp_rewrite->extra_permastructs as $name=>$permastruct)
 {
@@ -56,6 +59,7 @@ foreach (['author_structure', 'search_structure', 'page_structure'] as $name)
 {
 	$addRoute($name, $wp_rewrite->$name);
 }
+
 
 if( !empty($_locale) )
 {

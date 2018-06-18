@@ -25,7 +25,7 @@ class Image extends Entity
 	public function __construct($id = null) {
 
 		$data = $this->get($id);
-		$this->import($data);
+		$this->import($data, false, 'post_');
 	}
 
 
@@ -50,6 +50,8 @@ class Image extends Entity
 		if( !empty($metadata) )
 		{
 			$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
+			$metadata['src']  = str_replace(WP_FOLDER.'/..', '', $metadata['src']);
+
 			$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
 			$metadata['meta'] = $metadata['image_meta'];
 			$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));

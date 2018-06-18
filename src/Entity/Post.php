@@ -38,7 +38,7 @@ class Post extends Entity
 
 		if( $post = $this->get($id) )
 		{
-			$this->import($post);
+			$this->import($post, false, 'post_');
 			$this->addCustomFields($id);
 		}
 	}

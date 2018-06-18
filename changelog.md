@@ -15,6 +15,9 @@ CHANGELOG
 - Context->addTerm, add current primary term
 - update permalink clear cache
 - Context->addPagination
+- Comment entity
+- Context->addComments
+- Form helper :: post comment
 ### Changed
 - Context->addBreadcrumb now add post/term title
 - Context->addCurrent to add term for archive
