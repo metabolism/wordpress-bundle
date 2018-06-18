@@ -29,7 +29,8 @@ remove_submenu_page:
 #  disallow_file_edit: false
 
 #options
-gmap_api_key: AIzaSyDEv5UrZbosf5H8MFSFLvoVS7djfsTCQFc
+#https://developers.google.com/maps/documentation/javascript/get-api-key
+gmap_api_key: xxx
 
 support:
   - templates
