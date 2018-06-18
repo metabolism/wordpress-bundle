@@ -101,7 +101,7 @@ class Post extends Entity
 
 		if ( class_exists('WPSEO_Primary_Term') )
 		{
-			$wpseo_primary_term = new WPSEO_Primary_Term( $tax, $this->ID );
+			$wpseo_primary_term = new \WPSEO_Primary_Term( $tax, $this->ID );
 
 			if( $wpseo_primary_term )
 				$term = $wpseo_primary_term->get_primary_term();

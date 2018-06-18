@@ -17,23 +17,6 @@ class AdminController {
 
 
 	/**
-	 * Application Constructor
-	 */
-	public function setup()
-	{
-		if( defined('WP_INSTALLING') and WP_INSTALLING )
-			return;
-
-		$this->loadConfig();
-		$this->registerFilters();
-
-		add_action( 'admin_init', [$this, 'updateEditorRole'] );
-
-		// Remove image sizes for thumbnails
-		add_filter( 'intermediate_image_sizes_advanced', [$this, 'intermediateImageSizesAdvanced'] );
-	}
-
-	/**
 	 * Unset thumbnail image
 	 */
 	public function intermediateImageSizesAdvanced($sizes)
@@ -64,34 +47,6 @@ class AdminController {
 		add_filter('update_right_now_text', function($text){
 			return substr($text, 0, strpos($text, '%1$s')+4);
 		});
-
-		// Handle subfolder in url
-		add_filter('option_siteurl', [$this, 'optionSiteURL'] );
-		add_filter('network_site_url', [$this, 'networkSiteURL'] );
-	}
-
-
-	/**
-	 * Add edition folder to option url
-	 */
-	public function networkSiteURL($url)
-	{
-		if( WP_FOLDER && strpos($url,WP_FOLDER) === false )
-			return str_replace('/wp-admin', WP_FOLDER.'/wp-admin', $url);
-		else
-			return $url;
-	}
-
-
-	/**
-	 * Add edition folder to option url
-	 */
-	public function optionSiteURL($url)
-	{
-		if( WP_FOLDER )
-			return strpos($url, WP_FOLDER) === false ? $url.WP_FOLDER : $url;
-		else
-			return $url;
 	}
 
 
@@ -111,6 +66,15 @@ class AdminController {
 
 	public function __construct()
 	{
-		$this->setup();
+		if( defined('WP_INSTALLING') and WP_INSTALLING )
+			return;
+
+		$this->loadConfig();
+		$this->registerFilters();
+
+		add_action( 'admin_init', [$this, 'updateEditorRole'] );
+
+		// Remove image sizes for thumbnails
+		add_filter( 'intermediate_image_sizes_advanced', [$this, 'intermediateImageSizesAdvanced'] );
 	}
 }
