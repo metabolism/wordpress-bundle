@@ -75,8 +75,6 @@ Trait ContextTrait
 		global $wp_query;
 
 		$blog_language = get_bloginfo('language');
-		$queried_object_id = $wp_query->get_queried_object_id();
-
 		$language = explode('-', $blog_language);
 		$languages = [];
 
@@ -127,7 +125,7 @@ Trait ContextTrait
 			'posts_per_page' => get_option( 'posts_per_page' )
 		]);
 
-		if( $this->has_templates && $queried_object_id)
+		if( $this->has_templates && (is_single() || is_archive()) )
 		{
 			$wp_title = wp_title(' ', false);
 
