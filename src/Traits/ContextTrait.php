@@ -537,7 +537,7 @@ Trait ContextTrait
 	 * See : https://codex.wordpress.org/get_comments
 	 *
 	 */
-	public function addComments($args=[], $key='post')
+	public function addComments($args=[], $key='comments')
 	{
 		$args['fields'] = 'ids';
 
@@ -547,25 +547,35 @@ Trait ContextTrait
 		if( !isset($args['number']))
 			$args['number'] = 5;
 
+		$comments_id = get_comments($args);
+		$comments = [];
 
-		$comments = get_comments($args);
-
-		foreach ($comments as &$comment)
+		foreach ($comments_id as $comment_id)
 		{
-			$comment = new Comment($comment);
+			$comments[$comment_id] = new Comment($comment_id);
 		}
 
-		if( isset($this->data[$key]))
+		// todo: check recursivity
+		foreach ($comments as $comment)
 		{
-			if( is_array($this->data[$key]) )
-				$this->data[$key]['comments'] = $comments;
+			if( $comment->parent )
+			{
+				$comments[$comment->parent]->replies[] = $comment;
+				unset($comments[$comment->ID]);
+			}
+		}
+
+		if( isset($this->data['post']))
+		{
+			if( is_array($this->data['post']) )
+				$this->data['post'][$key] = $comments;
 			else
-				$this->data[$key]->comments = $comments;
-
+				$this->data['post']->$key = $comments;
 		}
+
 		else
 			$this->data[$key] = $comments;
-
+		
 		return $comments;
 	}
 }

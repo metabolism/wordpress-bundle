@@ -42,7 +42,7 @@ class TableHelper extends \WP_List_Table {
 		if( in_array($column_name, $this->fields) )
 			$value = $item[$column_name];
 
-		return apply_filters('list_table_column', $column_name, $value, $this->table);
+		return apply_filters('list_table_column', $value, $column_name, $this->table);
 	}
 
 
@@ -57,7 +57,7 @@ class TableHelper extends \WP_List_Table {
 		foreach ((array)$this->args['column_title'] as $column_title )
 			$value[] = $item[$column_title];
 
-		$value = apply_filters('list_table_column', 'title', implode(' ', $value), $this->table, $item);
+		$value = apply_filters('list_table_column', implode(' ', $value), 'title', $this->table, $item);
 
 		return sprintf('%1$s <span style="color:silver">(id:%2$s)</span>%3$s',
 			$value,

@@ -16,7 +16,7 @@ CHANGELOG
 - update permalink clear cache
 - Context->addPagination
 - Comment entity
-- Context->addComments
+- Context->addComments with replies
 - Form helper :: post comment
 ### Changed
 - Context->addBreadcrumb now add post/term title
