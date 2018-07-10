@@ -9,7 +9,6 @@ use Metabolism\WordpressBundle\Helper\ACFHelper as ACF;
 
 /**
  * Class Post
- * @see \Timber\Term
  *
  * @package Metabolism\WordpressBundle\Entity
  */

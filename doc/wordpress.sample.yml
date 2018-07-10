@@ -4,6 +4,18 @@ domain_name: rocket
 extra_permastructs:
   controller: MainController
 
+key:
+  auth : 'O-} !h|JpOq^w,CXn+O5=o3MvkN_So+ O0-chs$+a>KJq*i~/!ykEd<]IsPdgI#6'));
+  secure_auth : 'r HvS?mdf^4xc.Iy^G*<ZliwL5r_w.]CUWIu|j0{sfq-M)k:Lhi-),qCDcN<Yy+w'));
+  logged_in : 'u`UAyT)Wp0bT&Z.^e3RWTWDs?Je9K0UBQDJqG$W*yb9YG1yl,|*:LQV^ZUt|Q~#.'));
+  nonce : 'cV9Q^z7H{oI>H6>>vLHQYB[)1N&#ur(# Iqw*k?r-FkQ+#eo9<R^1N?uo.*N~!J5'));
+
+salt:
+  auth : 'w9J/dNw/bv}@Z#/YcrjPcH$^_[ni&4tji0JA0?na}yTw#0}yuZW>BXDVVjVGA+vk'));
+  secure_auth : 'T7ntE>-j*2G3Qosn;0?|7{aqs&SU) }_S ~6f5k~PTedeX^jNe&T h)9(k4nT2Rq'));
+  logged_in : 'w/iowiks]_i5b#/SqYuD2`28o</-L|P4H3vq@!<OrH 7Q!gxB[Q4m`/*CiVdylGs'));
+  nonce : 'gelPRQb4NzO=4pOG_5YnuN(5G~YJCIutY*BL%!:ds(TqwDd;F[PsI,gT_1J-9;;D'));
+
 remove_menu_page:
   - edit.php #Posts
   - edit-comments.php #Comments
@@ -41,6 +53,8 @@ menu:
   footer: Footer
   header: Header
 
+# https://codex.wordpress.org/Function_Reference/register_post_type
+# see vendor/metabolism/wordpress-bundle/doc/custom_taxonomy.yml for a full sample
 post_type:
 
   guide:
@@ -64,7 +78,8 @@ post_type:
       popular_items:  'Guides populaires'
       not_found:      'Aucun guide trouvé'
 
-
+# https://codex.wordpress.org/Function_Reference/register_taxonomy
+# see vendor/metabolism/wordpress-bundle/doc/custom_post_type.yml for a full sample
 taxonomy:
 
   guide_category:
@@ -89,4 +104,28 @@ options_page:
 page_template:
   coming_soon: 'Coming Soon'
   not_found: '404'
+
+post_template:
+  video: 'Video'
+
+
+#table:
+#  newsletter:
+#    page_title: Newsletter
+#    menu_title: Newsletter
+#    column_title: id
+#    columns:
+#      name: Name
+#      email: Email
+#      company: Company
+#      type: Type
+#  contact:
+#    page_title: Contact
+#    menu_title: Contact
+#    column_title: id
+#    columns:
+#      name: Name
+#      email: Email
+#      company: Company
+#      request: Request
 

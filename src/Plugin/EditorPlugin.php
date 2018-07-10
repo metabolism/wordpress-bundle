@@ -45,13 +45,13 @@ class EditorPlugin {
 
 	public function archiveButton($wp_admin_bar)
 	{
-		if( !is_admin() and is_post_type_archive() )
+		if( is_post_type_archive() )
 		{
 			$object = get_queried_object();
 
 			$args = [
 				'id'    => 'edit',
-				'title' => __('Edit Posts'),
+				'title' => __('Edit '.$object->label),
 				'href'  => get_admin_url( null, '/edit.php?post_type='.$object->name ),
 				'meta'   => ['class' => 'ab-item']
 			];
@@ -104,8 +104,11 @@ class EditorPlugin {
 		{
 			add_filter( 'mce_buttons', [$this, 'TinyMceButtons']);
 			add_filter( 'wp_editor_settings', [$this, 'editorSettings'], 10, 2);
-			add_action( 'admin_bar_menu', [$this, 'archiveButton']);
 			add_action( 'admin_menu', [$this, 'adminMenu']);
+		}
+		else
+		{
+			add_action( 'admin_bar_menu', [$this, 'archiveButton'], 80);
 		}
 	}
 }

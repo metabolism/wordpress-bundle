@@ -74,7 +74,6 @@ class FrontController {
 		add_filter('woocommerce_template_path', function($array){ return '../../../WoocommerceBundle/'; });
 		add_filter('woocommerce_enqueue_styles', '__return_empty_array' );
 
-		add_filter('timber/post/get_preview/read_more_link', '__return_null' );
 		add_filter('wp_calculate_image_srcset_meta', '__return_null');
 	}
 

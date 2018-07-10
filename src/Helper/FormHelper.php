@@ -117,28 +117,4 @@ class FormHelper {
 			return ['error' => 1, 'message' => "Invalid email address. Please type a valid email address."];
 		}
 	}
-
-	public static function postComment($data){
-
-		$comment = wp_handle_comment_submission( wp_unslash( $data ) );
-
-		if ( is_wp_error( $comment ) ) {
-
-			$data = intval( $comment->get_error_data() );
-
-			if ( ! empty( $data ) ) {
-				return ['error' => 1, 'message' => $comment->get_error_message()];
-			} else {
-				return ['error' => 1, 'message' => "Un error occured, please retry"];
-			}
-		}
-
-		$user = wp_get_current_user();
-
-		$cookies_consent = ( isset( $_POST['wp-comment-cookies-consent'] ) );
-
-		do_action( 'set_comment_cookies', $comment, $user, $cookies_consent );
-
-		return true;
-	}
 }

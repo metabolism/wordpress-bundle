@@ -5,9 +5,9 @@
 
 namespace Metabolism\WordpressBundle\Provider;
 
+use Metabolism\WordpressBundle\Entity\Post;
 use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
-use Timber\Timber;
 
 /**
  * Class WooCommerceProvider
@@ -41,7 +41,7 @@ class WooCommerceProvider
     {
         if (is_singular('product')) {
 
-            $context['post']    = Timber::get_post();
+            $context['post']    = new Post($context['post']->ID);
             $product            = wc_get_product( $context['post']->ID );
             $context['product'] = $product;
 
