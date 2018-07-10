@@ -165,8 +165,12 @@ We don't want to judge anyone, it's more like a code philosophy, once you go Sym
 
 Plus the security is a requirement for us and Wordpress failed to provide something good because of it's huge usage.
 
+Licence
+----------
+
+GNU AFFERO GPL
         
-MAINTAINERS
+Maintainers
 -----------
 
 This project is made by Metabolism ( http://metabolism.fr )
