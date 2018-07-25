@@ -5,7 +5,7 @@ namespace Metabolism\WordpressBundle\Helper;
 if(!class_exists('WP_List_Table'))
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 
-class TableHelper extends \WP_List_Table {
+class Table extends \WP_List_Table {
 
 	private $table, $args, $fields, $column_title;
 

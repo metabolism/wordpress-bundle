@@ -6,7 +6,7 @@
 namespace Metabolism\WordpressBundle\Traits;
 
 use Metabolism\WordpressBundle\Entity\Comment;
-use Metabolism\WordpressBundle\Helper\ACFHelper;
+use Metabolism\WordpressBundle\Helper\ACF;
 use Metabolism\WordpressBundle\Plugin\TermsPlugin;
 use Metabolism\WordpressBundle\Provider\WooCommerceProvider;
 
@@ -54,7 +54,7 @@ Trait ContextTrait
 
 	protected function getFields($id)
 	{
-		$fields = new ACFHelper($id);
+		$fields = new ACF($id);
 		return $fields->get();
 	}
 

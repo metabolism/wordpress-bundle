@@ -40,8 +40,19 @@ class MultisitePlugin {
 
 					$inserted_post_id = wp_insert_post($post); // insert the post
 
-					foreach($meta as $key=>$value)
-						update_post_meta($inserted_post_id,$key,$value[0]);
+					foreach($meta as $key=>$value){
+
+						if($key === '_thumbnail_id') {
+
+							$attachments = get_posts(['numberposts'=>1, 'post_type'=>'attachment', 'meta_value'=>$value[0], 'meta_key'=>'_wp_original_attachment_id']);
+
+							if( count($attachments) )
+								update_post_meta($inserted_post_id, $key, $attachments[0]->ID);
+						}
+						else{
+							update_post_meta($inserted_post_id, $key, $value[0]);
+						}
+					}
 
 					restore_current_blog(); // return to original blog
 
@@ -50,7 +61,7 @@ class MultisitePlugin {
 						'post.php?post='.$inserted_post_id.'&action=edit'
 					));
 
-					die();
+					exit();
 				}
 			}
 		});

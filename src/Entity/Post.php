@@ -16,7 +16,7 @@ use Metabolism\WordpressBundle\Entity\Term;
  */
 class Post extends Entity
 {
-	public $excerpt, $thumbnail;
+	public $excerpt, $thumbnail, $link, $template;
 	private $_next, $_prev;
 
 	/**
@@ -50,7 +50,8 @@ class Post extends Entity
 
 		if( is_int($pid) && $post = get_post($pid) )
 		{
-			$post->link = get_permalink($post);
+			$post->link = get_permalink( $post );
+			$post->template = get_page_template_slug( $post );
 			$post->thumbnail = get_post_thumbnail_id( $post );
 
 			if( $post->thumbnail )

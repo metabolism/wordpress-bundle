@@ -5,7 +5,7 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
-use Metabolism\WordpressBundle\Helper\ACFHelper as ACF;
+use Metabolism\WordpressBundle\Helper\ACF;
 
 /**
  * Class Post

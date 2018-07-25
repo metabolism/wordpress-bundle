@@ -5,7 +5,7 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
-use Metabolism\WordpressBundle\Helper\ACFHelper;
+use Metabolism\WordpressBundle\Helper\ACF;
 
 use Metabolism\WordpressBundle\Entity\Term,
 	Metabolism\WordpressBundle\Entity\Post;
@@ -20,7 +20,7 @@ class Query
 {
 	public static function get_fields($id)
 	{
-		$post = new ACFHelper($id);
+		$post = new ACF($id);
 		return $post->get();
 	}
 

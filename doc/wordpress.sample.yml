@@ -101,12 +101,12 @@ taxonomy:
 options_page:
   - 'Personnalisation'
 
-page_template:
-  coming_soon: 'Coming Soon'
-  not_found: '404'
-
-post_template:
-  video: 'Video'
+template:
+  page:
+    coming_soon: 'Coming Soon'
+    not_found: '404'
+  post:
+    video: 'Video'
 
 
 #table:

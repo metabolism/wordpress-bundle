@@ -138,8 +138,7 @@ This file allow you to manage :
  * Post types
  * Taxonomies
  * Options page
- * Page templates
- * Post templates
+ * Post type templates
 
         
 Roadmap
@@ -149,6 +148,7 @@ Roadmap
 * Global maintenance mode for multisite
 * Better Symfony 4.1 Support
 * Unit tests
+* Better code comments
 
        
 Why not using Bedrock

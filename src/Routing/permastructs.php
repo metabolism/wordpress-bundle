@@ -36,7 +36,6 @@ $addRoute = function( $name, $struct, $is_archive=false, $method='GET' ) use($co
 };
 
 $addRoute('front', '');
-$addRoute( 'comment', '/comment', false, 'POST');
 
 foreach ($wp_rewrite->extra_permastructs as $name=>$permastruct)
 {

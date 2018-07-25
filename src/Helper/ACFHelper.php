@@ -9,9 +9,10 @@ namespace Metabolism\WordpressBundle\Helper;
 use Metabolism\WordpressBundle\Entity\Post,
 	Metabolism\WordpressBundle\Entity\Term,
 	Metabolism\WordpressBundle\Entity\User,
-	Metabolism\WordpressBundle\Entity\Image;
+	Metabolism\WordpressBundle\Entity\Image,
+	Metabolism\WordpressBundle\Entity\Product;
 
-class ACFHelper
+class ACF
 {
 	private $raw_objects, $objects;
 
@@ -140,13 +141,7 @@ class ACFHelper
 
 			case 'product':
 				$post_status = get_post_status( $id );
-				if( $post_status && $post_status !== 'publish' )
-					$value = false;
-				else
-				{
-					$value = new Post( $id );
-					$value->wc = wc_get_product( $id );
-				}
+				$value = ( $post_status && $post_status !== 'publish' ) ? false : new Product( $id );
 
 				break;
 

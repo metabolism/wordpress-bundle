@@ -2,7 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
-use Metabolism\WordpressBundle\Helper\TableHelper;
+use Metabolism\WordpressBundle\Helper\Table;
 
 /**
  * Class Metabolism\WordpressBundle Framework
@@ -334,7 +334,7 @@ class ConfigPlugin {
 
 				add_menu_page($args['page_title'], $args['menu_title'], $args['capability'], 'table_'.$table, function() use($table, $args)
 				{
-					$table = new TableHelper($table, $args);
+					$table = new Table($table, $args);
 
 					$table->prepare_items();
 					$table->display();

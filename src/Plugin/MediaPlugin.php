@@ -16,20 +16,20 @@ class MediaPlugin {
 	public static function upload($file='file', $allowed_type = ['image/jpeg', 'image/gif', 'image/png'], $path='/user', $max_size=1048576){
 
 		if( !isset($_FILES[$file]) or empty($_FILES[$file]) )
-			return false;
+			return new \WP_Error('empty', 'File '.$file.' is empty');
 
 		$file = $_FILES[$file];
 
 		if ($file['error'] !== UPLOAD_ERR_OK)
-			return ['error' => true, 'message' => 'Sorry, there was an error uploading your file.' ];
+			return new \WP_Error('error_upload', 'There was an error uploading your file.');
 
 		if ($file['size'] > $max_size)
-			return ['error' => true, 'message' => 'Sorry, the file is too large.' ];
+			return new \WP_Error('file_size', 'The file is too large');
 
 		$mime_type = mime_content_type($file['tmp_name']);
 
 		if( !in_array($mime_type, $allowed_type) )
-			return ['error' => true, 'message' => 'Sorry, this file format is not permitted' ];
+			return new \WP_Error('file_format', 'Sorry, this file format is not permitted');
 
 		$name = preg_replace("/[^A-Z0-9._-]/i", "_", basename( $file['name']) );
 
@@ -40,12 +40,12 @@ class MediaPlugin {
 			mkdir($upload_dir, 0777, true);
 
 		if( !is_writable($upload_dir) )
-			return ['error' => true, 'message' => 'Sorry, upload directory is not writable.' ];
+			return new \WP_Error('right', 'Upload directory is not writable.');
 
 		if( move_uploaded_file($file['tmp_name'], WP_CONTENT_DIR.$target_file) )
 			return ['filename' => $target_file, 'original_filename' => basename( $file['name']), 'type' => $mime_type ];
 		else
-			return ['error' => true, 'message' => 'Sorry, there was an error uploading your file.' ];
+			return new \WP_Error('move', 'There was an error while writing the file.');
 	}
 
 
