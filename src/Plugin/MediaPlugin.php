@@ -345,6 +345,8 @@ class MediaPlugin {
 	{
 		if ( current_user_can('administrator') && is_super_admin() )
 		{
+			set_time_limit(0);
+			
 			$main_site_id = get_main_network_id();
 
 			global $wpdb;

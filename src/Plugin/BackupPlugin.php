@@ -128,6 +128,8 @@ class BackupPlugin {
 	 */
 	private function download($all=false)
 	{
+		set_time_limit(0);
+
 		if ( current_user_can('administrator') && (!$all || is_super_admin()) )
 		{
 			if( $backup = $this->create($all) )
