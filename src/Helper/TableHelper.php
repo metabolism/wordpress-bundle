@@ -18,7 +18,10 @@ class Table extends \WP_List_Table {
 
 		$structure = $wpdb->get_col( "DESCRIBE {$wpdb->prefix}{$this->table}", 0 );
 
-		if(!$structure || !is_array($structure) || !in_array('id', $structure))
+		if(!$structure || !is_array($structure) )
+			wp_die("Table {$wpdb->prefix}{$this->table} is missing");
+
+		if( !in_array('id', $structure))
 			wp_die("Field `id` is missing from table {$wpdb->prefix}{$this->table}");
 
 		if( isset($args['columns']['title']) )
