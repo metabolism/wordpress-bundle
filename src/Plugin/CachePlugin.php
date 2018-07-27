@@ -46,9 +46,9 @@ namespace Metabolism\WordpressBundle\Plugin {
 
 			$response = wp_remote_request($url, $args);
 
-			if ($response instanceof WP_Error) {
+			if ( is_wp_error($response) ) {
 				$this->errorMessage = $url.' : '.$response->get_error_code().' '.$response->get_error_message();
-			} else {
+			} elseif ( is_array($response) and isset($response['response']) ) {
 				$this->noticeMessage = $url.' : '.$response['response']['code'].' '.$response['response']['message'];
 			}
 
