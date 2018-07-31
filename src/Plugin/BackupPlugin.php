@@ -101,7 +101,7 @@ class BackupPlugin {
 	/**
 	 * Remove all thumbnails
 	 */
-	private function create($all=false)
+	private function create($all=false, $filename)
 	{
 		$backup = false;
 
@@ -110,7 +110,15 @@ class BackupPlugin {
 			$folder = wp_upload_dir();
 			$rootPath = $folder['basedir'];
 
-			$backup   = $rootPath.'/backup-'.date('Ymd').'.zip';
+			$backup   = $rootPath.'/'.$filename;
+
+			if( file_exists($backup) )
+			{
+				if( file_exists($rootPath.'/db.sql') )
+					unlink($rootPath.'/db.sql');
+
+				return $backup;
+			}
 
 			$this->dumpDatabase($rootPath.'/db.sql');
 			$this->dumpFolder($rootPath, $backup, ['wpallimport', 'cache', 'wpcf7_uploads'], '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/');
@@ -131,9 +139,11 @@ class BackupPlugin {
 	{
 		ini_set('max_execution_time', 300);
 
+		$filename = 'backup-'.date('Ymd').'.zip';
+
 		if ( current_user_can('administrator') && (!$all || is_super_admin()) )
 		{
-			if( $backup = $this->create($all) )
+			if( $backup = $this->create($all, $filename) )
 			{
 				header('Content-Description: File Transfer');
 				header('Content-Type: application/octet-stream');
