@@ -35,6 +35,49 @@ class Table extends \WP_List_Table {
 			'ajax'      => false
 		) );
 
+		$this->doActions();
+	}
+
+
+	function doActions() {
+
+		if( $this->args['export'] && isset($_REQUEST['action'], $_REQUEST['page']) && $_REQUEST['action'] == "export"  && $_REQUEST['page'] == "table_".$this->table ){
+
+			if( isset($_REQUEST['id']) )
+				$ids = implode( ',', array_map( 'absint', (array)$_REQUEST['id'] ) );
+			else
+				$ids = false;
+
+			global $wpdb;
+
+			$query = apply_filters('list_table_export_query', "SELECT * FROM {$wpdb->prefix}{$this->table}".($ids?" WHERE `id` IN({$ids})":""), $this->table, $ids);
+			$items = apply_filters('list_table_export_results', $wpdb->get_results( $query, ARRAY_A ), $this->table);
+			$filename = apply_filters('list_table_export_filename', 'export-'.$this->table.'.'.date('YmdHis').'.csv', $this->table);
+
+			header("Content-type: application/force-download");
+			header('Content-Disposition: inline; filename="'.$filename.'"');
+
+			if( count($items) )
+			{
+				$out = fopen('php://output', 'w');
+
+				fputcsv($out, array_keys($items[0]));
+
+				foreach ($items as $item)
+					fputcsv($out, array_values($item));
+
+				fclose($out);
+			}
+
+			exit();
+		}
+	}
+
+
+	function extra_tablenav( $which ) {
+
+		if( $this->args['export'] )
+			echo '<a class="button button-primary" href="'.sprintf('?page=%s&action=export', $_REQUEST['page']).'" style="display: inline-block;float: right;margin-left: 10px;margin-right: 0;margin-bottom: 10px;">'.__('Export all').'</a>';
 	}
 
 
@@ -51,9 +94,12 @@ class Table extends \WP_List_Table {
 
 	function column_title($item){
 
-		$actions = array(
-			'delete' => sprintf('<a href="?page=%s&action=%s&id=%s">'.__('Delete').'</a>', $_REQUEST['page'], 'delete', $item['id']),
-		);
+		$actions = [];
+
+		$actions['delete'] = sprintf('<a href="?page=%s&action=%s&id=%s" target="_blank">'.__('Delete').'</a>', $_REQUEST['page'], 'delete', $item['id']);
+
+		if( $this->args['export'] )
+			$actions['export'] = sprintf('<a href="?page=%s&action=%s&id=%s" target="_blank">'.__('Export').'</a>', $_REQUEST['page'], 'export', $item['id']);
 
 		$value = [];
 
@@ -97,7 +143,10 @@ class Table extends \WP_List_Table {
 
 	function get_bulk_actions()
 	{
-		$actions = ['delete' => 'Delete'];
+		$actions = ['delete' => __('Delete')];
+
+		if( $this->args['export'] )
+			$actions['export'] = __('Export');
 
 		return $actions;
 	}

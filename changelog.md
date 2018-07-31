@@ -19,6 +19,7 @@ CHANGELOG
 - Context->addComments with replies
 - Form helper :: post comment
 - Template in wordpress.yml for all post_type
+- Export on custom table
 ### Changed
 - Context->addBreadcrumb now add post/term title
 - Context->addCurrent to add term for archive

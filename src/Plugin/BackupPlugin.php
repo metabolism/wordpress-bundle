@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 use Ifsnop\Mysqldump as IMysqldump;
+use Metabolism\WordpressBundle\Helper\DirFilterHelper;
 
 /**
  * Class Metabolism\WordpressBundle Framework
@@ -11,21 +12,20 @@ class BackupPlugin {
 
 	protected $config;
 
-	private function dumpFolder($source, $destination, $exclude = [])
+	private function dumpFolder($source, $destination, $exclude = [], $exclude_pattern=false)
 	{
 		if ( !extension_loaded( 'zip' ) )
-			return 'Zip Extension is not loaded';
+			return new \WP_Error('zip_extension', 'Zip Extension is not loaded');
 
 		if ( is_string( $source ) )
 			$source_arr = [$source];
 		else
 			$source_arr = $source;
 
-		$exclude = array_merge( $exclude, ['.', '..'] );
-		$zip     = new \ZipArchive();
+		$zip = new \ZipArchive();
 
 		if ( !$zip->open( $destination, \ZipArchive::CREATE ) )
-			return 'Can\'t create archive file';
+			return new \WP_Error('archive', 'Can\'t create archive file');
 
 		foreach ( $source_arr as $source ) {
 
@@ -40,16 +40,16 @@ class BackupPlugin {
 
 			if ( is_dir( $source ) === true ) {
 
-				$files = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $source ), \RecursiveIteratorIterator::SELF_FIRST );
+				$directory = new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS);
+				$filtered = new DirFilterHelper($directory, $exclude);
+				$iterator = new \RecursiveIteratorIterator($filtered, \RecursiveIteratorIterator::SELF_FIRST);
 
-				foreach ( $files as $file ) {
+				foreach ( $iterator as $file ) {
 
 					$file = str_replace( '\\', '/', $file );
 
-					// Ignore "." and ".." folders
-					if ( in_array( substr( $file, strrpos( $file, '/' ) + 1 ), $exclude ) ) {
+					if( $exclude_pattern && preg_match($exclude_pattern, $file))
 						continue;
-					}
 
 					$file = realpath( $file );
 
@@ -58,6 +58,7 @@ class BackupPlugin {
 						$zip->addEmptyDir( $folder . str_replace( $source . '/', '', $file . '/' ) );
 					}
 					else {
+
 						if ( is_file( $file ) === true ) {
 
 							$zip->addFile( $file, $folder . str_replace( $source . '/', '', $file ) );
@@ -92,7 +93,7 @@ class BackupPlugin {
 		}
 		catch (\Exception $e)
 		{
-			return 'mysqldump-php error: ' . $e->getMessage();
+			return new \WP_Error('mysqldump-error', $e->getMessage());
 		}
 	}
 
@@ -111,10 +112,10 @@ class BackupPlugin {
 
 			$backup   = $rootPath.'/backup-'.date('Ymd').'.zip';
 
-			$this->dumpDatabase($rootPath.'/bdd.sql');
-			$this->dumpFolder($rootPath, $backup);
+			$this->dumpDatabase($rootPath.'/db.sql');
+			$this->dumpFolder($rootPath, $backup, ['wpallimport', 'cache', 'wpcf7_uploads'], '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/');
 
-			unlink($rootPath.'/bdd.sql');
+			unlink($rootPath.'/db.sql');
 
 			return $backup;
 		}
@@ -128,7 +129,7 @@ class BackupPlugin {
 	 */
 	private function download($all=false)
 	{
-		set_time_limit(0);
+		ini_set('max_execution_time', 300);
 
 		if ( current_user_can('administrator') && (!$all || is_super_admin()) )
 		{

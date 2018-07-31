@@ -114,6 +114,7 @@ template:
 #    page_title: Newsletter
 #    menu_title: Newsletter
 #    column_title: id
+#    export: false
 #    columns:
 #      name: Name
 #      email: Email

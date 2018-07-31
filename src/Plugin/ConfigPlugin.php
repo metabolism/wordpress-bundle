@@ -11,20 +11,8 @@ class ConfigPlugin {
 
 	protected $config;
 
-
 	/**
-	 * Add settings to acf
-	 */
-	public function ACFInit()
-	{
-		$acf_settings = $this->config->get('acf', []);
-
-		foreach ($acf_settings as $name=>$value)
-			acf_update_setting($name, $value);
-	}
-
-	/**
-	 * Add settings to acf
+	 * Get plural from name
 	 */
 	public function plural($name)
 	{
@@ -315,27 +303,28 @@ class ConfigPlugin {
 
 		add_action('admin_menu', function() {
 
-			foreach ( $this->config->get('table', []) as $table => $args )
+			foreach ( $this->config->get('table', []) as $name => $args )
 			{
 				$default_args = [
-					'page_title' => ucfirst($table),
-					'menu_title' => ucfirst($table),
+					'page_title' => ucfirst($name),
+					'menu_title' => ucfirst($name),
 					'capability' => 'activate_plugins',
-					'singular'   => $table,
+					'singular'   => $name,
 					'menu_icon'  => 'editor-table',
-					'plural'     => $table.'s',
+					'plural'     => $this->plural($name),
 					'per_page'   => 20,
-					'position'   => 30
+					'position'   => 30,
+					'export'     => true
 				];
 
 				$args = array_merge($default_args, $args);
 
 				$args['menu_icon'] = 'dashicons-'.$args['menu_icon'];
 
-				add_menu_page($args['page_title'], $args['menu_title'], $args['capability'], 'table_'.$table, function() use($table, $args)
-				{
-					$table = new Table($table, $args);
+				$table = new Table($name, $args);
 
+				add_menu_page($args['page_title'], $args['menu_title'], $args['capability'], 'table_'.$name, function() use($table, $args)
+				{
 					$table->prepare_items();
 					$table->display();
 
@@ -360,11 +349,11 @@ class ConfigPlugin {
 			$this->addTaxonomies();
 			$this->addRoles();
 			$this->addMenus();
-			$this->addTableViews();
 			$this->setPermalink();
 			
 			if( is_admin() )
 			{
+				$this->addTableViews();
 				$this->addOptionPages();
 			}
 		});
@@ -373,9 +362,6 @@ class ConfigPlugin {
 		// When viewing admin
 		if( is_admin() )
 		{
-			// Setup ACF Settings
-			add_action( 'acf/init', [$this, 'ACFInit'] );
-
 			add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
 
 			$support = $this->config->get('support', []);
