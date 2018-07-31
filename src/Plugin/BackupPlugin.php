@@ -154,12 +154,19 @@ class BackupPlugin {
 				header('Pragma: public');
 				header('Content-Length: ' . filesize($backup));
 
-				ob_clean();
-				flush();
+				ignore_user_abort(true);
 
-				readfile($backup);
+				$myInputStream = fopen($backup, 'rb');
+				$myOutputStream = fopen('php://output', 'wb');
+
+				stream_copy_to_stream($myInputStream, $myOutputStream);
+
+				fclose($myOutputStream);
+				fclose($myInputStream);
 
 				unlink($backup);
+
+				exit(0);
 			}
 		}
 
