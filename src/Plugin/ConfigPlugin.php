@@ -65,13 +65,17 @@ class ConfigPlugin {
 					$args['menu_icon'] = 'dashicons-'.$args['menu_icon'];
 
 				$slug = get_option( $post_type. '_rewrite_slug' );
-				$archive = get_option( $post_type. '_rewrite_archive' );
 
-				if( !is_null($slug) and !empty($slug) )
+				if( !is_null($slug) && !empty($slug) )
 					$args['rewrite'] = ['slug'=>$slug];
 
-				if( !is_null($archive) and !empty($archive) )
-					$args['has_archive'] = $archive;
+				if( $args['has_archive'] ){
+
+					$archive = get_option( $post_type. '_rewrite_archive' );
+
+					if( !is_null($archive) && !empty($archive) )
+						$args['has_archive'] = $archive;
+				}
 
 				register_post_type($post_type, $args);
 

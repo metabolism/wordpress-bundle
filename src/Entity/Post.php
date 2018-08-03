@@ -50,6 +50,10 @@ class Post extends Entity
 
 		if( is_int($pid) && $post = get_post($pid) )
 		{
+			$df = get_option('date_format');
+			$post->post_date = (string) mysql2date( get_option('date_format'), $post->post_date);
+			$post->post_date = apply_filters('get_the_date', $post->post_date, $df);
+
 			$post->link = get_permalink( $post );
 			$post->template = get_page_template_slug( $post );
 			$post->thumbnail = get_post_thumbnail_id( $post );

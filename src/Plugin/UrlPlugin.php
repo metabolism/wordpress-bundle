@@ -44,21 +44,38 @@ class UrlPlugin {
 			return $url;
 	}
 
+	/**
+	 * Add search post type filtered
+	 */
+	public function addRewriteRules(){
+
+		global $wp_rewrite;
+
+		$search_post_type_permastuct = str_replace('/%search%', '/%post_type%/%search%', $wp_rewrite->get_search_permastruct());
+		$regex = str_replace('%search%', '([^/]*)', str_replace('%post_type%', '([^/]*)', $search_post_type_permastuct));
+		add_rewrite_rule('^'.$regex.'/'.$wp_rewrite->pagination_base.'/([0-9]{1,})/?', 'index.php?s=$matches[2]&post_type=$matches[1]&paged=$matches[3]', 'top');
+		add_rewrite_rule('^'.$regex.'/?', 'index.php?s=$matches[2]&post_type=$matches[1]', 'top');
+
+		$wp_rewrite->search_post_type_structure = $search_post_type_permastuct;
+	}
+
 
 	public function __construct($config)
 	{
 
-		// Handle subfolder in url
+
 		add_filter('option_siteurl', [$this, 'optionSiteURL'] );
 		add_filter('network_site_url', [$this, 'networkSiteURL'] );
 		add_filter('home_url', [$this, 'homeURL'] );
-
+		add_action('init', [$this, 'addRewriteRules']);
 
 		if( is_admin() )
 			return;
 
 		add_action('init', function()
 		{
+
+			// Handle subfolder in url
 			if ( is_feed() || get_query_var( 'sitemap' ) )
 				return;
 

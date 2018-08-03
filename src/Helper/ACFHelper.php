@@ -16,7 +16,7 @@ class ACF
 {
 	private $raw_objects, $objects;
 
-	protected static $MAX_DEPTH = 2;
+	protected static $MAX_DEPTH = 3;
 	protected static $DEPTH = 0;
 	protected static $CACHE = [];
 
@@ -116,6 +116,12 @@ class ACF
 		}
 
 		return $data;
+	}
+
+
+	public function isCached($type, $id)
+	{
+		return isset(self::$CACHE[$type], self::$CACHE[$type][$id]);
 	}
 
 

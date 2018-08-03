@@ -14,19 +14,19 @@ $_locale = ($_config->get('multisite.multilangue') && !$_config->get('multisite.
 
 $collection = new RouteCollection();
 
-$addRoute = function( $name, $struct, $is_archive=false, $method='GET' ) use($controller_name, $_locale, $collection, $wp_rewrite)
+$addRoute = function( $name, $struct, $paginate=false, $method='GET' ) use($controller_name, $_locale, $collection, $wp_rewrite)
 {
 	$name = str_replace('_structure', '', $name);
 
 	$controller = 'App\Controller\\'.$controller_name.'::'.str_replace(' ', '',lcfirst(ucwords(str_replace('_', ' ', $name))).'Action');
-	$path = str_replace('%/', '}', str_replace('/%', '/{', $struct));
-	$path = preg_replace('/\%$/', '}', preg_replace('/^\%/', '/{', $path));
-	$path = ltrim($path, '/');
+	$path = str_replace('%/', '}/', str_replace('/%', '/{', $struct));
+	$path = preg_replace('/\%$/', '}/', preg_replace('/^\%/', '/{', $path));
+	$path = trim($path, '/');
 
 	$route = new Route( $_locale.$path, ['_controller'=>$controller]);
 	$collection->add('wp_'.$name, $route);
 
-	if( $is_archive )
+	if( $paginate )
 	{
 		$route = new Route( $_locale.$path.'/'.$wp_rewrite->pagination_base.'/{page}', ['_controller'=>$controller]);
 		$route->setMethods($method);
@@ -54,11 +54,10 @@ foreach ($wp_post_types as $wp_post_type)
 	}
 }
 
-foreach (['author_structure', 'search_structure', 'page_structure'] as $name)
-{
-	$addRoute($name, $wp_rewrite->$name);
-}
-
+$addRoute('author', $wp_rewrite->author_structure);
+$addRoute('search', $wp_rewrite->search_structure, true);
+$addRoute('search_post_type', $wp_rewrite->search_post_type_structure, true);
+$addRoute('page', $wp_rewrite->page_structure);
 
 if( !empty($_locale) )
 {

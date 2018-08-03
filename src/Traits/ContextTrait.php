@@ -72,7 +72,7 @@ Trait ContextTrait
 
 	public function addSite()
 	{
-		global $wp_query;
+		global $wp_query, $wp_rewrite;
 
 		$blog_language = get_bloginfo('language');
 		$post_id = $wp_query->get_queried_object_id();
@@ -114,7 +114,7 @@ Trait ContextTrait
 			'languages'        => $languages,
 			'is_admin'         => current_user_can('manage_options'),
 			'home_url'         => home_url(),
-			'search_url'       => get_search_link(),
+			'search_url'       => '/'.str_replace('/%search%', '', $wp_rewrite->get_search_permastruct()),
 			'maintenance_mode' => wp_maintenance_mode()
 		];
 

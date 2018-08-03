@@ -45,7 +45,7 @@ class FrontController {
 
 		if ( $query->is_archive and $post_type )
 		{
-			if( $ppp = $this->config->get('post_types.'.$post_type.'.posts_per_page') )
+			if( $ppp = $this->config->get('post_type.'.$post_type.'.posts_per_page') )
 				$query->set( 'posts_per_page', $ppp );
 		}
 
@@ -58,6 +58,12 @@ class FrontController {
 
 			$query->set('post_type', $post_type);
 			$query->query['post_type'] = $post_type;
+		}
+
+		if( $query->is_search ) {
+
+			if( $ppp = $this->config->get('search.posts_per_page') )
+				$query->set( 'posts_per_page', $ppp );
 		}
 
 		return $query;

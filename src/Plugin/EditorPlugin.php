@@ -43,7 +43,7 @@ class EditorPlugin {
 	}
 
 
-	public function archiveButton($wp_admin_bar)
+	public function addArchiveButton($wp_admin_bar)
 	{
 		if( is_post_type_archive() )
 		{
@@ -108,7 +108,7 @@ class EditorPlugin {
 		}
 		else
 		{
-			add_action( 'admin_bar_menu', [$this, 'archiveButton'], 80);
+			add_action( 'admin_bar_menu', [$this, 'addArchiveButton'], 80);
 		}
 	}
 }
