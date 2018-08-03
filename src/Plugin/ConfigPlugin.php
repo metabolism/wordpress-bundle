@@ -304,37 +304,36 @@ class ConfigPlugin {
 
 	public function addTableViews()
 	{
+		foreach ( $this->config->get('table', []) as $name => $args )
+		{
+			$default_args = [
+				'page_title' => ucfirst($name),
+				'menu_title' => ucfirst($name),
+				'capability' => 'activate_plugins',
+				'singular'   => $name,
+				'menu_icon'  => 'editor-table',
+				'plural'     => $this->plural($name),
+				'per_page'   => 20,
+				'position'   => 30,
+				'export'     => true
+			];
 
-		add_action('admin_menu', function() {
+			$args = array_merge($default_args, $args);
+			$args['menu_icon'] = 'dashicons-'.$args['menu_icon'];
 
-			foreach ( $this->config->get('table', []) as $name => $args )
-			{
-				$default_args = [
-					'page_title' => ucfirst($name),
-					'menu_title' => ucfirst($name),
-					'capability' => 'activate_plugins',
-					'singular'   => $name,
-					'menu_icon'  => 'editor-table',
-					'plural'     => $this->plural($name),
-					'per_page'   => 20,
-					'position'   => 30,
-					'export'     => true
-				];
+			$table = new Table($name, $args);
 
-				$args = array_merge($default_args, $args);
-
-				$args['menu_icon'] = 'dashicons-'.$args['menu_icon'];
-
-				$table = new Table($name, $args);
+			add_action('admin_menu', function() use($name, $table, $args) {
 
 				add_menu_page($args['page_title'], $args['menu_title'], $args['capability'], 'table_'.$name, function() use($table, $args)
 				{
+					$table->init();
 					$table->prepare_items();
 					$table->display();
 
 				}, $args['menu_icon'], $args['position']);
-			}
-		});
+			});
+		}
 	}
 
 

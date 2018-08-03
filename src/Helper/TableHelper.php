@@ -11,6 +11,12 @@ class Table extends \WP_List_Table {
 
 	function __construct($table, $args)
 	{
+		if( isset($args['columns'], $args['columns']['email']) )
+		{
+			add_filter( 'wp_privacy_personal_data_exporters', [$this, 'registerTableDataExporter'], 10 );
+			add_filter( 'wp_privacy_personal_data_erasers', [$this, 'registerTableDataEraser'], 10 );
+		}
+
 		global $wpdb;
 
 		$this->table = $table;
@@ -28,14 +34,79 @@ class Table extends \WP_List_Table {
 			unset($args['columns']['title']);
 
 		$this->args  = $args;
+	}
 
-		parent::__construct( array(
-			'singular'  => $args['singular'],
-			'plural'    => $args['plural'],
+
+	function init() {
+
+		parent::__construct([
+			'singular'  => $this->args['singular'],
+			'plural'    => $this->args['plural'],
 			'ajax'      => false
-		) );
+		]);
 
 		$this->doActions();
+	}
+
+
+	function registerTableDataEraser( $erasers ) {
+		$erasers[$this->table.'-eraser'] = array(
+			'eraser_friendly_name' => __( $this->args['page_title'].' eraser' ),
+			'callback'  => function( $email ) {
+
+				if ( !is_email($email) )
+					return ['items_removed' => false, 'items_retained' => false, 'messages' => [], 'done' => true];
+
+				global $wpdb;
+
+				$count = $wpdb->delete( $wpdb->prefix.$this->table, ['email'=>$email]);
+
+				return ['items_removed' => $count, 'items_retained' => false, 'messages' => [], 'done' => true];
+
+			}
+		);
+
+		return $erasers;
+	}
+
+	function registerTableDataExporter( $exporters ) {
+
+		$exporters[$this->table.'-exporter'] = [
+			'exporter_friendly_name' => __( $this->args['page_title'] . ' exporter' ),
+			'callback' => function( $email ) {
+
+				if( !is_email($email) )
+					return [ 'data' => false, 'done' => true];
+
+				global $wpdb;
+
+				$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}{$this->table} WHERE `email`='".$email."'", ARRAY_A );
+
+				$data = [];
+
+				foreach ($results as $row)
+				{
+					$entry = [];
+
+					foreach ($row as $key=>$value)
+					{
+						if( $key != 'id' )
+							$entry[] = ['name'=>ucfirst(str_replace('_', ' ', $key)), 'value'=>$value];
+					}
+
+					$data[] = [
+						'group_id'    => $this->table,
+						'group_label' => __( $this->args['page_title'] ),
+						'item_id'     => $row['id'],
+						'data'        => $entry
+					];
+				}
+
+				return [ 'data' => $data, 'done' => true];
+			}
+		];
+
+		return $exporters;
 	}
 
 

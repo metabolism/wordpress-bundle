@@ -107,15 +107,16 @@ Trait ContextTrait
 		}
 
 		$this->data = [
-			'debug'            => WP_DEBUG,
-			'environment'      => $this->config->get('environment', 'production'),
-			'locale'           => count($language) ? $language[0] : 'en',
-			'language'         => $blog_language,
-			'languages'        => $languages,
-			'is_admin'         => current_user_can('manage_options'),
-			'home_url'         => home_url(),
-			'search_url'       => '/'.str_replace('/%search%', '', $wp_rewrite->get_search_permastruct()),
-			'maintenance_mode' => wp_maintenance_mode()
+			'debug'              => WP_DEBUG,
+			'environment'        => $this->config->get('environment', 'production'),
+			'locale'             => count($language) ? $language[0] : 'en',
+			'language'           => $blog_language,
+			'languages'          => $languages,
+			'is_admin'           => current_user_can('manage_options'),
+			'home_url'           => home_url(),
+			'search_url'         => '/'.str_replace('/%search%', '', $wp_rewrite->get_search_permastruct()),
+			'privacy_policy_url' => get_privacy_policy_url(),
+			'maintenance_mode'   => wp_maintenance_mode()
 		];
 
 		if( is_multisite() )

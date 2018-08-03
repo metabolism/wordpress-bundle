@@ -20,6 +20,7 @@ CHANGELOG
 - Form helper :: post comment
 - Template in wordpress.yml for all post_type
 - Export on custom table
+- Custom table register wp rgpd handler to export and erase data
 ### Changed
 - Context->addBreadcrumb now add post/term title
 - Context->addCurrent to add term for archive
