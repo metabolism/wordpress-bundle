@@ -16,7 +16,7 @@ class ACF
 {
 	private $raw_objects, $objects;
 
-	protected static $MAX_DEPTH = 3;
+	protected static $MAX_DEPTH = 2;
 	protected static $DEPTH = 0;
 	protected static $CACHE = [];
 
