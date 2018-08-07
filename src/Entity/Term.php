@@ -28,12 +28,13 @@ class Term extends Entity
 			$id = $id[0];
 		}
 
-		$term = $this->get($id);
+		if( $term = $this->get($id) )
+		{
+			$this->import($term);
 
-		$this->import($term);
-
-		if( $term->taxonomy )
-			$this->addCustomFields($term->taxonomy.'_'.$id);
+			if( $term->taxonomy )
+				$this->addCustomFields($term->taxonomy.'_'.$id);
+		}
 	}
 
 
@@ -43,12 +44,14 @@ class Term extends Entity
 
 		if( is_int($pid) && $term = get_term($pid) )
 		{
+			if( !$term || is_wp_error($term) )
+				return false;
+			
 			$term->excerpt = strip_tags(term_description($pid),'<b><i><strong><em><br>');
 			$term->link = get_term_link($pid);
 			$term->ID = $term->term_id;
+			$term->current = get_queried_object_id() == $pid;
 		}
-
-		$term->current = get_queried_object_id() == $pid;
 
 		return $term;
 	}

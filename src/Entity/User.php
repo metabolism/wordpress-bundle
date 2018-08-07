@@ -20,8 +20,8 @@ class User extends Entity
 	 */
 	public function __construct($id)
 	{
-		$user = $this->get($id);
-		$this->import($user);
+		if( $user = $this->get($id) )
+			$this->import($user);
 	}
 
 
@@ -31,10 +31,11 @@ class User extends Entity
 
 		if( is_int($pid) && $user = get_user_by('id', $pid) )
 		{
-			//todo:
+			if( !$user || is_wp_error($user) )
+				return false;
 		}
 
-		return $term;
+		return $user;
 	}
 
 }

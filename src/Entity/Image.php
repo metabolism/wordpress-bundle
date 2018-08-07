@@ -24,8 +24,8 @@ class Image extends Entity
 	 */
 	public function __construct($id = null) {
 
-		$data = $this->get($id);
-		$this->import($data, false, 'post_');
+		if( $data = $this->get($id) )
+			$this->import($data, false, 'post_');
 	}
 
 
@@ -46,6 +46,9 @@ class Image extends Entity
 		$metadata = wp_get_attachment_metadata($id);
 		$post = get_post($id, ARRAY_A);
 		$post_meta = get_post_meta($id);
+
+		if( !$post || is_wp_error($post) )
+			return false;
 
 		if( !empty($metadata) )
 		{

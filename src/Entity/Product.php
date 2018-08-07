@@ -22,7 +22,9 @@ class Product extends Post
 	 */
 	public function __construct($id = null) {
 
+		parent::__construct($id);
+
 		if( function_exists('wc_get_product'))
-			$this->ws = wc_get_product( $id );
+			$this->wc = wc_get_product( $id );
 	}
 }

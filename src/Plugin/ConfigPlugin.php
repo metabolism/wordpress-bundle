@@ -221,6 +221,9 @@ class ConfigPlugin {
 			if( !isset($wp_roles->roles[$role]))
 				add_role($role, $args['display_name'], $args['capabilities']);
 		}
+
+		$wp_roles->add_cap( 'editor', 'wpseo_edit_advanced_metadata' );
+		$wp_roles->add_cap( 'editor', 'wpseo_manage_options' );
 	}
 
 

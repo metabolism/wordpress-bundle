@@ -34,6 +34,8 @@ class Table extends \WP_List_Table {
 			unset($args['columns']['title']);
 
 		$this->args  = $args;
+
+		$this->doActions();
 	}
 
 
@@ -44,8 +46,6 @@ class Table extends \WP_List_Table {
 			'plural'    => $this->args['plural'],
 			'ajax'      => false
 		]);
-
-		$this->doActions();
 	}
 
 
@@ -140,7 +140,7 @@ class Table extends \WP_List_Table {
 				fclose($out);
 			}
 
-			exit();
+			exit(0);
 		}
 	}
 

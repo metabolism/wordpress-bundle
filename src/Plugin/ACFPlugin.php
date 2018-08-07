@@ -35,15 +35,8 @@ class ACFPlugin {
 		// When viewing admin
 		if( is_admin() )
 		{
-			add_filter('acf/fields/google_map/api', function( $api ){
-
-				$api['key'] = $this->config->get('gmap_api_key');
-				return $api;
-			});
-
 			// Setup ACF Settings
 			add_action( 'acf/init', [$this, 'addSettings'] );
-
 		}
 	}
 }

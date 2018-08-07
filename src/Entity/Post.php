@@ -50,7 +50,11 @@ class Post extends Entity
 
 		if( is_int($pid) && $post = get_post($pid) )
 		{
+			if( !$post || is_wp_error($post) )
+				return false;
+
 			$df = get_option('date_format');
+			
 			$post->post_date = (string) mysql2date( get_option('date_format'), $post->post_date);
 			$post->post_date = apply_filters('get_the_date', $post->post_date, $df);
 

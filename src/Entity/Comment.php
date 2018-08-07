@@ -29,9 +29,7 @@ class Comment extends Entity
 
 	private function get( $pid ) {
 
-		$comment = get_comment($pid);
-
-		return $comment;
+		return get_comment($pid);
 	}
 
 
