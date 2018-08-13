@@ -56,6 +56,8 @@ class SecurityPlugin {
 	 */
 	public function cleanHeader()
 	{
+		remove_action('wp_head', 'feed_links', 2);
+		remove_action('wp_head', 'feed_links_extra', 3 );
 		remove_action('wp_head', 'rsd_link');
 		remove_action('wp_head', 'wlwmanifest_link');
 		remove_action('wp_head', 'wp_generator');
@@ -98,6 +100,10 @@ class SecurityPlugin {
 
 			add_action('init', function()
 			{
+				global $wp_rewrite;
+
+				$wp_rewrite->feeds = array();
+
 				if( class_exists( 'WPSEO_Frontend' ) )
 				{
 					if( method_exists( 'WPSEO_Frontend', 'debug_mark' ) )

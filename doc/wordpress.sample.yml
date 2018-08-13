@@ -41,8 +41,10 @@ remove_submenu_page:
 #  disallow_file_edit: false
 
 #options
-#https://developers.google.com/maps/documentation/javascript/get-api-key
-gmap_api_key: xxx
+acf:
+  autoload: true
+  #https://developers.google.com/maps/documentation/javascript/get-api-key
+  google_api_key: AIzaSyDEv5UrZbosf5H8MFSFLvoVS7djfsTCQFc
 
 support:
   - templates
@@ -60,7 +62,9 @@ post_type:
   guide:
     menu_icon: book #https://developer.wordpress.org/resource/dashicons/
     has_archive: true
+    #has_options: true
     capability_type: post
+    #posts_per_page: 11
     supports:
       - title
       - excerpt
@@ -83,6 +87,7 @@ post_type:
 taxonomy:
 
   guide_category:
+    #posts_per_page: 11
     object_type:
       - guide
     labels:
@@ -108,6 +113,8 @@ template:
   post:
     video: 'Video'
 
+#search:
+ # posts_per_page: 12
 
 #table:
 #  newsletter:

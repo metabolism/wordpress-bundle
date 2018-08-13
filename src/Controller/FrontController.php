@@ -41,20 +41,23 @@ class FrontController {
 		if( !$query->is_main_query() || is_admin() )
 			return;
 
-		$post_type = get_query_var('post_type');
+		global $wp_query;
 
-		if ( $query->is_archive and $post_type )
+		$object = $wp_query->get_queried_object();
+
+		if ( $query->is_archive )
 		{
-			if( $ppp = $this->config->get('post_type.'.$post_type.'.posts_per_page') )
+			if( get_class($object) == 'WP_Post_Type' && $ppp = $this->config->get('post_type.'.$object->name.'.posts_per_page') )
+				$query->set( 'posts_per_page', $ppp );
+			elseif( get_class($object) == 'WP_Term' && $ppp = $this->config->get('taxonomy.'.$object->taxonomy.'.posts_per_page') )
 				$query->set( 'posts_per_page', $ppp );
 		}
 
-		if ( $query->is_tax and !$post_type )
+		if ( $query->is_tax and !get_query_var('post_type') )
 		{
 			global $wp_taxonomies;
 
-			$taxo = get_queried_object();
-			$post_type = ( isset($taxo->taxonomy, $wp_taxonomies[$taxo->taxonomy] ) ) ? $wp_taxonomies[$taxo->taxonomy]->object_type : array();
+			$post_type = ( isset($object->taxonomy, $wp_taxonomies[$object->taxonomy] ) ) ? $wp_taxonomies[$object->taxonomy]->object_type :[];
 
 			$query->set('post_type', $post_type);
 			$query->query['post_type'] = $post_type;

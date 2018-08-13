@@ -142,9 +142,74 @@ class MultisitePlugin {
 	}
 
 
+	public function msls_head()
+	{
+		$blogs  = \MslsBlogCollection::instance();
+		$mydata = \MslsOptions::create();
+
+		$home_url = rtrim(network_site_url(), '/');
+
+		foreach ( $blogs->get_objects() as $blog ) {
+			$language = $blog->get_language();
+			$url      = $mydata->get_current_link();
+			$current  = ( $blog->userblog_id == \MslsBlogCollection::instance()->get_current_blog_id() );
+
+			if ( ! $current ) {
+				switch_to_blog( $blog->userblog_id );
+
+				if ( 'MslsOptions' != get_class( $mydata ) && ( is_null( $mydata ) || ! $mydata->has_value( $language ) ) ) {
+					restore_current_blog();
+					continue;
+				}
+				$url = $mydata->get_permalink( $language );
+				$title = $blog->get_description();
+
+				restore_current_blog();
+			}
+
+			if ( has_filter( 'msls_head_hreflang' ) ) {
+				/**
+				 * Overrides the hreflang value
+				 * @since 0.9.9
+				 * @param string $language
+				 */
+				$hreflang = (string) apply_filters( 'msls_head_hreflang', $language );
+			}
+			else {
+				$hreflang = $blog->get_alpha2();
+			}
+
+			//fix: ensure it's absolute
+			if( strpos($url, $home_url) === false )
+				$url = $home_url.$url;
+
+			printf(
+				'<link rel="alternate" hreflang="%s" href="%s"/>',
+				$hreflang,
+				$url
+			);
+			echo "\n";
+		}
+	}
+
+
 	public function __construct($config)
 	{
-		if( is_admin() && $config->get('multisite.clone_post') )
-			$this->setup();
+		if( is_multisite() )
+		{
+			if( is_admin() )
+			{
+				if( $config->get('multisite.clone_post') )
+					$this->setup();
+			}
+			else
+			{
+				//fix broken msls_head function
+				add_action('init', function() {
+					remove_action('wp_head', 'msls_head');
+					add_action('wp_head', [$this, 'msls_head']);
+				});
+			}
+		}
 	}
 }

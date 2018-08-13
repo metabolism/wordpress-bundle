@@ -40,7 +40,7 @@ $addRoute('front', '');
 foreach ($wp_rewrite->extra_permastructs as $name=>$permastruct)
 {
 	if( $permastruct['with_front'])
-		$addRoute($name, $permastruct['struct']);
+		$addRoute($name, $permastruct['struct'], $permastruct['paged']);
 }
 
 foreach ($wp_post_types as $wp_post_type)

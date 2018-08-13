@@ -32,6 +32,12 @@ class AdminController {
 
 		if( !$role_object->has_cap('edit_theme_options') )
 			$role_object->add_cap( 'edit_theme_options' );
+
+		if( !$role_object->has_cap('wpseo_edit_advanced_metadata') )
+			$wp_roles->add_cap( 'editor', 'wpseo_edit_advanced_metadata' );
+
+		if( !$role_object->has_cap('wpseo_manage_options') )
+			$wp_roles->add_cap( 'editor', 'wpseo_manage_options' );
 	}
 
 
