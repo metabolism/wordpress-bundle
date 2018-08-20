@@ -85,13 +85,21 @@ class ConfigPlugin {
 					{
 						add_filter ( 'manage_'.$post_type.'_posts_columns', function ( $columns ) use ( $args )
 						{
+							foreach ( $args['columns'] as &$column )
+								$column = ucfirst(str_replace('_', ' ', $column));
+
 							return array_merge ( $columns, $args['columns'] );
 						});
 
 						add_action ( 'manage_'.$post_type.'_posts_custom_column', function ( $column, $post_id ) use ( $args )
 						{
 							if( isset($args['columns'][$column]) )
-								echo get_post_meta( $post_id, $column, true );
+							{
+								if( $args['columns'][$column] == 'thumbnail')
+									echo '<a class="attachment-thumbnail-container">'.get_the_post_thumbnail($post_id, 'thumbnail').get_the_post_thumbnail($post_id, 'thumbnail').'</a>';
+								else
+									echo get_post_meta( $post_id, $args['columns'][$column], true );
+							}
 
 						}, 10, 2 );
 
@@ -340,6 +348,19 @@ class ConfigPlugin {
 	}
 
 
+	public function loadStyle(){
+
+		echo '<style>
+               #the-list .attachment-thumbnail-container{ position: relative; display: inline-block }
+               #the-list .attachment-thumbnail-container:hover .attachment-thumbnail{ display: block }
+               #the-list .attachment-thumbnail{ width: 60px; height: auto; border-radius: 2px; display: block }
+               #the-list .attachment-thumbnail+.attachment-thumbnail{ width: auto; position: absolute; left: 50%; top: 50%; display: none; transform: translate(-50%, -50%); box-shadow: 0 0 4px rgba(0,0,0,0.2) }
+               .manage-column.num{ text-align: left } 
+              </style>';
+	}
+
+
+
 	public function __construct($config)
 	{
 
@@ -369,6 +390,7 @@ class ConfigPlugin {
 		if( is_admin() )
 		{
 			add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
+			add_action('admin_head', [$this, 'loadStyle']);
 
 			$support = $this->config->get('support', []);
 

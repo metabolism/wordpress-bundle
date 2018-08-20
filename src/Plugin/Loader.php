@@ -6,6 +6,9 @@ class Loader{
 
 	public static function all(){
 
+		if( defined('WP_INSTALLING') and WP_INSTALLING )
+			return;
+
 		if( defined('WPINC') ){
 
 			global $_config;
@@ -17,10 +20,10 @@ class Loader{
 				{
 					$classname = str_replace('.php', '', $plugin);
 
-					if( class_exists('\App\Plugin\\'.$classname) )
-						$classname = '\App\Plugin\\'.$classname;
+					if( class_exists('App\Plugin\\'.$classname) )
+						$classname = 'App\Plugin\\'.$classname;
 					else
-						$classname = '\Metabolism\WordpressBundle\Plugin\\'.$classname;
+						$classname = 'Metabolism\WordpressBundle\Plugin\\'.$classname;
 
 					new $classname($_config);
 				}

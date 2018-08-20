@@ -6,6 +6,8 @@
 namespace Metabolism\WordpressBundle\Traits;
 
 use Metabolism\WordpressBundle\Entity\Comment;
+use Metabolism\WordpressBundle\Factory\PostFactory;
+use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 use Metabolism\WordpressBundle\Helper\ACF;
 use Metabolism\WordpressBundle\Plugin\TermsPlugin;
 use Metabolism\WordpressBundle\Provider\WooCommerceProvider;
@@ -199,7 +201,7 @@ Trait ContextTrait
 
 		if( $id )
 		{
-			$post = new Post($id);
+			$post = PostFactory::create($id);
 
 			if( $callback and is_callable($callback) )
 				call_user_func($callback, $post);
@@ -234,7 +236,7 @@ Trait ContextTrait
 
 		if( $id )
 		{
-			$term = new Term($id);
+			$term = TaxonomyFactory::create($id);
 
 			if( $callback and is_callable($callback) )
 				call_user_func($callback, $term);

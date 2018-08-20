@@ -1,13 +1,9 @@
 <?php
-/**
- * User: Paul Coudeville <paul@metabolism.fr>
- */
 
 namespace Metabolism\WordpressBundle\Entity;
 
 /**
- * Class Term
- * @see \Timber\Term
+ * Class User
  *
  * @package Metabolism\WordpressBundle\Entity
  */

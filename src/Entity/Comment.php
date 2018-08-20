@@ -1,13 +1,10 @@
 <?php
-/**
- * User: Paul Coudeville <paul@metabolism.fr>
- */
 
 namespace Metabolism\WordpressBundle\Entity;
 
 
 /**
- * Class Post
+ * Class Comment
  *
  * @package Metabolism\WordpressBundle\Entity
  */

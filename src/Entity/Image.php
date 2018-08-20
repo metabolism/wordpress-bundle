@@ -6,14 +6,12 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 /**
- * Class Post
- * @see \Timber\Term
+ * Class Image
  *
  * @package Metabolism\WordpressBundle\Entity
  */
 class Image extends Entity
 {
-	public $type;
 	public static $wp_upload_dir = false;
 
 
@@ -81,7 +79,12 @@ class Image extends Entity
 		if( !empty($metadata) )
 			unset($metadata['sizes'], $metadata['image_meta']);
 
+		$post['mime_type'] = mime_content_type($metadata['src']);
+
 		unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
+
+		if( $post['mime_type'] == 'image/svg+xml')
+			unset($metadata['meta'],$metadata['width'],$metadata['height']);
 
 		if( is_array($metadata) )
 			return array_merge($post, $metadata);

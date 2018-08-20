@@ -1,18 +1,15 @@
 <?php
-/**
- * User: Paul Coudeville <paul@metabolism.fr>
- */
 
 namespace Metabolism\WordpressBundle\Entity;
 
+use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 use Metabolism\WordpressBundle\Helper\ACF;
 
 use Metabolism\WordpressBundle\Entity\Term,
 	Metabolism\WordpressBundle\Entity\Post;
 
 /**
- * Class Post
- * @see \Timber\Post
+ * Class Query
  *
  * @package Metabolism\WordpressBundle\Entity
  */
@@ -33,7 +30,7 @@ class Query
 
 		foreach ($terms as &$term)
 		{
-			$term = new Term( $term );
+			$term = TaxonomyFactory::create( $term );
 		}
 
 		return $terms;
@@ -45,7 +42,7 @@ class Query
 		$term = get_term_by( $field, $value, $taxonomy );
 
 		if( $term )
-			return new Term( $term->term_id );
+			return TaxonomyFactory::create( $term );
 		else
 			return false;
 	}
@@ -70,7 +67,7 @@ class Query
 			$wpseo_primary_term = new \WPSEO_Primary_Term( $taxonomy, $id );
 
 			if( $wpseo_primary_term and $wpseo_primary_term->get_primary_term() )
-				return new Term( $wpseo_primary_term->get_primary_term() );
+				return TaxonomyFactory::create( $wpseo_primary_term->get_primary_term() );
 		}
 
 		$terms = wp_get_post_terms($id, $taxonomy, ['fields' => 'ids']);
@@ -78,7 +75,7 @@ class Query
 		if( $primary ){
 
 			if( !empty($terms) )
-				return new Term($terms[0]);
+				return TaxonomyFactory::create($terms[0]);
 			else
 				return false;
 		}
@@ -87,7 +84,7 @@ class Query
 			$post_terms = [];
 
 			foreach($terms as $term)
-				$post_terms[$taxonomy][] = new Term($term);
+				$post_terms[$taxonomy][] = TaxonomyFactory::create($term);
 
 			return $post_terms;
 		}
@@ -97,10 +94,10 @@ class Query
 	public static function get_post($args=[])
 	{
 		if( empty($args) )
-			return new Post();
+			return PostFactory::create();
 
 		if( !is_array($args) )
-			return new Post($args);
+			return PostFactory::create($args);
 
 		$args['posts_per_page'] = 1;
 
@@ -146,7 +143,7 @@ class Query
 
 		foreach ($query->posts as &$post)
 		{
-			$post = new Post( $post );
+			$post = PostFactory::create( $post );
 		}
 
 		return $query;

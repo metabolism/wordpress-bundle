@@ -1,25 +1,24 @@
 <?php
-/**
- * User: Paul Coudeville <paul@metabolism.fr>
- */
 
 namespace Metabolism\WordpressBundle\Entity;
 
 use Metabolism\WordpressBundle\Helper\ACF;
 
 /**
- * Class Post
+ * Class Entity
  *
  * @package Metabolism\WordpressBundle\Entity
  */
 class Entity
 {
 	public static $remove = [
-		'xfn', 'db_id', 'post_mime_type', 'ping_status', 'to_ping', 'pinged',
+		'xfn', 'db_id', 'post_mime_type', 'ping_status', 'to_ping', 'pinged', '_edit_lock',
 		'guid', 'filter', 'post_content_filtered', 'url', 'name', 'author_IP', 'agent'
 	];
 
 	public $ID;
+
+	public static $date_format = false;
 
 	public function import( $info, $remove=false , $replace=false )
 	{
@@ -72,6 +71,19 @@ class Entity
 
 		if( isset($object['name']) and !isset($object['title']) )
 			$object['title'] = $object['name'];
+
+		if( !self::$date_format )
+			self::$date_format = get_option('date_format');
+
+		if( isset($object['post_date']) ){
+			$object['post_date'] = (string) mysql2date( self::$date_format, $object['post_date']);
+			$object['post_date'] = apply_filters('get_the_date', $object['post_date'], self::$date_format);
+		}
+
+		if( isset($object['post_modified']) ){
+			$object['post_modified'] = (string) mysql2date( self::$date_format, $object['post_modified']);
+			$object['post_modified'] = apply_filters('get_the_date', $object['post_modified'], self::$date_format);
+		}
 
 		foreach(self::$remove as $prop){
 

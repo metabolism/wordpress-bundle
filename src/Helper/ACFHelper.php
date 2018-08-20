@@ -12,6 +12,9 @@ use Metabolism\WordpressBundle\Entity\Post,
 	Metabolism\WordpressBundle\Entity\Image,
 	Metabolism\WordpressBundle\Entity\Product;
 
+use Metabolism\WordpressBundle\Factory\PostFactory,
+	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
+
 class ACF
 {
 	private $raw_objects, $objects;
@@ -138,22 +141,16 @@ class ACF
 		switch ($type)
 		{
 			case 'image':
-				$value = new Image($id);
+				$value = PostFactory::create($id, 'image');
 				break;
 
 			case 'file':
 				$value = wp_get_attachment_url( $id );
 				break;
 
-			case 'product':
-				$post_status = get_post_status( $id );
-				$value = ( $post_status && $post_status !== 'publish' ) ? false : new Product( $id );
-
-				break;
-
 			case 'post':
 				$post_status = get_post_status( $id );
-				$value = ( $post_status && $post_status !== 'publish' ) ? false : new Post( $id );
+				$value = ( $post_status && $post_status !== 'publish' ) ? false : PostFactory::create( $id );
 				break;
 
 			case 'user':
@@ -161,7 +158,7 @@ class ACF
 				break;
 
 			case 'term':
-				$value = new Term( $id );
+				$value = TaxonomyFactory::create( $id );
 				break;
 
 			case 'objects':
@@ -270,12 +267,10 @@ class ACF
 
 						foreach ($object['value'] as $value) {
 
-							$type = count($object['post_type']) === 1 && $object['post_type'][0] == 'product' && class_exists( 'WooCommerce' ) ? 'product' : 'post';
-
 							if ($object['return_format'] == 'id' or is_int($value) )
-								$element = $this->getCache($type, $value);
+								$element = $this->getCache('post', $value);
 							elseif ($object['return_format'] == 'object')
-								$element = $this->getCache($type, $value->ID);
+								$element = $this->getCache('post', $value->ID);
 							else
 								$element = $object['value'];
 
@@ -290,12 +285,10 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					$type = count($object['post_type']) === 1 && $object['post_type'][0] == 'product' && class_exists( 'WooCommerce' ) ? 'product' : 'post';
-
 					if ($object['return_format'] == 'id' or is_int($object['value']) )
-						$objects[$object['name']] = $this->getCache($type, $object['value']);
+						$objects[$object['name']] = $this->getCache('post', $object['value']);
 					elseif ($object['return_format'] == 'object')
-						$objects[$object['name']] = $this->getCache($type, $object['value']->ID);
+						$objects[$object['name']] = $this->getCache('post', $object['value']->ID);
 					else
 						$objects[$object['name']] = $object['value'];
 

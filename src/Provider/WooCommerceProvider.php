@@ -41,7 +41,7 @@ class WooCommerceProvider
     {
         if (is_singular('product')) {
 
-            $context['post']    = new Post($context['post']->ID);
+            $context['post']    = PostFactory::create($context['post']->ID);
             $product            = wc_get_product( $context['post']->ID );
             $context['product'] = $product;
 

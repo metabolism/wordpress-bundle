@@ -7,7 +7,7 @@ if(!class_exists('WP_List_Table'))
 
 class Table extends \WP_List_Table {
 
-	private $table, $args, $fields, $column_title;
+	private $table, $args, $fields, $column_title, $total_items;
 
 	function __construct($table, $args)
 	{
@@ -147,7 +147,7 @@ class Table extends \WP_List_Table {
 
 	function extra_tablenav( $which ) {
 
-		if( $this->args['export'] )
+		if( $this->args['export'] && $this->total_items )
 			echo '<a class="button button-primary" href="'.sprintf('?page=%s&action=export', $_REQUEST['page']).'" style="display: inline-block;float: right;margin-left: 10px;margin-right: 0;margin-bottom: 10px;">'.__('Export all').'</a>';
 	}
 
@@ -279,15 +279,15 @@ class Table extends \WP_List_Table {
 
 		$this->process_bulk_action();
 
-		$total_items = $wpdb->get_var( "SELECT count(`id`) FROM {$wpdb->prefix}{$this->table}");
+		$this->total_items = $wpdb->get_var( "SELECT count(`id`) FROM {$wpdb->prefix}{$this->table}");
 
 		$query       = "SELECT `".implode("`,`", $this->fields)."` FROM {$wpdb->prefix}{$this->table} {$order} LIMIT ".(($current_page-1)*$per_page).", ".($current_page*$per_page);
 		$this->items = $wpdb->get_results( $query, ARRAY_A );
 
 		$this->set_pagination_args( array(
-			'total_items' => $total_items,
+			'total_items' => $this->total_items,
 			'per_page'    => $per_page,
-			'total_pages' => ceil($total_items/$per_page)
+			'total_pages' => ceil($this->total_items/$per_page)
 		) );
 	}
 }

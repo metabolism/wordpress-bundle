@@ -13,8 +13,11 @@ class Form {
 	/**
 	 * Get request parameter
 	 */
-	public static function getField( $key, $limit_lengh=500 )
+	public static function getField( $data, $key, $limit_lengh=500 )
 	{
+		if( !$data )
+			$data = $_REQUEST;
+
 		if( isset($_FILES[$key]))
 		{
 			$upload = Media::upload($key, ['image/jpeg', 'image/gif', 'image/png', 'application/pdf', 'application/zip']);
@@ -24,26 +27,26 @@ class Form {
 
 			return $upload['filename'];
 		}
-		elseif ( !isset( $_REQUEST[ $key ] ) )
+		elseif ( !isset( $data[ $key ] ) )
 		{
 			return false;
 		}
 		else
 		{
-			return substr( trim(sanitize_text_field( $_REQUEST[ $key ] )), 0, $limit_lengh );
+			return substr( trim(sanitize_text_field( $data[ $key ] )), 0, $limit_lengh );
 		}
 	}
 
 	/**
 	 * Get whole form
 	 */
-	public static function get($fields=[]){
+	public static function get($fields=[], $data=false){
 
 		$form = [];
 
-		foreach ( $fields as $key )
+		foreach ( $fields as $key=>$required )
 		{
-			$form[$key] = self::getField( $key );
+			$value = self::getField( $data, $key, $required );
 		}
 
 		return $form;

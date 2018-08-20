@@ -1,13 +1,11 @@
 <?php
-/**
- * User: Paul Coudeville <paul@metabolism.fr>
- */
 
 namespace Metabolism\WordpressBundle\Entity;
 
-
 use Metabolism\WordpressBundle\Entity\Image;
 use Metabolism\WordpressBundle\Entity\Term;
+use Metabolism\WordpressBundle\Factory\PostFactory;
+use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 
 /**
  * Class Post
@@ -16,8 +14,14 @@ use Metabolism\WordpressBundle\Entity\Term;
  */
 class Post extends Entity
 {
-	public $excerpt, $thumbnail, $link, $template;
-	private $_next, $_prev;
+	public $excerpt ='';
+	public $thumbnail = false;
+	public $link = '';
+	public $template = '';
+
+	private $_next = null;
+	private $_prev = null;
+	private $_post = null;
 
 	/**
 	 * Post constructor.
@@ -25,16 +29,6 @@ class Post extends Entity
 	 * @param null $id
 	 */
 	public function __construct($id = null) {
-
-		$_next = $_prev = null;
-
-		if( is_object($id) )
-		{
-			if( !isset($id->ID) )
-				return false;
-
-			$id = $id->ID;
-		}
 
 		if( $post = $this->get($id) )
 		{
@@ -48,22 +42,19 @@ class Post extends Entity
 
 		$post = false;
 
-		if( is_int($pid) && $post = get_post($pid) )
+		if( $post = get_post($pid) )
 		{
 			if( !$post || is_wp_error($post) )
 				return false;
 
-			$df = get_option('date_format');
-			
-			$post->post_date = (string) mysql2date( get_option('date_format'), $post->post_date);
-			$post->post_date = apply_filters('get_the_date', $post->post_date, $df);
+			$this->_post = $post;
 
 			$post->link = get_permalink( $post );
 			$post->template = get_page_template_slug( $post );
 			$post->thumbnail = get_post_thumbnail_id( $post );
 
 			if( $post->thumbnail )
-				$post->thumbnail = new Image($post->thumbnail);
+				$post->thumbnail = PostFactory::create($post->thumbnail, 'image');
 		}
 
 		return $post;
@@ -77,11 +68,14 @@ class Post extends Entity
 
 		global $post;
 		$old_global = $post;
+		$post = $this->_post;
 
 		$_next = get_next_post($in_same_term , $excluded_terms, $taxonomy);
 
+		$post = $old_global;
+
 		if( $_next )
-			$this->_next = new Post($_next->ID);
+			$this->_next = PostFactory::create($_next->ID);
 
 		return $this->_next;
 	}
@@ -94,11 +88,14 @@ class Post extends Entity
 
 		global $post;
 		$old_global = $post;
+		$post = $this->_post;
 
 		$_next = get_previous_post($in_same_term , $excluded_terms, $taxonomy);
 
+		$post = $old_global;
+
 		if( $_next )
-			$this->_next = new Post($_next->ID);
+			$this->_next = PostFactory::create($_next->ID);
 
 		return $this->_next;
 	}
@@ -122,7 +119,7 @@ class Post extends Entity
 		}
 
 		if( $term )
-			return new Term( $term->term_id );
+			return TaxonomyFactory::create( $term );
 		else
 			return false;
 	}
@@ -139,13 +136,9 @@ class Post extends Entity
 		if ( is_string($tax) )
 		{
 			if ( in_array($tax, ['all', 'any', '']) )
-			{
 				$taxonomies = get_object_taxonomies($this->type);
-			}
 			else
-			{
 				$taxonomies = [$tax];
-			}
 		}
 
 		$term_array = [];
@@ -160,7 +153,7 @@ class Post extends Entity
 			$terms = wp_get_post_terms($this->ID, $taxonomy, ['fields' => 'ids']);
 
 			foreach ($terms as $term)
-				$term_array[$term] = new Term($term);
+				$term_array[$term] = TaxonomyFactory::create($term);
 		}
 
 		return $term_array;
