@@ -32,7 +32,8 @@
     },
     "branch-alias": {
       "dev-3.4.x": "3.4.x-dev",
-      "dev-4.0.x": "4.0.x-dev"
+      "dev-4.0.x": "4.0.x-dev",
+      "dev-4.1.x": "4.1.x-dev"
     }
   },
   "autoload" : {
