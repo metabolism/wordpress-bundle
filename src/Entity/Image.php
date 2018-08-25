@@ -58,7 +58,6 @@ class Image extends Entity
 			$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
 		}
 
-
 		foreach($post_meta as $key=>$value)
 		{
 			if( in_array($key, ['_wp_attached_file', '_wp_attachment_metadata']) )
@@ -79,7 +78,8 @@ class Image extends Entity
 		if( !empty($metadata) )
 			unset($metadata['sizes'], $metadata['image_meta']);
 
-		$post['mime_type'] = mime_content_type($metadata['src']);
+		if( file_exists($metadata['src']) )
+			$post['mime_type'] = mime_content_type($metadata['src']);
 
 		unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
 
