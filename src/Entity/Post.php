@@ -61,47 +61,48 @@ class Post extends Entity
 	}
 
 
-	public function next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
+	protected function next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
 
 		if( !is_null($this->_next) )
 			return $this->_next;
 
-		global $post;
-		$old_global = $post;
-		$post = $this->_post;
-
-		$_next = get_next_post($in_same_term , $excluded_terms, $taxonomy);
-
-		$post = $old_global;
-
-		if( $_next )
-			$this->_next = PostFactory::create($_next->ID);
+		$this->_next = $this->getSibling('next', $in_same_term , $excluded_terms, $taxonomy);
 
 		return $this->_next;
 	}
 
 
-	public function prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
+	protected function prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
 
-		if( !is_null($this->_next) )
-			return $this->_next;
+		if( !is_null($this->_prev) )
+			return $this->_prev;
+
+		$this->_prev = $this->getSibling('prev', $in_same_term , $excluded_terms, $taxonomy);
+
+		return $this->_prev;
+	}
+
+
+	private function getSibling($direction='prev', $in_same_term , $excluded_terms, $taxonomy){
 
 		global $post;
 		$old_global = $post;
 		$post = $this->_post;
 
-		$_next = get_previous_post($in_same_term , $excluded_terms, $taxonomy);
+		if( $direction === 'prev')
+			$sibling = get_previous_post($in_same_term , $excluded_terms, $taxonomy);
+		else
+			$sibling = get_next_post($in_same_term , $excluded_terms, $taxonomy);
 
 		$post = $old_global;
 
-		if( $_next )
-			$this->_next = PostFactory::create($_next->ID);
-
-		return $this->_next;
+		if( $sibling && $sibling instanceof \WP_Post)
+			return PostFactory::create($sibling->ID);
+		else
+			return false;
 	}
 
-
-	public function get_term( $tax='category' ) {
+	protected function get_term( $tax='category' ) {
 
 		$term = false;
 
@@ -114,7 +115,7 @@ class Post extends Entity
 		}
 		else {
 			$terms = get_the_terms($this->ID, $tax);
-			if( count($terms) )
+			if( $terms && !is_wp_error($terms) && count($terms) )
 				$term = $terms[0];
 		}
 
@@ -125,7 +126,7 @@ class Post extends Entity
 	}
 
 
-	public function get_terms( $tax = '' ) {
+	protected function get_terms( $tax = '' ) {
 
 		$taxonomies = array();
 
@@ -147,15 +148,26 @@ class Post extends Entity
 		{
 			if ( in_array($taxonomy, ['tag', 'tags']) )
 				$taxonomy = 'post_tag';
+
 			if ( $taxonomy == 'categories' )
 				$taxonomy = 'category';
 
 			$terms = wp_get_post_terms($this->ID, $taxonomy, ['fields' => 'ids']);
 
-			foreach ($terms as $term)
-				$term_array[$term] = TaxonomyFactory::create($term);
+			if( is_wp_error($terms) ){
+
+				$term_array[$taxonomy] = $terms->get_error_messages();
+			}
+			else
+			{
+				foreach ($terms as $term)
+					$term_array[$taxonomy][$term] = TaxonomyFactory::create($term);
+			}
 		}
 
-		return $term_array;
+		if( count($taxonomies) == 1 )
+			return end($term_array);
+		else
+			return $term_array;
 	}
 }

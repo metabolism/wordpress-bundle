@@ -11,8 +11,16 @@ namespace Metabolism\WordpressBundle\Entity;
 class Menu extends Entity
 {
 	public $items, $id, $title, $slug, $description;
+	private $menuItemClass;
 
 	public function __construct( $slug = 0 ) {
+
+		$app_classname = 'App\Entity\MenuItem';
+
+		if( class_exists($app_classname) )
+			$this->menuItemClass = $app_classname;
+		else
+			$this->menuItemClass = 'Metabolism\WordpressBundle\Entity\MenuItem';
 
 		$menu_id = false;
 		$locations = get_nav_menu_locations();
@@ -31,42 +39,44 @@ class Menu extends Entity
 
 	protected function get( $menu_id )
 	{
-		$menu = wp_get_nav_menu_items($menu_id);
+		$menu_items = wp_get_nav_menu_items($menu_id);
 
-		if ( $menu )
-		{
-			_wp_menu_item_classes_by_context($menu);
+		if ( !$menu_items )
+			return false;
 
-			$this->orderItems($menu);
-			$this->items = $menu;
+		_wp_menu_item_classes_by_context($menu_items);
 
-			$menu_info = wp_get_nav_menu_object($menu_id);
+		$this->items = $this->orderItems($menu_items);
 
-			$this->id = $menu_id;
-			$this->title = $menu_info->name;
-			$this->slug = $menu_info->slug;
-			$this->description = $menu_info->description;
-		}
+		$menu_info = wp_get_nav_menu_object($menu_id);
+
+		$this->id = $menu_id;
+		$this->title = $menu_info->name;
+		$this->slug = $menu_info->slug;
+		$this->description = $menu_info->description;
+
 	}
 
 
-	protected function orderItems(&$menu)
+	protected function orderItems($menu_items)
 	{
 		$ordered_menu = [];
 
-		foreach ($menu as $item)
-			$ordered_menu[$item->ID] = Entity::normalize( $item, 'post_');
+		foreach ($menu_items as $item){
+
+			$ordered_menu[$item->ID] = new $this->menuItemClass($item);
+		}
 
 		foreach ($ordered_menu as $item)
 		{
-			if( $item['menu_item_parent'] != 0 )
+			if( $item->menu_item_parent != 0 )
 			{
-				$ordered_menu[$item['menu_item_parent']]['children'][] = $item;
-				unset($ordered_menu[$item['ID']]);
+				$ordered_menu[$item->menu_item_parent]['children'][] = $item;
+				unset($ordered_menu[$item->ID]);
 			}
 		}
 
-		$menu = array_values($ordered_menu);
+		return array_values($ordered_menu);
 	}
 
 

@@ -111,7 +111,12 @@ class Entity
 		foreach($object as $key=>$value)
 		{
 			if($replace && strpos($key, $replace) === 0 ){
-				$object[str_replace($replace,'', $key)] = $value;
+
+				$new_key = str_replace($replace,'', $key);
+
+				if( !isset($object[$new_key]) or empty($object[$new_key]))
+					$object[$new_key] = $value;
+
 				unset($object[$key]);
 			}
 		}

@@ -21,7 +21,6 @@ class ACF
 
 	protected static $MAX_DEPTH = 2;
 	protected static $DEPTH = 0;
-	protected static $CACHE = [];
 
 	public function __construct( $post_id )
 	{
@@ -32,7 +31,7 @@ class ACF
 		else
 		{
 			++self::$DEPTH;
-			$this->objects = $this->getCache('objects', $post_id);
+			$this->objects = $this->load('objects', $post_id);
 			--self::$DEPTH;
 		}
 	}
@@ -121,21 +120,8 @@ class ACF
 		return $data;
 	}
 
-
-	public function isCached($type, $id)
+	public function load($type, $id)
 	{
-		return isset(self::$CACHE[$type], self::$CACHE[$type][$id]);
-	}
-
-
-	public function getCache($type, $id)
-	{
-		if( isset(self::$CACHE[$type], self::$CACHE[$type][$id]))
-			return self::$CACHE[$type][$id];
-
-		if( !isset(self::$CACHE[$type]) )
-			self::$CACHE[$type] = [];
-
 		$value = false;
 
 		switch ($type)
@@ -172,9 +158,7 @@ class ACF
 
 				break;
 		}
-
-		self::$CACHE[$type][$id] = $value;
-
+		
 		return $value;
 	}
 
@@ -212,7 +196,7 @@ class ACF
 					$objects[$object['name']] = [];
 
 					foreach($object['value'] as $post)
-						$objects[$object['name']][] = $this->getCache('post', $post->ID);
+						$objects[$object['name']][] = $this->load('post', $post->ID);
 
 					break;
 
@@ -222,9 +206,9 @@ class ACF
 						break;
 
 					if ($object['return_format'] == 'id' or is_int($object['value']) )
-						$objects[$object['name']] = $this->getCache('image', $object['value']);
+						$objects[$object['name']] = $this->load('image', $object['value']);
 					elseif ($object['return_format'] == 'array')
-						$objects[$object['name']] = $this->getCache('image', $object['value']['id']);
+						$objects[$object['name']] = $this->load('image', $object['value']['id']);
 					else
 						$objects[$object['name']] = $object['value'];
 
@@ -240,7 +224,7 @@ class ACF
 						$objects[$object['name']] = [];
 
 						foreach ($object['value'] as $value)
-							$objects[$object['name']][] = $this->getCache('image', $value['id']);
+							$objects[$object['name']][] = $this->load('image', $value['id']);
 					}
 
 					break;
@@ -251,7 +235,7 @@ class ACF
 						break;
 
 					if ($object['return_format'] == 'id')
-						$objects[$object['name']] = $this->getCache('file', $object['value']);
+						$objects[$object['name']] = $this->load('file', $object['value']);
 					elseif ($object['return_format'] == 'array')
 						$objects[$object['name']] = $object['value']['url'];
 					else
@@ -268,9 +252,9 @@ class ACF
 						foreach ($object['value'] as $value) {
 
 							if ($object['return_format'] == 'id' or is_int($value) )
-								$element = $this->getCache('post', $value);
+								$element = $this->load('post', $value);
 							elseif ($object['return_format'] == 'object')
-								$element = $this->getCache('post', $value->ID);
+								$element = $this->load('post', $value->ID);
 							else
 								$element = $object['value'];
 
@@ -286,9 +270,9 @@ class ACF
 						break;
 
 					if ($object['return_format'] == 'id' or is_int($object['value']) )
-						$objects[$object['name']] = $this->getCache('post', $object['value']);
+						$objects[$object['name']] = $this->load('post', $object['value']);
 					elseif ($object['return_format'] == 'object')
-						$objects[$object['name']] = $this->getCache('post', $object['value']->ID);
+						$objects[$object['name']] = $this->load('post', $object['value']->ID);
 					else
 						$objects[$object['name']] = $object['value'];
 
@@ -299,7 +283,7 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					$objects[$object['name']] = $this->getCache('user', $object['value']['ID']);
+					$objects[$object['name']] = $this->load('user', $object['value']['ID']);
 					break;
 
 				case 'flexible_content';
@@ -357,7 +341,7 @@ class ACF
 								$id = $value->term_id;
 
 							if( $id )
-								$objects[$object['name']][] = $this->getCache('term', $id);
+								$objects[$object['name']][] = $this->load('term', $id);
 						}
 					}
 					else{
@@ -370,7 +354,7 @@ class ACF
 							$id = $object['value']->term_id;
 
 						if( $id )
-							$objects[$object['name']] = $this->getCache('term', $id);
+							$objects[$object['name']] = $this->load('term', $id);
 					}
 
 					break;
