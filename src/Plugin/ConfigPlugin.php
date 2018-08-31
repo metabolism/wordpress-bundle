@@ -254,6 +254,21 @@ class ConfigPlugin {
 	{
 		$updated = false;
 
+		add_settings_section('search_rewrite', '', false,'permalink');
+
+		if( isset( $_POST['search_rewrite_slug'] ) && !empty($_POST['search_rewrite_slug']) )
+		{
+			update_option( 'search_rewrite_slug', sanitize_title_with_dashes( $_POST['search_rewrite_slug'] ) );
+			$updated = true;
+		}
+
+		add_settings_field( 'search_rewrite_slug', 'Search',function ()
+		{
+			$value = get_option( 'search_rewrite_slug' );
+			echo '<input type="text" value="' . esc_attr( $value ) . '" name="search_rewrite_slug" placeholder="search" id="search_rewrite_slug" class="regular-text" />';
+
+		}, 'permalink', 'search_rewrite' );
+
 		add_settings_section('custom_post_type_rewrite', 'Custom post type', false,'permalink');
 
 		foreach ( get_post_types(['public'=> true, '_builtin' => false], 'objects') as $post_type=>$args )

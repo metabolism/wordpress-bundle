@@ -7,68 +7,158 @@ use Metabolism\WordpressBundle\Helper\WordpressHelper as Wordpress;
 use Symfony\Component\Routing\Route,
 	Symfony\Component\Routing\RouteCollection;
 
-global $wp_rewrite, $wp_post_types, $_config;
+class Permastuct{
 
+	public $collection;
+	private $controller_name, $_locale, $wp_rewrite;
+
+	public function __construct($collection, $locale='', $controller_name)
+	{
+		global $wp_rewrite;
+
+		$this->collection = $collection;
+		$this->controller_name = $controller_name;
+		$this->locale = $locale;
+		$this->wp_rewrite = $wp_rewrite;
+
+		$this->addRoutes();
+	}
+
+	public function addRoutes(){
+
+		$this->addRoute('front', '');
+
+		global $wp_post_types, $wp_taxonomies;
+
+		$registered = [];
+
+		foreach ($wp_post_types as $post_type)
+		{
+			if( $post_type->public ){
+
+				if( isset($this->wp_rewrite->extra_permastructs[$post_type->name]) ){
+
+					$base_struct = $this->wp_rewrite->extra_permastructs[$post_type->name]['struct'];
+					$translated_slug = get_option( $post_type->name. '_rewrite_slug' );
+
+					if( !empty($translated_slug) )
+						$struct = str_replace('/'.$post_type->rewrite['slug'].'/', '/'.$translated_slug.'/', $base_struct);
+					else
+						$struct = $base_struct;
+
+					$this->addRoute($post_type->name, $struct);
+				}
+
+				if( $post_type->has_archive ){
+
+					$base_struct = is_string($post_type->has_archive) ? $post_type->has_archive : $post_type->name;
+					$translated_slug = get_option( $post_type->name. '_rewrite_archive' );
+
+					$struct = empty($translated_slug) ? $base_struct : $translated_slug;
+
+					$this->addRoute($post_type->name.'_archive', $struct, $this->wp_rewrite->extra_permastructs[$post_type->name]['struct']);
+				}
+
+				$registered[] = $post_type->name;
+			}
+		}
+
+		foreach ($wp_taxonomies as $taxonomy){
+
+			if( $taxonomy->public ){
+
+				$base_struct = $this->wp_rewrite->extra_permastructs[$taxonomy->name]['struct'];
+				$translated_slug = get_option( $taxonomy->name. '_rewrite_slug' );
+
+				if( !empty($translated_slug) )
+					$struct = str_replace('/'.$taxonomy->rewrite['slug'].'/', '/'.$translated_slug.'/', $base_struct);
+				else
+					$struct = $base_struct;
+
+				$this->addRoute($taxonomy->name, $struct, $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
+
+				$registered[] = $taxonomy->name;
+			}
+		}
+
+		$this->addRoute('author', $this->wp_rewrite->author_structure);
+
+		$translated_search_slug = get_option( 'search_rewrite_slug' );
+
+		if( !empty($translated_search_slug) ){
+
+			$search_structure = str_replace($this->wp_rewrite->search_base.'/', $translated_search_slug.'/', $this->wp_rewrite->search_structure);
+			$search_post_type_structure = str_replace($this->wp_rewrite->search_base.'/', $translated_search_slug.'/', $this->wp_rewrite->search_post_type_structure);
+		}
+		else{
+
+			$search_structure = $this->wp_rewrite->search_structure;
+			$search_post_type_structure = $this->wp_rewrite->search_post_type_structure;
+		}
+
+		$this->addRoute('search', $search_structure, true);
+		$this->addRoute('search_post_type', $search_post_type_structure, true);
+
+		$this->addRoute('page', $this->wp_rewrite->page_structure);
+	}
+
+
+	private function getControllerName( $name ){
+		return 'App\Controller\\'.$this->controller_name.'::'.str_replace(' ', '',lcfirst(ucwords(str_replace('_', ' ', $name))).'Action');
+	}
+
+	private function getPaths( $struct ){
+
+		$path = str_replace('%/', '}/', str_replace('/%', '/{', $struct));
+		$path = preg_replace('/\%$/', '}/', preg_replace('/^\%/', '/{', $path));
+		$path = trim($path, '/');
+		$path = !empty($this->locale)? $this->locale.'/'.$path: $path;
+
+		return ['singular'=>$path, 'archive'=>$path.'/'.$this->wp_rewrite->pagination_base.'/{page}'];
+	}
+
+	public function addRoute( $name, $struct, $paginate=false )
+	{
+		$name = str_replace('_structure', '', $name);
+
+		$controller = $this->getControllerName($name);
+		$paths = $this->getPaths($struct);
+		$locale = $this->locale?'.'.$this->locale:'';
+
+		if( !empty($paths['singular']) or $name == 'front' ){
+
+			$route = new Route( $paths['singular'], ['_controller'=>$controller]);
+			$this->collection->add($name.$locale, $route);
+		}
+
+		if( $paginate && !empty($paths['archive']) )
+		{
+			$route = new Route( $paths['archive'], ['_controller'=>$controller]);
+			$this->collection->add($name.'_paged'.$locale, $route);
+		}
+	}
+}
+
+global $_config;
 $controller_name = $_config->get('extra_permastructs.controller', 'MainController');
-$_locale = ($_config->get('multisite.multilangue') && !$_config->get('multisite.subdomain_install')) ? '{_locale}{_separator}': '';
 
 $collection = new RouteCollection();
 
-$addRoute = function( $name, $struct, $paginate=false, $method='GET' ) use($controller_name, $_locale, $collection, $wp_rewrite)
+if( $_config->get('multisite.multilangue') && !$_config->get('multisite.subdomain_install') )
 {
-	$name = str_replace('_structure', '', $name);
-
-	$controller = 'App\Controller\\'.$controller_name.'::'.str_replace(' ', '',lcfirst(ucwords(str_replace('_', ' ', $name))).'Action');
-	$path = str_replace('%/', '}/', str_replace('/%', '/{', $struct));
-	$path = preg_replace('/\%$/', '}/', preg_replace('/^\%/', '/{', $path));
-	$path = trim($path, '/');
-
-	$route = new Route( $_locale.$path, ['_controller'=>$controller]);
-	$collection->add('wp_'.$name, $route);
-
-	if( $paginate )
+	foreach (get_sites() as $site)
 	{
-		$route = new Route( $_locale.$path.'/'.$wp_rewrite->pagination_base.'/{page}', ['_controller'=>$controller]);
-		$route->setMethods($method);
+		switch_to_blog( $site->blog_id );
 
-		$collection->add('wp_'.$name.'_paged', $route);
+		$locale = trim($site->path, '/');
+		new Permastuct($collection, $locale, $controller_name);
 	}
-};
 
-$addRoute('front', '');
-
-foreach ($wp_rewrite->extra_permastructs as $name=>$permastruct)
-{
-	if( $permastruct['with_front'])
-		$addRoute($name, $permastruct['struct'], $permastruct['paged']);
+	restore_current_blog();
 }
+else{
 
-foreach ($wp_post_types as $wp_post_type)
-{
-	if( $wp_post_type->public && $wp_post_type->has_archive )
-	{
-		if( is_string($wp_post_type->has_archive) )
-			$addRoute($wp_post_type->name.'_archive', $wp_post_type->has_archive, true);
-		else
-			$addRoute($wp_post_type->name.'_archive', $wp_post_type->query_var, true);
-	}
-}
-
-$addRoute('author', $wp_rewrite->author_structure);
-$addRoute('search', $wp_rewrite->search_structure, true);
-$addRoute('search_post_type', $wp_rewrite->search_post_type_structure, true);
-$addRoute('page', $wp_rewrite->page_structure);
-
-if( !empty($_locale) )
-{
-	$locales = [];
-	$sites = get_sites();
-
-	foreach ($sites as $site)
-		$locales[] = str_replace('/', '', $site->path);
-
-	$collection->addRequirements(['_separator'=>'/?', '_locale'=>implode('|', $locales)]);
-	$collection->addDefaults(['_separator'=>'/', '_locale'=>$_config->get('multisite.default_locale', 'en')]);
+	new Permastuct($collection, '', $controller_name);
 }
 
 return $collection;

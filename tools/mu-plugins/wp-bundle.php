@@ -7,13 +7,18 @@
  * Author URI: http://www.metabolism.fr
  */
 
+use Metabolism\WordpressBundle\Plugin\Loader;
+
 $uri = explode('/', $_SERVER['SCRIPT_NAME']);
 $page = end($uri);
 
-if( in_array( $page, ['wp-login.php', 'wp-register.php'] ) )
+if( in_array( $page, ['wp-login.php', 'wp-signup.php'] ) )
+{
+	Loader::load('UrlPlugin');
 	return;
+}
 
-Metabolism\WordpressBundle\Plugin\Loader::all();
+Loader::all();
 
 if( is_admin() )
 {

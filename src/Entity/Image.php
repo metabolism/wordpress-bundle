@@ -5,6 +5,8 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
+use Gumlet\ImageResize;
+
 /**
  * Class Image
  *
@@ -14,6 +16,12 @@ class Image extends Entity
 {
 	public static $wp_upload_dir = false;
 
+	public $focus_point = false;
+	private $quality_jpg = 90;
+
+	protected $src;
+
+	public $sizes = [];
 
 	/**
 	 * Post constructor.
@@ -21,6 +29,9 @@ class Image extends Entity
 	 * @param null $id
 	 */
 	public function __construct($id = null) {
+
+		global $_config;
+		$this->quality_jpg = $_config->get('jpeg_quality', 90);
 
 		if( $data = $this->get($id) )
 			$this->import($data, false, 'post_');
@@ -90,5 +101,85 @@ class Image extends Entity
 			return array_merge($post, $metadata);
 		else
 			return $post;
+	}
+
+
+	public function getSrc(){
+		return $this->src;
+	}
+
+
+	public function getFileContent(){
+
+		if( file_exists($this->src) )
+			return file_get_contents($this->src);
+		else
+			return 'File does not exist';
+	}
+
+
+	public function resize($w, $h = 0, $name=false){
+
+		$abspath = $this->uploadDir('basedir');
+		$abspath = str_replace(WP_FOLDER.'/..', '', $abspath);
+
+		$image_file = $this->_resize($w, $h);
+		$image = str_replace($abspath, $this->uploadDir('relative'), $image_file);
+
+		if( $name )
+			$this->sizes[$name] = $image;
+
+		return $image;
+	}
+
+
+	private function _resize($w, $h = 0)
+	{
+		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
+			$this->focus_point = false;
+
+		if( !file_exists($this->src) )
+			return 'File does not exist';
+
+		$ext = pathinfo($this->src, PATHINFO_EXTENSION);
+
+		if( $ext == 'svg' )
+			return $this->src;
+
+		if( $this->focus_point )
+			$dest = str_replace('.'.$ext, '-'.round($w).'x'.round($h).'-c-'.round($this->focus_point['x']).'x'.round($this->focus_point['y']).'.' . $ext, $this->src);
+		else
+			$dest = str_replace('.'.$ext, '-'.round($w).'x'.round($h).'.' . $ext, $this->src);
+
+		if( file_exists($dest) ){
+
+			if( filemtime($dest) > filemtime($this->src) )
+				return  $dest;
+			else
+				unlink($dest);
+		}
+
+		try
+		{
+			$image = new ImageResize($this->src);
+			$image->quality_jpg = $this->quality_jpg;
+
+			if(!$w)
+				$image->resizeToHeight($h, true);
+			elseif(!$h)
+				$image->resizeToWidth($w, true);
+			elseif($center)
+				$image->freecrop($w, $h, $this->focus_point['x'], $this->focus_point['y']);
+			else
+				$image->crop($w, $h, true);
+
+			$image->save($dest);
+
+			return $dest;
+		}
+		catch(ImageResizeException $e)
+		{
+			return $e->getMessage();
+		}
 	}
 }

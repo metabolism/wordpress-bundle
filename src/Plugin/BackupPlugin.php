@@ -12,20 +12,12 @@ class BackupPlugin {
 
 	protected $config;
 
-	private function dumpFolder($source, $destination, $exclude = [], $exclude_pattern=false)
+	private function dumpFolder($zip, $source, $exclude = [], $exclude_pattern=false)
 	{
-		if ( !extension_loaded( 'zip' ) )
-			return new \WP_Error('zip_extension', 'Zip Extension is not loaded');
-
 		if ( is_string( $source ) )
 			$source_arr = [$source];
 		else
 			$source_arr = $source;
-
-		$zip = new \ZipArchive();
-
-		if ( !$zip->open( $destination, \ZipArchive::CREATE ) )
-			return new \WP_Error('archive', 'Can\'t create archive file');
 
 		foreach ( $source_arr as $source ) {
 
@@ -61,7 +53,9 @@ class BackupPlugin {
 
 						if ( is_file( $file ) === true ) {
 
-							$zip->addFile( $file, $folder . str_replace( $source . '/', '', $file ) );
+							$localname = $folder . str_replace( $source . '/', '', $file );
+							$zip->addFile($file, $localname);
+							$zip->setCompressionName($localname, \ZipArchive::CM_STORE);
 						}
 					}
 				}
@@ -70,24 +64,35 @@ class BackupPlugin {
 
 				if ( is_file( $source ) === true ) {
 
-					$zip->addFile( $source, $folder . basename( $source ) );
+					$localname = $folder . basename( $source );
+					$zip->addFile($source, $localname);
+					$zip->setCompressionName($localname, \ZipArchive::CM_STORE);
 				}
 			}
 		}
-
-		return $zip->close();
 	}
 
 
 	/**
 	 * Remove all thumbnails
 	 */
-	private function dumpDatabase($file)
+	private function dumpDatabase($zip, $path)
 	{
 		try {
+			$localname = 'db.sql';
+			$file = $path.'/'.$localname;
+
+			if( file_exists($file) )
+				unlink($file);
 
 			$dump = new IMysqldump\Mysqldump('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD, ['add-drop-table' => true]);
 			$dump->start($file);
+
+			if( file_exists($file) ){
+
+				$zip->addFile($file, $localname);
+				$zip->setCompressionName($localname, \ZipArchive::CM_DEFAULT);
+			}
 
 			return true;
 		}
@@ -101,31 +106,65 @@ class BackupPlugin {
 	/**
 	 * Remove all thumbnails
 	 */
-	private function create($all=false, $filename)
+	private function init($destination){
+
+		if ( !extension_loaded( 'zip' ) )
+			return new \WP_Error('zip_extension', 'Zip Extension is not loaded');
+
+		$zip = new \ZipArchive();
+
+		if ( !$zip->open( $destination, \ZipArchive::CREATE ) )
+			return new \WP_Error('archive', 'Can\'t create archive file');
+
+		return $zip;
+	}
+
+
+	/**
+	 * Init zip file
+	 */
+	private function create($global=false, $type='all', $filename)
 	{
 		$backup = false;
 
-		if ( current_user_can('administrator') && (!$all || is_super_admin()) )
+		if ( current_user_can('administrator') && (!$global || is_super_admin()) )
 		{
 			$folder = wp_upload_dir();
 			$rootPath = $folder['basedir'];
 
-			$backup   = $rootPath.'/'.$filename;
+			$backup = $rootPath.'/'.$filename;
+
+			$zip = $this->init($backup);
+
+			if( is_wp_error($zip) )
+				wp_die( $zip->get_error_message() );
 
 			if( file_exists($backup) )
-			{
-				if( file_exists($rootPath.'/db.sql') )
-					unlink($rootPath.'/db.sql');
-
 				return $backup;
+
+			if( $type == 'all' || $type == 'sql'){
+
+				$db = $this->dumpDatabase($zip, $rootPath);
+				if( is_wp_error($db) )
+					wp_die( $db->get_error_message() );
 			}
 
-			$this->dumpDatabase($rootPath.'/db.sql');
-			$this->dumpFolder($rootPath, $backup, ['wpallimport', 'cache', 'wpcf7_uploads'], '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/');
+			if( $type == 'all' || $type == 'uploads'){
 
-			unlink($rootPath.'/db.sql');
+				$uploads = $this->dumpFolder($zip, $rootPath, ['wpallimport', 'cache', 'wpcf7_uploads', 'wp-personal-data-exports'], '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/');
+				if( is_wp_error($uploads) )
+					wp_die( $uploads->get_error_message() );
+			}
 
-			return $backup;
+			$zip->close();
+
+			if( $type == 'all' || $type == 'sql')
+				unlink($rootPath.'/db.sql');
+
+			if( file_exists($backup) )
+				return $backup;
+			else
+				wp_die('Can\'t generate archive file');
 		}
 
 		return $backup;
@@ -135,15 +174,15 @@ class BackupPlugin {
 	/**
 	 * Remove all thumbnails
 	 */
-	private function download($all=false)
+	private function download($global=false, $type='all')
 	{
-		ini_set('max_execution_time', 300);
+		@ini_set('max_execution_time', 60);
 
 		$filename = 'backup-'.date('Ymd').'.zip';
 
-		if ( current_user_can('administrator') && (!$all || is_super_admin()) )
+		if ( current_user_can('administrator') && (!$global || is_super_admin()) )
 		{
-			if( $backup = $this->create($all, $filename) )
+			if( $backup = $this->create($global, $type, $filename) )
 			{
 				header('Content-Description: File Transfer');
 				header('Content-Type: application/octet-stream');
@@ -170,7 +209,7 @@ class BackupPlugin {
 			}
 		}
 
-		wp_redirect( get_admin_url(null, $all?'network/settings.php':'options-general.php') );
+		wp_redirect( get_admin_url(null, $global?'network/settings.php':'options-general.php') );
 	}
 
 
@@ -179,11 +218,14 @@ class BackupPlugin {
 	 */
 	public function wpmuOptions()
 	{
-		echo '<h2>Backup</h2>';
 		echo '<table id="backup" class="form-table">
 			<tbody><tr>
-				<th scope="row">'.__('Download backup').'</th>
-				<td><a class="button button-primary" href="'.get_admin_url().'?download_mu_backup">Download</a></td>
+				<th scope="row"><h2>'.__('Backup').'</h2></th>
+				<td>
+				  <a class="button button-primary" href="'.get_admin_url().'?download_mu_backup&type=all">'.__('Download All').'</a>
+				  <a class="button button-primary" href="'.get_admin_url().'?download_mu_backup&type=sql">'.__('Download SQL').'</a>
+				  <a class="button button-primary" href="'.get_admin_url().'?download_mu_backup&type=uploads">'.__('Download Uploads').'</a>
+				</td>
 			</tr>
 		</tbody></table>';
 	}
@@ -195,15 +237,17 @@ class BackupPlugin {
 	public function adminInit()
 	{
 		if( isset($_GET['download_backup']) )
-			$this->download();
+			$this->download(false, isset($_GET['type'])?$_GET['type']:'all');
 
 		if( isset($_GET['download_mu_backup']) )
-			$this->download(true);
+			$this->download(true, isset($_GET['type'])?$_GET['type']:'all');
 
 		// Remove generated thumbnails option
 		add_settings_field('download_backup', __('Backup'), function(){
 
-			echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup">'.__('Download').'</a>';
+			echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=all">'.__('Download All').'</a> ';
+			echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=sql">'.__('Download SQL').'</a> ';
+			echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=uploads">'.__('Download Uploads').'</a>';
 
 		}, 'general');
 
@@ -213,13 +257,10 @@ class BackupPlugin {
 	{
 		$this->config = $config;
 
-		if( !is_admin() )
+		if( !is_admin() or (isset($_SERVER['BACKUP']) && !$_SERVER['BACKUP']) )
 			return;
 
-		add_action( 'init', function()
-		{
-			add_action( 'admin_init', [$this, 'adminInit'] );
-			add_action( 'wpmu_options', [$this, 'wpmuOptions'] );
-		});
+		add_action( 'admin_init', [$this, 'adminInit'] );
+		add_action( 'wpmu_options', [$this, 'wpmuOptions'] );
 	}
 }

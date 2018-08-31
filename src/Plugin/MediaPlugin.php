@@ -417,20 +417,17 @@ class MediaPlugin {
 
 		if( is_admin() )
 		{
-			add_action( 'init', function()
-			{
-				add_action( 'admin_init', [$this, 'adminInit'] );
-				add_action( 'wpmu_options', [$this, 'wpmuOptions'] );
+			add_action( 'admin_init', [$this, 'adminInit'] );
+			add_action( 'wpmu_options', [$this, 'wpmuOptions'] );
 
-				// Replicate media on network
-				if( $this->config->get('multisite.shared_media') and is_multisite() )
-				{
-					add_action( 'add_attachment', [$this, 'addAttachment']);
-					add_action( 'delete_attachment', [$this, 'deleteAttachment']);
-					add_filter( 'wp_update_attachment_metadata', [$this, 'updateAttachment'], 10, 2);
-					add_filter( 'wpmu_delete_blog_upload_dir', '__return_false' );
-				}
-			});
+			// Replicate media on network
+			if( $this->config->get('multisite.shared_media') and is_multisite() )
+			{
+				add_action( 'add_attachment', [$this, 'addAttachment']);
+				add_action( 'delete_attachment', [$this, 'deleteAttachment']);
+				add_filter( 'wp_update_attachment_metadata', [$this, 'updateAttachment'], 10, 2);
+				add_filter( 'wpmu_delete_blog_upload_dir', '__return_false' );
+			}
 		}
 	}
 }

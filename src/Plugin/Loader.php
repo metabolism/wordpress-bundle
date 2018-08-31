@@ -6,28 +6,30 @@ class Loader{
 
 	public static function all(){
 
-		if( defined('WP_INSTALLING') and WP_INSTALLING )
-			return;
+		$plugins = scandir(__DIR__);
 
-		if( defined('WPINC') ){
+		foreach($plugins as $plugin){
 
-			global $_config;
-
-			$plugins = scandir(__DIR__);
-			foreach($plugins as $plugin){
-
-				if( !in_array($plugin, ['.','..','autoload.php']) )
-				{
-					$classname = str_replace('.php', '', $plugin);
-
-					if( class_exists('App\Plugin\\'.$classname) )
-						$classname = 'App\Plugin\\'.$classname;
-					else
-						$classname = 'Metabolism\WordpressBundle\Plugin\\'.$classname;
-
-					new $classname($_config);
-				}
+			if( !in_array($plugin, ['.','..','Loader.php']) )
+			{
+				$classname = str_replace('.php', '', $plugin);
+				Loader::load($classname);
 			}
 		}
+	}
+
+	public static function load($classname){
+
+		if( ( defined('WP_INSTALLING') and WP_INSTALLING ) or !defined('WPINC') )
+			return;
+
+		global $_config;
+
+		if( class_exists('\App\Plugin\\'.$classname) )
+			$classname = '\App\Plugin\\'.$classname;
+		else
+			$classname = '\Metabolism\WordpressBundle\Plugin\\'.$classname;
+
+		new $classname($_config);
 	}
 }

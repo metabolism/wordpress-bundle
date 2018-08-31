@@ -116,7 +116,7 @@ Trait ContextTrait
 			'languages'          => $languages,
 			'is_admin'           => current_user_can('manage_options'),
 			'home_url'           => home_url(),
-			'search_url'         => '/'.str_replace('/%search%', '', $wp_rewrite->get_search_permastruct()),
+			'search_url'         => get_search_link(),
 			'privacy_policy_url' => get_privacy_policy_url(),
 			'maintenance_mode'   => wp_maintenance_mode()
 		];
@@ -496,7 +496,15 @@ Trait ContextTrait
 				$terms[$term->term_id] = $term;
 		}
 
-		$this->data[$key] = $terms;
+		$ordered_terms =[];
+
+		foreach ($args['taxonomy'] as $taxonomy){
+
+			if( isset($terms[$taxonomy]) )
+				$ordered_terms[$taxonomy] = $terms[$taxonomy];
+		}
+
+		$this->data[$key] = $ordered_terms;
 
 		return $this->data[$key];
 	}
