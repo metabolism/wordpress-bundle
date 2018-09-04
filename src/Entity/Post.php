@@ -15,7 +15,10 @@ use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 class Post extends Entity
 {
 	public $excerpt ='';
+
+	/** @var Image */
 	public $thumbnail = false;
+
 	public $link = '';
 	public $template = '';
 

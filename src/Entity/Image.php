@@ -168,7 +168,7 @@ class Image extends Entity
 				$image->resizeToHeight($h, true);
 			elseif(!$h)
 				$image->resizeToWidth($w, true);
-			elseif($center)
+			elseif($this->focus_point)
 				$image->freecrop($w, $h, $this->focus_point['x'], $this->focus_point['y']);
 			else
 				$image->crop($w, $h, true);
