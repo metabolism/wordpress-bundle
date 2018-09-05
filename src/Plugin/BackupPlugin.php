@@ -242,14 +242,17 @@ class BackupPlugin {
 		if( isset($_GET['download_mu_backup']) )
 			$this->download(true, isset($_GET['type'])?$_GET['type']:'all');
 
-		// Remove generated thumbnails option
-		add_settings_field('download_backup', __('Backup'), function(){
+		add_settings_field('download_backup', __('Database'), function(){
 
-			echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=all">'.__('Download All').'</a> ';
-			echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=sql">'.__('Download SQL').'</a> ';
-			echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=uploads">'.__('Download Uploads').'</a>';
+			echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=sql">'.__('Download backup').'</a> ';
 
 		}, 'general');
+
+		add_settings_field('download_backup', __('Uploads'), function(){
+
+			echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=uploads">'.__('Download backup').'</a>';
+
+		}, 'media');
 
 	}
 	
