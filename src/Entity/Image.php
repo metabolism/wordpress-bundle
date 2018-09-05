@@ -94,7 +94,7 @@ class Image extends Entity
 
 		unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
 
-		if( $post['mime_type'] == 'image/svg+xml')
+		if( isset($post['mime_type']) && $post['mime_type'] == 'image/svg+xml')
 			unset($metadata['meta'],$metadata['width'],$metadata['height']);
 
 		if( is_array($metadata) )
@@ -123,7 +123,7 @@ class Image extends Entity
 		$abspath = $this->uploadDir('basedir');
 		$abspath = str_replace(WP_FOLDER.'/..', '', $abspath);
 
-		$image_file = $this->_resize($w, $h);
+		$image_file = $this->crop($w, $h);
 		$image = str_replace($abspath, $this->uploadDir('relative'), $image_file);
 
 		if( $name )
@@ -133,7 +133,7 @@ class Image extends Entity
 	}
 
 
-	private function _resize($w, $h = 0)
+	private function crop($w, $h = 0)
 	{
 		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
 			$this->focus_point = false;
@@ -162,18 +162,60 @@ class Image extends Entity
 		try
 		{
 			$image = new ImageResize($this->src);
-			$image->quality_jpg = $this->quality_jpg;
 
-			if(!$w)
+			if(!$w){
+
 				$image->resizeToHeight($h, true);
-			elseif(!$h)
-				$image->resizeToWidth($w, true);
-			elseif($this->focus_point)
-				$image->freecrop($w, $h, $this->focus_point['x'], $this->focus_point['y']);
-			else
-				$image->crop($w, $h, true);
+			}
+			elseif(!$h){
 
-			$image->save($dest);
+				$image->resizeToWidth($w, true);
+			}
+			elseif($this->focus_point){
+
+				$src_width = $image->getSourceWidth();
+				$src_height = $image->getSourceHeight();
+				$src_ratio = $src_width/$src_height;
+				$dest_ratio = $w/$h;
+
+				$ratio_height = $src_height/$h;
+				$ratio_width = $src_width/$w;
+
+				if( $dest_ratio < 1)
+				{
+					$dest_width = $w*$ratio_height;
+					$dest_height = $src_height;
+				}
+				else
+				{
+					$dest_width = $src_width;
+					$dest_height = $h*$ratio_width;
+				}
+
+				if ($ratio_height < $ratio_width) {
+
+					list($cropX1, $cropX2) = $this->calculateCrop($src_width, $dest_width, $this->focus_point['x']/100);
+					$cropY1 = 0;
+					$cropY2 = $src_height;
+				} else {
+
+					list($cropY1, $cropY2) = $this->calculateCrop($src_height, $dest_height, $this->focus_point['y']/100);
+					$cropX1 = 0;
+					$cropX2 = $src_width;
+				}
+
+				$image->freecrop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
+				$image->save($dest, null, 100);
+
+				$image = new ImageResize($dest);
+				$image->resize($w, $h, true);
+			}
+			else{
+
+				$image->crop($w, $h, true);
+			}
+
+			$image->save($dest, null,  $this->quality_jpg);
 
 			return $dest;
 		}
@@ -181,5 +223,22 @@ class Image extends Entity
 		{
 			return $e->getMessage();
 		}
+	}
+
+	private function calculateCrop($origSize, $newSize, $focalFactor) {
+
+		$focalPoint = $focalFactor * $origSize;
+		$cropStart = $focalPoint - $newSize / 2;
+		$cropEnd = $cropStart + $newSize;
+
+		if ($cropStart < 0) {
+			$cropEnd -= $cropStart;
+			$cropStart = 0;
+		} else if ($cropEnd > $origSize) {
+			$cropStart -= ($cropEnd - $origSize);
+			$cropEnd = $origSize;
+		}
+
+		return array(ceil($cropStart), ceil($cropEnd));
 	}
 }
