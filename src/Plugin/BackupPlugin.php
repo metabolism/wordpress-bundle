@@ -1,224 +1,251 @@
 <?php
 
-namespace Metabolism\WordpressBundle\Plugin;
+namespace Metabolism\WordpressBundle\Plugin{
 
 use Ifsnop\Mysqldump as IMysqldump;
-use Metabolism\WordpressBundle\Helper\DirFilterHelper;
+	use Metabolism\WordpressBundle\Helper\DirFilterHelper;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class BackupPlugin {
+	class BackupPlugin {
 
-	protected $config;
+		protected $config;
+		private $zip;
 
-	private function dumpFolder($zip, $source, $exclude = [], $exclude_pattern=false)
-	{
-		if ( is_string( $source ) )
-			$source_arr = [$source];
-		else
-			$source_arr = $source;
 
-		foreach ( $source_arr as $source ) {
+		/**
+		 * Export folder, recursif
+		 */
+		public function dumpFolder($source, $exclude = [], $exclude_pattern=false)
+		{
+			if ( is_string( $source ) )
+				$source_arr = [$source];
+			else
+				$source_arr = $source;
 
-			$source = str_replace( '\\', '/', realpath( $source ) );
-			$folder = "";
+			foreach ( $source_arr as $source ) {
 
-			if ( count( $source_arr ) > 1 ) {
+				$source = str_replace( '\\', '/', realpath( $source ) );
+				$folder = "";
 
-				$folder = substr( $source, strrpos( $source, '/' ) + 1 ) . '/';
-				$zip->addEmptyDir( $folder );
-			}
+				if ( count( $source_arr ) > 1 ) {
 
-			if ( is_dir( $source ) === true ) {
+					$folder = substr( $source, strrpos( $source, '/' ) + 1 ) . '/';
+					$this->zip->addEmptyDir( $folder );
+				}
 
-				$directory = new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS);
-				$filtered = new DirFilterHelper($directory, $exclude);
-				$iterator = new \RecursiveIteratorIterator($filtered, \RecursiveIteratorIterator::SELF_FIRST);
+				if ( is_dir( $source ) === true ) {
 
-				foreach ( $iterator as $file ) {
+					$directory = new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS);
+					$filtered = new DirFilterHelper($directory, $exclude);
+					$iterator = new \RecursiveIteratorIterator($filtered, \RecursiveIteratorIterator::SELF_FIRST);
 
-					$file = str_replace( '\\', '/', $file );
+					foreach ( $iterator as $file ) {
 
-					if( $exclude_pattern && preg_match($exclude_pattern, $file))
-						continue;
+						$file = str_replace( '\\', '/', $file );
 
-					$file = realpath( $file );
+						if( $exclude_pattern && preg_match($exclude_pattern, $file))
+							continue;
 
-					if ( is_dir( $file ) === true ) {
+						$file = realpath( $file );
 
-						$zip->addEmptyDir( $folder . str_replace( $source . '/', '', $file . '/' ) );
-					}
-					else {
+						if ( is_dir( $file ) === true ) {
 
-						if ( is_file( $file ) === true ) {
+							$this->zip->addEmptyDir( $folder . str_replace( $source . '/', '', $file . '/' ) );
+						}
+						else {
 
-							$localname = $folder . str_replace( $source . '/', '', $file );
-							$zip->addFile($file, $localname);
-							$zip->setCompressionName($localname, \ZipArchive::CM_STORE);
+							if ( is_file( $file ) === true ) {
+
+								$localname = $folder . str_replace( $source . '/', '', $file );
+								$this->zip->addFile($file, $localname);
+								$this->zip->setCompressionName($localname, \ZipArchive::CM_STORE);
+							}
 						}
 					}
 				}
-			}
-			else {
+				else {
 
-				if ( is_file( $source ) === true ) {
+					if ( is_file( $source ) === true ) {
 
-					$localname = $folder . basename( $source );
-					$zip->addFile($source, $localname);
-					$zip->setCompressionName($localname, \ZipArchive::CM_STORE);
+						$localname = $folder . basename( $source );
+						$this->zip->addFile($source, $localname);
+						$this->zip->setCompressionName($localname, \ZipArchive::CM_STORE);
+					}
 				}
 			}
 		}
-	}
 
 
-	/**
-	 * Remove all thumbnails
-	 */
-	private function dumpDatabase($zip, $path)
-	{
-		try {
-			$localname = 'db.sql';
-			$file = $path.'/'.$localname;
-
-			if( file_exists($file) )
-				unlink($file);
-
-			$dump = new IMysqldump\Mysqldump('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD, ['add-drop-table' => true]);
-			$dump->start($file);
-
-			if( file_exists($file) ){
-
-				$zip->addFile($file, $localname);
-				$zip->setCompressionName($localname, \ZipArchive::CM_DEFAULT);
-			}
-
-			return true;
-		}
-		catch (\Exception $e)
+		/**
+		 * Export database
+		 */
+		private function dumpDatabase($path)
 		{
-			return new \WP_Error('mysqldump-error', $e->getMessage());
-		}
-	}
+			try {
+				$localname = 'db.sql';
+				$file = $path.'/'.$localname;
 
+				if( file_exists($file) )
+					unlink($file);
 
-	/**
-	 * Remove all thumbnails
-	 */
-	private function init($destination){
+				$dump = new IMysqldump\Mysqldump('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD, ['add-drop-table' => true]);
+				$dump->start($file);
 
-		if ( !extension_loaded( 'zip' ) )
-			return new \WP_Error('zip_extension', 'Zip Extension is not loaded');
+				if( file_exists($file) ){
 
-		$zip = new \ZipArchive();
+					$this->zip->addFile($file, $localname);
+					$this->zip->setCompressionName($localname, \ZipArchive::CM_DEFAULT);
+				}
 
-		if ( !$zip->open( $destination, \ZipArchive::CREATE ) )
-			return new \WP_Error('archive', 'Can\'t create archive file');
-
-		return $zip;
-	}
-
-
-	/**
-	 * Init zip file
-	 */
-	private function create($global=false, $type='all', $filename)
-	{
-		$backup = false;
-
-		if ( current_user_can('administrator') && (!$global || is_super_admin()) )
-		{
-			$folder = wp_upload_dir();
-			$rootPath = $folder['basedir'];
-
-			$backup = $rootPath.'/'.$filename;
-
-			$zip = $this->init($backup);
-
-			if( is_wp_error($zip) )
-				wp_die( $zip->get_error_message() );
-
-			if( file_exists($backup) )
-				return $backup;
-
-			if( $type == 'all' || $type == 'sql'){
-
-				$db = $this->dumpDatabase($zip, $rootPath);
-				if( is_wp_error($db) )
-					wp_die( $db->get_error_message() );
+				return true;
 			}
-
-			if( $type == 'all' || $type == 'uploads'){
-
-				$uploads = $this->dumpFolder($zip, $rootPath, ['wpallimport', 'cache', 'wpcf7_uploads', 'wp-personal-data-exports'], '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/');
-				if( is_wp_error($uploads) )
-					wp_die( $uploads->get_error_message() );
-			}
-
-			$zip->close();
-
-			if( $type == 'all' || $type == 'sql')
-				unlink($rootPath.'/db.sql');
-
-			if( file_exists($backup) )
-				return $backup;
-			else
-				wp_die('Can\'t generate archive file');
-		}
-
-		return $backup;
-	}
-
-
-	/**
-	 * Remove all thumbnails
-	 */
-	private function download($global=false, $type='all')
-	{
-		@ini_set('max_execution_time', 60);
-
-		$filename = 'backup-'.date('Ymd').'.zip';
-
-		if ( current_user_can('administrator') && (!$global || is_super_admin()) )
-		{
-			if( $backup = $this->create($global, $type, $filename) )
+			catch (\Exception $e)
 			{
-				header('Content-Description: File Transfer');
-				header('Content-Type: application/octet-stream');
-				header('Content-Disposition: attachment; filename='.basename($backup));
-				header('Content-Transfer-Encoding: binary');
-				header('Expires: 0');
-				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-				header('Pragma: public');
-				header('Content-Length: ' . filesize($backup));
-
-				ignore_user_abort(true);
-
-				$myInputStream = fopen($backup, 'rb');
-				$myOutputStream = fopen('php://output', 'wb');
-
-				stream_copy_to_stream($myInputStream, $myOutputStream);
-
-				fclose($myOutputStream);
-				fclose($myInputStream);
-
-				unlink($backup);
-
-				exit(0);
+				return new \WP_Error('mysqldump-error', $e->getMessage());
 			}
 		}
 
-		wp_redirect( get_admin_url(null, $global?'network/settings.php':'options-general.php') );
-	}
+
+		/**
+		 * Create zip file
+		 */
+		public function init($destination){
+
+			if ( !extension_loaded( 'zip' ) )
+				return new \WP_Error('zip_extension', 'Zip Extension is not loaded');
+
+			$this->zip = new \ZipArchive();
+
+			if ( !$this->zip->open( $destination, \ZipArchive::CREATE ) )
+				return new \WP_Error('archive', 'Can\'t create archive file');
+
+			return $this->zip;
+		}
 
 
-	/**
-	 * add network parameters
-	 */
-	public function wpmuOptions()
-	{
-		echo '<table id="backup" class="form-table">
+		/**
+		 * Bundle SQL and Uploads
+		 */
+		private function bundle($global=false, $type='all', $filename)
+		{
+			$backup = false;
+
+			if ( current_user_can('administrator') && (!$global || is_super_admin()) )
+			{
+				$folder = wp_upload_dir();
+				$rootPath = $folder['basedir'];
+
+				$backup = $rootPath.'/'.$filename;
+
+				$this->init($backup);
+
+				if( is_wp_error($this->zip) )
+					wp_die( $this->zip->get_error_message() );
+
+				if( file_exists($backup) )
+					return $backup;
+
+				if( $type == 'all' || $type == 'sql'){
+
+					$db = $this->dumpDatabase($rootPath);
+
+					if( is_wp_error($db) )
+						wp_die( $db->get_error_message() );
+				}
+
+				if( $type == 'all' || $type == 'uploads'){
+
+					$uploads = $this->dumpFolder($rootPath, ['wpallimport', 'cache', 'wpcf7_uploads', 'wp-personal-data-exports'], '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/');
+
+					if( is_wp_error($uploads) )
+						wp_die( $uploads->get_error_message() );
+				}
+
+				$this->close();
+
+				if( $type == 'all' || $type == 'sql')
+					unlink($rootPath.'/db.sql');
+
+				if( file_exists($backup) )
+					return $backup;
+				else
+					wp_die('Can\'t generate archive file');
+			}
+
+			return $backup;
+		}
+
+
+		/**
+		 * Generate and download zip file
+		 */
+		private function download($global=false, $type='all')
+		{
+			@ini_set('max_execution_time', 60);
+
+			$filename = 'backup-'.date('Ymd').'.zip';
+
+			if ( current_user_can('administrator') && (!$global || is_super_admin()) )
+			{
+				if( $backup = $this->bundle($global, $type, $filename) )
+				{
+					$this->stream($backup);
+					exit(0);
+				}
+			}
+
+			wp_redirect( get_admin_url(null, $global?'network/settings.php':'options-general.php') );
+		}
+
+
+		/**
+		 * Close zip to write file
+		 */
+		public function close()
+		{
+			$this->zip->close();
+		}
+
+
+		/**
+		 * Stream file to browser
+		 */
+		public function stream($file)
+		{
+			if( !file_exists($file) )
+				return new \WP_Error('file_error', 'File does not exist');
+
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename='.basename($file));
+			header('Content-Transfer-Encoding: binary');
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
+			header('Content-Length: ' . filesize($file));
+
+			ignore_user_abort(true);
+
+			$myInputStream = fopen($file, 'rb');
+			$myOutputStream = fopen('php://output', 'wb');
+
+			stream_copy_to_stream($myInputStream, $myOutputStream);
+
+			fclose($myOutputStream);
+			fclose($myInputStream);
+
+			unlink($file);
+		}
+
+
+		/**
+		 * add network parameters
+		 */
+		public function wpmuOptions()
+		{
+			echo '<table id="backup" class="form-table">
 			<tbody><tr>
 				<th scope="row"><h2>'.__('Backup').'</h2></th>
 				<td>
@@ -228,42 +255,72 @@ class BackupPlugin {
 				</td>
 			</tr>
 		</tbody></table>';
+		}
+
+
+		/**
+		 * add admin parameters
+		 */
+		public function adminInit()
+		{
+			if( isset($_GET['download_backup']) )
+				$this->download(false, isset($_GET['type'])?$_GET['type']:'all');
+
+			if( isset($_GET['download_mu_backup']) )
+				$this->download(true, isset($_GET['type'])?$_GET['type']:'all');
+
+			add_settings_field('download_backup', __('Database'), function(){
+
+				echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=sql">'.__('Download backup').'</a> ';
+
+			}, 'general');
+
+			add_settings_field('download_backup', __('Uploads'), function(){
+
+				echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=uploads">'.__('Download backup').'</a>';
+
+			}, 'media');
+		}
+
+
+		/**
+		 * Constructor
+		 */
+		public function __construct($config=false)
+		{
+			$this->config = $config;
+
+			if( !is_admin() or (isset($_SERVER['BACKUP']) && !$_SERVER['BACKUP']) )
+				return;
+
+			add_action( 'admin_init', [$this, 'adminInit'] );
+			add_action( 'wpmu_options', [$this, 'wpmuOptions'] );
+		}
 	}
+}
 
 
-	/**
-	 * add admin parameters
-	 */
-	public function adminInit()
+namespace {
+
+	use Metabolism\WordpressBundle\Plugin\BackupPlugin;
+
+	function wp_backup($source_folder, $zip_filename, $exclude_folders = [], $exclude_pattern=false)
 	{
-		if( isset($_GET['download_backup']) )
-			$this->download(false, isset($_GET['type'])?$_GET['type']:'all');
+		$zipfile = $source_folder.'/'.$zip_filename;
 
-		if( isset($_GET['download_mu_backup']) )
-			$this->download(true, isset($_GET['type'])?$_GET['type']:'all');
+		$backup = new BackupPlugin();
+		$status = $backup->init($zipfile);
 
-		add_settings_field('download_backup', __('Database'), function(){
+		if( is_wp_error($status))
+			return $status;
 
-			echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=sql">'.__('Download backup').'</a> ';
+		$status = $backup->dumpFolder($source_folder, $exclude_folders, $exclude_pattern);
 
-		}, 'general');
+		if( is_wp_error($status))
+			return $status;
 
-		add_settings_field('download_backup', __('Uploads'), function(){
+		$backup->close();
 
-			echo '<a class="button button-primary" href="'.get_admin_url().'?download_backup&type=uploads">'.__('Download backup').'</a>';
-
-		}, 'media');
-
-	}
-	
-	public function __construct($config)
-	{
-		$this->config = $config;
-
-		if( !is_admin() or (isset($_SERVER['BACKUP']) && !$_SERVER['BACKUP']) )
-			return;
-
-		add_action( 'admin_init', [$this, 'adminInit'] );
-		add_action( 'wpmu_options', [$this, 'wpmuOptions'] );
+		return $backup->stream($zipfile);
 	}
 }
