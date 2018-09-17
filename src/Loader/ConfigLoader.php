@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\Loader;
 
 use Dflydev\DotAccessData\Data;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -43,7 +44,15 @@ class ConfigLoader {
 		 */
 		global $_config;
 
-		$config = Yaml::parseFile($resource);
+		try{
+
+			$config = Yaml::parseFile($resource);
+		}
+		catch (ParseException $e){
+
+			die(basename($resource).' loading error: '.$e->getMessage());
+		}
+
 		$_config = new Data($config);
 
 		/**

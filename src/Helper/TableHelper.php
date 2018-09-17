@@ -7,7 +7,7 @@ if(!class_exists('WP_List_Table'))
 
 class Table extends \WP_List_Table {
 
-	private $table, $args, $fields, $column_title, $total_items;
+	private $table, $args, $fields, $column_title, $total_items, $delimiter;
 
 	function __construct($table, $args)
 	{
@@ -32,6 +32,11 @@ class Table extends \WP_List_Table {
 
 		if( isset($args['columns']['title']) )
 			unset($args['columns']['title']);
+
+		if( $args['export'] && isset($args['export']['delimiter']) )
+			$this->delimiter = $args['export']['delimiter'];
+		else
+			$this->delimiter = ',';
 
 		$this->args  = $args;
 
@@ -132,10 +137,10 @@ class Table extends \WP_List_Table {
 			{
 				$out = fopen('php://output', 'w');
 
-				fputcsv($out, array_keys($items[0]));
+				fputcsv($out, array_keys($items[0]), $this->delimiter);
 
 				foreach ($items as $item)
-					fputcsv($out, array_values($item));
+					fputcsv($out, array_values($item), $this->delimiter);
 
 				fclose($out);
 			}
