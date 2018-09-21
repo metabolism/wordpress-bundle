@@ -1,13 +1,9 @@
 <?php
 
-namespace Metabolism\WordpressBundle\Entity;
+namespace Metabolism\WordpressBundle\Helper;
 
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
-use Metabolism\WordpressBundle\Helper\ACF;
-
-use Metabolism\WordpressBundle\Entity\Term,
-	Metabolism\WordpressBundle\Entity\Post;
 
 /**
  * Class Query
@@ -18,8 +14,8 @@ class Query
 {
 	public static function get_fields($id)
 	{
-		$post = new ACF($id);
-		return $post->get();
+		$acf_helper = new ACF($id);
+		return $acf_helper->get();
 	}
 
 
@@ -35,6 +31,41 @@ class Query
 		}
 
 		return $terms;
+	}
+
+	public static function get_adjacent_posts($post_id, $args=[], $loop=false)
+	{
+		$default_args = [
+			'orderby' => 'menu_order',
+			'order' => 'ASC',
+			'posts_per_page' => -1,
+			'fields' => 'ids'
+		];
+
+		$args = array_merge($default_args, $args);
+
+		$query = new \WP_Query($args);
+
+		$next_id = $prev_id = false;
+
+		foreach($query->posts as $key => $_post_id) {
+			if($_post_id == $post_id){
+				$next_id = isset($query->posts[$key + 1]) ? $query->posts[$key + 1] : false;
+				$prev_id = isset($query->posts[$key - 1]) ? $query->posts[$key - 1] : false;
+				break;
+			}
+		}
+
+		if( !$next_id && $loop )
+			$next_id = $query->posts[0];
+
+		if( !$prev_id && $loop )
+			$prev_id = $query->posts[ count($query->posts) - 1 ];
+
+		return [
+			'next' => $next_id ? PostFactory::create($next_id) : false,
+			'prev' => $prev_id ? PostFactory::create($prev_id) : false
+		];
 	}
 
 
@@ -58,37 +89,6 @@ class Query
 			$post_terms[$taxonomy] = self::get_post_term($id, $taxonomy, $primary);
 
 		return $post_terms;
-	}
-
-
-	public static function get_post_term($id, $taxonomy, $primary=false)
-	{
-		if( $primary and class_exists('WPSEO_Primary_Term') )
-		{
-			$wpseo_primary_term = new \WPSEO_Primary_Term( $taxonomy, $id );
-
-			if( $wpseo_primary_term and $wpseo_primary_term->get_primary_term() )
-				return TaxonomyFactory::create( $wpseo_primary_term->get_primary_term() );
-		}
-
-		$terms = wp_get_post_terms($id, $taxonomy, ['fields' => 'ids']);
-
-		if( $primary ){
-
-			if( !empty($terms) )
-				return TaxonomyFactory::create($terms[0]);
-			else
-				return false;
-		}
-		else{
-
-			$post_terms = [];
-
-			foreach($terms as $term)
-				$post_terms[$taxonomy][] = TaxonomyFactory::create($term);
-
-			return $post_terms;
-		}
 	}
 
 

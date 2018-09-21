@@ -2,8 +2,6 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
-use Metabolism\WordpressBundle\Entity\Image;
-use Metabolism\WordpressBundle\Entity\Term;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 
@@ -43,14 +41,12 @@ class Post extends Entity
 
 	private function get( $pid ) {
 
-		$post = false;
-
 		if( $post = get_post($pid) )
 		{
 			if( !$post || is_wp_error($post) )
 				return false;
 
-			$this->_post = $post;
+			$this->_post = clone $post;
 
 			$post->link = get_permalink( $post );
 			$post->template = get_page_template_slug( $post );
@@ -105,7 +101,8 @@ class Post extends Entity
 			return false;
 	}
 
-	protected function get_term( $tax='category' ) {
+
+	protected function get_term( $tax='' ) {
 
 		$term = false;
 
@@ -116,7 +113,8 @@ class Post extends Entity
 			if( $wpseo_primary_term )
 				$term = $wpseo_primary_term->get_primary_term();
 		}
-		else {
+
+		if(!$term){
 			$terms = get_the_terms($this->ID, $tax);
 			if( $terms && !is_wp_error($terms) && count($terms) )
 				$term = $terms[0];
