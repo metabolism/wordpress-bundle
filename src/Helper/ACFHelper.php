@@ -17,25 +17,40 @@ use Metabolism\WordpressBundle\Factory\PostFactory,
 
 class ACF
 {
-	private $raw_objects, $objects;
+	private $raw_objects, $objects, $loaded=false;
 
 	protected static $MAX_DEPTH = 2;
 	protected static $DEPTH = 0;
 
 	public function __construct( $post_id )
 	{
+		self::$DEPTH++;
+
+		if( $cached = wp_cache_get( $post_id.'::'.self::$DEPTH, 'acf_helper' ) ){
+			$this->objects = $cached;
+		}
+		else{
+
 		if( self::$DEPTH > self::$MAX_DEPTH )
 		{
 			$this->objects = [];
 		}
-		else
-		{
-			++self::$DEPTH;
+			else {
 			$this->objects = $this->load('objects', $post_id);
-			--self::$DEPTH;
+				$this->loaded = self::$DEPTH;
+
+				wp_cache_set( $post_id.'::'.self::$DEPTH, $this->objects, 'acf_helper' );
 		}
 	}
 
+		self::$DEPTH--;
+	}
+
+
+	public function loaded()
+	{
+		return $this->loaded;
+	}
 
 	public static function setMaxDepth( $value )
 	{

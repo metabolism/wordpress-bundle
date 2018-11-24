@@ -55,7 +55,8 @@ class Factory {
 			}
 		}
 
-		self::saveToCache($id, $post, $class);
+		if( $post && $post->loaded() )
+			self::saveToCache($id, $post, $class);
 
 		return $post;
 	}

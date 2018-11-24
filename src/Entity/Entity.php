@@ -17,6 +17,8 @@ class Entity
 	];
 
 	public $ID;
+	private $custom_fields;
+	private $imported=false;
 
 	public static $date_format = false;
 
@@ -38,6 +40,17 @@ class Entity
 					$this->$key = $value;
 			}
 		}
+
+		$this->imported = true;
+	}
+
+
+	/**
+	 * Return true if all fields have been loaded to the entity
+	 */
+	public function loaded()
+	{
+		return (!$this->custom_fields || $this->custom_fields->loaded()) && $this->imported;
 	}
 
 
@@ -48,9 +61,9 @@ class Entity
 	{
 		if( class_exists('ACF') )
 		{
-			$custom_fields = new ACF( $id );
+			$this->custom_fields = new ACF( $id );
 
-			foreach ($custom_fields->get() as $name => $value )
+			foreach ($this->custom_fields->get() as $name => $value )
 			{
 				$this->$name = $value;
 			}
