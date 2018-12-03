@@ -31,17 +31,16 @@ class ACF
 		}
 		else{
 
-		if( self::$DEPTH > self::$MAX_DEPTH )
-		{
-			$this->objects = [];
-		}
+			if( self::$DEPTH > self::$MAX_DEPTH ) {
+				$this->objects = [];
+			}
 			else {
-			$this->objects = $this->load('objects', $post_id);
+				$this->objects = $this->load('objects', $post_id);
 				$this->loaded = self::$DEPTH;
 
 				wp_cache_set( $post_id.'::'.self::$DEPTH, $this->objects, 'acf_helper' );
+			}
 		}
-	}
 
 		self::$DEPTH--;
 	}

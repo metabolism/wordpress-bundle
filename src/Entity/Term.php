@@ -34,7 +34,7 @@ class Term extends Entity
 	}
 
 
-	private function get( $pid ) {
+	protected function get( $pid ) {
 
 		$term = false;
 

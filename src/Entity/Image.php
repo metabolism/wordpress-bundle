@@ -38,7 +38,7 @@ class Image extends Entity
 	}
 
 
-	private function uploadDir($field)
+	protected function uploadDir($field)
 	{
 		if ( !self::$wp_upload_dir )
 			self::$wp_upload_dir = wp_upload_dir();
@@ -133,7 +133,7 @@ class Image extends Entity
 	}
 
 
-	private function crop($w, $h = 0)
+	protected function crop($w, $h = 0)
 	{
 		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
 			$this->focus_point = false;
@@ -225,7 +225,7 @@ class Image extends Entity
 		}
 	}
 
-	private function calculateCrop($origSize, $newSize, $focalFactor) {
+	protected function calculateCrop($origSize, $newSize, $focalFactor) {
 
 		$focalPoint = $focalFactor * $origSize;
 		$cropStart = $focalPoint - $newSize / 2;

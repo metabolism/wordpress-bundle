@@ -21,7 +21,7 @@ class User extends Entity
 	}
 
 
-	private function get( $pid ) {
+	protected function get( $pid ) {
 
 		$user = false;
 

@@ -24,7 +24,7 @@ class Comment extends Entity
 	}
 
 
-	private function get( $pid ) {
+	protected function get( $pid ) {
 
 		return get_comment($pid);
 	}

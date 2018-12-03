@@ -39,7 +39,7 @@ class Post extends Entity
 	}
 
 
-	private function get( $pid ) {
+	protected function get( $pid ) {
 
 		if( $post = get_post($pid) )
 		{
@@ -60,29 +60,7 @@ class Post extends Entity
 	}
 
 
-	protected function next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
-
-		if( !is_null($this->_next) )
-			return $this->_next;
-
-		$this->_next = $this->getSibling('next', $in_same_term , $excluded_terms, $taxonomy);
-
-		return $this->_next;
-	}
-
-
-	protected function prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
-
-		if( !is_null($this->_prev) )
-			return $this->_prev;
-
-		$this->_prev = $this->getSibling('prev', $in_same_term , $excluded_terms, $taxonomy);
-
-		return $this->_prev;
-	}
-
-
-	private function getSibling($direction='prev', $in_same_term , $excluded_terms, $taxonomy){
+	protected function getSibling($direction='prev', $in_same_term , $excluded_terms, $taxonomy){
 
 		global $post;
 		$old_global = $post;
@@ -102,7 +80,29 @@ class Post extends Entity
 	}
 
 
-	protected function get_term( $tax='' ) {
+	public function next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
+
+		if( !is_null($this->_next) )
+			return $this->_next;
+
+		$this->_next = $this->getSibling('next', $in_same_term , $excluded_terms, $taxonomy);
+
+		return $this->_next;
+	}
+
+
+	public function prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
+
+		if( !is_null($this->_prev) )
+			return $this->_prev;
+
+		$this->_prev = $this->getSibling('prev', $in_same_term , $excluded_terms, $taxonomy);
+
+		return $this->_prev;
+	}
+
+
+	public function get_term( $tax='' ) {
 
 		$term = false;
 
@@ -127,8 +127,8 @@ class Post extends Entity
 	}
 
 
-	protected function get_terms( $tax = '' ) {
-
+	public function get_terms( $tax = '' ) {
+		
 		$taxonomies = array();
 
 		if ( is_array($tax) )
