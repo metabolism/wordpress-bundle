@@ -97,7 +97,7 @@ class Permastuct{
 		$this->addRoute('search', $search_structure, [], true);
 		$this->addRoute('search_post_type', $search_post_type_structure, [], true);
 
-		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'.{3,}']);
+		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[^/]{3,}']);
 	}
 
 
