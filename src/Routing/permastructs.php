@@ -2,17 +2,15 @@
 
 namespace Metabolism\WordpressBundle;
 
-use Metabolism\WordpressBundle\Helper\WordpressHelper as Wordpress;
-
 use Symfony\Component\Routing\Route,
 	Symfony\Component\Routing\RouteCollection;
 
 class Permastuct{
 
 	public $collection;
-	private $controller_name, $_locale, $wp_rewrite;
+	private $controller_name, $wp_rewrite, $locale;
 
-	public function __construct($collection, $locale='', $controller_name)
+	public function __construct($collection, $locale, $controller_name)
 	{
 		global $wp_rewrite;
 
@@ -56,7 +54,7 @@ class Permastuct{
 
 					$struct = empty($translated_slug) ? $base_struct : $translated_slug;
 
-					$this->addRoute($post_type->name.'_archive', $struct, $this->wp_rewrite->extra_permastructs[$post_type->name]['struct']);
+					$this->addRoute($post_type->name.'_archive', $struct, [], $this->wp_rewrite->extra_permastructs[$post_type->name]['struct']);
 				}
 
 				$registered[] = $post_type->name;
@@ -75,7 +73,7 @@ class Permastuct{
 				else
 					$struct = $base_struct;
 
-				$this->addRoute($taxonomy->name, $struct, $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
+				$this->addRoute($taxonomy->name, $struct, [], $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
 
 				$registered[] = $taxonomy->name;
 			}
@@ -96,10 +94,10 @@ class Permastuct{
 			$search_post_type_structure = $this->wp_rewrite->search_post_type_structure;
 		}
 
-		$this->addRoute('search', $search_structure, true);
-		$this->addRoute('search_post_type', $search_post_type_structure, true);
+		$this->addRoute('search', $search_structure, [], true);
+		$this->addRoute('search_post_type', $search_post_type_structure, [], true);
 
-		$this->addRoute('page', $this->wp_rewrite->page_structure);
+		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'.{3,}']);
 	}
 
 
@@ -117,7 +115,7 @@ class Permastuct{
 		return ['singular'=>$path, 'archive'=>$path.'/'.$this->wp_rewrite->pagination_base.'/{page}'];
 	}
 
-	public function addRoute( $name, $struct, $paginate=false )
+	public function addRoute( $name, $struct, $requirements=[], $paginate=false )
 	{
 		$name = str_replace('_structure', '', $name);
 
@@ -127,13 +125,13 @@ class Permastuct{
 
 		if( !empty($paths['singular']) or $name == 'front' ){
 
-			$route = new Route( $paths['singular'], ['_controller'=>$controller]);
+			$route = new Route( $paths['singular'], ['_controller'=>$controller], $requirements);
 			$this->collection->add($name.$locale, $route);
 		}
 
 		if( $paginate && !empty($paths['archive']) )
 		{
-			$route = new Route( $paths['archive'], ['_controller'=>$controller]);
+			$route = new Route( $paths['archive'], ['_controller'=>$controller], $requirements);
 			$this->collection->add($name.'_paged'.$locale, $route);
 		}
 	}
