@@ -42,18 +42,26 @@ Trait ContextTrait
 		$this->has_templates = in_array('templates', $_config->get('support', []));
 
 		$this->addSite();
-		$this->addMenu();
+		$this->addMenus();
 		$this->addOptions();
 		$this->addCurrent();
 	}
 
 
+	/**
+	 * load ACF options
+	 */
 	protected function addOptions()
 	{
 		$this->data['options'] = $this->getFields('options');
 	}
 
 
+	/**
+	 * Get ACF Fields wrapper
+	 * @param $id
+	 * @return array|bool|\Metabolism\WordpressBundle\Entity\User|\WP_Error
+	 */
 	protected function getFields($id)
 	{
 		$fields = new ACF($id);
@@ -61,6 +69,12 @@ Trait ContextTrait
 	}
 
 
+	/**
+	 * Return function echo
+	 * @param $function
+	 * @param array $args
+	 * @return false|string
+	 */
 	protected function getOutput($function, $args=[])
 	{
 		ob_start();
@@ -72,7 +86,10 @@ Trait ContextTrait
 	}
 
 
-	public function addSite()
+	/**
+	 * Add global data
+	 */
+	protected function addSite()
 	{
 		global $wp_query, $wp_rewrite;
 
@@ -152,7 +169,10 @@ Trait ContextTrait
 	}
 
 
-	public function addMenu()
+	/**
+	 * Add wordpress defined menus
+	 */
+	protected function addMenus()
 	{
 		$menus = get_registered_nav_menus();
 		$this->data['menu'] = [];
@@ -167,7 +187,11 @@ Trait ContextTrait
 	}
 
 
-	public function addCurrent()
+	/**
+	 * Get default wordpress data
+	 * @return array|bool|mixed|void
+	 */
+	protected function addCurrent()
 	{
 		if( (is_single() or is_page()) and !is_attachment() )
 		{
@@ -187,7 +211,7 @@ Trait ContextTrait
 
 
 	/**
-	 * Add post entry to context
+	 * Add post to context from id
 	 *
 	 * @see Post
 	 * @param null $id
@@ -216,7 +240,7 @@ Trait ContextTrait
 
 
 	/**
-	 * Add term entry to context
+	 * Add term entry to context from id
 	 *
 	 * @see Post
 	 * @param null $id
@@ -251,49 +275,7 @@ Trait ContextTrait
 
 
 	/**
-	 * Add post entry to context with current Post instance
-	 *
-	 * @see   Post
-	 * @param $key
-	 * @param $item
-	 * @param $term
-	 * @return bool
-	 */
-	public function sortHierarchicallyByTerm($key, $item, $term)
-	{
-		$sorted_posts = [];
-
-		if( !isset($this->data[$key]) )
-			return false;
-
-		$object = $this->data[$key];
-
-		if( !isset($object->$item) )
-			return false;
-
-		$posts = &$object->$item;
-
-		foreach ($posts as $post )
-		{
-			$terms = get_the_terms($post->id, $term);
-
-			if( !count($terms) )
-				return false;
-
-			if( !isset($sorted_posts[$terms[0]->term_id]) )
-				$sorted_posts[$terms[0]->term_id] = ['name'=>$terms[0]->name, 'posts'=>[]];
-
-			$sorted_posts[$terms[0]->term_id]['posts'][] = $post;
-		}
-
-		$posts = $sorted_posts;
-
-		return true;
-	}
-
-
-	/**
-	 * Add post entry to context with current Post instance
+	 * Query posts
 	 *
 	 * @see Post
 	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters
@@ -323,25 +305,6 @@ Trait ContextTrait
 			array_map($callback, $posts);
 
 		$this->data[$key] = array_merge($this->data[$key], $posts);
-	}
-
-
-	/**
-	 * Add post entry to context with current Post instance
-	 * @see Post
-	 */
-	public function addFeatured($args=[], $key = 'featured_post')
-	{
-		$args = array_merge([
-			'meta_query' => [[
-				'key' => 'featured',
-				'value' => true,
-			]]
-		], $args);
-
-		$this->data[$key] = Query::get_post($args);
-
-		return $this->data[$key]->ID;
 	}
 
 
@@ -468,8 +431,8 @@ Trait ContextTrait
 
 
 	/**
-	 * Add post entry to context with current Post instance
-	 * @see Post
+	 * Query terms
+	 * @see Term
 	 */
 	public function addTerms($args=[], $key='terms', $sort=true)
 	{

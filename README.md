@@ -1,4 +1,4 @@
-# Wordpress Bundle for Symfony 4.0.X
+# Wordpress Bundle for Symfony 4.X
 
 Introduction
 ------------
@@ -6,6 +6,7 @@ Introduction
 Use Wordpress as a backend for a Symfony 4 application
 
 The main idea is to use the power of Symfony for the front / webservices with the ease of Wordpress for the backend.
+
 
 How does it work ?
 --------
@@ -20,6 +21,10 @@ Because it's a Symfony bundle, there is no theme management in Wordpress and the
 Features
 --------
 
+From Composer :
+* Install/update Wordpress via composer
+* Install/update plugin via composer
+
 From Symfony :
 * Template engine
 * Folder structure
@@ -31,7 +36,7 @@ From Symfony :
 * Enhanced Security ( Wordpress is hidden )
 * Dynamic image resize
 
-From the bundle itself
+From the bundle itself :
 * YML configuration for Wordpress (see bellow )
 * Permalink settings for custom post type and taxonomy
 * ACF data cleaning
@@ -52,12 +57,14 @@ From the bundle itself
 * Custom datatable support with view and delete actions in admin
 * Extensible, entities, controller and bundle plugins can be extended in the app
  
+ 
 Drawbacks
 -----------
 
 Because of Wordpress design, functions are available in the global namespace, it's not perfect but Wordpress will surely change this soon.
 
 Some plugins may not work directly, Woocommerce provider needs some rework
+ 
  
 Installation
 -----------
@@ -112,15 +119,114 @@ Installation
   
     public function articleAction(Context $context)
     {
-        return $this->render( 'page/article.twig', $context->toArray() );
+        //use wordpress function directly ex:is_user_logged_in()
+        if( is_user_logged_in() )
+           return $this->render( 'page/article-unlocked.twig', $context->toArray() );
+        else   
+           return $this->render( 'page/article.twig', $context->toArray() );
     }
     
+
+Context trait
+-----------
+    
+ Wordpress data wrapper, allow to query :   
+ * Post
+ * Posts
+ * Term
+ * Terms
+ * Pagination
+ * Breadcrumb
+ * Comments
+ 
+ 
+    public function articleAction(Context $context)
+    {
+        $context->addPosts(['category__and' => [1,3], 'posts_per_page' => 2, 'orderby' => 'title']);
+        return $this->render( 'page/article.twig', $context->toArray() );
+    }
+     
+Wordpress core and plugin installation
+-----------
+
+ Plugin have to be declared to your composer.json, but first you must declare wpackagist.org as a replacement repository to your composer.json
+
+ Then define install paths, for mu-plugin, plugin and core
+ 
+    {
+        "name": "acme/brilliant-wordpress-site",
+        "description": "My brilliant WordPress site",
+        "repositories":[
+            {
+                "type":"composer",
+                "url":"https://wpackagist.org"
+            }
+        ],
+        "require": {
+            ...
+            "wpackagist-plugin/wordpress-seo":">=7.0.2"
+            ...
+        },
+        "extra": {
+          "installer-paths": {
+            "web/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+            "web/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
+            "web/edition/": ["type:wordpress-core"]
+          }
+        },
+        "autoload": {
+            "psr-0": {
+                "Acme": "src/"
+            }
+        }
+    }
+    
+Wordpress ACF PRO installation
+-----------
+
+You must declare a new repository like bellow
+
+    "repositories": [
+        {
+          "type": "package",
+          "package": {
+            "name": "elliotcondon/advanced-custom-fields-pro",
+            "version": "5.7.9",
+            "type": "wordpress-plugin",
+            "dist": {
+              "type": "zip",
+              "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download"
+            },
+            "require": {
+              "philippbaschke/acf-pro-installer": "^1.0",
+              "composer/installers": "^1.0"
+            }
+          }
+        },
+        {
+          "type":"composer", "url":"https://wpackagist.org"
+        }
+      ]
+
+Still in composer.json, add ACF to the require section
+
+    "require": {
+        ...
+        "elliotcondon/advanced-custom-fields-pro": "5.*",
+        ...
+      }
+      
+Set the environment variable ACF_PRO_KEY to your ACF PRO key. Add an entry to your .env file:
+
+    ACF_PRO_KEY=Your-Key-Here      
 
 Environment
 -----------
 
 The environment configuration ( debug, database, cookie ) is managed via the `.env` file like any other SF4 project, there is a sample file in `doc/sample.env`
+
 We've added an option to handle cookie prefix named `COOKIE_PREFIX`
+
 
 Wordpress configuration
 -----------
@@ -131,7 +237,7 @@ This file allow you to manage :
  * Controller name
  * Keys and Salts
  * Admin page removal
- * Multisite configuration
+ * Multi-site configuration
  * Constants
  * Support
  * Menu
@@ -145,17 +251,25 @@ Roadmap
 --------
 
 * Woocommerce Provider rework + samples
-* Global maintenance mode for multisite
+* Global maintenance mode for multi-site
 * Better Symfony 4.1 Support
 * Unit tests
 * Better code comments
-
+* Post/Term/User Repository
+* Test support for Wordpress 5
+       
        
 Why not using Bedrock
 --------
 
 Because Bedrock "only" provides a folder organisation with composer dependencies management.
 Btw this Bundle comes from years of Bedrock usage + Timber plugin...
+       
+Why not using Ekino Wordpress Bundle
+--------
+
+The philosophy is not the same, Ekino use Symfony to manipulate Wordpress database.
+Plus the last release was in 2015...
 
 
 Is Wordpress classic theme bad ?
@@ -165,11 +279,13 @@ We don't want to judge anyone, it's more like a code philosophy, once you go Sym
 
 Plus the security is a requirement for us and Wordpress failed to provide something good because of it's huge usage.
 
+
 Licence
 ----------
 
 GNU AFFERO GPL
-        
+    
+    
 Maintainers
 -----------
 
