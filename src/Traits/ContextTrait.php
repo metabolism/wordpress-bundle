@@ -5,17 +5,17 @@
 
 namespace Metabolism\WordpressBundle\Traits;
 
-use Metabolism\WordpressBundle\Entity\Comment;
-use Metabolism\WordpressBundle\Factory\PostFactory;
-use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
-use Metabolism\WordpressBundle\Helper\ACF;
+use Metabolism\WordpressBundle\Factory\PostFactory,
+	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
+use Metabolism\WordpressBundle\Helper\ACF,
+	Metabolism\WordpressBundle\Helper\Query;
 use Metabolism\WordpressBundle\Plugin\TermsPlugin;
 use Metabolism\WordpressBundle\Provider\WooCommerceProvider;
 
 use Metabolism\WordpressBundle\Entity\Post,
-	Metabolism\WordpressBundle\Entity\Query,
 	Metabolism\WordpressBundle\Entity\Term,
-	Metabolism\WordpressBundle\Entity\Menu;
+	Metabolism\WordpressBundle\Entity\Menu,
+	Metabolism\WordpressBundle\Entity\Comment;
 
 
 /**

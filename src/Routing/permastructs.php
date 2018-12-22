@@ -142,7 +142,7 @@ $controller_name = $_config->get('extra_permastructs.controller', 'MainControlle
 
 $collection = new RouteCollection();
 
-if( $_config->get('multisite.multilangue') && !$_config->get('multisite.subdomain_install') )
+if( $_config->get('multisite') && !$_config->get('multisite.multilangue') && !$_config->get('multisite.subdomain_install') )
 {
 	foreach (get_sites() as $site)
 	{

@@ -36,6 +36,9 @@ remove_submenu_page:
 #  subdomain_install: true
 #  shared_media: true
 #  multilangue: true
+#  multidomain: true
+#  clone_post: true
+#  default_locale: 'fr'
 
 #define:
 #  disallow_file_edit: false

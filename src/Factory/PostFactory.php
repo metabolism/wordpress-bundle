@@ -18,10 +18,11 @@ class PostFactory {
 		}
 		if( is_object($id) ) {
 
-			if( $post instanceof \WP_Post ) {
+			if( $id instanceof \WP_Post ) {
 
-				$id = $id->ID;
-				$post_type = $id->post_type;
+				$post = $id;
+				$id = $post->ID;
+				$post_type = $post->post_type;
 			}
 			else{
 				return new \WP_Error('post_factory_invalid_post_object', 'The object is not an instance of WP_Post');

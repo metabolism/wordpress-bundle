@@ -18,10 +18,11 @@ class TaxonomyFactory {
 		}
 		if( is_object($id) ) {
 
-			if( $post instanceof \WP_Term ) {
+			if( $id instanceof \WP_Term ) {
 
-				$id = $id->term_id;
-				$taxonomy_name = $id->taxonomy;
+				$term = $id;
+				$id = $term->term_id;
+				$taxonomy_name = $term->taxonomy;
 			}
 			else{
 				return new \WP_Error('taxonomy_factory_invalid_term_object', 'The object is not an instance of WP_Term');

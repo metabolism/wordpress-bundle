@@ -71,7 +71,7 @@ class Menu extends Entity
 		{
 			if( $item->menu_item_parent != 0 )
 			{
-				$ordered_menu[$item->menu_item_parent]['children'][] = $item;
+				$ordered_menu[$item->menu_item_parent]->children[] = $item;
 				unset($ordered_menu[$item->ID]);
 			}
 		}
