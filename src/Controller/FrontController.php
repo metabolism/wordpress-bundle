@@ -39,7 +39,7 @@ class FrontController {
 	public function preGetPosts( $query )
 	{
 		if( !$query->is_main_query() || is_admin() )
-			return;
+			return $query;
 
 		global $wp_query;
 

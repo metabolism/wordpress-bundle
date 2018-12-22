@@ -132,7 +132,7 @@ Trait ContextTrait
 			'language'           => $blog_language,
 			'languages'          => $languages,
 			'is_admin'           => current_user_can('manage_options'),
-			'home_url'           => home_url(),
+			'home_url'           => home_url('/'),
 			'search_url'         => get_search_link(),
 			'privacy_policy_url' => get_privacy_policy_url(),
 			'maintenance_mode'   => wp_maintenance_mode()
@@ -484,7 +484,7 @@ Trait ContextTrait
 		$breadcrumb = [];
 
 		if( $add_home )
-			$breadcrumb[] = ['title' => __('Home'), 'link' => get_home_url()];
+			$breadcrumb[] = ['title' => __('Home'), 'link' => home_url('/')];
 
 		$breadcrumb = array_merge($breadcrumb, $data);
 
@@ -521,8 +521,8 @@ Trait ContextTrait
 	{
 		$args['fields'] = 'ids';
 
-		if( !isset($args['include_unapproved']))
-			$args['include_unapproved'] = false;
+		if( !isset($args['status']))
+			$args['status'] = 'approve';
 
 		if( !isset($args['number']))
 			$args['number'] = 5;
@@ -545,17 +545,25 @@ Trait ContextTrait
 			}
 		}
 
+		$comments_count = wp_count_comments(isset($args['post_id'])?$args['post_id']:0 );
+
 		if( isset($this->data['post']))
 		{
-			if( is_array($this->data['post']) )
+			if( is_array($this->data['post']) ){
 				$this->data['post'][$key] = $comments;
-			else
+				$this->data['post']['comments_count'] = $comments_count;
+			}
+			else{
 				$this->data['post']->$key = $comments;
+				$this->data['post']->comments_count = $comments_count;
+		}
+		}
+		else{
+
+			$this->data[$key] = $comments;
+			$this->data['comments_count'] = $comments_count;
 		}
 
-		else
-			$this->data[$key] = $comments;
-		
 		return $comments;
 	}
 }
