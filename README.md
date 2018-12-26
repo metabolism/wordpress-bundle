@@ -1,9 +1,9 @@
-# Wordpress Bundle for Symfony 4.X
+# Symfony 4.X Bundle for Wordpress
 
 Introduction
 ------------
 
-Use Wordpress as a backend for a Symfony 4 application
+Use Wordpress 5 as a backend for a Symfony 4 application
 
 The main idea is to use the power of Symfony for the front / webservices with the ease of Wordpress for the backend.
 
@@ -64,7 +64,8 @@ Drawbacks
 Because of Wordpress design, functions are available in the global namespace, it's not perfect but Wordpress will surely change this soon.
 
 Some plugins may not work directly, Woocommerce provider needs some rework
- 
+
+No support for Gutemberg, activate the Classic Editor until further notice. 
  
 Installation
 -----------
