@@ -44,9 +44,9 @@ class Form {
 
 		$form = [];
 
-		foreach ( $fields as $key=>$required )
+		foreach ( $fields as $key )
 		{
-			$value = self::getField( $data, $key, $required );
+			$value = self::getField( $data, $key );
 		}
 
 		return $form;
@@ -72,14 +72,15 @@ class Form {
 
 			foreach ( $fields as $key ) {
 
+				if ( !$form[$key] or !file_exists( $form[$key] ) )
 				$body .= ($form[$key] ? ' - ' . $key . ' : ' . $form[$key] . "\n" : '');
 			}
 
 			foreach ( $attachements as $attachement )
 			{
-				if ( file_exists( $attachement ) )
+				if ( $form[$attachement] and file_exists( $form[$attachement] ) )
 				{
-					$attachments[] = $attachement;
+					$attachments[] = $form[$attachement];
 				}
 			}
 

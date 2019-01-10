@@ -188,7 +188,7 @@ class ACF
 
 		foreach ($raw_objects as $object) {
 
-			if(!isset($object['type']))
+			if(!isset($object['type'], $object['name']) || empty($object['name']))
 				continue;
 
 			switch ($object['type']) {
