@@ -1,18 +1,18 @@
 {
-  "name":"metabolism/wordpress-bundle",
+  "name": "eleven-labs/wordpress-bundle",
   "version": "1.0.2",
   "description": "Wordpress bundle for Symfony 4",
   "license": "GPL-3.0-or-later",
   "require": {
-    "php" : ">=7.1.0",
+    "php": ">=7.1.0",
     "metabolism/wordpress-core-installer": "1.0.*",
     "metabolism/package-actions": "1.0.*",
     "johnpbloch/wordpress-core": "5.*",
-    "ifsnop/mysqldump-php":"2.*",
-    "dflydev/dot-access-data":"2.*",
+    "ifsnop/mysqldump-php": "2.*",
+    "dflydev/dot-access-data": "2.*",
     "enshrined/svg-sanitize": "0.*",
     "gumlet/php-image-resize": "1.*",
-    "wpackagist-plugin/classic-editor":"1.*"
+    "wpackagist-plugin/classic-editor": "1.*"
   },
   "extra": {
     "post-package-install": {
@@ -38,9 +38,9 @@
       "dev-4.1.x": "4.1.x-dev"
     }
   },
-  "autoload" : {
-    "psr-4" : {
-      "Metabolism\\WordpressBundle\\" : "src/"
+  "autoload": {
+    "psr-4": {
+      "Metabolism\\WordpressBundle\\": "src/"
     }
   }
 }
