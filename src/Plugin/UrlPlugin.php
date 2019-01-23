@@ -68,9 +68,50 @@ class UrlPlugin {
 		$wp_rewrite->search_post_type_structure = $search_post_type_permastuct;
 	}
 
+	/**
+	 * Save post name when requesting for preview link
+	 */
+	public function previewPostLink($preview_link, $post){
 
-	public function __construct($config)
-	{
+		$filter = isset($post->filter) ? $post->filter : false;
+
+		list($permalink, $post_name) = get_sample_permalink($post);
+
+		$post->filter = $filter;
+
+		if($post->post_name != $post_name){
+			wp_update_post([
+				'ID'=> $post->ID,
+				'post_name'=> $post_name
+			]);
+		}
+
+		return $preview_link;
+	}
+
+	/**
+	 * Symfony require real url so redirect preview url to real url
+	 * ex /?post_type=project&p=899&preview=true redirect to /project/post-title?preview=true
+	 */
+	public function redirect(){
+
+		require_once(ABSPATH . 'wp-admin/includes/post.php');
+
+		list($permalink, $post_name) =  get_sample_permalink($_GET['p']);
+		$permalink = str_replace( array( '%pagename%', '%postname%' ), $post_name, esc_html( urldecode( $permalink ) ) );
+
+		$query_args['preview'] = 'true';
+		$permalink = add_query_arg( $query_args, $permalink );
+
+		wp_redirect($permalink);
+
+		exit();
+	}
+
+
+	public function __construct($config){
+
+		add_filter('preview_post_link', [$this, 'previewPostLink'], 10, 2 );
 		add_filter('option_siteurl', [$this, 'optionSiteURL'] );
 		add_filter('network_site_url', [$this, 'networkSiteURL'] );
 		add_filter('home_url', [$this, 'homeURL'] );
@@ -84,6 +125,9 @@ class UrlPlugin {
 			// Handle subfolder in url
 			if ( is_feed() || get_query_var( 'sitemap' ) )
 				return;
+
+			if( isset($_GET['preview'], $_GET['p']) )
+				$this->redirect();
 
 			$filters = array(
 				'post_link',
