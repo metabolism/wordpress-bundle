@@ -184,6 +184,46 @@ Trait ContextTrait
 			if( $menu->id )
 				$this->data['menu'][$location] = new Menu($location);
 		}
+
+		return $this->data['menu'];
+	}
+
+
+	/**
+	 * Add list of all wordpress post, page and custom post
+	 */
+	protected function addSitemap($args=[], $title_meta='_yoast_wpseo_title')
+	{
+		$sitemap = [];
+
+		$query = array_merge([
+			'post_type' => 'any',
+			'posts_per_page' => -1
+		], $args);
+
+		$query = new \WP_Query($query);
+
+		if( isset($query->posts) && is_array($query->posts) )
+		{
+			foreach ($query->posts as $post)
+			{
+				$template = get_page_template_slug($post);
+				$title = get_post_meta($post->ID, $title_meta, true);
+				$sitemap[] = [
+					'link'=> get_permalink($post),
+					'template' => empty($template)?'default':$template,
+					'name' => $post->post_name,
+					'type' => $post->post_type,
+					'modified' => $post->post_modified,
+					'title' => $title?$title:strip_tags($post->post_title),
+					'ID' => $post->ID
+				];
+			}
+		}
+
+		$this->data['sitemap'] = $sitemap;
+
+		return $sitemap;
 	}
 
 

@@ -186,7 +186,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 		{
 			@ini_set('max_execution_time', 60);
 			
-			$filename = 'backup-'.date('Ymd').'.zip';
+			$filename = 'backup-'.$type.'-'.date('Ymd').'.zip';
 			
 			if ( current_user_can('administrator') && (!$global || is_super_admin()) )
 			{

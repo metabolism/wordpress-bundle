@@ -1,6 +1,9 @@
 CHANGELOG
 ---------
 
+##1.0.4
+Feature: add addSitemap context function
+
 ##1.0.3
 Bugfix: Preview button in post now generate a real url
 
