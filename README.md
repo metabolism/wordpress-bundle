@@ -156,7 +156,7 @@ public function articleAction(Context $context)
 
 To preview/debug context, just add `?debug=context` to any url, it will output a json representation of itself.
 
-```
+```json
 {
   "debug": false,
   "environment": "prod",
