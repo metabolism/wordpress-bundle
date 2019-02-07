@@ -70,63 +70,72 @@ No support for Gutemberg, activate the Classic Editor until further notice.
 Installation
 -----------
 
-    composer require metabolism/wordpress-bundle
+~~~
+composer require metabolism/wordpress-bundle
+~~~
     
-  register the bundle in the Kernel
+register the bundle in the Kernel
   
-    public function registerBundles()
-    {
-        $bundles = [
-    	    new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-    	    new \Symfony\Bundle\TwigBundle\TwigBundle(),
-    	    ...
-    	];
-    	
-        $bundles[] = new \Metabolism\WordpressBundle\WordpressBundle();
-    	
-        return $bundles;
-    }
+~~~
+public function registerBundles()
+{
+   $bundles = [
+      new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
+      new \Symfony\Bundle\TwigBundle\TwigBundle(),
+      ...
+  ];
+  	
+  $bundles[] = new \Metabolism\WordpressBundle\WordpressBundle();
+  	
+  return $bundles;
+}
+~~~
     
-  add wordpress permastruct in the routing
+add wordpress permastruct in the routing
   
-    _wordpress:
-        resource: "@WordpressBundle/Routing/permastructs.php"
-        
-  add a context service and use context trait from the Wordpress bundle
+~~~
+_wordpress:
+    resource: "@WordpressBundle/Routing/permastructs.php"
+~~~
   
-    <?php
-    
-    namespace App\Service;
-    
-    use Metabolism\WordpressBundle\Traits\ContextTrait as WordpressContext;
-    
-    class Context
-    {
-    	use WordpressContext;
-    
-    	protected $data;
-    
-    	/**
-    	 * Return Context as Array
-    	 * @return array
-    	 */
-    	public function toArray()
-    	{    	    
-    	    return is_array($this->data) ? $this->data : [];
-    	}
-    }
-      
-  inject the context in the controller
+add a context service and use context trait from the Wordpress bundle
   
-    public function articleAction(Context $context)
-    {
-        //use wordpress function directly ex:is_user_logged_in()
-        if( is_user_logged_in() )
-           return $this->render( 'page/article-unlocked.twig', $context->toArray() );
-        else   
-           return $this->render( 'page/article.twig', $context->toArray() );
-    }
+~~~
+<?php
+
+namespace App\Service;
+
+use Metabolism\WordpressBundle\Traits\ContextTrait as WordpressContext;
+
+class Context
+{
+	use WordpressContext;
+
+	protected $data;
+
+	/**
+	 * Return Context as Array
+	 * @return array
+	 */
+	public function toArray()
+	{    	    
+	    return is_array($this->data) ? $this->data : [];
+	}
+}
+~~~
     
+inject the context in the controller
+
+~~~
+public function articleAction(Context $context)
+{
+    //use wordpress function directly ex:is_user_logged_in()
+    if( is_user_logged_in() )
+       return $this->render( 'page/article-unlocked.twig', $context->toArray() );
+    else   
+       return $this->render( 'page/article.twig', $context->toArray() );
+}
+~~~ 
 
 Context trait
 -----------
@@ -141,87 +150,97 @@ Context trait
  * Comments
  
  
-    public function articleAction(Context $context)
-    {
-        $context->addPosts(['category__and' => [1,3], 'posts_per_page' => 2, 'orderby' => 'title']);
-        return $this->render( 'page/article.twig', $context->toArray() );
-    }
+~~~
+public function articleAction(Context $context)
+{
+    $context->addPosts(['category__and' => [1,3], 'posts_per_page' => 2, 'orderby' => 'title']);
+    return $this->render( 'page/article.twig', $context->toArray() );
+}
+~~~
      
- To debug context, just add `?debug=context` to any url, it will output a json representation of itself.
+To debug context, just add `?debug=context` to any url, it will output a json representation of itself.
      
 Wordpress core and plugin installation
 -----------
 
- Plugin have to be declared to your composer.json, but first you must declare wpackagist.org as a replacement repository to your composer.json
+Plugin have to be declared to your composer.json, but first you must declare wpackagist.org as a replacement repository to your composer.json
 
- Then define install paths, for mu-plugin, plugin and core
+Then define install paths, for mu-plugin, plugin and core
  
-    {
-        "name": "acme/brilliant-wordpress-site",
-        "description": "My brilliant WordPress site",
-        "repositories":[
-            {
-                "type":"composer",
-                "url":"https://wpackagist.org"
-            }
-        ],
-        "require": {
-            ...
-            "wpackagist-plugin/wordpress-seo":">=7.0.2"
-            ...
-        },
-        "extra": {
-          "installer-paths": {
-            "web/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
-            "web/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
-            "web/edition/": ["type:wordpress-core"]
-          }
-        },
-        "autoload": {
-            "psr-0": {
-                "Acme": "src/"
-            }
+~~~
+{
+    "name": "acme/brilliant-wordpress-site",
+    "description": "My brilliant WordPress site",
+    "repositories":[
+        {
+            "type":"composer",
+            "url":"https://wpackagist.org"
+        }
+    ],
+    "require": {
+        ...
+        "wpackagist-plugin/wordpress-seo":">=7.0.2"
+        ...
+    },
+    "extra": {
+      "installer-paths": {
+        "web/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+        "web/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
+        "web/edition/": ["type:wordpress-core"]
+      }
+    },
+    "autoload": {
+        "psr-0": {
+            "Acme": "src/"
         }
     }
+}
+~~~
     
 Wordpress ACF PRO installation
 -----------
 
 You must declare a new repository like bellow
 
-    "repositories": [
-        {
-          "type": "package",
-          "package": {
-            "name": "elliotcondon/advanced-custom-fields-pro",
-            "version": "5.7.10",
-            "type": "wordpress-plugin",
-            "dist": {
-              "type": "zip",
-              "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download"
-            },
-            "require": {
-              "philippbaschke/acf-pro-installer": "^1.0",
-              "composer/installers": "^1.0"
-            }
-          }
+~~~
+"repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "elliotcondon/advanced-custom-fields-pro",
+        "version": "5.7.10",
+        "type": "wordpress-plugin",
+        "dist": {
+          "type": "zip",
+          "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download"
         },
-        {
-          "type":"composer", "url":"https://wpackagist.org"
+        "require": {
+          "philippbaschke/acf-pro-installer": "^1.0",
+          "composer/installers": "^1.0"
         }
-      ]
+      }
+    },
+    {
+      "type":"composer", "url":"https://wpackagist.org"
+    }
+  ]
+~~~
 
 Still in composer.json, add ACF to the require section
 
-    "require": {
-        ...
-        "elliotcondon/advanced-custom-fields-pro": "5.*",
-        ...
-      }
+~~~ 
+"require": {
+     ...
+     "elliotcondon/advanced-custom-fields-pro": "5.*",
+     ...
+}
+~~~
       
 Set the environment variable ACF_PRO_KEY to your ACF PRO key. Add an entry to your .env file:
 
-    ACF_PRO_KEY=Your-Key-Here      
+~~~
+ACF_PRO_KEY=Your-Key-Here      
+~~~
 
 Environment
 -----------
@@ -253,7 +272,7 @@ This file allow you to manage :
 Roadmap
 --------
 
-* Woocommerce Provider rework + samples
+* Woo-commerce Provider rework + samples
 * Global maintenance mode for multi-site
 * Better Symfony 4.1 Support
 * Unit tests
