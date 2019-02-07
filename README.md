@@ -93,7 +93,7 @@ public function registerBundles()
     
 add wordpress permastruct in the routing
   
-```
+```json
 _wordpress:
     resource: "@WordpressBundle/Routing/permastructs.php"
 ```
@@ -178,9 +178,7 @@ Then define install paths, for mu-plugin, plugin and core
         }
     ],
     "require": {
-        ...
         "wpackagist-plugin/wordpress-seo":">=7.0.2"
-        ...
     },
     "extra": {
       "installer-paths": {
@@ -230,9 +228,7 @@ Still in composer.json, add ACF to the require section
 
 ```json
 "require": {
-     ...
      "elliotcondon/advanced-custom-fields-pro": "5.*",
-     ...
 }
 ```
       
