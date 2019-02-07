@@ -44,6 +44,6 @@ if (!isset($_SERVER['APP_ENV'])) {
 $loader = new ConfigLoader();
 $loader->import( dirname(__DIR__).'/config/wordpress.yml' );
 
-$table_prefix  = $loader->get('database.prefix', 'wp_');
+$table_prefix  = $_SERVER['TABLE_PREFIX'] ?? 'wp_';
 
 require_once(ABSPATH . 'wp-settings.php');

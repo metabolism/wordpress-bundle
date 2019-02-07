@@ -111,7 +111,7 @@ class Query
 	}
 
 
-	public static function get_posts($args=[])
+	public static function get_posts(&$args=[])
 	{
 		$query = self::wp_query($args);
 
@@ -119,7 +119,7 @@ class Query
 	}
 
 
-	public static function wp_query($args=[])
+	public static function wp_query(&$args=[])
 	{
 		global $wp_query;
 

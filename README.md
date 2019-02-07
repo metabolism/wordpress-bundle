@@ -147,6 +147,8 @@ Context trait
         return $this->render( 'page/article.twig', $context->toArray() );
     }
      
+ To debug context, just add `?debug=context` to any url, it will output a json representation of itself.
+     
 Wordpress core and plugin installation
 -----------
 
@@ -192,7 +194,7 @@ You must declare a new repository like bellow
           "type": "package",
           "package": {
             "name": "elliotcondon/advanced-custom-fields-pro",
-            "version": "5.7.9",
+            "version": "5.7.10",
             "type": "wordpress-plugin",
             "dist": {
               "type": "zip",
@@ -226,7 +228,7 @@ Environment
 
 The environment configuration ( debug, database, cookie ) is managed via the `.env` file like any other SF4 project, there is a sample file in `doc/sample.env`
 
-We've added an option to handle cookie prefix named `COOKIE_PREFIX`
+We've added an option to handle cookie prefix named `COOKIE_PREFIX` and table prefix named `TABLE_PREFIX`
 
 
 Wordpress configuration
@@ -257,7 +259,6 @@ Roadmap
 * Unit tests
 * Better code comments
 * Post/Term/User Repository
-* Test support for Wordpress 5
        
        
 Why not using Bedrock

@@ -1,7 +1,4 @@
 <?php
-/**
- * User: Paul Coudeville <paul@metabolism.fr>
- */
 
 namespace Metabolism\WordpressBundle\Traits;
 
@@ -50,6 +47,7 @@ Trait ContextTrait
 
 	/**
 	 * load ACF options
+	 * @return object|bool
 	 */
 	protected function addOptions()
 	{
@@ -60,7 +58,7 @@ Trait ContextTrait
 	/**
 	 * Get ACF Fields wrapper
 	 * @param $id
-	 * @return array|bool|\Metabolism\WordpressBundle\Entity\User|\WP_Error
+	 * @return object|bool
 	 */
 	protected function getFields($id)
 	{
@@ -73,7 +71,7 @@ Trait ContextTrait
 	 * Return function echo
 	 * @param $function
 	 * @param array $args
-	 * @return false|string
+	 * @return string
 	 */
 	protected function getOutput($function, $args=[])
 	{
@@ -171,6 +169,8 @@ Trait ContextTrait
 
 	/**
 	 * Add wordpress defined menus
+	 * @return Menu[]
+	 *
 	 */
 	protected function addMenus()
 	{
@@ -191,6 +191,10 @@ Trait ContextTrait
 
 	/**
 	 * Add list of all wordpress post, page and custom post
+	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters
+	 * @param string $title_meta
+	 * @return array
+	 *
 	 */
 	protected function addSitemap($args=[], $title_meta='_yoast_wpseo_title')
 	{
@@ -229,7 +233,7 @@ Trait ContextTrait
 
 	/**
 	 * Get default wordpress data
-	 * @return array|bool|mixed|void
+	 * @return Post|array|bool
 	 */
 	protected function addCurrent()
 	{
@@ -253,10 +257,10 @@ Trait ContextTrait
 	/**
 	 * Add post to context from id
 	 *
-	 * @see Post
 	 * @param null $id
 	 * @param string $key
-	 * @return mixed
+	 * @param callable|bool $callback
+	 * @return Post|bool
 	 */
 	public function addPost($id = null, $key='post', $callback=false)
 	{
@@ -285,7 +289,8 @@ Trait ContextTrait
 	 * @see Post
 	 * @param null $id
 	 * @param string $key
-	 * @return mixed
+	 * @param callable|bool $callback
+	 * @return Term|bool
 	 */
 	public function addTerm($id = null, $key='term', $callback=false)
 	{
@@ -319,38 +324,39 @@ Trait ContextTrait
 	 *
 	 * @see Post
 	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters
-	 * @param string $key the key name to store data
+	 * @param bool|string $key the key name to store data
 	 * @param bool $found_posts include found posts value
-	 * @param bool $callback execute a function for each result via array_map
+	 * @param callable|bool $callback execute a function for each result via array_map
+	 * @return Post[]
 	 */
 	public function addPosts($args=[], $key='posts', $found_posts=false, $callback=false)
-	{
-		if( !isset($this->data[$key]) )
-			$this->data[$key] = [];
-
-		if( $found_posts )
 		{
 			$wp_query = Query::wp_query($args);
 			$posts = $wp_query->posts;
 
+		if( $found_posts ) {
+
 			if( !isset($this->data['found_'.$key]) )
 				$this->data['found_'.$key] = 0;
-
+			else
 			$this->data['found_'.$key] += $wp_query->found_posts;
 		}
-		else
-			$posts = Query::get_posts($args);
 
 		if( $callback && is_callable($callback) )
 			array_map($callback, $posts);
 
-		$this->data[$key] = array_merge($this->data[$key], $posts);
+		if( !isset($this->data[$key]) )
+			$this->data[$key] = $posts;
+		else
+			$this->data[$key] = array_merge($this->data[$key], $posts);
+
+		return $this->data[$key];
 	}
 
 
 	/**
 	 * Retrieve paginated link for archive post pages.
-	 * @see paginate_links
+	 * @return object|bool
 	 */
 	public function addPagination($args=[])
 	{
@@ -472,7 +478,10 @@ Trait ContextTrait
 
 	/**
 	 * Query terms
-	 * @see Term
+	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
+	 * @param string $key
+	 * @param bool $sort
+	 * @return Term[]
 	 */
 	public function addTerms($args=[], $key='terms', $sort=true)
 	{
@@ -516,7 +525,11 @@ Trait ContextTrait
 
 
 	/**
-	 * Add breadcrumd entries
+	 * Add breadcrumb entries
+	 * @param array $data
+	 * @param bool $add_current
+	 * @param bool $add_home
+	 * @return object[]
 	 *
 	 */
 	public function addBreadcrumb($data=[], $add_current=true, $add_home=true)
@@ -554,7 +567,9 @@ Trait ContextTrait
 
 	/**
 	 * Add comments entries
-	 * See : https://codex.wordpress.org/get_comments
+	 * @param array $args see https://codex.wordpress.org/get_comments
+	 * @param string $key
+	 * @return Comment[]
 	 *
 	 */
 	public function addComments($args=[], $key='comments')
