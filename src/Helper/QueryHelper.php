@@ -25,8 +25,7 @@ class Query
 
 		$terms = get_terms( $args );
 
-		foreach ($terms as &$term)
-		{
+		foreach ($terms as &$term) {
 			$term = TaxonomyFactory::create( $term );
 		}
 
@@ -123,12 +122,10 @@ class Query
 	{
 		global $wp_query;
 
-		if( empty($args) )
-		{
+		if( empty($args) ) {
 			$query = $wp_query;
 		}
-		else
-		{
+		else {
 			if( !isset($args['post_type']) )
 				$args = array_merge($wp_query->query, $args);
 
@@ -142,8 +139,7 @@ class Query
 		if( !isset($query->posts) || !is_array($query->posts) )
 			return false;
 
-		foreach ($query->posts as &$post)
-		{
+		foreach ($query->posts as &$post) {
 			$post = PostFactory::create( $post );
 		}
 

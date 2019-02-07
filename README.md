@@ -93,7 +93,7 @@ public function registerBundles()
     
 add wordpress permastruct in the routing
   
-```json
+```
 _wordpress:
     resource: "@WordpressBundle/Routing/permastructs.php"
 ```
@@ -140,26 +140,150 @@ public function articleAction(Context $context)
 Context trait
 -----------
     
- Wordpress data wrapper, allow to query :   
- * Post
- * Posts
- * Term
- * Terms
- * Pagination
- * Breadcrumb
- * Comments
- 
+Wordpress data wrapper, allow to query post, term, pagination, breadcrumb, comments and sitemap.
+
+Critical data are added automatically, such as current post or posts for archive, locale, home url, search url, ...
  
 ```php
 public function articleAction(Context $context)
 {
-    $context->addPosts(['category__and' => [1,3], 'posts_per_page' => 2, 'orderby' => 'title']);
+    $context->addPosts(['category__and' => [1,3], 'posts_per_page' => 2, 'orderby' => 'title'], 'portraits');
+    $context->addSitemap();
     return $this->render( 'page/article.twig', $context->toArray() );
 }
 ```
-     
-To debug context, just add `?debug=context` to any url, it will output a json representation of itself.
-     
+### Preview
+
+To preview/debug context, just add `?debug=context` to any url, it will output a json representation of itself.
+
+```
+{
+  "debug": false,
+  "environment": "prod",
+  "locale": "fr",
+  "language": "fr-FR",
+  "languages": [],
+  "is_admin": false,
+  "home_url": "http://brilliant-wordpress-site.fr/",
+  "search_url": "/search",
+  "privacy_policy_url": "",
+  "maintenance_mode": false,
+  "tagline": "Un site utilisant WordPress",
+  "posts_per_page": "10",
+  "body_class": "fr-FR home page-template-default page page-id-38",
+  "page_title": "Home",
+  "system": "-- Removed from debug --",
+  "menu": [...],
+  "post": {
+    "excerpt": "",
+    "thumbnail": "",
+    "link": "/",
+    "template": "",
+    "ID": 38,
+    "comment_status": "closed",
+    "menu_order": 0,
+    "comment_count": "0",
+    "author": "1",
+    "date": "15 January 2019",
+    "date_gmt": "2019-01-15 11:45:59",
+    "content": "",
+    "title": "Home",
+    "status": "publish",
+    "password": "",
+    "name": "home",
+    "modified": "17 January 2019",
+    "modified_gmt": "2019-01-17 14:07:13",
+    "parent": 0,
+    "type": "page",
+    "splashscreen": {
+      "text": "La France et le Japon partagent les valeurs ...",
+      "partner": {
+        "link": "http://www.japon.fr"
+      }
+    }
+  },
+  "portraits": [...],
+  "sitemap": [...],
+  "layout": "default"
+}
+```   
+
+Entities
+-----------
+
+### Post
+
+```php
+//MainController.php
+
+public function articleAction(Context $context)
+{
+    $article = $context->addPost(12, 'article');
+    return $this->render( 'page/article.twig', $context->toArray() );
+}
+```
+
+```twig
+{# page/article.twig #}
+
+<h1>{{ article.title }}</h1>
+{% set next_article = article.next() %}
+{% if next_article %}
+    <a href="{{ next_article.link }}">next</a>
+{% endif %}
+```
+
+ACF fields are directly available so let say you've added a `copyright` text field :
+
+```twig
+<h1>{{ post.title }}</h1>
+<small>{{ post.copyright }}</small>
+```
+
+Available functions :
+- next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category')
+- prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category')
+- get_term( $tax='' )
+- get_terms( $tax='' )
+
+### Image
+
+Image entity provide a nice on the fly resize function, add width and height to crop-resize, set width or height to 0 to resize
+
+```twig
+<h1>{{ post.title }}</h1>
+<img src="{{ post.thumbnail.resize(800, 600) }}" alt="{{ post.thumbnail.alt }}">
+<img src="{{ post.thumbnail.resize(0, 600) }}" alt="{{ post.thumbnail.alt }}">
+<img src="{{ post.thumbnail.resize(800, 0) }}" alt="{{ post.thumbnail.alt }}">
+```
+
+### Custom posts
+
+Custom posts can extend the `Post` entity to add some preprocess or new functions,
+in the `/src` folder, add an `Entity` folder, then create a new class for the post_type using Pascal case
+
+```php
+namespace App\Entity;
+
+use Metabolism\WordpressBundle\Entity\Post;
+use Metabolism\WordpressBundle\Entity\Image;
+
+class Keyfact extends Post
+{
+	public function __construct($id = null)
+	{
+		parent::__construct($id);
+
+		if( isset($this->picto) && $this->picto instanceof Image)
+			$this->picto = $this->picto->getFileContent();
+	}
+}
+```
+
+### Other entities
+
+Menu, Comment, MenuItem, Product, Term and User can be extended by creating the same file in the `/src/Entity` folder. 
+
 Wordpress core and plugin installation
 -----------
 
@@ -200,7 +324,7 @@ Wordpress ACF PRO installation
 
 You must declare a new repository like bellow
 
-```json
+```
 "repositories": [
     {
       "type": "package",
@@ -226,7 +350,7 @@ You must declare a new repository like bellow
 
 Still in composer.json, add ACF to the require section
 
-```json
+```
 "require": {
      "elliotcondon/advanced-custom-fields-pro": "5.*",
 }
@@ -254,7 +378,7 @@ This file allow you to manage :
  * Domain name for translation
  * Controller name
  * Keys and Salts
- * Admin page removal
+ * Admin pages removal
  * Multi-site configuration
  * Constants
  * Support

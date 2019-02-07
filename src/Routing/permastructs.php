@@ -5,7 +5,7 @@ namespace Metabolism\WordpressBundle;
 use Symfony\Component\Routing\Route,
 	Symfony\Component\Routing\RouteCollection;
 
-class Permastuct{
+class Permastruct{
 
 	public $collection;
 	private $controller_name, $wp_rewrite, $locale;
@@ -149,14 +149,14 @@ if( $_config->get('multisite') && !$_config->get('multisite.multilangue') && !$_
 		switch_to_blog( $site->blog_id );
 
 		$locale = trim($site->path, '/');
-		new Permastuct($collection, $locale, $controller_name);
+		new Permastruct($collection, $locale, $controller_name);
 	}
 
 	restore_current_blog();
 }
 else{
 
-	new Permastuct($collection, '', $controller_name);
+	new Permastruct($collection, '', $controller_name);
 }
 
 return $collection;

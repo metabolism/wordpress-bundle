@@ -329,10 +329,10 @@ Trait ContextTrait
 	 * @param callable|bool $callback execute a function for each result via array_map
 	 * @return Post[]
 	 */
-	public function addPosts($args=[], $key='posts', $found_posts=false, $callback=false)
-		{
-			$wp_query = Query::wp_query($args);
-			$posts = $wp_query->posts;
+	public function addPosts($args=[], $key='posts', $found_posts=false, $callback=false){
+
+		$wp_query = Query::wp_query($args);
+		$posts = $wp_query->posts;
 
 		if( $found_posts ) {
 
