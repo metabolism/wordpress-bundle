@@ -70,13 +70,13 @@ No support for Gutemberg, activate the Classic Editor until further notice.
 Installation
 -----------
 
-~~~
+```
 composer require metabolism/wordpress-bundle
-~~~
+```
     
 register the bundle in the Kernel
   
-~~~
+```php
 public function registerBundles()
 {
    $bundles = [
@@ -89,18 +89,18 @@ public function registerBundles()
   	
   return $bundles;
 }
-~~~
+```
     
 add wordpress permastruct in the routing
   
-~~~
+```
 _wordpress:
     resource: "@WordpressBundle/Routing/permastructs.php"
-~~~
+```
   
 add a context service and use context trait from the Wordpress bundle
   
-~~~
+```php
 <?php
 
 namespace App\Service;
@@ -122,11 +122,11 @@ class Context
 	    return is_array($this->data) ? $this->data : [];
 	}
 }
-~~~
+```
     
 inject the context in the controller
 
-~~~
+```php
 public function articleAction(Context $context)
 {
     //use wordpress function directly ex:is_user_logged_in()
@@ -135,7 +135,7 @@ public function articleAction(Context $context)
     else   
        return $this->render( 'page/article.twig', $context->toArray() );
 }
-~~~ 
+``` 
 
 Context trait
 -----------
@@ -150,13 +150,13 @@ Context trait
  * Comments
  
  
-~~~
+```php
 public function articleAction(Context $context)
 {
     $context->addPosts(['category__and' => [1,3], 'posts_per_page' => 2, 'orderby' => 'title']);
     return $this->render( 'page/article.twig', $context->toArray() );
 }
-~~~
+```
      
 To debug context, just add `?debug=context` to any url, it will output a json representation of itself.
      
@@ -167,7 +167,7 @@ Plugin have to be declared to your composer.json, but first you must declare wpa
 
 Then define install paths, for mu-plugin, plugin and core
  
-~~~
+```json
 {
     "name": "acme/brilliant-wordpress-site",
     "description": "My brilliant WordPress site",
@@ -195,14 +195,14 @@ Then define install paths, for mu-plugin, plugin and core
         }
     }
 }
-~~~
+```
     
 Wordpress ACF PRO installation
 -----------
 
 You must declare a new repository like bellow
 
-~~~
+```json
 "repositories": [
     {
       "type": "package",
@@ -224,23 +224,23 @@ You must declare a new repository like bellow
       "type":"composer", "url":"https://wpackagist.org"
     }
   ]
-~~~
+```
 
 Still in composer.json, add ACF to the require section
 
-~~~ 
+```json
 "require": {
      ...
      "elliotcondon/advanced-custom-fields-pro": "5.*",
      ...
 }
-~~~
+```
       
 Set the environment variable ACF_PRO_KEY to your ACF PRO key. Add an entry to your .env file:
 
-~~~
+```
 ACF_PRO_KEY=Your-Key-Here      
-~~~
+```
 
 Environment
 -----------
