@@ -10,7 +10,7 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class Menu extends Entity
 {
-	public $items, $id, $title, $slug, $description;
+	public $items, $title, $slug, $description;
 	private $menuItemClass;
 
 	public function __construct( $slug = 0 ) {
@@ -50,7 +50,7 @@ class Menu extends Entity
 
 		$menu_info = wp_get_nav_menu_object($menu_id);
 
-		$this->id = $menu_id;
+		$this->ID = $menu_id;
 		$this->title = $menu_info->name;
 		$this->slug = $menu_info->slug;
 		$this->description = $menu_info->description;

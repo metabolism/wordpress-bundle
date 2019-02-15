@@ -19,6 +19,20 @@ class Post extends Entity
 
 	public $link = '';
 	public $template = '';
+	public $comment_status;
+	public $menu_order;
+	public $comment_count;
+	public $author;
+	public $date;
+	public $date_gmt;
+	public $modified;
+	public $modified_gmt;
+	public $title;
+	public $status;
+	public $password;
+	public $parent;
+	public $type;
+	public $name;
 
 	private $_next = null;
 	private $_prev = null;

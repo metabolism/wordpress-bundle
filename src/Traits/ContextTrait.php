@@ -181,7 +181,7 @@ Trait ContextTrait
 		{
 			$menu = new Menu($location);
 
-			if( $menu->id )
+			if( $menu->ID )
 				$this->data['menu'][$location] = new Menu($location);
 		}
 
@@ -515,7 +515,7 @@ Trait ContextTrait
 				$raw_terms = TermsPlugin::sortHierarchically( $raw_terms );
 
 			foreach ($raw_terms as $term)
-				$terms[$term->term_id] = $term;
+				$terms[$term->ID] = $term;
 		}
 
 		$this->data[$key] = $terms;

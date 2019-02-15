@@ -13,6 +13,17 @@ class Term extends Entity
 	public $link;
 	public $ID;
 	public $current;
+	public $slug;
+	public $term_group;
+	public $taxonomy;
+	public $description;
+	public $parent;
+	public $count;
+	public $term_order;
+	public $title;
+
+	protected $term_id;
+	protected $term_taxonomy_id;
 
 	/**
 	 * Post constructor.
@@ -33,7 +44,9 @@ class Term extends Entity
 		{
 			$this->import($term);
 
-			if( $term->taxonomy )
+			$this->term_order = intval($this->term_order);
+
+			if( !empty($term->taxonomy) )
 				$this->addCustomFields($term->taxonomy.'_'.$id);
 		}
 	}

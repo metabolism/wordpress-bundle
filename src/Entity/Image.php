@@ -25,6 +25,13 @@ class Image extends Entity
 	public $meta;
 	public $alt;
 	public $mime_type;
+	public $width;
+	public $height;
+	public $date;
+	public $date_gmt;
+	public $modified;
+	public $modified_gmt;
+	public $title;
 
 	public $sizes = [];
 

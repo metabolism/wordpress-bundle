@@ -17,6 +17,7 @@ class Entity
 	];
 
 	public $ID;
+	private $parent;
 	private $custom_fields;
 	private $imported=false;
 
@@ -36,7 +37,7 @@ class Entity
 				if ( $key === '' || ord($key[0]) === 0 )
 					continue;
 
-				if ( !empty($key) && !method_exists($this, $key) )
+				if ( !empty($key) && !method_exists($this, $key) && property_exists($this, $key) )
 					$this->$key = $value;
 			}
 		}
