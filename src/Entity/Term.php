@@ -9,6 +9,11 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class Term extends Entity
 {
+	public $excerpt;
+	public $link;
+	public $ID;
+	public $current;
+
 	/**
 	 * Post constructor.
 	 *

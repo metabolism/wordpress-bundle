@@ -16,10 +16,15 @@ class Image extends Entity
 {
 	public static $wp_upload_dir = false;
 
-	public $focus_point = false;
-	private $quality_jpg = 90;
+	private $compression = 90;
 
 	protected $src;
+
+	public $focus_point = false;
+	public $file;
+	public $meta;
+	public $alt;
+	public $mime_type;
 
 	public $sizes = [];
 
@@ -31,7 +36,7 @@ class Image extends Entity
 	public function __construct($id = null) {
 
 		global $_config;
-		$this->quality_jpg = $_config->get('jpeg_quality', 90);
+		$this->compression = $_config->get('image_compression', 90);
 
 		if( $data = $this->get($id) )
 			$this->import($data, false, 'post_');
@@ -118,12 +123,12 @@ class Image extends Entity
 	}
 
 
-	public function resize($w, $h = 0, $name=false){
+	public function resize($w, $h = 0, $name=false, $ext=null){
 
 		$abspath = $this->uploadDir('basedir');
 		$abspath = str_replace(WP_FOLDER.'/..', '', $abspath);
 
-		$image_file = $this->crop($w, $h);
+		$image_file = $this->crop($w, $h, $ext);
 		$image = str_replace($abspath, $this->uploadDir('relative'), $image_file);
 
 		if( $name )
@@ -133,23 +138,54 @@ class Image extends Entity
 	}
 
 
-	protected function crop($w, $h = 0)
-	{
+	public function toHTML($w, $h=0){
+
+		return '<picture>'.
+			'	<source srcset="'.$this->resize($w, $h, false,'webp').'" type="image/webp">'.
+			'	<source srcset="'.$this->resize($w, $h).'" type="'.$this->mime_type.'">'.
+			'	<img src="'.$this->resize($w, $h).'" alt="'.$this->alt.'">'.
+			'</picture>';
+	}
+
+
+	protected function crop($w, $h=0, $ext=null){
+
+		switch ($ext){
+			case 'jpg':
+			case 'jpeg':
+			$image_type = IMAGETYPE_JPEG;
+			break;
+			case 'png':
+				$image_type = IMAGETYPE_PNG;
+				break;
+			case 'webp':
+				$image_type = IMAGETYPE_WEBP;
+				break;
+			case 'gif':
+				$image_type = IMAGETYPE_GIF;
+				break;
+			default:
+				$image_type = null;
+		}
+
 		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
 			$this->focus_point = false;
 
 		if( !file_exists($this->src) )
 			return 'File does not exist';
 
-		$ext = pathinfo($this->src, PATHINFO_EXTENSION);
+		$src_ext = pathinfo($this->src, PATHINFO_EXTENSION);
 
-		if( $ext == 'svg' )
+		if( $src_ext == 'svg' )
 			return $this->src;
 
+		if( $ext == null )
+			$ext = $src_ext;
+
 		if( $this->focus_point )
-			$dest = str_replace('.'.$ext, '-'.round($w).'x'.round($h).'-c-'.round($this->focus_point['x']).'x'.round($this->focus_point['y']).'.' . $ext, $this->src);
+			$dest = str_replace('.'.$src_ext, '-'.round($w).'x'.round($h).'-c-'.round($this->focus_point['x']).'x'.round($this->focus_point['y']).'.' . $ext, $this->src);
 		else
-			$dest = str_replace('.'.$ext, '-'.round($w).'x'.round($h).'.' . $ext, $this->src);
+			$dest = str_replace('.'.$src_ext, '-'.round($w).'x'.round($h).'.' . $ext, $this->src);
 
 		if( file_exists($dest) ){
 
@@ -215,7 +251,7 @@ class Image extends Entity
 				$image->crop($w, $h, true);
 			}
 
-			$image->save($dest, null,  $this->quality_jpg);
+			$image->save($dest, $image_type,  $this->compression);
 
 			return $dest;
 		}

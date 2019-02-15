@@ -189,6 +189,8 @@ class ConfigLoader {
 		if (!defined('WP_POST_REVISIONS'))
 			define( 'WP_POST_REVISIONS', 3);
 
+		if (!defined('DISABLE_WP_CRON'))
+			define('DISABLE_WP_CRON', true);
 
 		/**
 		 * Bootstrap WordPress
