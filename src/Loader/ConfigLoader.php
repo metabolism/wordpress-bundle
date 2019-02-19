@@ -98,10 +98,13 @@ class ConfigLoader {
 		 */
 		$isSecure = false;
 
-		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'){
 			$isSecure = true;
-		elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on')
+		}
+		elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on'){
 			$isSecure = true;
+			$_SERVER['HTTPS']='on';
+		}
 
 		$base_uri = ( $isSecure ? 'https' : 'http' ) . '://'.trim($_SERVER['HTTP_HOST'], '/');
 
