@@ -62,7 +62,9 @@ class Post extends Entity
 
 			$this->_post = clone $post;
 
-			$post->link = get_permalink( $post );
+			if( WP_FRONT )
+				$post->link = get_permalink( $post );
+
 			$post->template = get_page_template_slug( $post );
 			$post->thumbnail = get_post_thumbnail_id( $post );
 

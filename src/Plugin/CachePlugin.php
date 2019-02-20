@@ -2,6 +2,8 @@
 
 namespace Metabolism\WordpressBundle\Plugin {
 
+	use Dflydev\DotAccessData\Data;
+
 
 /**
  * Class Metabolism\WordpressBundle Framework
@@ -76,6 +78,10 @@ namespace Metabolism\WordpressBundle\Plugin {
 		}
 
 
+		/**
+		 * CachePlugin constructor.
+		 * @param Data $config
+		 */
 		public function __construct($config)
 		{
 			$env = $_SERVER['APP_ENV'] ?? 'dev';

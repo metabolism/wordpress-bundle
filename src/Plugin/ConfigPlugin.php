@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
+use Dflydev\DotAccessData\Data;
 use Metabolism\WordpressBundle\Helper\Table;
 
 /**
@@ -75,6 +76,11 @@ class ConfigPlugin {
 
 					if( !is_null($archive) && !empty($archive) )
 						$args['has_archive'] = $archive;
+				}
+
+				if( !WP_FRONT ){
+					$args['public'] = false;
+					$args['show_ui'] = true;
 				}
 
 				register_post_type($post_type, $args);
@@ -209,6 +215,11 @@ class ConfigPlugin {
 					unset($args['object_type']);
 				} else {
 					$object_type = 'post';
+				}
+
+				if( !WP_FRONT ){
+					$args['public'] = false;
+					$args['show_ui'] = true;
 				}
 
 				register_taxonomy($taxonomy, $object_type, $args);
@@ -375,7 +386,10 @@ class ConfigPlugin {
 	}
 
 
-
+	/**
+	 * ConfigPlugin constructor.
+	 * @param Data $config
+	 */
 	public function __construct($config)
 	{
 
@@ -391,7 +405,9 @@ class ConfigPlugin {
 			$this->addTaxonomies();
 			$this->addRoles();
 			$this->addMenus();
-			$this->setPermalink();
+
+			if( WP_FRONT )
+				$this->setPermalink();
 			
 			if( is_admin() )
 			{
@@ -404,7 +420,9 @@ class ConfigPlugin {
 		// When viewing admin
 		if( is_admin() )
 		{
-			add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
+			if( WP_FRONT )
+				add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
+			
 			add_action('admin_head', [$this, 'loadStyle']);
 
 			$support = $this->config->get('support', []);

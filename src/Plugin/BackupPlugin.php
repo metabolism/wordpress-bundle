@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Plugin{
 	
+	use Dflydev\DotAccessData\Data;
 	use Ifsnop\Mysqldump as IMysqldump;
 	use Metabolism\WordpressBundle\Helper\DirFilterHelper;
 	use Metabolism\WordpressBundle\Helper\Stream;
@@ -17,6 +18,10 @@ namespace Metabolism\WordpressBundle\Plugin{
 		
 		/**
 		 * Export folder, recursif
+		 * @param $source
+		 * @param array $exclude
+		 * @param bool $exclude_pattern
+		 * @return bool
 		 */
 		public function dumpFolder($source, $exclude = [], $exclude_pattern=false)
 		{
@@ -76,6 +81,8 @@ namespace Metabolism\WordpressBundle\Plugin{
 					}
 				}
 			}
+
+			return true;
 		}
 		
 		
@@ -111,6 +118,8 @@ namespace Metabolism\WordpressBundle\Plugin{
 		
 		/**
 		 * Create zip file
+		 * @param $destination
+		 * @return \WP_Error|\ZipArchive
 		 */
 		public function init($destination){
 			
@@ -128,8 +137,12 @@ namespace Metabolism\WordpressBundle\Plugin{
 		
 		/**
 		 * Bundle SQL and Uploads
+		 * @param $global
+		 * @param $type
+		 * @param $filename
+		 * @return bool|string
 		 */
-		private function bundle($global=false, $type='all', $filename)
+		private function bundle($global, $type, $filename)
 		{
 			$backup = false;
 			
@@ -181,6 +194,8 @@ namespace Metabolism\WordpressBundle\Plugin{
 		
 		/**
 		 * Generate and download zip file
+		 * @param bool $global
+		 * @param string $type
 		 */
 		private function download($global=false, $type='all')
 		{
@@ -265,8 +280,9 @@ namespace Metabolism\WordpressBundle\Plugin{
 		
 		/**
 		 * Constructor
+		 * @param Data $config
 		 */
-		public function __construct($config=false)
+		public function __construct($config)
 		{
 			$this->config = $config;
 			
@@ -287,7 +303,9 @@ namespace {
 	
 	function wp_backup($source_folder, $zip_file, $exclude_folders = [], $exclude_pattern=false)
 	{
-		$backup = new BackupPlugin();
+		global $_config;
+
+		$backup = new BackupPlugin($_config);
 		$status = $backup->init($zip_file);
 		
 		if( is_wp_error($status))

@@ -88,13 +88,16 @@ class FrontController {
 
 
 	/**
-	 * Create Menu instances from configs
-	 * @see Menu
+	 * Display sql requests
 	 */
 	public function postsRequest($input)
 	{
-		if( $this->config->get('debug.show_query'))
-			var_dump($input);
+		if( isset($_REQUEST['debug']) && $_REQUEST['debug'] == 'query' && $_SERVER['APP_ENV'] == 'dev' ){
+
+			header('Content-Type: application/json');
+			echo json_encode($input);
+			exit(0);
+		}
 
 		return $input;
 	}

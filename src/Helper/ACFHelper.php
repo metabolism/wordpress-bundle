@@ -316,7 +316,7 @@ class ACF
 							if( is_array($value) and count($value) == 1 and is_string(key($value)) )
 								$data = reset($data);
 
-							$objects[$object['name']][] = ['@type'=>$type, 'data'=>$data];
+							$objects[$object['name']][] = ['type'=>$type, 'data'=>$data];
 						}
 					}
 

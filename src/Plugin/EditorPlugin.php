@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
+use Dflydev\DotAccessData\Data;
 
 /**
  * Class Metabolism\WordpressBundle Framework
@@ -75,6 +76,12 @@ class EditorPlugin {
 			remove_submenu_page($menu, $submenu);
 		}
 
+		if( !WP_FRONT ){
+
+			remove_submenu_page('options-general.php', 'options-reading.php');
+			remove_submenu_page('options-general.php', 'options-permalink.php');
+		}
+
 		global $submenu;
 
 		if ( isset( $submenu[ 'themes.php' ] ) )
@@ -90,7 +97,33 @@ class EditorPlugin {
 		}
 	}
 
+	/**
+	 * Disable wordpress auto update and check
+	 */
+	protected function disableUpdate(){
+
+		remove_action( 'admin_init', '_maybe_update_core' );
+		remove_action( 'wp_version_check', 'wp_version_check' );
+		remove_action( 'load-plugins.php', 'wp_update_plugins' );
+		remove_action( 'load-update.php', 'wp_update_plugins' );
+		remove_action( 'load-update-core.php', 'wp_update_plugins' );
+		remove_action( 'admin_init', '_maybe_update_plugins' );
+		remove_action( 'wp_update_plugins', 'wp_update_plugins' );
+		remove_action( 'load-themes.php', 'wp_update_themes' );
+		remove_action( 'load-update.php', 'wp_update_themes' );
+		remove_action( 'load-update-core.php', 'wp_update_themes' );
+		remove_action( 'admin_init', '_maybe_update_themes' );
+		remove_action( 'wp_update_themes', 'wp_update_themes' );
+		remove_action( 'update_option_WPLANG', 'wp_clean_update_cache' );
+		remove_action( 'wp_maybe_auto_update', 'wp_maybe_auto_update' );
+		remove_action( 'init', 'wp_schedule_update_checks' );
+	}
 	
+
+	/**
+	 * ConfigPlugin constructor.
+	 * @param Data $config
+	 */
 	public function __construct($config)
 	{
 		$this->config = $config;
@@ -110,5 +143,8 @@ class EditorPlugin {
 		{
 			add_action( 'admin_bar_menu', [$this, 'addArchiveButton'], 80);
 		}
+
+		if( $config->get('optimizations.disable_update', true) )
+			$this->disableUpdate();
 	}
 }

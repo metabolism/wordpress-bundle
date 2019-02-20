@@ -3,6 +3,8 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 
+use Dflydev\DotAccessData\Data;
+
 /**
  * Class Metabolism\WordpressBundle Framework
  */
@@ -108,14 +110,30 @@ class UrlPlugin {
 		exit();
 	}
 
+	/**
+	 * Remove link when there is no template support
+	 */
+	public function removeAdminBarLinks(){
 
+		global $wp_admin_bar;
+		$wp_admin_bar->remove_menu('view-site');
+		$wp_admin_bar->remove_menu('site-name');
+	}
+
+
+	/**
+	 * UrlPlugin constructor.
+	 * @param Data $config
+	 */
 	public function __construct($config){
 
 		add_filter('preview_post_link', [$this, 'previewPostLink'], 10, 2 );
 		add_filter('option_siteurl', [$this, 'optionSiteURL'] );
 		add_filter('network_site_url', [$this, 'networkSiteURL'] );
 		add_filter('home_url', [$this, 'homeURL'] );
-		add_action('init', [$this, 'addRewriteRules']);
+
+		if( !WP_FRONT )
+			add_action( 'wp_before_admin_bar_render', [$this, 'removeAdminBarLinks'] );
 
 		if( is_admin() )
 			return;

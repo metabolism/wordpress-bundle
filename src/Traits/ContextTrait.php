@@ -25,7 +25,7 @@ use Metabolism\WordpressBundle\Entity\Post,
  */
 Trait ContextTrait
 {
-	public $has_templates, $config;
+	public $config;
 
 
 	/**
@@ -35,8 +35,6 @@ Trait ContextTrait
 	{
 		global $_config;
 		$this->config = $_config;
-
-		$this->has_templates = in_array('templates', $_config->get('support', []));
 
 		$this->addSite();
 		$this->addMenus();
@@ -130,11 +128,13 @@ Trait ContextTrait
 			'language'           => $blog_language,
 			'languages'          => $languages,
 			'is_admin'           => current_user_can('manage_options'),
-			'home_url'           => home_url('/'),
-			'search_url'         => get_search_link(),
-			'privacy_policy_url' => get_privacy_policy_url(),
-			'maintenance_mode'   => wp_maintenance_mode()
+			'home_url'           => home_url('/')
 		];
+
+		if( WP_FRONT ){
+			$this->data['search_url'] = get_search_link();
+			$this->data['privacy_policy_url'] = get_privacy_policy_url();
+		}
 
 		if( is_multisite() )
 			$this->data['network_home_url'] = trim(network_home_url(), '/');
@@ -145,7 +145,7 @@ Trait ContextTrait
 			'posts_per_page' => get_option( 'posts_per_page' )
 		]);
 
-		if( $this->has_templates && (!is_singular() || $post_id) )
+		if( WP_FRONT && (!is_singular() || $post_id) )
 		{
 			$wp_title = wp_title(' ', false);
 

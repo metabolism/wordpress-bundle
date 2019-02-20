@@ -2,6 +2,8 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
+use Dflydev\DotAccessData\Data;
+
 /**
  * Class Metabolism\WordpressBundle Framework
  */
@@ -23,6 +25,10 @@ class ACFPlugin {
 	}
 
 	
+	/**
+	 * ACFPlugin constructor.
+	 * @param Data $config
+	 */
 	public function __construct($config)
 	{
 		$this->config = $config;

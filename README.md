@@ -127,7 +127,7 @@ class Context
 inject the context in the controller
 
 ```php
-public function articleAction(Context $context)
+public function frontAction(Context $context)
 {
     //use wordpress function directly ex:is_user_logged_in()
     if( is_user_logged_in() )

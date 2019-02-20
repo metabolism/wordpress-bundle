@@ -74,18 +74,20 @@ post_type:
       - thumbnail
     #columns:
      # - thumbnail
-    labels:
-      name:           'Guides'
-      singular_name:  'Guide'
-      all_items:      'Tous les guides'
-      edit_item:      'Editer le guide'
-      view_item:      'Voir le guide'
-      update_item:    'Mettre à jour le guide'
-      add_new_item:   'Ajouter un guide'
-      new_item_name:  'Nouveau guide'
-      search_items:   'Rechercher un guide'
-      popular_items:  'Guides populaires'
-      not_found:      'Aucun guide trouvé'
+    #taxonomies:
+     # - category
+    #labels:
+    #  name:           'Guides'
+    #  singular_name:  'Guide'
+    #  all_items:      'Tous les guides'
+    #  edit_item:      'Editer le guide'
+    #  view_item:      'Voir le guide'
+    #  update_item:    'Mettre à jour le guide'
+    #  add_new_item:   'Ajouter un guide'
+    #  new_item_name:  'Nouveau guide'
+    #  search_items:   'Rechercher un guide'
+    #  popular_items:  'Guides populaires'
+    #  not_found:      'Aucun guide trouvé'
 
 # https://codex.wordpress.org/Function_Reference/register_taxonomy
 # see vendor/metabolism/wordpress-bundle/doc/custom_post_type.yml for a full sample
@@ -95,21 +97,21 @@ taxonomy:
     #posts_per_page: 11
     object_type:
       - guide
-    labels:
-      name:           'Catégories'
-      singular_name:  'Catégorie'
-      all_items:      'Toutes les catégories'
-      edit_item:      'Editer la catégorie'
-      view_item:      'Voir la catégorie'
-      update_item:    'Mettre à jour la catégorie'
-      add_new_item:   'Ajouter une catégorie'
-      new_item_name:  'Nouvelle catégorie'
-      search_items:   'Rechercher une catégorie'
-      popular_items:  'Catégories populaires'
-      not_found:      'Aucune catégorie trouvée'
+    #labels:
+    #  name:           'Catégories'
+    #  singular_name:  'Catégorie'
+    #  all_items:      'Toutes les catégories'
+    #  edit_item:      'Editer la catégorie'
+    #  view_item:      'Voir la catégorie'
+    #  update_item:    'Mettre à jour la catégorie'
+    #  add_new_item:   'Ajouter une catégorie'
+    #  new_item_name:  'Nouvelle catégorie'
+    #  search_items:   'Rechercher une catégorie'
+    #  popular_items:  'Catégories populaires'
+    #  not_found:      'Aucune catégorie trouvée'
 
 options_page:
-  - 'Personnalisation'
+  - 'Option'
 
 template:
   page:
