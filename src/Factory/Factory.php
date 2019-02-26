@@ -28,10 +28,10 @@ class Factory {
 
 	public static function create($id, $class, $default_class=false){
 
-		$post = self::loadFromCache($id, $class);
+		$item = self::loadFromCache($id, $class);
 
-		if( $post )
-			return $post;
+		if( $item )
+			return $item;
 
 		$classname = self::camelCase($class);
 
@@ -39,7 +39,7 @@ class Factory {
 
 		if( class_exists($app_classname) ){
 
-			$post = new $app_classname($id);
+			$item = new $app_classname($id);
 		}
 		else{
 
@@ -47,17 +47,17 @@ class Factory {
 
 			if( class_exists($bundle_classname) ){
 
-				$post = new $bundle_classname($id);
+				$item = new $bundle_classname($id);
 			}
 			elseif( $default_class ){
 
-				$post = self::create($id, $default_class);
+				$item = self::create($id, $default_class);
 			}
 		}
 
-		if( $post && $post->loaded() )
-			self::saveToCache($id, $post, $class);
+		if( $item && $item->loaded() )
+			self::saveToCache($id, $item, $class);
 
-		return $post;
+		return $item;
 	}
 }

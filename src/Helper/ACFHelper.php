@@ -12,6 +12,7 @@ use Metabolism\WordpressBundle\Entity\Post,
 	Metabolism\WordpressBundle\Entity\Image,
 	Metabolism\WordpressBundle\Entity\Product;
 
+use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 
@@ -141,7 +142,7 @@ class ACF
 		switch ($type)
 		{
 			case 'image':
-				$value = PostFactory::create($id, 'image');
+				$value = Factory::create($id, 'image');
 				break;
 
 			case 'file':
@@ -154,7 +155,7 @@ class ACF
 				break;
 
 			case 'user':
-				$value = new User( $id );
+				$value = Factory::create($id, 'user');
 				break;
 
 			case 'term':

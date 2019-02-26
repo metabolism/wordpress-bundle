@@ -9,29 +9,46 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class User extends Entity
 {
+	public $caps;
+	public $cap_key;
+	public $roles;
+	public $allcaps;
+	public $first_name;
+	public $last_name;
+    public $login;
+    public $pass;
+    public $nicename;
+    public $email;
+    public $url;
+    public $registered;
+    public $status;
+    public $display_name;
+
 	/**
-	 * Post constructor.
+	 * User constructor.
 	 *
-	 * @param null $id
+	 * @param $id
 	 */
 	public function __construct($id)
 	{
-		if( $user = $this->get($id) )
-			$this->import($user);
+		if( $user = $this->get($id) ) {
+			$this->import($user, false, 'user_');
+			$this->addCustomFields($id);
+		}
 	}
 
-
+	/**
+	 * Get user
+	 *
+	 * @param $pid
+	 * @return bool|\WP_User
+	 */
 	protected function get( $pid ) {
 
-		$user = false;
+		if( is_int($pid) && $user = get_userdata($pid) )
+			return $user;
 
-		if( is_int($pid) && $user = get_user_by('id', $pid) )
-		{
-			if( !$user || is_wp_error($user) )
-				return false;
-		}
-
-		return $user;
+		return false;
 	}
 
 }

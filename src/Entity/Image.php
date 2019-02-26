@@ -145,7 +145,7 @@ class Image extends Entity
 	}
 
 
-	public function toHTML($w, $h=0, $sources){
+	public function toHTML($w, $h=0, $sources=false){
 
 		if($this->mime_type == 'image/svg+xml'){
 
@@ -154,7 +154,6 @@ class Image extends Entity
 		else{
 
 			$html = '<picture>';
-			$html .='	<source srcset="'.$this->resize($w, $h, false,'webp').'" type="image/webp">';
 
 			if( is_array($sources) ){
 
@@ -162,10 +161,12 @@ class Image extends Entity
 					$html .='	<source media="('.$media.')"  srcset="'.$this->resize($size[0], $size[1] ?? 0, false,'webp').'" type="image/webp">';
 				}
 			}
+			else{
+				$html .='<source srcset="'.$this->resize($w, $h, false,'webp').'" type="image/webp">';
+			}
 
-			$html .='	<source srcset="'.$this->resize($w, $h).'" type="'.$this->mime_type.'">'.
-			'	<img src="'.$this->resize($w, $h).'" alt="'.$this->alt.'">'.
-			'</picture>';
+			$html .= '<img src="'.$this->resize($w, $h).'" alt="'.$this->alt.'">';
+			$html .='</picture>';
 		}
 
 		return new \Twig\Markup($html, 'UTF-8');
