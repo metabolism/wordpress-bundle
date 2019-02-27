@@ -17,7 +17,7 @@ class ConfigPlugin {
 	 */
 	public function plural($name)
 	{
-		return substr($name, -1) == 's' ? $name : (substr($name, -1) == 'y' ? substr($name, 0, -1).'ies' : $name.'s');
+		return substr($name, -1) == 's' ? $name : (substr($name, -1) == 'y' && !in_array(substr($name, -2, 1), ['a','e','i','o','u']) ? substr($name, 0, -1).'ies' : $name.'s');
 	}
 
 

@@ -57,7 +57,7 @@ class Post extends Entity
 
 		if( $post = get_post($pid) )
 		{
-			if( !$post || is_wp_error($post) )
+			if( is_wp_error($post) )
 				return false;
 
 			$this->_post = clone $post;

@@ -55,6 +55,16 @@ class NoticePlugin {
 	}
 
 
+	/**
+	 * remove wpdb error
+	 */
+	public function suppressError(){
+
+		global $wpdb;
+		$wpdb->suppress_errors = true;
+	}
+
+
 	public function __construct($config)
 	{
 		$this->config = $config;
@@ -65,6 +75,11 @@ class NoticePlugin {
 
 			if( WP_DEBUG )
 				add_action( 'init', [$this, 'debugInfo']);
+		}
+		else{
+
+			if( !WP_FRONT)
+				add_action( 'init', [$this, 'suppressError']);
 		}
 	}
 }
