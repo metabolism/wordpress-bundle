@@ -6,6 +6,7 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use Gumlet\ImageResize;
+use Gumlet\ImageResizeException;
 
 /**
  * Class Image
@@ -61,6 +62,8 @@ class Image extends Entity
 
 	/**
 	 * Remove useless data
+	 * @param $id
+	 * @return array|bool|\WP_Post|null
 	 */
 	protected function get($id)
 	{
@@ -121,6 +124,9 @@ class Image extends Entity
 	}
 
 
+	/**
+	 * @return false|string
+	 */
 	public function getFileContent(){
 
 		if( file_exists($this->src) )
@@ -130,6 +136,13 @@ class Image extends Entity
 	}
 
 
+	/**
+	 * @param $w
+	 * @param int $h
+	 * @param bool $name
+	 * @param null $ext
+	 * @return mixed
+	 */
 	public function resize($w, $h = 0, $name=false, $ext=null){
 
 		$abspath = $this->uploadDir('basedir');
@@ -145,6 +158,12 @@ class Image extends Entity
 	}
 
 
+	/**
+	 * @param $w
+	 * @param int $h
+	 * @param bool $sources
+	 * @return \Twig\Markup
+	 */
 	public function toHTML($w, $h=0, $sources=false){
 
 		if($this->mime_type == 'image/svg+xml'){
@@ -158,7 +177,7 @@ class Image extends Entity
 			if( is_array($sources) ){
 
 				foreach ($sources as $media=>$size){
-					$html .='	<source media="('.$media.')"  srcset="'.$this->resize($size[0], $size[1] ?? 0, false,'webp').'" type="image/webp">';
+					$html .='<source media="('.$media.')"  srcset="'.$this->resize($size[0], $size[1] ?? 0, false,'webp').'" type="image/webp">';
 				}
 			}
 			else{
@@ -173,6 +192,13 @@ class Image extends Entity
 	}
 
 
+	/**
+	 * @param $w
+	 * @param int $h
+	 * @param null $ext
+	 * @return mixed|string
+	 * @throws \Gumlet\ImageResizeException
+	 */
 	protected function crop($w, $h=0, $ext=null){
 
 		switch ($ext){
@@ -286,6 +312,12 @@ class Image extends Entity
 		}
 	}
 
+	/**
+	 * @param $origSize
+	 * @param $newSize
+	 * @param $focalFactor
+	 * @return array
+	 */
 	protected function calculateCrop($origSize, $newSize, $focalFactor) {
 
 		$focalPoint = $focalFactor * $origSize;

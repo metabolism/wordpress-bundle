@@ -4,6 +4,12 @@ namespace Metabolism\WordpressBundle\Factory;
 
 class PostFactory {
 
+	/**
+	 * Create entity from post_type
+	 * @param null $id
+	 * @param bool $post_type
+	 * @return bool|mixed|\WP_Error
+	 */
 	public static function create($id=null, $post_type = false){
 
 		if( is_array($id) ) {

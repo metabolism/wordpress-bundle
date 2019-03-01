@@ -35,6 +35,8 @@ class FrontController {
 
 	/**
 	 * Add custom post type for taxonomy archive page
+	 * @param \WP_Query $query
+	 * @return mixed
 	 */
 	public function preGetPosts( $query )
 	{

@@ -4,7 +4,12 @@ namespace Metabolism\WordpressBundle\Factory;
 
 class Factory {
 
-	protected static function camelCase($str)
+	/**
+	 * Generate classname from string
+	 * @param $str
+	 * @return string
+	 */
+	public static function getClassname($str)
 	{
 		// non-alpha and non-numeric characters become spaces
 		$str = preg_replace('/[^a-z0-9]+/i', ' ', $str);
@@ -16,16 +21,36 @@ class Factory {
 		return $str;
 	}
 
+	/**
+	 * Retrieves the cache contents from the cache by key and group.
+	 * @param $id
+	 * @param string $type
+	 * @return bool|mixed
+	 */
 	protected static function loadFromCache($id, $type='object'){
 
 		return wp_cache_get( $id, $type.'_factory' );
 	}
 
+	/**
+	 * Saves the data to the cache.
+	 * @param $id
+	 * @param $object
+	 * @param $type
+	 * @return bool
+	 */
 	protected static function saveToCache($id, $object, $type){
 
 		return wp_cache_set( $id, $object, $type.'_factory' );
 	}
 
+	/**
+	 * Create entity
+	 * @param $id
+	 * @param $class
+	 * @param bool $default_class
+	 * @return bool|mixed
+	 */
 	public static function create($id, $class, $default_class=false){
 
 		$item = self::loadFromCache($id, $class);
@@ -33,7 +58,7 @@ class Factory {
 		if( $item )
 			return $item;
 
-		$classname = self::camelCase($class);
+		$classname = self::getClassname($class);
 
 		$app_classname = 'App\Entity\\'.$classname;
 

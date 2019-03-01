@@ -128,8 +128,6 @@ class ConfigPlugin {
 					}
 				}
 
-			}else{
-				wp_die($post_type. 'is not allowed, reserved keyword');
 			}
 		};
 	}
@@ -181,7 +179,7 @@ class ConfigPlugin {
 
 		foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args )
 		{
-			if( $taxonomy != 'type' && $taxonomy != 'category' && $taxonomy != 'tag' && $taxonomy != 'product' ) {
+			if( $taxonomy != 'type' && $taxonomy != 'category' && $taxonomy != 'tag' ) {
 
 				$args = array_merge($default_args, $args);
 				$name = str_replace('_', ' ', isset($args['name']) ? $args['name'] : $taxonomy);
@@ -225,9 +223,6 @@ class ConfigPlugin {
 				}
 
 				register_taxonomy($taxonomy, $object_type, $args);
-
-			} else{
-				wp_die($taxonomy. 'is not allowed, reserved keyword');
 			}
 		}
 	}

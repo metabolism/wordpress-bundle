@@ -6,13 +6,15 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class WordpressBundle extends Bundle
 {
+	/**
+	 * 	@see wp-includes/class-wp.php, main function
+	 */
 	public function boot()
 	{
 		$rootDir = $this->container->get('kernel')->getRootDir();
 
 		include $rootDir.'/../web/edition/wp-load.php';
 
-		//see wp-includes/class-wp.php, main function
 		global $wp;
 
 		$wp->init();
@@ -24,6 +26,9 @@ class WordpressBundle extends Bundle
 		do_action_ref_array( 'wp', array( &$wp ) );
 	}
 
+	/**
+	 * Analyse query and load posts
+	 */
 	protected function registerGlobals() {
 
 		global $wp_query, $wp;

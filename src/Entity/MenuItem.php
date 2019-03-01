@@ -22,7 +22,11 @@ class MenuItem extends Entity
 	public $object;
 	public $link;
 
-	public function __construct( $data ) {
+	/**
+	 * MenuItem constructor.
+	 * @param $data
+	 */
+	public function __construct($data ) {
 		
 		if ( $data ){
 			$this->import($data, false, 'post_');

@@ -68,7 +68,6 @@ class NoticePlugin {
 	public function __construct($config)
 	{
 		$this->config = $config;
-
 		if( is_admin() )
 		{
 			add_action( 'admin_notices', [$this, 'adminNotices']);

@@ -480,10 +480,9 @@ Trait ContextTrait
 	 * Query terms
 	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
 	 * @param string $key
-	 * @param bool $sort
 	 * @return Term[]
 	 */
-	public function addTerms($args=[], $key='terms', $sort=true)
+	public function addTerms($args=[], $key='terms')
 	{
 		$raw_terms = Query::get_terms($args);
 		$terms = [];
@@ -493,7 +492,7 @@ Trait ContextTrait
 			foreach ($raw_terms as $term)
 				$terms[$term->taxonomy][$term->term_id] = $term;
 
-			if( $sort ){
+			if( !isset($args['sort']) || $args['sort'] ){
 
 				foreach ($terms as &$term_group)
 					$term_group = TermsPlugin::sortHierarchically( $term_group );
@@ -511,7 +510,7 @@ Trait ContextTrait
 		}
 		else
 		{
-			if( $sort )
+			if( !isset($args['sort']) || $args['sort']  )
 				$raw_terms = TermsPlugin::sortHierarchically( $raw_terms );
 
 			foreach ($raw_terms as $term)

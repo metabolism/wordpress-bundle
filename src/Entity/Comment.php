@@ -24,8 +24,7 @@ class Comment extends Entity
 	public $user_id;
 
 	/**
-	 * Post constructor.
-	 *
+	 * Post constructor
 	 * @param null $id
 	 */
 	public function __construct($id = null) {
@@ -37,12 +36,30 @@ class Comment extends Entity
 	}
 
 
-	protected function get( $pid ) {
+	/**
+	 * @param $pid
+	 * @return array|\WP_Comment|null
+	 */
+	protected function get($pid ) {
 
 		return get_comment($pid);
 	}
 
 
+	/**
+	 * @param array $comment_data {
+	 *     Comment data.
+	 *
+	 *     @type string|int $comment_post_ID             The ID of the post that relates to the comment.
+	 *     @type string     $author                      The name of the comment author.
+	 *     @type string     $email                       The comment author email address.
+	 *     @type string     $url                         The comment author URL.
+	 *     @type string     $comment                     The content of the comment.
+	 *     @type string|int $comment_parent              The ID of this comment's parent, if any. Default 0.
+	 *     @type string     $_wp_unfiltered_html_comment The nonce value for allowing unfiltered HTML.
+	 * }
+	 * @return bool|\WP_Error
+	 */
 	public static function post($data){
 
 		$comment = wp_handle_comment_submission( wp_unslash( $data ) );

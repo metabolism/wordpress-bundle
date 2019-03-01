@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
+use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 
@@ -45,19 +46,37 @@ class Post extends Entity
 	 */
 	public function __construct($id = null) {
 
-		if( $post = $this->get($id) )
-		{
+		if( $post = $this->get($id) ) {
+
 			$this->import($post, false, 'post_');
 			$this->addCustomFields($id);
 		}
 	}
 
 
-	protected function get( $pid ) {
+	/**
+	 * Validate class
+	 * @param \WP_Post $post
+	 * @return bool
+	 */
+	protected function isValidClass($post){
 
-		if( $post = get_post($pid) )
-		{
-			if( is_wp_error($post) )
+		$class =  explode('\\', get_class($this));
+		$class =  end($class);
+
+		return $class == "Post" || Factory::getClassname($post->post_type) == $class;
+	}
+
+
+	/**
+	 * @param $pid
+	 * @return array|bool|\WP_Post|null
+	 */
+	protected function get($pid ) {
+
+		if( $post = get_post($pid) ) {
+
+			if( is_wp_error($post) || !$this->isValidClass($post) )
 				return false;
 
 			$this->_post = clone $post;
@@ -69,16 +88,25 @@ class Post extends Entity
 			$post->thumbnail = get_post_thumbnail_id( $post );
 
 			if( $post->thumbnail )
-				$post->thumbnail = PostFactory::create($post->thumbnail, 'image');
+				$post->thumbnail = Factory::create($post->thumbnail, 'image');
 		}
 
 		return $post;
 	}
 
 
-	protected function getSibling($direction='prev', $in_same_term , $excluded_terms, $taxonomy){
+	/**
+	 * Get sibling post
+	 * @param $direction
+	 * @param $in_same_term
+	 * @param $excluded_terms
+	 * @param $taxonomy
+	 * @return Post|false
+	 */
+	protected function getSibling($direction, $in_same_term , $excluded_terms, $taxonomy){
 
 		global $post;
+		
 		$old_global = $post;
 		$post = $this->_post;
 
@@ -96,6 +124,14 @@ class Post extends Entity
 	}
 
 
+	/**
+	 * Get next post
+	 *
+	 * @param bool $in_same_term
+	 * @param string $excluded_terms
+	 * @param string $taxonomy
+	 * @return Post|false
+	 */
 	public function next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
 
 		if( !is_null($this->_next) )
@@ -107,6 +143,14 @@ class Post extends Entity
 	}
 
 
+	/**
+	 * Get previous post
+	 *
+	 * @param bool $in_same_term
+	 * @param string $excluded_terms
+	 * @param string $taxonomy
+	 * @return Post|false
+	 */
 	public function prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
 
 		if( !is_null($this->_prev) )
@@ -118,6 +162,12 @@ class Post extends Entity
 	}
 
 
+	/**
+	 * Get term
+	 *
+	 * @param string $tax
+	 * @return Term|bool
+	 */
 	public function get_term( $tax='' ) {
 
 		$term = false;
@@ -142,7 +192,12 @@ class Post extends Entity
 			return false;
 	}
 
-
+	/**
+	 * Get term list
+	 *
+	 * @param string $tax
+	 * @return Term[]|[]
+	 */
 	public function get_terms( $tax = '' ) {
 		
 		$taxonomies = array();

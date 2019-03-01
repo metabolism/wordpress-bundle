@@ -17,7 +17,7 @@ class Entity
 	];
 
 	public $ID;
-	private $parent;
+
 	private $custom_fields;
 	private $imported=false;
 
@@ -57,6 +57,7 @@ class Entity
 
 	/**
 	 * Add custom fields as members of the post
+	 * @param $id
 	 */
 	protected function addCustomFields( $id )
 	{
@@ -72,6 +73,12 @@ class Entity
 	}
 
 
+	/**
+	 * @param $object
+	 * @param bool $remove
+	 * @param bool $replace
+	 * @return array|bool
+	 */
 	public static function normalize($object, $remove=false, $replace=false)
 	{
 		if( is_object($object) )

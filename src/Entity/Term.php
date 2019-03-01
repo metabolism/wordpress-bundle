@@ -2,6 +2,9 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
+use Metabolism\WordpressBundle\Factory\Factory;
+use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
+
 /**
  * Class Term
  *
@@ -35,7 +38,7 @@ class Term extends Entity
 		if( is_array($id) )
 		{
 			if( empty($id) || isset($id['invalid_taxonomy']) )
-				return false;
+				return;
 
 			$id = $id[0];
 		}
@@ -52,11 +55,29 @@ class Term extends Entity
 	}
 
 
-	protected function get( $pid ) {
+	/**
+	 * Validate class
+	 * @param \WP_Term $term
+	 * @return bool
+	 */
+	protected function isValidClass($term){
+
+		$class = explode('\\', get_class($this));
+		$class = end($class);
+		return $class == "Term" || Factory::getClassname($term->taxonomy) == $class;
+
+	}
+
+
+	/**
+	 * @param $pid
+	 * @return array|bool|\WP_Error|\WP_Term|null
+	 */
+	protected function get($pid ) {
 
 		$term = false;
 
-		if( is_int($pid) && $term = get_term($pid) )
+		if( $term = get_term($pid) )
 		{
 			if( !$term || is_wp_error($term) )
 				return false;
@@ -65,6 +86,9 @@ class Term extends Entity
 			$term->link = get_term_link($pid);
 			$term->ID = $term->term_id;
 			$term->current = get_queried_object_id() == $pid;
+
+			if( $term->parent )
+				$term->parent = TaxonomyFactory::create($term->parent);
 		}
 
 		return $term;

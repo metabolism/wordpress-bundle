@@ -7,6 +7,7 @@ namespace Metabolism\WordpressBundle\Controller;
  */
 class AdminController {
 
+	private $config;
 
 	/**
 	 * @var string plugin domain name for translations
@@ -18,6 +19,8 @@ class AdminController {
 
 	/**
 	 * Unset thumbnail image
+	 * @param $sizes
+	 * @return mixed
 	 */
 	public function intermediateImageSizesAdvanced($sizes)
 	{
@@ -26,6 +29,9 @@ class AdminController {
 	}
 
 
+	/**
+	 * Allow editor to edit theme and wpseo options
+	 */
 	public function updateEditorRole()
 	{
 		$role_object = get_role( 'editor' );

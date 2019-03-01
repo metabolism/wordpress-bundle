@@ -13,7 +13,11 @@ class Menu extends Entity
 	public $items, $title, $slug, $description;
 	private $menuItemClass;
 
-	public function __construct( $slug = 0 ) {
+	/**
+	 * Menu constructor.
+	 * @param int $slug
+	 */
+	public function __construct($slug = 0 ) {
 
 		$app_classname = 'App\Entity\MenuItem';
 
@@ -37,7 +41,11 @@ class Menu extends Entity
 	}
 
 
-	protected function get( $menu_id )
+	/**
+	 * @param $menu_id
+	 * @return bool
+	 */
+	protected function get($menu_id )
 	{
 		$menu_items = wp_get_nav_menu_items($menu_id);
 
@@ -55,9 +63,14 @@ class Menu extends Entity
 		$this->slug = $menu_info->slug;
 		$this->description = $menu_info->description;
 
+		return true;
 	}
 
 
+	/**
+	 * @param $menu_items
+	 * @return array
+	 */
 	protected function orderItems($menu_items)
 	{
 		$ordered_menu = [];
@@ -84,7 +97,7 @@ class Menu extends Entity
 	 * @internal
 	 * @param string $slug
 	 * @param array $locations
-	 * @return integer
+	 * @return false|integer
 	 */
 	protected function get_menu_id_from_locations( $slug, $locations )
 	{
@@ -96,5 +109,7 @@ class Menu extends Entity
 
 			return $menu_id;
 		}
+
+		return false;
 	}
 }
