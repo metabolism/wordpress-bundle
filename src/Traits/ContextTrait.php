@@ -45,7 +45,7 @@ Trait ContextTrait
 
 	/**
 	 * load ACF options
-	 * @return object|bool
+	 * @return void
 	 */
 	protected function addOptions()
 	{
@@ -325,16 +325,15 @@ Trait ContextTrait
 	 * @see Post
 	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters
 	 * @param bool|string $key the key name to store data
-	 * @param bool $found_posts include found posts value
 	 * @param callable|bool $callback execute a function for each result via array_map
 	 * @return Post[]
 	 */
-	public function addPosts($args=[], $key='posts', $found_posts=false, $callback=false){
+	public function addPosts($args=[], $key='posts', $callback=false){
 
 		$wp_query = Query::wp_query($args);
-		$posts = $wp_query->posts;
+		$raw_posts = $wp_query->posts;
 
-		if( $found_posts ) {
+		if( isset($args['found_posts']) && $args['found_posts']) {
 
 			if( !isset($this->data['found_'.$key]) )
 				$this->data['found_'.$key] = 0;
@@ -343,7 +342,10 @@ Trait ContextTrait
 		}
 
 		if( $callback && is_callable($callback) )
-			array_map($callback, $posts);
+			array_map($callback, $raw_posts);
+
+		foreach ($raw_posts as $post)
+			$posts[$post->ID] = $post;
 
 		if( !isset($this->data[$key]) )
 			$this->data[$key] = $posts;
@@ -482,7 +484,7 @@ Trait ContextTrait
 	 * @param string $key
 	 * @return Term[]
 	 */
-	public function addTerms($args=[], $key='terms')
+	public function addTerms($args=[], $key='terms', $callback=false)
 	{
 		$raw_terms = Query::get_terms($args);
 		$terms = [];
@@ -517,7 +519,13 @@ Trait ContextTrait
 				$terms[$term->ID] = $term;
 		}
 
-		$this->data[$key] = $terms;
+		if( $callback && is_callable($callback) )
+			array_map($callback, $terms);
+
+		if( !isset($this->data[$key]) )
+			$this->data[$key] = $terms;
+		else
+			$this->data[$key] = array_merge($this->data[$key], $terms);
 
 		return $this->data[$key];
 	}

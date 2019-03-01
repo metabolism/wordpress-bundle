@@ -33,6 +33,7 @@ class Post extends Entity
 	public $password;
 	public $parent;
 	public $type;
+	public $slug;
 	public $name;
 
 	private $_next = null;
@@ -89,6 +90,8 @@ class Post extends Entity
 
 			if( $post->thumbnail )
 				$post->thumbnail = Factory::create($post->thumbnail, 'image');
+
+			$post->slug = $post->post_name;
 		}
 
 		return $post;

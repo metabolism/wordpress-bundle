@@ -17,12 +17,11 @@ class Term extends Entity
 	public $ID;
 	public $current;
 	public $slug;
-	public $term_group;
 	public $taxonomy;
 	public $description;
 	public $parent;
 	public $count;
-	public $term_order;
+	public $order;
 	public $title;
 
 	protected $term_id;
@@ -45,9 +44,7 @@ class Term extends Entity
 
 		if( $term = $this->get($id) )
 		{
-			$this->import($term);
-
-			$this->term_order = intval($this->term_order);
+			$this->import($term, false, 'term_');
 
 			if( !empty($term->taxonomy) )
 				$this->addCustomFields($term->taxonomy.'_'.$id);
@@ -83,12 +80,13 @@ class Term extends Entity
 				return false;
 			
 			$term->excerpt = strip_tags(term_description($pid),'<b><i><strong><em><br>');
-			$term->link = get_term_link($pid);
-			$term->ID = $term->term_id;
-			$term->current = get_queried_object_id() == $pid;
 
-			if( $term->parent )
-				$term->parent = TaxonomyFactory::create($term->parent);
+			if( WP_FRONT )
+				$term->link = get_term_link($pid);
+
+			$term->ID = $term->term_id;
+			$term->term_order = intval($term->term_order);
+			$term->current = get_queried_object_id() == $pid;
 		}
 
 		return $term;
