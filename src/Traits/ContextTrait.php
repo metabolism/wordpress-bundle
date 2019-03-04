@@ -482,6 +482,7 @@ Trait ContextTrait
 	 * Query terms
 	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
 	 * @param string $key
+	 * @param false|callable $callback
 	 * @return Term[]
 	 */
 	public function addTerms($args=[], $key='terms', $callback=false)

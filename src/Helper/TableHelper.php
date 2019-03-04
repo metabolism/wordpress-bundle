@@ -164,7 +164,7 @@ class Table extends \WP_List_Table {
 		if( in_array($column_name, $this->fields) )
 			$value = $item[$column_name];
 
-		return apply_filters('list_table_column', $value, $column_name, $this->table);
+		return apply_filters('list_table_column', $value, $column_name, $this->table, $item);
 	}
 
 
