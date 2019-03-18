@@ -78,10 +78,8 @@ class ConfigPlugin {
 						$args['has_archive'] = $archive;
 				}
 
-				if( !WP_FRONT ){
-					$args['public'] = false;
-					$args['show_ui'] = true;
-				}
+				if( !WP_FRONT )
+					$args['publicly_queryable'] = false;
 
 				register_post_type($post_type, $args);
 
@@ -219,10 +217,8 @@ class ConfigPlugin {
 					$object_type = 'post';
 				}
 
-				if( !WP_FRONT ){
-					$args['public'] = false;
-					$args['show_ui'] = true;
-				}
+				if( !WP_FRONT )
+					$args['publicly_queryable'] = false;
 
 				register_taxonomy($taxonomy, $object_type, $args);
 
