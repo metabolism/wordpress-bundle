@@ -396,6 +396,19 @@ class MediaPlugin {
 		return $dirs;
 	}
 
+
+	/**
+	 * Redefine upload dir
+	 * @see Menu
+	 */
+	public function attachmentUrl($url)
+	{
+		$wp_upload_dir = wp_upload_dir();
+
+		return $wp_upload_dir['relative'].str_replace($wp_upload_dir['baseurl'], '', $url);
+	}
+
+
 	public static function add_relative_upload_dir_key( $arr )
 	{
 		$arr['url'] = str_replace('edition/../', '', $arr['url']);
@@ -412,8 +425,11 @@ class MediaPlugin {
 
 		add_filter('upload_dir', [$this, 'add_relative_upload_dir_key'], 10, 2);
 
-		if( $this->config->get('multisite.shared_media') and is_multisite() )
+		if( $this->config->get('multisite.shared_media') and is_multisite() ){
+
 			add_filter( 'upload_dir', [$this, 'uploadDir'], 11 );
+			add_filter( 'wp_get_attachment_url', [$this, 'attachmentUrl'], 10, 2 );
+		}
 
 		if( is_admin() )
 		{
