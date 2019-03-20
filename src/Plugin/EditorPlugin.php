@@ -119,6 +119,15 @@ class EditorPlugin {
 		remove_action( 'init', 'wp_schedule_update_checks' );
 	}
 	
+	function disableDashboardWidgets()
+	{
+		remove_meta_box( 'dashboard_incoming_links', 'dashboard', 'normal' );   // Incoming Links
+		remove_meta_box( 'dashboard_plugins', 'dashboard', 'normal' );          // Plugins
+		remove_meta_box( 'dashboard_quick_press', 'dashboard', 'side' );        // Quick Press
+		remove_meta_box( 'dashboard_primary', 'dashboard', 'side' );            // WordPress blog
+		remove_meta_box( 'dashboard_secondary', 'dashboard', 'side' );          // Other WordPress News
+		remove_action( 'welcome_panel', 'wp_welcome_panel' );                // Remove WordPress Welcome Panel
+	}
 
 	/**
 	 * ConfigPlugin constructor.
@@ -138,6 +147,7 @@ class EditorPlugin {
 			add_filter( 'mce_buttons', [$this, 'TinyMceButtons']);
 			add_filter( 'wp_editor_settings', [$this, 'editorSettings'], 10, 2);
 			add_action( 'admin_menu', [$this, 'adminMenu']);
+			add_action( 'wp_dashboard_setup', [$this,  'disableDashboardWidgets']);
 		}
 		else
 		{
