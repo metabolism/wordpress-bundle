@@ -81,7 +81,7 @@ class ConfigLoader {
 		/**
 		 * Enable multisite
 		 */
-		if( $_config->get('multisite') )
+		if( $_config->get('multisite') && (!isset($_ENV['MULTISITE']) || getenv('MULTISITE')) )
 		{
 			define( 'MULTISITE', true );
 			define( 'SUBDOMAIN_INSTALL', $_config->get('multisite.subdomain_install') );
