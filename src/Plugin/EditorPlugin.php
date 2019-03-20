@@ -13,7 +13,7 @@ class EditorPlugin {
 
 
 	/**
-	 * Add custom post type for taxonomy archive page
+	 * Disable editor options for seo taxonomy edition
 	 */
 	public function editorSettings( $settings, $editor_id )
 	{
@@ -44,6 +44,9 @@ class EditorPlugin {
 	}
 
 
+	/**
+	 * Add quick link top bar archive button
+	 */
 	public function addArchiveButton($wp_admin_bar)
 	{
 		if( is_post_type_archive() )
@@ -61,7 +64,9 @@ class EditorPlugin {
 		}
 	}
 
-
+	/**
+	 * Filter admin menu entries
+	 */
 	public function adminMenu()
 	{
 		foreach ( $this->config->get('remove_menu_page', []) as $menu )
@@ -119,6 +124,10 @@ class EditorPlugin {
 		remove_action( 'init', 'wp_schedule_update_checks' );
 	}
 	
+
+	/**
+	 * Disable widgets
+	 */
 	function disableDashboardWidgets()
 	{
 		remove_meta_box( 'dashboard_incoming_links', 'dashboard', 'normal' );   // Incoming Links

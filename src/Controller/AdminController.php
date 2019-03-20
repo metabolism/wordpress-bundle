@@ -47,6 +47,14 @@ class AdminController {
 	}
 
 
+	/**
+	 * Init admin
+	 */
+	public function init(){
+
+		$this->updateEditorRole();
+	}
+
 
 	/**
 	 * Allows user to add specific process on Wordpress functions
@@ -84,7 +92,7 @@ class AdminController {
 		$this->loadConfig();
 		$this->registerFilters();
 
-		add_action( 'admin_init', [$this, 'updateEditorRole'] );
+		add_action( 'admin_init', [$this, 'init'] );
 
 		// Remove image sizes for thumbnails
 		add_filter( 'intermediate_image_sizes_advanced', [$this, 'intermediateImageSizesAdvanced'] );
