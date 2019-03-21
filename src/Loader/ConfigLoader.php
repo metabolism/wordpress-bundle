@@ -183,6 +183,7 @@ class ConfigLoader {
 		if (!defined('WP_CONTENT_URL'))
 			define( 'WP_CONTENT_URL', WP_HOME.'/wp-bundle' );
 
+		define('WP_UPLOADS_DIR', WP_CONTENT_DIR.'/'.UPLOADS);
 
 		/**
 		 * Custom Settings

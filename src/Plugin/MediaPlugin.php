@@ -33,8 +33,8 @@ class MediaPlugin {
 
 		$name = preg_replace("/[^A-Z0-9._-]/i", "_", basename( $file['name']) );
 
-		$target_file = '/uploads'.$path.'/'.uniqid().'_'.$name;
-		$upload_dir = WP_CONTENT_DIR.'/uploads'.$path;
+		$target_file = '/'.uniqid().'_'.$name;
+		$upload_dir = WP_UPLOADS_DIR.$path;
 
 		if( !is_dir($upload_dir) )
 			mkdir($upload_dir, 0777, true);
@@ -42,8 +42,8 @@ class MediaPlugin {
 		if( !is_writable($upload_dir) )
 			return new \WP_Error('right', 'Upload directory is not writable.');
 
-		if( move_uploaded_file($file['tmp_name'], WP_CONTENT_DIR.$target_file) )
-			return ['filename' => $target_file, 'original_filename' => basename( $file['name']), 'type' => $mime_type ];
+		if( move_uploaded_file($file['tmp_name'], $upload_dir.$target_file) )
+			return ['filename' => str_replace('..', '', UPLOADS).$path.$target_file, 'original_filename' => basename( $file['name']), 'type' => $mime_type ];
 		else
 			return new \WP_Error('move', 'There was an error while writing the file.');
 	}
