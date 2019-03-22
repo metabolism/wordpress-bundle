@@ -82,20 +82,27 @@ class Permastruct{
 		$this->addRoute('author', $this->wp_rewrite->author_structure);
 
 		$translated_search_slug = get_option( 'search_rewrite_slug' );
+		$search_post_type_structure = false;
 
 		if( !empty($translated_search_slug) ){
 
 			$search_structure = str_replace($this->wp_rewrite->search_base.'/', $translated_search_slug.'/', $this->wp_rewrite->search_structure);
-			$search_post_type_structure = str_replace($this->wp_rewrite->search_base.'/', $translated_search_slug.'/', $this->wp_rewrite->search_post_type_structure);
+
+			if( isset($this->wp_rewrite->search_post_type_structure) )
+				$search_post_type_structure = str_replace($this->wp_rewrite->search_base.'/', $translated_search_slug.'/', $this->wp_rewrite->search_post_type_structure);
 		}
 		else{
 
 			$search_structure = $this->wp_rewrite->search_structure;
-			$search_post_type_structure = $this->wp_rewrite->search_post_type_structure;
+
+			if( isset($this->wp_rewrite->search_post_type_structure) )
+				$search_post_type_structure = $this->wp_rewrite->search_post_type_structure;
 		}
 
 		$this->addRoute('search', $search_structure, [], true);
-		$this->addRoute('search_post_type', $search_post_type_structure, [], true);
+
+		if( $search_post_type_structure )
+			$this->addRoute('search_post_type', $search_post_type_structure, [], true);
 
 		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[^/]{3,}']);
 	}
