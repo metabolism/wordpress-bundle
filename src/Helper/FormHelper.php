@@ -76,15 +76,17 @@ class Form {
 				$body .= ($form[$key] ? ' - ' . $key . ' : ' . $form[$key] . "\n" : '');
 			}
 
-			foreach ( $attachements as $attachement )
-			{
-				if ( $form[$attachement] and file_exists( $form[$attachement] ) )
-				{
-					$attachments[] = $form[$attachement];
-				}
-			}
+			// foreach ( $attachements as $attachement )
+			// {
+			// 	if ( $form[$attachement] and file_exists( $form[$attachement] ) )
+			// 	{
+			// 		$attachments[] = $form[$attachement];
+			// 	}
+			// }
 
-			if ( wp_mail( $to, $subject, $body, $attachments ) )
+			// if ( wp_mail( $to, $subject, $body, $attachments ) )
+			$headers = 'From: plerouge@eleven-labs.com' . "\r\n";
+			if ( mail( $to, $subject, $message, $headers ) )
 				return $form;
 			else
 				return new \WP_Error('send_mail', "The server wasn't able to send the email.");
