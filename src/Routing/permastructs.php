@@ -151,6 +151,8 @@ $collection = new RouteCollection();
 
 if( $_config->get('multisite') && !$_config->get('multisite.multilangue') && !$_config->get('multisite.subdomain_install') )
 {
+	$current_site_id = get_current_blog_id();
+
 	foreach (get_sites() as $site)
 	{
 		switch_to_blog( $site->blog_id );
@@ -159,7 +161,7 @@ if( $_config->get('multisite') && !$_config->get('multisite.multilangue') && !$_
 		new Permastruct($collection, $locale, $controller_name);
 	}
 
-	restore_current_blog();
+	switch_to_blog($current_site_id);
 }
 else{
 

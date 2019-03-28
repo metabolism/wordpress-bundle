@@ -86,7 +86,7 @@ class MediaPlugin {
 			}
 		}
 
-		restore_current_blog();
+		switch_to_blog($current_site_id);
 
 		$this->prevent_recurssion = false;
 
@@ -131,7 +131,7 @@ class MediaPlugin {
 			}
 		}
 
-		restore_current_blog();
+		switch_to_blog($current_site_id);
 
 		$this->prevent_recurssion = false;
 	}
@@ -225,7 +225,7 @@ class MediaPlugin {
 			}
 		}
 
-		restore_current_blog();
+		switch_to_blog( $current_site_id );
 
 		if( $main_site_id != $current_site_id && $original_id )
 			add_post_meta( $attachment_ID, '_wp_original_attachment_id', $original_id );
@@ -348,6 +348,7 @@ class MediaPlugin {
 			set_time_limit(0);
 			
 			$main_site_id = get_main_network_id();
+			$current_site_id = get_current_blog_id();
 
 			global $wpdb;
 
@@ -372,7 +373,7 @@ class MediaPlugin {
 					$this->addAttachment($original_attachment_id);
 			}
 
-			restore_current_blog();
+			switch_to_blog($current_site_id);
 		}
 
 		wp_redirect( get_admin_url(null, 'network/settings.php') );
