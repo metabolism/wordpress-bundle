@@ -151,6 +151,9 @@ class MediaPlugin {
 		$current_site_id = get_current_blog_id();
 		$main_site_id = get_main_network_id();
 
+		if( !$attachment )
+			return $attachment_ID;
+
 		$attr = [
 			'post_mime_type' => $attachment->post_mime_type,
 			'filename'       => $attachment->guid,
@@ -167,6 +170,12 @@ class MediaPlugin {
 
 		if( !$attachment_metadata )
 			$attachment_metadata = wp_generate_attachment_metadata( $attachment_ID, $file );
+
+		if(!isset($attachment_metadata['file']) ){
+
+			$file = get_post_meta( $attachment_ID, '_wp_attached_file', true );
+			$attachment_metadata['file'] = _wp_get_attachment_relative_path( $file ) . basename( $file );
+		}
 
 		$original_id = false;
 
@@ -371,6 +380,10 @@ class MediaPlugin {
 
 				foreach ($original_attachment_ids as $original_attachment_id)
 					$this->addAttachment($original_attachment_id);
+
+				//clean duplicated posts
+				$wpdb->query("DELETE p1 FROM $wpdb->posts p1 INNER JOIN $wpdb->posts p2 WHERE p1.ID > p2.ID AND p1.post_title = p2.post_title");
+				$wpdb->query("DELETE pm FROM $wpdb->postmeta pm LEFT JOIN $wpdb->posts wp ON wp.ID = pm.post_id WHERE wp.ID IS NULL");
 			}
 
 			switch_to_blog($current_site_id);
