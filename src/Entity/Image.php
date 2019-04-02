@@ -5,8 +5,7 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
-use Gumlet\ImageResize;
-use Gumlet\ImageResizeException;
+use Intervention\Image\ImageManagerStatic;
 
 /**
  * Class Image
@@ -197,27 +196,9 @@ class Image extends Entity
 	 * @param int $h
 	 * @param null $ext
 	 * @return mixed|string
-	 * @throws \Gumlet\ImageResizeException
+	 * @throws Exception
 	 */
 	protected function crop($w, $h=0, $ext=null){
-
-		switch ($ext){
-			case 'jpg':
-			case 'jpeg':
-			$image_type = IMAGETYPE_JPEG;
-			break;
-			case 'png':
-				$image_type = IMAGETYPE_PNG;
-				break;
-			case 'webp':
-				$image_type = IMAGETYPE_WEBP;
-				break;
-			case 'gif':
-				$image_type = IMAGETYPE_GIF;
-				break;
-			default:
-				$image_type = null;
-		}
 
 		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
 			$this->focus_point = false;
@@ -248,15 +229,19 @@ class Image extends Entity
 
 		try
 		{
-			$image = new ImageResize($this->src);
+			$image = ImageManagerStatic::make($this->src);
 
 			if(!$w){
 
-				$image->resizeToHeight($h, true);
+				$image->resize(null, $h, function ($constraint) {
+					$constraint->upsize();
+				});
 			}
 			elseif(!$h){
 
-				$image->resizeToWidth($w, true);
+				$image->resize($w, null, function ($constraint) {
+					$constraint->upsize();
+				});
 			}
 			elseif($this->focus_point){
 
@@ -291,22 +276,26 @@ class Image extends Entity
 					$cropX2 = $src_width;
 				}
 
-				$image->freecrop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
+				$image->crop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
 				$image->save($dest, null, 100);
 
-				$image = new ImageResize($dest);
-				$image->resize($w, $h, true);
+				$image = ImageManagerStatic::make($dest);
+				$image->resize($w, $h, function ($constraint) {
+					$constraint->upsize();
+				});
 			}
 			else{
 
-				$image->crop($w, $h, true);
+				$image->fit($w, $h);
 			}
 
-			$image->save($dest, $image_type,  $this->compression);
+			$image->save($dest,  $this->compression, function ($constraint) {
+				$constraint->upsize();
+			});
 
 			return $dest;
 		}
-		catch(ImageResizeException $e)
+		catch(Exception $e)
 		{
 			return $e->getMessage();
 		}

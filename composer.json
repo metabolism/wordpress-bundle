@@ -12,7 +12,7 @@
     "ifsnop/mysqldump-php":"2.*",
     "dflydev/dot-access-data":"2.*",
     "enshrined/svg-sanitize": "0.*",
-    "gumlet/php-image-resize": "1.*",
+    "intervention/image": "2.*",
     "wpackagist-plugin/classic-editor":"1.*"
   },
   "extra": {
