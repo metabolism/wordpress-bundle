@@ -128,30 +128,26 @@ Trait ContextTrait
 			'language'           => $blog_language,
 			'languages'          => $languages,
 			'is_admin'           => current_user_can('manage_options'),
-			'home_url'           => home_url('/')
+			'home_url'           => home_url('/'),
+			'maintenance_mode'   => wp_maintenance_mode(),
+			'tagline'            => get_bloginfo('description'),
+			'site_title'         => get_bloginfo('name'),
+			'posts_per_page'     => get_option( 'posts_per_page' )
 		];
-
-		if( WP_FRONT ){
-			$this->data['search_url'] = get_search_link();
-			$this->data['privacy_policy_url'] = get_privacy_policy_url();
-		}
 
 		if( is_multisite() )
 			$this->data['network_home_url'] = trim(network_home_url(), '/');
 
-		$this->data = array_merge($this->data, [
-			'maintenance_mode' => wp_maintenance_mode(),
-			'tagline' => get_bloginfo('description'),
-			'posts_per_page' => get_option( 'posts_per_page' )
-		]);
-
 		if( WP_FRONT && (!is_singular() || $post_id) )
 		{
-			$wp_title = wp_title(' ', false);
+			$wp_title = trim(wp_title(' ', false));
 
 			$this->data = array_merge($this->data, [
-				'body_class' => $blog_language . ' ' . implode(' ', get_body_class()),
-				'page_title' => empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title,
+				'search_url'         => get_search_link(),
+				'privacy_policy_url' => get_privacy_policy_url(),
+				'is_front_page'      => is_front_page(),
+				'body_class'         => $blog_language . ' ' . implode(' ', get_body_class()),
+				'page_title'         => empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title,
 				'system' => [
 					'head'   => $this->getOutput('wp_head'),
 					'footer' => $this->getOutput('wp_footer')

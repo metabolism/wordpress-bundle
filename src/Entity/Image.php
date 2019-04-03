@@ -142,15 +142,15 @@ class Image extends Entity
 	 * @param null $ext
 	 * @return mixed
 	 */
-	public function resize($w, $h = 0, $name=false, $ext=null){
+	public function resize($w, $h = 0, $ext=null, $params=false){
 
 		$abspath = $this->uploadDir('basedir');
 		$abspath = str_replace(WP_FOLDER.'/..', '', $abspath);
 
-		$image_file = $this->crop($w, $h, $ext);
+		$image_file = $this->crop($w, $h, $ext, $params);
 		$image = str_replace($abspath, $this->uploadDir('relative'), $image_file);
 
-		if( $name )
+		if( is_array($params) && isset($params['name']) )
 			$this->sizes[$name] = $image;
 
 		return $image;
@@ -163,7 +163,7 @@ class Image extends Entity
 	 * @param bool $sources
 	 * @return \Twig\Markup
 	 */
-	public function toHTML($w, $h=0, $sources=false){
+	public function toHTML($w, $h=0, $sources=false, $params=false){
 
 		if($this->mime_type == 'image/svg+xml'){
 
@@ -173,17 +173,17 @@ class Image extends Entity
 
 			$html = '<picture>';
 
-			if( is_array($sources) ){
+			if( $sources && is_array($sources) ){
 
 				foreach ($sources as $media=>$size){
-					$html .='<source media="('.$media.')"  srcset="'.$this->resize($size[0], $size[1] ?? 0, false,'webp').'" type="image/webp">';
+					$html .='<source media="('.$media.')"  srcset="'.$this->resize($size[0], $size[1] ?? 0,'webp', $params).'" type="image/webp">';
 				}
 			}
 			else{
-				$html .='<source srcset="'.$this->resize($w, $h, false,'webp').'" type="image/webp">';
+				$html .='<source srcset="'.$this->resize($w, $h,'webp', $params).'" type="image/webp">';
 			}
 
-			$html .= '<img src="'.$this->resize($w, $h).'" alt="'.$this->alt.'">';
+			$html .= '<img src="'.$this->resize($w, $h, null, $params).'" alt="'.$this->alt.'">';
 			$html .='</picture>';
 		}
 
@@ -196,9 +196,8 @@ class Image extends Entity
 	 * @param int $h
 	 * @param null $ext
 	 * @return mixed|string
-	 * @throws Exception
 	 */
-	protected function crop($w, $h=0, $ext=null){
+	protected function crop($w, $h=0, $ext=null, $params=false){
 
 		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
 			$this->focus_point = false;
@@ -214,10 +213,12 @@ class Image extends Entity
 		if( $ext == null )
 			$ext = $src_ext;
 
+		$extrafilename = $params ? '-'.substr(md5(json_encode($params)), 0, 6) : '';
+
 		if( $this->focus_point )
-			$dest = str_replace('.'.$src_ext, '-'.round($w).'x'.round($h).'-c-'.round($this->focus_point['x']).'x'.round($this->focus_point['y']).'.' . $ext, $this->src);
+			$dest = str_replace('.'.$src_ext, '-'.round($w).'x'.round($h).'-c-'.round($this->focus_point['x']).'x'.round($this->focus_point['y']).$extrafilename.'.' . $ext, $this->src);
 		else
-			$dest = str_replace('.'.$src_ext, '-'.round($w).'x'.round($h).'.' . $ext, $this->src);
+			$dest = str_replace('.'.$src_ext, '-'.round($w).'x'.round($h).$extrafilename.'.' . $ext, $this->src);
 
 		if( file_exists($dest) ){
 
@@ -287,6 +288,30 @@ class Image extends Entity
 			else{
 
 				$image->fit($w, $h);
+			}
+
+			if($params && is_array($params) ){
+
+				if( isset($params['colorize']) && count($params['colorize']) === 3 )
+					$image->colorize($params['colorize'][0], $params['colorize'][1], $params['colorize'][2]);
+
+				if( isset($params['blur']) )
+					$image->blur($params['blur']);
+
+				if( isset($params['brightness']) )
+					$image->brightness($params['brightness']);
+
+				if( isset($params['gamma']) )
+					$image->gamma($params['gamma']);
+
+				if( isset($params['pixelate']) )
+					$image->pixelate($params['pixelate']);
+
+				if( isset($params['greyscale']) )
+					$image->greyscale();
+
+				if( isset($params['limitColors']) && count($params['limitColors']) === 2 )
+					$image->limitColors($params['limitColors'][0], $params['limitColors'][1]);
 			}
 
 			$image->save($dest,  $this->compression, function ($constraint) {
