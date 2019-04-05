@@ -1,7 +1,4 @@
 <?php
-/**
- * User: Paul Coudeville <paul@metabolism.fr>
- */
 
 namespace Metabolism\WordpressBundle\Entity;
 
@@ -144,6 +141,9 @@ class Image extends Entity
 	 */
 	public function resize($w, $h = 0, $ext=null, $params=false){
 
+		if( $ext === 'webp' && !function_exists('imagewebp'))
+			$ext = null;
+
 		$abspath = $this->uploadDir('basedir');
 		$abspath = str_replace(WP_FOLDER.'/..', '', $abspath);
 
@@ -165,9 +165,9 @@ class Image extends Entity
 	 */
 	public function toHTML($w, $h=0, $sources=false, $params=false){
 
-		if($this->mime_type == 'image/svg+xml'){
+		if($this->mime_type == 'image/svg+xml' || !function_exists('imagewebp') ){
 
-			$html = '<img src="'.$this->resize($w, $h).'" alt="'.$this->alt.'">';
+			$html = '<img src="'.$this->resize($w, $h, null, $params).'" alt="'.$this->alt.'">';
 		}
 		else{
 
