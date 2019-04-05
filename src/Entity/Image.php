@@ -151,7 +151,7 @@ class Image extends Entity
 		$image = str_replace($abspath, $this->uploadDir('relative'), $image_file);
 
 		if( is_array($params) && isset($params['name']) )
-			$this->sizes[$name] = $image;
+			$this->sizes[$params['name']] = $image;
 
 		return $image;
 	}
