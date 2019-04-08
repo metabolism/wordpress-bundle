@@ -165,7 +165,10 @@ class Image extends Entity
 	 */
 	public function toHTML($w, $h=0, $sources=false, $params=false){
 
-		if($this->mime_type == 'image/svg+xml' || !function_exists('imagewebp') ){
+		$ext = function_exists('imagewebp') ? 'webp' : null;
+		$mime = function_exists('imagewebp') ? 'image/webp' : $this->mime_type;
+
+		if($this->mime_type == 'image/svg+xml' || (!$sources && $ext == null) ){
 
 			$html = '<img src="'.$this->resize($w, $h, null, $params).'" alt="'.$this->alt.'">';
 		}
@@ -176,11 +179,11 @@ class Image extends Entity
 			if( $sources && is_array($sources) ){
 
 				foreach ($sources as $media=>$size){
-					$html .='<source media="('.$media.')"  srcset="'.$this->resize($size[0], $size[1] ?? 0,'webp', $params).'" type="image/webp">';
+					$html .='	<source media="('.$media.')"  srcset="'.$this->resize($size[0], $size[1] ?? 0, $ext, $params).'" type="'.$mime.'">';
 				}
 			}
 			else{
-				$html .='<source srcset="'.$this->resize($w, $h,'webp', $params).'" type="image/webp">';
+				$html .='	<source srcset="'.$this->resize($w, $h, $ext, $params).'" type="'.$mime.'">';
 			}
 
 			$html .= '<img src="'.$this->resize($w, $h, null, $params).'" alt="'.$this->alt.'">';
