@@ -24,6 +24,8 @@ class WordpressBundle extends Bundle
 		$this->registerGlobals();
 
 		do_action_ref_array( 'wp', array( &$wp ) );
+
+		do_action('template-redirect');
 	}
 
 	/**

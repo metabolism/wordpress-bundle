@@ -16,7 +16,7 @@ class Form {
 	public static function getField( $data, $key, $limit_lengh=500 )
 	{
 		if( !$data )
-			$data = $_REQUEST;
+			$data = json_decode(file_get_contents('php://input'), true);
 
 		if( isset($_FILES[$key]))
 		{
