@@ -267,7 +267,7 @@ class ACF
 						foreach ($object['value'] as $value) {
 
 							if ($object['return_format'] == 'id' or is_int($value) )
-								$element = $this->load('post', $value);
+								$element = $value;
 							elseif ($object['return_format'] == 'object')
 								$element = $this->load('post', $value->ID);
 							else
@@ -285,7 +285,7 @@ class ACF
 						break;
 
 					if ($object['return_format'] == 'id' or is_int($object['value']) )
-						$objects[$object['name']] = $this->load('post', $object['value']);
+						$objects[$object['name']] = $object['value'];
 					elseif ($object['return_format'] == 'object')
 						$objects[$object['name']] = $this->load('post', $object['value']->ID);
 					else
@@ -348,28 +348,27 @@ class ACF
 
 						foreach ($object['value'] as $value) {
 
-							$id = false;
-
-							if ($object['return_format'] == 'id')
-								$id = $value;
-							elseif (is_object($value) && $object['return_format'] == 'object')
-								$id = $value->term_id;
-
-							if( $id )
-								$objects[$object['name']][] = $this->load('term', $id);
+							if ($object['return_format'] == 'id'){
+								if( $value )
+									$objects[$object['name']][] = $value;
+							}
+							elseif (is_object($value) && $object['return_format'] == 'object'){
+								if( $value->term_id )
+									$objects[$object['name']][] = $this->load('term', $value->term_id);
+							}
 						}
 					}
 					else{
 
-						$id = false;
+						if ($object['return_format'] == 'id'){
+							if( $object['value'] )
+								$objects[$object['name']] = $object['value'];
+						}
+						elseif (is_object($object['value']) && $object['return_format'] == 'object'){
 
-						if ($object['return_format'] == 'id')
-							$id = $object['value'];
-						elseif (is_object($object['value']) && $object['return_format'] == 'object')
-							$id = $object['value']->term_id;
-
-						if( $id )
-							$objects[$object['name']] = $this->load('term', $id);
+							if( $object['value']->term_id )
+								$objects[$object['name']] = $this->load('term', $object['value']->term_id);
+						}
 					}
 
 					break;
