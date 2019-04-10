@@ -144,6 +144,9 @@ class MultisitePlugin {
 
 	public function msls_head()
 	{
+		if( !class_exists('MslsBlogCollection') || !class_exists('MslsOptions') )
+			return;
+		
 		$blogs  = \MslsBlogCollection::instance();
 		$mydata = \MslsOptions::create();
 

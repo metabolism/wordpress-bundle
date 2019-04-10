@@ -32,6 +32,8 @@ remove_menu_page:
 remove_submenu_page:
   themes.php: customize.php?return=%2Fedition%2Fwp-admin%2F
 
+install-multisite: true
+
 # multisite:
 #  subdomain_install: true
 #  shared_media: true
