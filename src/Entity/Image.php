@@ -82,7 +82,7 @@ class Image extends Entity
 
 		foreach($post_meta as $key=>$value)
 		{
-			if( in_array($key, ['_wp_attached_file', '_wp_attachment_metadata']) )
+			if( in_array($key, ['_wp_attached_file', '_wp_attachment_metadata', '_wpsmartcrop_enabled', '_wpsmartcrop_image_focus']) )
 				continue;
 
 			if($key == '_wp_attachment_image_alt')
@@ -93,8 +93,18 @@ class Image extends Entity
 			{
 				$value = (is_array($value) and count($value)==1) ? $value[0] : $value;
 				$unserialized = @unserialize($value);
+
+				if( substr($key, 0, 1) == '_')
+					$key = substr($key, 1);
+
 				$post[$key] = $unserialized?$unserialized:$value;
 			}
+		}
+
+		//wpsmartcrop plugin support
+		if( isset($post_meta['_wpsmartcrop_enabled'], $post_meta['_wpsmartcrop_image_focus']) && $post_meta['_wpsmartcrop_enabled'][0] ){
+			$focus_point =  @unserialize($post_meta['_wpsmartcrop_image_focus'][0]);
+			$this->focus_point = ['x'=>$focus_point['left'], 'y'=>$focus_point['top']];
 		}
 
 		if( !empty($metadata) )
@@ -249,8 +259,8 @@ class Image extends Entity
 			}
 			elseif($this->focus_point){
 
-				$src_width = $image->getSourceWidth();
-				$src_height = $image->getSourceHeight();
+				$src_width = $image->getWidth();
+				$src_height = $image->getHeight();
 				$src_ratio = $src_width/$src_height;
 				$dest_ratio = $w/$h;
 

@@ -250,6 +250,8 @@ Available functions :
 
 Image entity provide a nice on the fly resize function, add width and height to crop-resize, set width or height to 0 to resize
 
+[wp-smartcrop](https://wordpress.org/plugins/wp-smartcrop/) plugin is supported
+
 ```twig
 <h1>{{ post.title }}</h1>
 <img src="{{ post.thumbnail.resize(800, 600) }}" alt="{{ post.thumbnail.alt }}">
