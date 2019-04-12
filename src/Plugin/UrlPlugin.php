@@ -92,6 +92,14 @@ class UrlPlugin {
 	}
 
 	/**
+	 * Make link relative
+	 */
+	public function relativeLink($link){
+
+		return str_replace(WP_HOME, '', $link);
+	}
+
+	/**
 	 * Symfony require real url so redirect preview url to real url
 	 * ex /?post_type=project&p=899&preview=true redirect to /project/post-title?preview=true
 	 */
@@ -128,6 +136,11 @@ class UrlPlugin {
 	public function __construct($config){
 
 		add_filter('preview_post_link', [$this, 'previewPostLink'], 10, 2 );
+
+		add_filter('post_link', [$this, 'relativeLink']);
+		add_filter('page_link', [$this, 'relativeLink']);
+		add_filter('post_type_link', [$this, 'relativeLink']);
+
 		add_filter('option_siteurl', [$this, 'optionSiteURL'] );
 		add_filter('network_site_url', [$this, 'networkSiteURL'] );
 		add_filter('home_url', [$this, 'homeURL'] );

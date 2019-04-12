@@ -190,12 +190,12 @@ class Image extends Entity
 
 				foreach ($sources as $media=>$size){
 					$html .='	<source media="('.$media.')"  srcset="'.$this->resize($size[0], $size[1] ?? 0, $ext, $params).'" type="'.$mime.'">';
+					if( $ext == 'webp' )
+						$html .='	<source media="('.$media.')"  srcset="'.$this->resize($size[0], $size[1] ?? 0, null, $params).'" type="'.$this->mime_type.'">';
 				}
 			}
-			else{
-				$html .='	<source srcset="'.$this->resize($w, $h, $ext, $params).'" type="'.$mime.'">';
-			}
 
+			$html .='	<source srcset="'.$this->resize($w, $h, $ext, $params).'" type="'.$mime.'">';
 			$html .= '<img src="'.$this->resize($w, $h, null, $params).'" alt="'.$this->alt.'">';
 			$html .='</picture>';
 		}
@@ -248,13 +248,13 @@ class Image extends Entity
 			if(!$w){
 
 				$image->resize(null, $h, function ($constraint) {
-					$constraint->upsize();
+					$constraint->aspectRatio();
 				});
 			}
 			elseif(!$h){
 
 				$image->resize($w, null, function ($constraint) {
-					$constraint->upsize();
+					$constraint->aspectRatio();
 				});
 			}
 			elseif($this->focus_point){
@@ -291,12 +291,11 @@ class Image extends Entity
 				}
 
 				$image->crop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
-				$image->save($dest, null, 100);
+				$image->save($dest, 100);
 
 				$image = ImageManagerStatic::make($dest);
-				$image->resize($w, $h, function ($constraint) {
-					$constraint->upsize();
-				});
+
+				$image->fit($w, $h);
 			}
 			else{
 
@@ -327,9 +326,7 @@ class Image extends Entity
 					$image->limitColors($params['limitColors'][0], $params['limitColors'][1]);
 			}
 
-			$image->save($dest,  $this->compression, function ($constraint) {
-				$constraint->upsize();
-			});
+			$image->save($dest, $this->compression);
 
 			return $dest;
 		}
