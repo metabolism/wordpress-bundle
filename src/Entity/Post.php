@@ -175,19 +175,9 @@ class Post extends Entity
 
 		$term = false;
 
-		if ( class_exists('WPSEO_Primary_Term') )
-		{
-			$wpseo_primary_term = new \WPSEO_Primary_Term( $tax, $this->ID );
-
-			if( $wpseo_primary_term )
-				$term = $wpseo_primary_term->get_primary_term();
-		}
-
-		if(!$term){
-			$terms = get_the_terms($this->ID, $tax);
-			if( $terms && !is_wp_error($terms) && count($terms) )
-				$term = $terms[0];
-		}
+		$terms = get_the_terms($this->ID, $tax);
+		if( $terms && !is_wp_error($terms) && count($terms) )
+			$term = $terms[0];
 
 		if( $term )
 			return TaxonomyFactory::create( $term );

@@ -296,7 +296,6 @@ class MediaPlugin {
 				echo __('Nothing to remove');
 
 		}, 'media');
-
 	}
 
 

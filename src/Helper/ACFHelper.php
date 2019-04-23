@@ -196,13 +196,19 @@ class ACF
 
 				case 'clone';
 
-					foreach ($object['sub_fields'] as &$sub_field)
-					{
-						if( isset($object['value'][$sub_field['name']]))
-							$sub_field['value'] = $object['value'][$sub_field['name']];
-					}
+					if( $object['display'] == 'group' ){
 
-					$objects[$object['name']] = $this->clean($object['sub_fields']);
+						foreach ($object['sub_fields'] as &$sub_field)
+						{
+							if( isset($object['value'][$sub_field['name']])){
+
+								$sub_field['value'] = $object['value'][$sub_field['name']];
+								$sub_field['name'] = $sub_field['_name'];
+							}
+						}
+
+						$objects[$object['name']] = $this->clean($object['sub_fields']);
+					}
 
 					break;
 

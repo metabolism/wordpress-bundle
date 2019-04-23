@@ -54,7 +54,6 @@ acf:
 support:
   - templates
   - post_thumbnails
-#  - woocommerce
 
 menu:
   footer: Footer

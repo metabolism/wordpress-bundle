@@ -1,13 +1,13 @@
 <?php
 
-namespace Metabolism\WordpressBundle\Plugin;
+namespace Metabolism\WordpressBundle\Provider;
 
 use Dflydev\DotAccessData\Data;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class ACFPlugin {
+class ACFProvider {
 
 	public static $acf_folder;
 	private $config;

@@ -3,7 +3,6 @@
 namespace Metabolism\WordpressBundle\Provider;
 
 use Metabolism\WordpressBundle\Entity\Post;
-use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 
 /**
@@ -13,15 +12,11 @@ use Metabolism\WordpressBundle\Traits\SingletonTrait;
  */
 class WooCommerceProvider
 {
-    use SingletonTrait;
-
-
     /**
      * @param $context
      */
     public function globalContext(&$context)
     {
-
         // WooCommerce Notices
         $context['wc_notices'] = wc_get_notices();
         wc_clear_notices();
@@ -117,7 +112,6 @@ class WooCommerceProvider
 
     public function accountContext(&$context)
     {
-
         return $context;
     }
 
