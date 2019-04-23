@@ -79,6 +79,54 @@ namespace Metabolism\WordpressBundle\Plugin {
 
 
 		/**
+		 * Clear cache folder
+		 */
+		private function clearCache(){
+			if( !empty(BASE_URI) )
+				$this->rrmdir(BASE_URI.'/var/cache');
+
+			wp_redirect( get_admin_url(null, 'options-general.php' ));
+		}
+
+
+		/**
+		 * Recursive rmdir
+		 * @param string $dir
+		 */
+		private function rrmdir($dir) {
+			
+			if (is_dir($dir)) {
+				$objects = scandir($dir);
+				foreach ($objects as $object) {
+					if ($object != "." && $object != "..") {
+						if (is_dir($dir."/".$object))
+							$this->rrmdir($dir."/".$object);
+						else
+							unlink($dir."/".$object);
+					}
+				}
+				rmdir($dir);
+			}
+		}
+
+
+		/**
+		 * add admin parameters
+		 */
+		public function adminInit(){
+
+			if( isset($_GET['forceclearcache']) )
+				$this->clearCache();
+
+			add_settings_field('cache', __('Cache'), function(){
+
+				echo '<a class="button button-primary" href="'.get_admin_url().'?forceclearcache">'.__('Force clear').'</a>';
+
+			}, 'general');
+		}
+
+
+		/**
 		 * CachePlugin constructor.
 		 * @param Data $config
 		 */
@@ -90,8 +138,10 @@ namespace Metabolism\WordpressBundle\Plugin {
 			if( isset($_GET['purge_cache']) )
 				$this->purgeCache();
 
-			if( !$debug )
-			{
+			add_action( 'admin_init', [$this, 'adminInit']);
+
+			if( !$debug ) {
+
 				add_action( 'init', [$this, 'addClearCacheButton']);
 
 				foreach (['save_post', 'deleted_post', 'trashed_post', 'edit_post', 'delete_attachment'] as $action)

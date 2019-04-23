@@ -7,7 +7,6 @@ use Metabolism\WordpressBundle\Factory\PostFactory,
 use Metabolism\WordpressBundle\Helper\ACF,
 	Metabolism\WordpressBundle\Helper\Query;
 use Metabolism\WordpressBundle\Plugin\TermsPlugin;
-use Metabolism\WordpressBundle\Provider\WooCommerceProvider;
 
 use Metabolism\WordpressBundle\Entity\Post,
 	Metabolism\WordpressBundle\Entity\Term,
@@ -153,12 +152,6 @@ Trait ContextTrait
 					'footer' => $this->getOutput('wp_footer')
 				]
 			]);
-
-			if (class_exists('WooCommerce'))
-			{
-				$wcProvider = WooCommerceProvider::getInstance();
-				$wcProvider->globalContext($this->data);
-			}
 		}
 	}
 
@@ -192,7 +185,7 @@ Trait ContextTrait
 	 * @return array
 	 *
 	 */
-	protected function addSitemap($args=[], $title_meta='_yoast_wpseo_title')
+	protected function addSitemap($args=[], $title_meta=false)
 	{
 		$sitemap = [];
 
@@ -208,7 +201,7 @@ Trait ContextTrait
 			foreach ($query->posts as $post)
 			{
 				$template = get_page_template_slug($post);
-				$title = get_post_meta($post->ID, $title_meta, true);
+				$title = $title_meta ? get_post_meta($post->ID, $title_meta, true) : false;
 				$sitemap[] = [
 					'link'=> get_permalink($post),
 					'template' => empty($template)?'default':$template,

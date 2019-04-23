@@ -13,25 +13,6 @@ class EditorPlugin {
 
 
 	/**
-	 * Disable editor options for seo taxonomy edition
-	 */
-	public function editorSettings( $settings, $editor_id )
-	{
-		if ( $editor_id == 'description' and class_exists('WPSEO_Taxonomy') and \WPSEO_Taxonomy::is_term_edit( $GLOBALS['pagenow'] ) )
-		{
-			$settings[ 'tinymce' ] = false;
-			$settings[ 'wpautop' ] = false;
-			$settings[ 'media_buttons' ] = false;
-			$settings[ 'quicktags' ] = false;
-			$settings[ 'default_editor' ] = '';
-			$settings[ 'textarea_rows' ] = 4;
-		}
-
-		return $settings;
-	}
-
-
-	/**
 	 * Configure Tiny MCE first line buttons
 	 */
 	public function TinyMceButtons( $mce_buttons )
@@ -154,7 +135,6 @@ class EditorPlugin {
 		if( is_admin() )
 		{
 			add_filter( 'mce_buttons', [$this, 'TinyMceButtons']);
-			add_filter( 'wp_editor_settings', [$this, 'editorSettings'], 10, 2);
 			add_action( 'admin_menu', [$this, 'adminMenu']);
 			add_action( 'wp_dashboard_setup', [$this,  'disableDashboardWidgets']);
 		}

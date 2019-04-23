@@ -81,10 +81,6 @@ class FrontController {
 	public function registerFilters()
 	{
 		add_filter('posts_request', [$this, 'postsRequest'] );
-
-		add_filter('woocommerce_template_path', function($array){ return '../../../WoocommerceBundle/'; });
-		add_filter('woocommerce_enqueue_styles', '__return_empty_array' );
-
 		add_filter('wp_calculate_image_srcset_meta', '__return_null');
 	}
 

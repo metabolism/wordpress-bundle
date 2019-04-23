@@ -49,6 +49,43 @@ class SecurityPlugin {
 
 		return $file;
 	}
+
+
+	/**
+	 * Recursive chown
+	 * @param string $dir
+	 * @param string $user
+	 */
+	private function rchown($dir, $user)
+	{
+		$dir = rtrim($dir, "/");
+		if ($items = glob($dir . "/*")) {
+			foreach ($items as $item) {
+				if (is_dir($item)) {
+					$this->rchown($item, $user);
+				} else {
+					@chown($item, $user);
+				}
+			}
+		}
+
+		@chown($dir, $user);
+	}
+
+
+	/**
+	 * Try to fix permissions
+	 * @param string $type
+	 */
+	private function permissions($type='all')
+	{
+		if ( current_user_can('administrator') ) {
+			$webuser = posix_getpwuid(posix_geteuid())['name'];
+			$this->rchown(WP_UPLOADS_DIR, 'www-data');
+		}
+
+		wp_redirect( get_admin_url(null, 'options-media.php' ));
+	}
 	
 
 	/**
@@ -80,12 +117,29 @@ class SecurityPlugin {
 	}
 
 
+	/**
+	 * add admin parameters
+	 */
+	public function adminInit()
+	{
+		if( isset($_GET['permissions']) )
+			$this->permissions(isset($_GET['type'])?$_GET['type']:'all');
+
+		add_settings_field('fix_permissions', __('Permissions'), function(){
+
+			echo '<a class="button button-primary" href="'.get_admin_url().'?permissions&type=uploads">'.__('Try to fix it').'</a>';
+
+		}, 'media');
+	}
+
+
 	public function __construct($config)
 	{
 		add_filter( 'flush_rewrite_rules_hard', '__return_false');
 
 		if( is_admin() )
 		{
+			add_action( 'admin_init', [$this, 'adminInit'] );
 			add_action( 'wp_handle_upload_prefilter', [$this, 'cleanFilename']);
 			add_filter( 'map_meta_cap', [$this, 'addUnfilteredHtmlCapabilityToEditors'], 1, 3 );
 			add_action( 'admin_head', [$this, 'hideUpdateNotice'], 1 );
@@ -103,12 +157,6 @@ class SecurityPlugin {
 				global $wp_rewrite;
 
 				$wp_rewrite->feeds = array();
-
-				if( class_exists( 'WPSEO_Frontend' ) )
-				{
-					if( method_exists( 'WPSEO_Frontend', 'debug_mark' ) )
-						remove_action( 'wpseo_head', [\WPSEO_Frontend::get_instance(), 'debug_mark'], 2);
-				}
 			});
 		}
 	}

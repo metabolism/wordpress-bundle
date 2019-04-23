@@ -92,7 +92,15 @@ class ConfigPlugin {
 							foreach ( $args['columns'] as &$column )
 								$column = ucfirst(str_replace('_', ' ', $column));
 
-							return array_merge ( $columns, $args['columns'] );
+							$columns = array_merge ( $columns, $args['columns'] );
+
+							if( isset($columns['date']) ){
+								$date = $columns['date'];
+								unset($columns['date']);
+								$columns['date'] = $date;
+							}
+
+							return $columns;
 						});
 
 						add_action ( 'manage_'.$post_type.'_posts_custom_column', function ( $column, $post_id ) use ( $args )
@@ -241,9 +249,6 @@ class ConfigPlugin {
 			if( !isset($wp_roles->roles[$role]))
 				add_role($role, $args['display_name'], $args['capabilities']);
 		}
-
-		$wp_roles->add_cap( 'editor', 'wpseo_edit_advanced_metadata' );
-		$wp_roles->add_cap( 'editor', 'wpseo_manage_options' );
 	}
 
 
@@ -431,9 +436,6 @@ class ConfigPlugin {
 
 			if( in_array('post_thumbnails', $support ) )
 				add_theme_support( 'post-thumbnails' );
-
-			if( in_array('woocommerce', $support ) )
-				add_theme_support( 'woocommerce' );
 
 			add_post_type_support( 'page', 'excerpt' );
 		}
