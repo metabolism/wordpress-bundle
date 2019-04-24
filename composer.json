@@ -1,6 +1,6 @@
 {
   "name":"metabolism/wordpress-bundle",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "Wordpress bundle for Symfony 4",
   "license": "GPL-3.0-or-later",
   "require": {
@@ -28,13 +28,13 @@
       "copy": {
         "metabolism/wordpress-bundle": {
           "tools/wp-config.php": "web/wp-config.php",
-          "doc/wordpress.sample.yml": "config/wordpress.yml",
-          "tools/mu-plugins/wp-bundle.php": "web/wp-bundle/mu-plugins/wp-bundle.php"
+          "doc/wordpress.sample.yml": "config/wordpress.yml"
         }
       },
       "symlink": {
         "metabolism/wordpress-bundle": {
-          "README.md": "doc/wordpress-bundle.md"
+          "README.md": "doc/wordpress-bundle.md",
+          "tools/mu-plugins/wp-bundle.php": "web/wp-bundle/mu-plugins/wp-bundle.php"
         }
       }
     },
