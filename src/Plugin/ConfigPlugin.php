@@ -30,6 +30,7 @@ class ConfigPlugin {
 		$default_args = [
 			'public' => true,
 			'has_archive' => true,
+			'supports' => [],
 			'menu_position' => 25
 		];
 
@@ -107,10 +108,23 @@ class ConfigPlugin {
 						{
 							if( isset($args['columns'][$column]) )
 							{
-								if( $args['columns'][$column] == 'thumbnail')
-									echo '<a class="attachment-thumbnail-container">'.get_the_post_thumbnail($post_id, 'thumbnail').get_the_post_thumbnail($post_id, 'thumbnail').'</a>';
-								else
+								if( $args['columns'][$column] == 'thumbnail'){
+
+									if( in_array('thumbnail', $args['supports']) ){
+										echo '<a class="attachment-thumbnail-container">'.get_the_post_thumbnail($post_id, 'thumbnail').get_the_post_thumbnail($post_id, 'thumbnail').'</a>';
+									}
+									else{
+
+										$thumbnail_id = get_post_meta( $post_id, 'thumbnail', true );
+										$image = wp_get_attachment_image_src($thumbnail_id, 'thumbnail');
+
+										if( $image && count($image) )
+											echo '<a class="attachment-thumbnail-container"><img class="attachment-thumbnail size-thumbnail wp-post-image" src="'.$image[0].'"><img class="attachment-thumbnail size-thumbnail wp-post-image" src="'.$image[0].'"></a>';
+									}
+								}
+								else{
 									echo get_post_meta( $post_id, $args['columns'][$column], true );
+								}
 							}
 
 						}, 10, 2 );
