@@ -9,7 +9,8 @@ use Dflydev\DotAccessData\Data;
  */
 class ACFProvider {
 
-	public static $acf_folder;
+	public static $folder = BASE_URI . '/config/acf-json';
+
 	private $config;
 
 
@@ -33,10 +34,8 @@ class ACFProvider {
 	{
 		$this->config = $config;
 
-		self::$acf_folder = BASE_URI . '/config/acf-json';
-
-		add_filter('acf/settings/save_json', function(){ return $this::$acf_folder; });
-		add_filter('acf/settings/load_json', function(){ return [$this::$acf_folder]; });
+		add_filter('acf/settings/save_json', function(){ return $this::$folder; });
+		add_filter('acf/settings/load_json', function(){ return [$this::$folder]; });
 
 		// When viewing admin
 		if( is_admin() )

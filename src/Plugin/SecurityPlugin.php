@@ -43,9 +43,11 @@ class SecurityPlugin {
 	 */
 	function cleanFilename($file) {
 
-		$path = pathinfo($file['name']);
-		$new_filename = preg_replace('/.' . $path['extension'] . '$/', '', $file['name']);
-		$file['name'] = sanitize_title($new_filename) . '.' . $path['extension'];
+		if($file && isset($file['name'], $path['extension'])){
+			$path = pathinfo($file['name']);
+			$new_filename = preg_replace('/.' . $path['extension'] . '$/', '', $file['name']);
+			$file['name'] = sanitize_title($new_filename) . '.' . $path['extension'];
+		}
 
 		return $file;
 	}
@@ -106,6 +108,8 @@ class SecurityPlugin {
 		remove_action('wp_head', 'wp_oembed_add_discovery_links');
 		remove_action('template_redirect', 'rest_output_link_header', 11 );
 		remove_action('template_redirect', 'wp_shortlink_header', 11 );
+
+		add_action( 'wp_enqueue_scripts', function(){ wp_dequeue_style( 'wp-block-library' ); });
 
 		add_filter('wp_headers', function($headers) {
 

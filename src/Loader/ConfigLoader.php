@@ -74,7 +74,6 @@ class ConfigLoader {
 		define( 'WP_ENV', $env);
 		define( 'WP_DEBUG', $env === 'dev');
 		define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
-		define( 'WC_TEMPLATE_DEBUG_MODE', WP_DEBUG );
 
 		define( 'WP_FRONT', in_array('templates', $_config->get('support', [])) );
 
