@@ -15,6 +15,9 @@ namespace Metabolism\WordpressBundle\Plugin {
 		 */
 		public function addMaintenanceMode()
 		{
+			if( !current_user_can('editor') && !current_user_can('administrator') )
+				return;
+			
 			if( is_admin() )
 			{
 				add_action( 'admin_init', function(){
