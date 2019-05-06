@@ -137,6 +137,15 @@ class EditorPlugin {
 			add_filter( 'mce_buttons', [$this, 'TinyMceButtons']);
 			add_action( 'admin_menu', [$this, 'adminMenu']);
 			add_action( 'wp_dashboard_setup', [$this,  'disableDashboardWidgets']);
+
+			add_filter('admin_body_class', function ( $classes ) {
+				$data = get_userdata( get_current_user_id() );
+				$caps = [];
+				foreach($data->allcaps as $cap=>$value)
+					$caps[] = $value ? $cap : 'no-'.$cap;
+
+				return implode(' ', $caps).$classes;
+			});
 		}
 		else
 		{

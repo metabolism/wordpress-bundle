@@ -94,7 +94,7 @@ post_type:
 # see vendor/metabolism/wordpress-bundle/doc/custom_post_type.yml for a full sample
 taxonomy:
 
-  guide_category:
+  item:
     #posts_per_page: 11
     object_type:
       - guide
@@ -145,3 +145,27 @@ template:
 #      company: Company
 #      request: Request
 
+
+#role:
+#  translator:
+#    display_name: Traducteur
+#    force: true
+#    capabilities:
+#      read: true
+#
+#      edit_others_guides: true
+#      read_guide: true
+#      edit_guides: true
+#      publish_guides: false
+#      edit_published_guides: true
+#
+#      acf_edit_layout: false
+#      acf_edit_repeater: false
+#      acf_edit_true-false: false
+#      acf_edit_radio: false
+#      acf_edit_image: false
+#      acf_edit_file: false
+#      acf_edit_post-object: false
+#
+#      manage_items: true
+#      edit_items: true

@@ -31,7 +31,8 @@ class ConfigPlugin {
 			'public' => true,
 			'has_archive' => true,
 			'supports' => [],
-			'menu_position' => 25
+			'menu_position' => 25,
+			'map_meta_cap' => true
 		];
 
 		$is_admin = is_admin();
@@ -65,6 +66,9 @@ class ConfigPlugin {
 
 				if( isset($args['menu_icon']) )
 					$args['menu_icon'] = 'dashicons-'.$args['menu_icon'];
+
+				if( !isset($args['capability_type']) && $args['map_meta_cap'] )
+					$args['capability_type'] = [$post_type, $this->plural($post_type)];
 
 				$slug = get_option( $post_type. '_rewrite_slug' );
 
@@ -151,7 +155,33 @@ class ConfigPlugin {
 			}else{
 				wp_die($post_type. 'is not allowed, reserved keyword');
 			}
-		};
+		}
+
+		$roles = array('editor','administrator');
+
+		// Loop through each role and assign capabilities
+		foreach($roles as $the_role) {
+
+			foreach ( $this->config->get('post_type', []) as $post_type => $args ){
+
+				if( (!isset($args['map_meta_cap']) || $args['map_meta_cap']) && (!isset($args['capability_type']) || ($args['capability_type'] != 'page' && $args['capability_type'] != 'post'))){
+
+					$role = get_role($the_role);
+					$post_types = $this->plural($post_type);
+
+					$role->add_cap( 'read_'.$post_type);
+					$role->add_cap( 'read_private_'.$post_types );
+					$role->add_cap( 'edit_'.$post_type );
+					$role->add_cap( 'edit_'.$post_types );
+					$role->add_cap( 'edit_others_'.$post_types );
+					$role->add_cap( 'edit_published_'.$post_types );
+					$role->add_cap( 'publish_'.$post_types );
+					$role->add_cap( 'delete_others_'.$post_types );
+					$role->add_cap( 'delete_private_'.$post_types );
+					$role->add_cap( 'delete_published_'.$post_types );
+				}
+			}
+		}
 	}
 
 
@@ -224,6 +254,17 @@ class ConfigPlugin {
 				if (!isset($args['hierarchical']))
 					$args['hierarchical'] = true;
 
+				if (!isset($args['capabilities'])){
+
+					$taxonomies = $this->plural($taxonomy);
+					$args['capabilities'] = [
+						'manage_terms' => 'manage_'.$taxonomies,
+						'edit_terms' => 'edit_'.$taxonomies,
+						'delete_terms' => 'delete_'.$taxonomies,
+						'assign_terms' => 'assign_'.$taxonomies
+					];
+				}
+
 				if (!isset($args['show_admin_column']))
 					$args['show_admin_column'] = true;
 
@@ -253,6 +294,7 @@ class ConfigPlugin {
 	/**
 	 * Adds User role
 	 * @see Taxonomy
+	 * see https://codex.wordpress.org/Function_Reference/add_role
 	 */
 	public function addRoles()
 	{
@@ -260,7 +302,9 @@ class ConfigPlugin {
 
 		foreach ( $this->config->get('role', []) as $role => $args )
 		{
-			if( !isset($wp_roles->roles[$role]))
+			if( isset($args['force']) && $args['force'] )
+				remove_role($role);
+
 				add_role($role, $args['display_name'], $args['capabilities']);
 		}
 	}
@@ -424,8 +468,8 @@ class ConfigPlugin {
 		{
 			$this->addPostTypes();
 			$this->addTaxonomies();
-			$this->addRoles();
 			$this->addMenus();
+			$this->addRoles();
 
 			if( WP_FRONT )
 				$this->setPermalink();
