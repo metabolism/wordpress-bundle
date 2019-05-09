@@ -343,6 +343,7 @@ class MediaPlugin {
 		clearstatcache();
 
 		wp_redirect( get_admin_url(null, $all?'network/settings.php':'options-media.php') );
+		exit;
 	}
 
 
@@ -389,6 +390,7 @@ class MediaPlugin {
 		}
 
 		wp_redirect( get_admin_url(null, 'network/settings.php') );
+		exit;
 	}
 
 	

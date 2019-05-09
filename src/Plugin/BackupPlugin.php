@@ -213,6 +213,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 			}
 			
 			wp_redirect( get_admin_url(null, $global?'network/settings.php':'options-'.($type=='uploads'?'media':'general').'.php') );
+			exit;
 		}
 		
 		

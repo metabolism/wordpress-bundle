@@ -28,7 +28,7 @@ class EditorPlugin {
 	/**
 	 * Add quick link top bar archive button
 	 */
-	public function addArchiveButton($wp_admin_bar)
+	public function editBarMenu($wp_admin_bar)
 	{
 		if( is_post_type_archive() )
 		{
@@ -43,6 +43,8 @@ class EditorPlugin {
 
 			$wp_admin_bar->add_node( $args );
 		}
+
+		$wp_admin_bar->remove_node('themes');
 	}
 
 	/**
@@ -149,7 +151,7 @@ class EditorPlugin {
 		}
 		else
 		{
-			add_action( 'admin_bar_menu', [$this, 'addArchiveButton'], 80);
+			add_action( 'admin_bar_menu', [$this, 'editBarMenu'], 80);
 		}
 
 		if( $config->get('optimizations.disable_update', true) )

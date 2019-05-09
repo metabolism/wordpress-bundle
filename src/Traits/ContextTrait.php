@@ -65,6 +65,26 @@ Trait ContextTrait
 
 
 	/**
+	 * Get current post
+	 * @return Post|bool
+	 */
+	protected function getPost()
+	{
+		return $this->get('post');
+	}
+
+
+	/**
+	 * Get current posts
+	 * @return Post[]|bool
+	 */
+	protected function getPosts()
+	{
+		return $this->get('posts');
+	}
+
+
+	/**
 	 * Return function echo
 	 * @param $function
 	 * @param array $args

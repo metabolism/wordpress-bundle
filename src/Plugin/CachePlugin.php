@@ -86,6 +86,7 @@ namespace Metabolism\WordpressBundle\Plugin {
 				$this->rrmdir(BASE_URI.'/var/cache');
 
 			wp_redirect( get_admin_url(null, 'options-general.php' ));
+			exit;
 		}
 
 

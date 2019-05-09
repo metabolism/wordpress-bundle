@@ -114,8 +114,7 @@ class UrlPlugin {
 		$permalink = add_query_arg( $query_args, $permalink );
 
 		wp_redirect($permalink);
-
-		exit();
+		exit;
 	}
 
 	/**

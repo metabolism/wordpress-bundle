@@ -134,8 +134,7 @@ class MultisitePlugin {
 
 					// return to edit page
 					wp_redirect( get_admin_url(get_current_blog_id(), 'post.php?post='.$inserted_post_id.'&action=edit'));
-
-					exit();
+					exit;
 				}
 			}
 		});
