@@ -36,8 +36,8 @@ class Menu extends Entity
 		else if ( $slug === false )
 			$menu_id = false;
 
-		if ( $menu_id )
-			$this->get($menu_id);
+		if ( $menu_id && $menu = $this->get($menu_id))
+			$this->addCustomFields($menu_id);
 	}
 
 

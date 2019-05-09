@@ -35,6 +35,8 @@ class MenuItem extends Entity
 			$this->menu_item_parent = intval($this->menu_item_parent);
 
 			unset($this->date, $this->date_gmt, $this->modified, $this->modified_gmt, $this->name);
+
+			$this->addCustomFields($this->ID);
 		}
 	}
 }

@@ -162,11 +162,12 @@ class ConfigPlugin {
 		// Loop through each role and assign capabilities
 		foreach($roles as $the_role) {
 
+			$role = get_role($the_role);
+
 			foreach ( $this->config->get('post_type', []) as $post_type => $args ){
 
 				if( (!isset($args['map_meta_cap']) || $args['map_meta_cap']) && (!isset($args['capability_type']) || ($args['capability_type'] != 'page' && $args['capability_type'] != 'post'))){
 
-					$role = get_role($the_role);
 					$post_types = $this->plural($post_type);
 
 					$role->add_cap( 'read_'.$post_type);
@@ -287,6 +288,34 @@ class ConfigPlugin {
 
 			} else{
 				wp_die($taxonomy. 'is not allowed, reserved keyword');
+			}
+		}
+
+		$roles = array('editor','administrator');
+
+		// Loop through each role and assign capabilities
+		foreach($roles as $the_role) {
+
+			$role = get_role($the_role);
+
+			foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args ){
+
+				if( !isset($args['capabilities']) ){
+
+					$taxonomies = $this->plural($taxonomy);
+
+					$role->add_cap( 'manage_'.$taxonomies);
+					$role->add_cap( 'edit_'.$taxonomies );
+					$role->add_cap( 'delete_'.$taxonomies );
+					$role->add_cap( 'assign_'.$taxonomies );
+				}
+				else{
+
+					foreach ($args['capabilities'] as $type=>$capability){
+
+						$role->add_cap( $capability );
+					}
+				}
 			}
 		}
 	}

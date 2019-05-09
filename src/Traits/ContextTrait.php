@@ -321,6 +321,7 @@ Trait ContextTrait
 
 		$wp_query = Query::wp_query($args);
 		$raw_posts = $wp_query->posts;
+		$posts = [];
 
 		if( isset($args['found_posts']) && $args['found_posts']) {
 
