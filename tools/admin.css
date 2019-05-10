@@ -1,0 +1,22 @@
+.no-publish a.page-title-action{ display: none!important; }
+.no-publish a[href^="post-new.php"]{ display: none!important; }
+.no-publish #wp-admin-bar-new-content{ display: none!important; }
+
+.no-acf_edit_layout [data-name="add-layout"],
+.no-acf_edit_layout [data-name="remove-layout"]
+{ display: none!important }
+
+.no-acf_edit_image .acf-field-image .acf-actions.-hover,
+.no-acf_edit_file .acf-field-file .acf-actions.-hover{ display: none!important }
+
+.no-acf_edit_layout .acf-repeater .acf-actions,
+.no-acf_edit_layout [data-event="add-row"],
+.no-acf_edit_layout [data-event="remove-row"]
+{ display: none!important }
+
+.no-acf_edit_layout .acf-flexible-content .layout .acf-fc-layout-handle{ cursor: pointer!important }
+
+.no-acf_edit_true-false .acf-field-true-false .acf-input label,
+.no-acf_edit_radio .acf-field-radio .acf-input label,
+.no-acf_edit_post-object .acf-field-post-object .select2
+{ pointer-events: none!important; opacity: 0.5; }

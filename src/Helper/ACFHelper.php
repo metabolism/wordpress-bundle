@@ -257,8 +257,6 @@ class ACF
 
 					if ($object['return_format'] == 'id')
 						$objects[$object['name']] = $this->load('file', $object['value']);
-					elseif ($object['return_format'] == 'array')
-						$objects[$object['name']] = $object['value']['url'];
 					else
 						$objects[$object['name']] = $object['value'];
 
