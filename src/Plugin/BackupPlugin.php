@@ -241,6 +241,9 @@ namespace Metabolism\WordpressBundle\Plugin{
 		 */
 		public function wpmuOptions()
 		{
+			if(!current_user_can('administrator'))
+				return;
+			
 			echo '<table id="backup" class="form-table">
 			<tbody><tr>
 				<th scope="row"><h2>'.__('Backup').'</h2></th>
@@ -259,6 +262,9 @@ namespace Metabolism\WordpressBundle\Plugin{
 		 */
 		public function adminInit()
 		{
+			if(!current_user_can('administrator'))
+				return;
+
 			if( isset($_GET['download_backup']) )
 				$this->download(false, isset($_GET['type'])?$_GET['type']:'all');
 			

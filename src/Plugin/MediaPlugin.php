@@ -276,6 +276,9 @@ class MediaPlugin {
 	 */
 	public function adminInit()
 	{
+		if( !current_user_can('administrator') )
+			return;
+		
 		if( isset($_GET['clear_thumbnails']) )
 			$this->clearThumbnails();
 

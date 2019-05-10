@@ -27,16 +27,19 @@ class ACFProvider {
 
 	public function adminInit(){
 
+		if( !current_user_can('administrator') )
+			return;
+
 		if( isset($_GET['clear_acf_meta']) )
 			$this->deleteUnusedMeta();
 
 		// Remove generated thumbnails option
-		add_settings_field('clean_unused_acf_meta', __('Clean acf meta'), function(){
+		add_settings_field('clean_unused_acf_meta', __('Advanced Custom Fields'), function(){
 
 			$unusedMeta = $this->getUnusedMeta();
 
 			if( $unusedMeta )
-				echo '<a class="button button-primary" href="'.get_admin_url().'?clear_acf_meta">'.__('Remove').' '.$unusedMeta.' meta</a>';
+				echo '<a class="button button-primary" href="'.get_admin_url().'?clear_acf_meta" title="Be carefull, fields must be synchronised">'.__('Remove').' '.$unusedMeta.' unused meta</a>';
 			else
 				echo __('Nothing to remove');
 

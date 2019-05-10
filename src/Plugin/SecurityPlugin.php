@@ -127,6 +127,9 @@ class SecurityPlugin {
 	 */
 	public function adminInit()
 	{
+		if( !current_user_can('administrator') )
+			return;
+
 		if( isset($_GET['permissions']) )
 			$this->permissions(isset($_GET['type'])?$_GET['type']:'all');
 
