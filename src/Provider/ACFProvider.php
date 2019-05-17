@@ -27,7 +27,7 @@ class ACFProvider {
 
 	public function adminInit(){
 
-		if( !current_user_can('administrator') )
+		if( !current_user_can('administrator') || WP_ENV != 'dev' )
 			return;
 
 		if( isset($_GET['clear_acf_meta']) )
