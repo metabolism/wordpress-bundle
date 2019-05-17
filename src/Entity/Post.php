@@ -130,6 +130,7 @@ class Post extends Entity
 
 	/**
 	 * Get next post
+	 * See: https://developer.wordpress.org/reference/functions/get_next_post/
 	 *
 	 * @param bool $in_same_term
 	 * @param string $excluded_terms
@@ -149,6 +150,7 @@ class Post extends Entity
 
 	/**
 	 * Get previous post
+	 * See: https://developer.wordpress.org/reference/functions/get_previous_post/
 	 *
 	 * @param bool $in_same_term
 	 * @param string $excluded_terms
@@ -168,6 +170,7 @@ class Post extends Entity
 
 	/**
 	 * Get term
+	 * See: https://developer.wordpress.org/reference/functions/get_the_terms/
 	 *
 	 * @param string $tax
 	 * @return Term|bool

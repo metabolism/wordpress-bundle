@@ -20,3 +20,6 @@
 .no-acf_edit_radio .acf-field-radio .acf-input label,
 .no-acf_edit_post-object .acf-field-post-object .select2
 { pointer-events: none!important; opacity: 0.5; }
+
+.acf-image-uploader .image-wrap img{ max-width: 86px }
+.acf-icon.-pencil { font-size: 11px }
