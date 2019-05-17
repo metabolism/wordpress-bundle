@@ -152,6 +152,7 @@ template:
 #    force: true
 #    capabilities:
 #      read: true
+#      publish: false
 #
 #      edit_others_guides: true
 #      read_guide: true

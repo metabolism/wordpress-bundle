@@ -35,6 +35,7 @@ class Post extends Entity
 	public $type;
 	public $slug;
 	public $name;
+	public $content;
 
 	private $_next = null;
 	private $_prev = null;
