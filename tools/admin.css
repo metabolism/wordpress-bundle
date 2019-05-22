@@ -1,6 +1,10 @@
-.no-publish a.page-title-action{ display: none!important; }
-.no-publish a[href^="post-new.php"]{ display: none!important; }
+.no-publish a.page-title-action,
+.no-publish a[href^="post-new.php"],
+.no-publish .taxonomy-add-new,
+.no-publish.taxonomy-item #col-container #col-left,
 .no-publish #wp-admin-bar-new-content{ display: none!important; }
+
+.no-publish.taxonomy-item #col-container #col-right{ width: 100%; float: none }
 
 .no-acf_edit_layout [data-name="add-layout"],
 .no-acf_edit_layout [data-name="remove-layout"]
