@@ -3,6 +3,9 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 
+use Dflydev\DotAccessData\Data;
+use Intervention\Image\ImageManagerStatic;
+
 /**
  * Class Metabolism\WordpressBundle Framework
  */
@@ -427,6 +430,9 @@ class MediaPlugin {
 	}
 
 
+	/**
+	 * Add relative key
+	 */
 	public static function add_relative_upload_dir_key( $arr )
 	{
 		$arr['url'] = str_replace('edition/../', '', $arr['url']);
@@ -437,6 +443,40 @@ class MediaPlugin {
 	}
 
 
+	/**
+	 * Resize image on upload to ensure max size
+	 */
+	public function uploadResize( $image_data )
+	{
+		$valid_types = array('image/gif','image/png','image/jpeg','image/jpg');
+
+		if(in_array($image_data['type'], $valid_types) && $this->config->get('image.resize') ){
+
+			$src = $image_data['file'];
+			$image = ImageManagerStatic::make($src);
+
+			if( $image->getWidth() > $this->config->get('image.resize.max_width', 1920) ){
+				$image->resize($this->config->get('image.resize.max_width', 1920), null, function ($constraint) {
+					$constraint->aspectRatio();
+				});
+			}
+			elseif( $image->getHeight() > $this->config->get('image.resize.max_height', 2160) ){
+				$image->resize(null, $this->config->get('image.resize.max_height', 2160), function ($constraint) {
+					$constraint->aspectRatio();
+				});
+			}
+
+			$image->save($src, 99);
+		}
+
+		return $image_data;
+	}
+
+
+	/**
+	 * Constructor
+	 * @param Data $config
+	 */
 	public function __construct($config)
 	{
 		$this->config = $config;
@@ -445,22 +485,23 @@ class MediaPlugin {
 
 		if( $this->config->get('multisite.shared_media') and is_multisite() ){
 
-			add_filter( 'upload_dir', [$this, 'uploadDir'], 11 );
-			add_filter( 'wp_get_attachment_url', [$this, 'attachmentUrl'], 10, 2 );
+			add_filter('upload_dir', [$this, 'uploadDir'], 11 );
+			add_filter('wp_get_attachment_url', [$this, 'attachmentUrl'], 10, 2 );
 		}
 
 		if( is_admin() )
 		{
-			add_action( 'admin_init', [$this, 'adminInit'] );
-			add_action( 'wpmu_options', [$this, 'wpmuOptions'] );
+			add_action('admin_init', [$this, 'adminInit'] );
+			add_action('wpmu_options', [$this, 'wpmuOptions'] );
+			add_action('wp_handle_upload', [$this, 'uploadResize']);
 
 			// Replicate media on network
 			if( $this->config->get('multisite.shared_media') and is_multisite() )
 			{
-				add_action( 'add_attachment', [$this, 'addAttachment']);
-				add_action( 'delete_attachment', [$this, 'deleteAttachment']);
-				add_filter( 'wp_update_attachment_metadata', [$this, 'updateAttachment'], 10, 2);
-				add_filter( 'wpmu_delete_blog_upload_dir', '__return_false' );
+				add_action('add_attachment', [$this, 'addAttachment']);
+				add_action('delete_attachment', [$this, 'deleteAttachment']);
+				add_filter('wp_update_attachment_metadata', [$this, 'updateAttachment'], 10, 2);
+				add_filter('wpmu_delete_blog_upload_dir', '__return_false' );
 			}
 		}
 	}

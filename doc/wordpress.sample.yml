@@ -16,6 +16,9 @@ salt:
   logged_in : 'w/iowiks]_i5b#/SqYuD2`28o</-L|P4H3vq@!<OrH 7Q!gxB[Q4m`/*CiVdylGs'
   nonce : 'gelPRQb4NzO=4pOG_5YnuN(5G~YJCIutY*BL%!:ds(TqwDd;F[PsI,gT_1J-9;;D'
 
+image:
+  resize: true
+
 remove_menu_page:
   - edit.php #Posts
   - edit-comments.php #Comments
