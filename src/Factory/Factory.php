@@ -2,6 +2,8 @@
 
 namespace Metabolism\WordpressBundle\Factory;
 
+use Metabolism\WordpressBundle\Entity\Entity;
+
 class Factory {
 
 	/**
@@ -49,7 +51,7 @@ class Factory {
 	 * @param $id
 	 * @param $class
 	 * @param bool $default_class
-	 * @return bool|mixed
+	 * @return Entity|mixed
 	 */
 	public static function create($id, $class, $default_class=false){
 
@@ -80,7 +82,10 @@ class Factory {
 			}
 		}
 
-		if( $item && $item->loaded() )
+		if( !$item->exist() )
+			$item = false;
+
+		if( !$item || $item->loaded() )
 			self::saveToCache($id, $item, $class);
 
 		return $item;

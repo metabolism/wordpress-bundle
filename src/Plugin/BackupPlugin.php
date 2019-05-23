@@ -171,7 +171,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 				
 				if( $type == 'all' || $type == 'uploads'){
 					
-					$uploads = $this->dumpFolder($rootPath, ['wpallimport', 'cache', 'wpcf7_uploads', 'wp-personal-data-exports'], '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/');
+					$uploads = $this->dumpFolder($rootPath, ['wpallimport', 'cache', 'wpcf7_uploads', 'acf-thumbnails', 'wp-personal-data-exports'], '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/');
 					
 					if( is_wp_error($uploads) )
 						wp_die( $uploads->get_error_message() );

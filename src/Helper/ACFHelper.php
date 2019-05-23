@@ -255,10 +255,22 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id')
+					if ($object['return_format'] == 'id'){
+
 						$objects[$object['name']] = $this->load('file', $object['value']);
-					else
-						$objects[$object['name']] = $object['value'];
+					}
+					else {
+
+						$object_value = $object['value'];
+						$remove = ['id', 'link', 'name', 'status', 'uploaded_to', 'menu_order', 'icon', 'author'];
+
+						foreach($remove as $prop){
+							if( isset($object_value[$prop]) )
+								unset($object_value[$prop]);
+						}
+
+						$objects[$object['name']] = $object_value;
+					}
 
 					break;
 

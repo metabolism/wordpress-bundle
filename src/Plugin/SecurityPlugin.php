@@ -43,9 +43,14 @@ class SecurityPlugin {
 	 */
 	function cleanFilename($file) {
 
-		if($file && isset($file['name'], $path['extension'])){
+		$input = ['ß', '·'];
+		$output = ['ss', '.'];
+
+		if($file && isset($file['name'])){
 			$path = pathinfo($file['name']);
 			$new_filename = preg_replace('/.' . $path['extension'] . '$/', '', $file['name']);
+			$new_filename = preg_replace('/-([0-9]+x[0-9]+)$/', '', $new_filename);
+			$new_filename = str_replace( $input, $output, $new_filename );
 			$file['name'] = sanitize_title($new_filename) . '.' . $path['extension'];
 		}
 

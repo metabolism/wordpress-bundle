@@ -306,7 +306,7 @@ class MediaPlugin {
 
 
 	/**
-	 * Remove all thumbnails
+	 * Get all thumbnails
 	 */
 	private function getThumbnails($all=false)
 	{
@@ -402,7 +402,6 @@ class MediaPlugin {
 	
 	/**
 	 * Redefine upload dir
-	 * @see Menu
 	 */
 	public function uploadDir($dirs)
 	{
@@ -413,14 +412,12 @@ class MediaPlugin {
 		$dirs['path'] = str_replace($dirs['relative'],'/uploads', $dirs['path']);
 
 		$dirs['relative'] = '/uploads';
-
 		return $dirs;
 	}
 
 
 	/**
-	 * Redefine upload dir
-	 * @see Menu
+	 * Redefine attachment url
 	 */
 	public function attachmentUrl($url)
 	{

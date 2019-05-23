@@ -40,7 +40,7 @@ class Image extends Entity
 	public function __construct($id = null) {
 
 		global $_config;
-		$this->compression = $_config->get('image_compression', 90);
+		$this->compression = $_config->get('image.compression', 90);
 
 		if( $data = $this->get($id) )
 			$this->import($data, false, 'post_');
@@ -175,6 +175,9 @@ class Image extends Entity
 	 */
 	public function toHTML($w, $h=0, $sources=false, $params=false){
 
+		if( !file_exists($this->src) )
+			return '<img src="/404.png" alt="image not found">';
+
 		$ext = function_exists('imagewebp') ? 'webp' : null;
 		$mime = function_exists('imagewebp') ? 'image/webp' : $this->mime_type;
 
@@ -216,7 +219,7 @@ class Image extends Entity
 			$this->focus_point = false;
 
 		if( !file_exists($this->src) )
-			return 'File does not exist';
+			return '/404.png';
 
 		$src_ext = pathinfo($this->src, PATHINFO_EXTENSION);
 

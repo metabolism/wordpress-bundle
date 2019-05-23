@@ -17,6 +17,7 @@ salt:
   nonce : 'gelPRQb4NzO=4pOG_5YnuN(5G~YJCIutY*BL%!:ds(TqwDd;F[PsI,gT_1J-9;;D'
 
 image:
+  compression: 90
   resize: true
 
 remove_menu_page:

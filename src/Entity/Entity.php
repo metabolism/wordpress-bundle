@@ -56,6 +56,15 @@ class Entity
 
 
 	/**
+	 * Return true if id exists
+	 */
+	public function exist()
+	{
+		return is_int( $this->ID );
+	}
+
+
+	/**
 	 * Add custom fields as members of the post
 	 * @param $id
 	 */
