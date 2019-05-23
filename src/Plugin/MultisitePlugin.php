@@ -40,9 +40,9 @@ class MultisitePlugin {
 					// get the original meta
 					$meta = get_post_meta($_GET['post_id']);
 
-					// get the original language, fallback to us
+					// get the original language, fallback to en
 					$language = get_option('WPLANG');
-					$language = empty($language)?'us':$language;
+					$language = empty($language)?'en':$language;
 
 					// empty id field, to tell wordpress that this will be a new post
 					$post['ID'] = '';
@@ -61,19 +61,21 @@ class MultisitePlugin {
 					// add and filter meta
 					foreach($meta as $key=>$value){
 
-						if($key === '_thumbnail_id') {
+						$value = maybe_unserialize($value[0]);
+
+						if($key === '_thumbnail_id' and is_string($value)) {
 
 							if( $current_site_id == $main_site_id )
 							{
 								switch_to_blog($_GET['blog_id']);
-								$original_id = get_post_meta($value[0], '_wp_original_attachment_id', true);
+								$original_id = get_post_meta($value, '_wp_original_attachment_id', true);
 								restore_current_blog();
 
 								update_post_meta($inserted_post_id, $key, $original_id);
 							}
 							else
 							{
-								$attachments = get_posts(['numberposts'=>1, 'post_type'=>'attachment', 'meta_value'=>$value[0], 'meta_key'=>'_wp_original_attachment_id', 'fields'=>'ids']);
+								$attachments = get_posts(['numberposts'=>1, 'post_type'=>'attachment', 'meta_value'=>$value, 'meta_key'=>'_wp_original_attachment_id', 'fields'=>'ids']);
 
 								if( count($attachments) )
 									update_post_meta($inserted_post_id, $key, $attachments[0]);
@@ -81,9 +83,9 @@ class MultisitePlugin {
 						}
 						else{
 
-							if( function_exists('get_field_object') )
+							if( function_exists('get_field_object') and is_string($value) )
 							{
-								$field = get_field_object($value[0]);
+								$field = get_field_object($value);
 
 								if( isset($field['type']) && in_array($field['type'], ['image', 'file']) )
 								{
@@ -115,7 +117,7 @@ class MultisitePlugin {
 								}
 							}
 
-							update_post_meta($inserted_post_id, $key, $value[0]);
+							update_post_meta($inserted_post_id, $key, $value);
 						}
 					}
 
