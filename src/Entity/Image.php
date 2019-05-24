@@ -91,7 +91,7 @@ class Image extends Entity
 			}
 			else
 			{
-				$value = (is_array($value) and count($value)==1) ? $value[0] : $value;
+				$value = (is_array($value) && count($value)==1) ? $value[0] : $value;
 				$unserialized = @unserialize($value);
 
 				if( substr($key, 0, 1) == '_')

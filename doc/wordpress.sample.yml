@@ -20,6 +20,8 @@ image:
   compression: 90
   resize: true
 
+maintenance: true
+
 remove_menu_page:
   - edit.php #Posts
   - edit-comments.php #Comments

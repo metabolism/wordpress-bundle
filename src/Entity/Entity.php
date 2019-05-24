@@ -99,7 +99,7 @@ class Entity
 		if( isset($object['url']) )
 			$object['link'] = $object['url'];
 
-		if( isset($object['name']) and !isset($object['title']) )
+		if( isset($object['name']) && !isset($object['title']) )
 			$object['title'] = $object['name'];
 
 		if( !self::$date_format )
@@ -121,7 +121,7 @@ class Entity
 				unset($object[$prop]);
 		}
 
-		if( isset($object['classes']) and count($object['classes']) )
+		if( isset($object['classes']) && count($object['classes']) )
 		{
 			if( empty($object['classes'][0]))
 				array_shift($object['classes']);
@@ -144,7 +144,7 @@ class Entity
 
 				$new_key = str_replace($replace,'', $key);
 
-				if( !isset($object[$new_key]) or empty($object[$new_key]))
+				if( !isset($object[$new_key]) || empty($object[$new_key]))
 					$object[$new_key] = $value;
 
 				unset($object[$key]);

@@ -3,12 +3,15 @@
 // bad design but required by to make wp style function
 namespace Metabolism\WordpressBundle\Plugin {
 
+use Dflydev\DotAccessData\Data;
+
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 	class MaintenancePlugin {
 
+		private $config;
 
 		/**
 		 * Add maintenance button and checkbox
@@ -45,13 +48,16 @@ namespace Metabolism\WordpressBundle\Plugin {
 			}, 999 );
 		}
 
-
+		/**
+		 * MaintenancePlugin constructor.
+		 * @param Data $config
+		 */
 		public function __construct($config)
 		{
-			add_action( 'init', function()
-			{
-				$this->addMaintenanceMode();
-			});
+			$this->config = $config;
+
+			if( $this->config->get('maintenance', true) )
+				add_action( 'init', [$this, 'addMaintenanceMode']);
 		}
 	}
 }

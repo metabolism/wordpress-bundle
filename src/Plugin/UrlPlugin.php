@@ -139,6 +139,7 @@ class UrlPlugin {
 		add_filter('post_link', [$this, 'relativeLink']);
 		add_filter('page_link', [$this, 'relativeLink']);
 		add_filter('post_type_link', [$this, 'relativeLink']);
+		add_filter('post_type_archive_link', [$this, 'relativeLink']);
 
 		add_filter('option_siteurl', [$this, 'optionSiteURL'] );
 		add_filter('network_site_url', [$this, 'networkSiteURL'] );

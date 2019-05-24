@@ -14,7 +14,7 @@ class WPSEOProvider
 	 */
 	public function editorSettings( $settings, $editor_id ){
 
-		if ( $editor_id == 'description' and class_exists('WPSEO_Taxonomy') and \WPSEO_Taxonomy::is_term_edit( $GLOBALS['pagenow'] ) ) {
+		if ( $editor_id == 'description' && class_exists('WPSEO_Taxonomy') && \WPSEO_Taxonomy::is_term_edit( $GLOBALS['pagenow'] ) ) {
 
 			$settings[ 'tinymce' ] = false;
 			$settings[ 'wpautop' ] = false;

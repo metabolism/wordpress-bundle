@@ -118,7 +118,7 @@ Trait ContextTrait
 		{
 			$languages = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc' );
 		}
-		elseif(  defined('MSLS_PLUGIN_VERSION') and is_multisite() )
+		elseif(  defined('MSLS_PLUGIN_VERSION') && is_multisite() )
 		{
 			$sites = get_sites(['public'=>1]);
 			$current_blog_id = get_current_blog_id();
@@ -246,7 +246,7 @@ Trait ContextTrait
 	 */
 	protected function addCurrent()
 	{
-		if( (is_single() or is_page()) and !is_attachment() )
+		if( (is_single() || is_page()) && !is_attachment() )
 		{
 			return $this->addPost();
 		}
@@ -280,7 +280,7 @@ Trait ContextTrait
 		{
 			$post = PostFactory::create($id);
 
-			if( $callback and is_callable($callback) )
+			if( $callback && is_callable($callback) )
 				call_user_func($callback, $post);
 
 			$this->data[$key] = $post;
@@ -316,7 +316,7 @@ Trait ContextTrait
 		{
 			$term = TaxonomyFactory::create($id);
 
-			if( $callback and is_callable($callback) )
+			if( $callback && is_callable($callback) )
 				call_user_func($callback, $term);
 
 			$this->data[$key] = $term;

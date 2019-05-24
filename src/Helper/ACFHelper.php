@@ -182,7 +182,7 @@ class ACF
 	{
 		$objects = [];
 
-		if( !$raw_objects or !is_array($raw_objects) )
+		if( !$raw_objects || !is_array($raw_objects) )
 			return $objects;
 
 		// Start analyzing
@@ -226,7 +226,7 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id' or is_int($object['value']) )
+					if ($object['return_format'] == 'id' || is_int($object['value']) )
 						$objects[$object['name']] = $this->load('image', $object['value']);
 					elseif ($object['return_format'] == 'array')
 						$objects[$object['name']] = $this->load('image', $object['value']['id']);
@@ -282,7 +282,7 @@ class ACF
 
 						foreach ($object['value'] as $value) {
 
-							if ($object['return_format'] == 'id' or is_int($value) )
+							if ($object['return_format'] == 'id' || is_int($value) )
 								$element = $value;
 							elseif ($object['return_format'] == 'object')
 								$element = $this->load('post', $value->ID);
@@ -300,7 +300,7 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id' or is_int($object['value']) )
+					if ($object['return_format'] == 'id' || is_int($object['value']) )
 						$objects[$object['name']] = $object['value'];
 					elseif ($object['return_format'] == 'object')
 						$objects[$object['name']] = $this->load('post', $object['value']->ID);
@@ -330,7 +330,7 @@ class ACF
 							$value = $this->bindLayoutsFields($value, $layouts);
 							$data = $this->clean($value);
 
-							if( is_array($value) and count($value) == 1 and is_string(key($value)) )
+							if( is_array($value) && count($value) == 1 && is_string(key($value)) )
 								$data = reset($data);
 
 							$objects[$object['name']][] = ['type'=>$type, 'data'=>$data];
@@ -391,7 +391,7 @@ class ACF
 
 				case 'select';
 
-					if( !$object['multiple'] and is_array($object['value']) and count($object['value']) )
+					if( !$object['multiple'] && is_array($object['value']) &&($object['value']) )
 						$objects[$object['name']] = $object['value'][0];
 					else
 						$objects[$object['name']] = $object['value'];

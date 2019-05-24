@@ -77,7 +77,7 @@ class Form {
 
 			foreach ( $fields as $key ) {
 
-				if ( !$form[$key] or !file_exists( $form[$key] ) )
+				if ( !$form[$key] || !file_exists( $form[$key] ) )
 				$body .= ($form[$key] ? ' - ' . $key . ' : ' . $form[$key] . "\n" : '');
 			}
 

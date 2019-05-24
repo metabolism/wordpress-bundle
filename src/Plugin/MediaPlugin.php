@@ -18,7 +18,7 @@ class MediaPlugin {
 	 */
 	public static function upload($file='file', $allowed_type = ['image/jpeg', 'image/gif', 'image/png'], $path='/user', $max_size=1048576){
 
-		if( !isset($_FILES[$file]) or empty($_FILES[$file]) )
+		if( !isset($_FILES[$file]) || empty($_FILES[$file]) )
 			return new \WP_Error('empty', 'File '.$file.' is empty');
 
 		$file = $_FILES[$file];
@@ -469,6 +469,17 @@ class MediaPlugin {
 		return $image_data;
 	}
 
+	/**
+	 * Unset thumbnail image
+	 * @param $sizes
+	 * @return mixed
+	 */
+	public function intermediateImageSizesAdvanced($sizes)
+	{
+		unset($sizes['medium'], $sizes['medium_large'], $sizes['large']);
+		return $sizes;
+	}
+
 
 	/**
 	 * Constructor
@@ -479,8 +490,9 @@ class MediaPlugin {
 		$this->config = $config;
 
 		add_filter('upload_dir', [$this, 'add_relative_upload_dir_key'], 10, 2);
+		add_filter('wp_calculate_image_srcset_meta', '__return_null');
 
-		if( $this->config->get('multisite.shared_media') and is_multisite() ){
+		if( $this->config->get('multisite.shared_media') && is_multisite() ){
 
 			add_filter('upload_dir', [$this, 'uploadDir'], 11 );
 			add_filter('wp_get_attachment_url', [$this, 'attachmentUrl'], 10, 2 );
@@ -491,9 +503,10 @@ class MediaPlugin {
 			add_action('admin_init', [$this, 'adminInit'] );
 			add_action('wpmu_options', [$this, 'wpmuOptions'] );
 			add_action('wp_handle_upload', [$this, 'uploadResize']);
+			add_filter( 'intermediate_image_sizes_advanced', [$this, 'intermediateImageSizesAdvanced'] );
 
 			// Replicate media on network
-			if( $this->config->get('multisite.shared_media') and is_multisite() )
+			if( $this->config->get('multisite.shared_media') && is_multisite() )
 			{
 				add_action('add_attachment', [$this, 'addAttachment']);
 				add_action('delete_attachment', [$this, 'deleteAttachment']);

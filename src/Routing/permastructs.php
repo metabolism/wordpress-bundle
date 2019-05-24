@@ -130,7 +130,7 @@ class Permastruct{
 		$paths = $this->getPaths($struct);
 		$locale = $this->locale?'.'.$this->locale:'';
 
-		if( !empty($paths['singular']) or $name == 'front' ){
+		if( !empty($paths['singular']) || $name == 'front' ){
 
 			$route = new Route( $paths['singular'], ['_controller'=>$controller], $requirements);
 			$this->collection->add($name.$locale, $route);

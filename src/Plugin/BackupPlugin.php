@@ -293,7 +293,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 		{
 			$this->config = $config;
 			
-			if( !is_admin() or (isset($_SERVER['BACKUP']) && !$_SERVER['BACKUP']) )
+			if( !is_admin() || (isset($_SERVER['BACKUP']) && !$_SERVER['BACKUP']) )
 				return;
 			
 			add_action( 'admin_init', [$this, 'adminInit'] );

@@ -22,7 +22,9 @@ class FrontController {
 	 */
 	public function redirect()
 	{
-		if( rtrim($_SERVER['REQUEST_URI'], '/') == WP_FOLDER ){
+		$path = rtrim($_SERVER['REQUEST_URI'], '/');
+
+		if( $path == WP_FOLDER || '/web'.WP_FOLDER ){
 
 			wp_redirect(is_user_logged_in() ? admin_url() : wp_login_url());
 
@@ -55,7 +57,7 @@ class FrontController {
 				$query->set( 'posts_per_page', $ppp );
 		}
 
-		if ( $query->is_tax and !get_query_var('post_type') )
+		if ( $query->is_tax && !get_query_var('post_type') )
 		{
 			global $wp_taxonomies;
 
@@ -81,7 +83,6 @@ class FrontController {
 	public function registerFilters()
 	{
 		add_filter('posts_request', [$this, 'postsRequest'] );
-		add_filter('wp_calculate_image_srcset_meta', '__return_null');
 	}
 
 
@@ -117,7 +118,7 @@ class FrontController {
 
 	public function __construct()
 	{
-		if( defined('WP_INSTALLING') and WP_INSTALLING )
+		if( defined('WP_INSTALLING') && WP_INSTALLING )
 			return;
 
 		$this->loadConfig();

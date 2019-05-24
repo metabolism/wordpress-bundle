@@ -249,7 +249,7 @@ class ConfigPlugin {
 
 				$slug = get_option( $taxonomy. '_rewrite_slug' );
 
-				if( !is_null($slug) and !empty($slug) )
+				if( !is_null($slug) && !empty($slug) )
 					$args['rewrite'] = ['slug'=>$slug];
 
 				if (!isset($args['hierarchical']))
@@ -379,7 +379,7 @@ class ConfigPlugin {
 		{
 			foreach( ['slug', 'archive'] as $type)
 			{
-				if( $type == 'slug' or ($type == 'archive' and $args->has_archive ))
+				if( $type == 'slug' || ($type == 'archive' && $args->has_archive ))
 				{
 					if( isset( $_POST[$post_type. '_rewrite_'.$type] ) && !empty($_POST[$post_type. '_rewrite_'.$type]) )
 					{

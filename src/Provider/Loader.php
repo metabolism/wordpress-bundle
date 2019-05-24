@@ -20,7 +20,7 @@ class Loader{
 
 	public static function load($classname){
 
-		if( ( defined('WP_INSTALLING') and WP_INSTALLING ) or !defined('WPINC') )
+		if( ( defined('WP_INSTALLING') && WP_INSTALLING ) || !defined('WPINC') )
 			return;
 
 		global $_config;

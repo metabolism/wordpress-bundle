@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle;
 
+use Metabolism\WordpressBundle\Extension\TwigExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class WordpressBundle extends Bundle
@@ -26,6 +27,9 @@ class WordpressBundle extends Bundle
 		do_action_ref_array( 'wp', array( &$wp ) );
 
 		do_action('template-redirect');
+
+		$twigExtension = new TwigExtension();
+		$this->container->get('twig')->addExtension($twigExtension);
 	}
 
 	/**

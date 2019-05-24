@@ -63,7 +63,7 @@ class MultisitePlugin {
 
 						$value = maybe_unserialize($value[0]);
 
-						if($key === '_thumbnail_id' and is_string($value)) {
+						if($key === '_thumbnail_id' && is_string($value)) {
 
 							if( $current_site_id == $main_site_id )
 							{
@@ -83,7 +83,7 @@ class MultisitePlugin {
 						}
 						else{
 
-							if( function_exists('get_field_object') and is_string($value) )
+							if( function_exists('get_field_object') && is_string($value) )
 							{
 								$field = get_field_object($value);
 

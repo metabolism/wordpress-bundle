@@ -147,7 +147,7 @@ class Query
 			if( !isset($args['post_type']) )
 				$args = array_merge($wp_query->query, $args);
 
-			if( !isset($args['posts_per_page']) and !isset($args['numberposts']))
+			if( !isset($args['posts_per_page']) && !isset($args['numberposts']))
 				$args['posts_per_page'] = get_option( 'posts_per_page' );
 
 			$args['fields'] = 'ids';

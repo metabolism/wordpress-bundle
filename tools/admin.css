@@ -27,3 +27,6 @@
 
 .acf-image-uploader .image-wrap img{ max-width: 86px }
 .acf-icon.-pencil { font-size: 11px }
+
+.options-media-php .wrap .form-table tr:nth-child(2),
+.options-media-php .wrap .form-table tr:nth-child(3){ display: none }

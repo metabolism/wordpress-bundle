@@ -131,6 +131,17 @@ class EditorPlugin {
 		echo '<script type="text/javascript">'.file_get_contents(__DIR__.'/../../tools/admin.js').'</script>';
 	}
 
+	/**
+	 * Allow editor to edit theme
+	 */
+	public function adminInit()
+	{
+		$role_object = get_role( 'editor' );
+
+		if( !$role_object->has_cap('edit_theme_options') )
+			$role_object->add_cap( 'edit_theme_options' );
+	}
+
 
 	/**
 	 * ConfigPlugin constructor.
@@ -147,10 +158,11 @@ class EditorPlugin {
 
 		if( is_admin() )
 		{
-			add_filter( 'mce_buttons', [$this, 'TinyMceButtons']);
-			add_action( 'admin_menu', [$this, 'adminMenu']);
-			add_action( 'wp_dashboard_setup', [$this,  'disableDashboardWidgets']);
-			add_action('admin_head', [$this,  'addCustomHeader']);
+			add_filter('mce_buttons', [$this, 'TinyMceButtons']);
+			add_action('admin_menu', [$this, 'adminMenu']);
+			add_action('wp_dashboard_setup', [$this, 'disableDashboardWidgets']);
+			add_action('admin_head', [$this, 'addCustomHeader']);
+			add_action('admin_init', [$this, 'adminInit'] );
 
 			add_filter('admin_body_class', function ( $classes ) {
 				$data = get_userdata( get_current_user_id() );
