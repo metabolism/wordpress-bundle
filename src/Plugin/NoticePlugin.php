@@ -21,8 +21,11 @@ class NoticePlugin {
 
 		$notices = [];
 
-		//check folder wright
-		foreach (['web/wp-bundle/languages', 'web/uploads', 'web/wp-bundle/upgrade', 'config/acf-json'] as $folder ){
+		//check folder right
+		$folders = ['web/wp-bundle/languages', 'web/uploads', 'web/uploads/acf-thumbnails', 'web/wp-bundle/upgrade', 'config/acf-json', 'var/cache', 'var/log'];
+		$folders = apply_filters('notice/folders', $folders);
+
+		foreach ($folders as $folder ){
 
 			$path = BASE_URI.'/'.$folder;
 
