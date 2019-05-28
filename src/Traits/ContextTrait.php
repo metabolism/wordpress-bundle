@@ -53,38 +53,6 @@ Trait ContextTrait
 
 
 	/**
-	 * Get ACF Fields wrapper
-	 * @param $id
-	 * @return object|bool
-	 */
-	protected function getFields($id)
-	{
-		$fields = new ACF($id);
-		return $fields->get();
-	}
-
-
-	/**
-	 * Get current post
-	 * @return Post|bool
-	 */
-	protected function getPost()
-	{
-		return $this->get('post');
-	}
-
-
-	/**
-	 * Get current posts
-	 * @return Post[]|bool
-	 */
-	protected function getPosts()
-	{
-		return $this->get('posts');
-	}
-
-
-	/**
 	 * Return function echo
 	 * @param $function
 	 * @param array $args
@@ -199,13 +167,45 @@ Trait ContextTrait
 
 
 	/**
+	 * Get ACF Fields wrapper
+	 * @param $id
+	 * @return object|bool
+	 */
+	public function getFields($id)
+	{
+		$fields = new ACF($id);
+		return $fields->get();
+	}
+
+
+	/**
+	 * Get current post
+	 * @return Post|bool
+	 */
+	public function getPost()
+	{
+		return $this->get('post');
+	}
+
+
+	/**
+	 * Get current posts
+	 * @return Post[]|bool
+	 */
+	public function getPosts()
+	{
+		return $this->get('posts');
+	}
+
+
+	/**
 	 * Add list of all wordpress post, page and custom post
 	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters
 	 * @param string $title_meta
 	 * @return array
 	 *
 	 */
-	protected function addSitemap($args=[], $title_meta=false)
+	public function addSitemap($args=[], $title_meta=false)
 	{
 		$sitemap = [];
 

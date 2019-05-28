@@ -175,7 +175,7 @@ class Post extends Entity
 	 * @param string $tax
 	 * @return Term|bool
 	 */
-	public function get_term( $tax='' ) {
+	public function getTerm( $tax='' ) {
 
 		$term = false;
 
@@ -195,7 +195,7 @@ class Post extends Entity
 	 * @param string $tax
 	 * @return Term[]|[]
 	 */
-	public function get_terms( $tax = '' ) {
+	public function getTerms( $tax = '' ) {
 		
 		$taxonomies = array();
 
@@ -239,4 +239,11 @@ class Post extends Entity
 		else
 			return $term_array;
 	}
+
+
+	/*
+	 * Retro compatibility
+	 */
+	public function get_terms( $tax='' ) { return $this->getTerms($tax); }
+	public function get_term( $tax='' ) { return $this->getTerm($tax); }
 }
