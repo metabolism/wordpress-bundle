@@ -63,6 +63,9 @@ class MultisitePlugin {
 
 						$value = maybe_unserialize($value[0]);
 
+						if(empty($value))
+							continue;
+
 						if($key === '_thumbnail_id' && is_string($value)) {
 
 							if( $current_site_id == $main_site_id )
@@ -89,29 +92,36 @@ class MultisitePlugin {
 
 								if( isset($field['type']) && in_array($field['type'], ['image', 'file']) )
 								{
-									if( $current_site_id == $main_site_id )
-									{
-										switch_to_blog($_GET['blog_id']);
-										$original_id = get_post_meta($meta[ substr($key, 1) ][0], '_wp_original_attachment_id', true);
-										restore_current_blog();
+									$meta_key = substr($key, 1);
+									$meta_value = $meta[$meta_key][0];
 
-										if( $original_id )
+									if( !empty($meta_value)){
+
+										if( $current_site_id == $main_site_id )
 										{
-											$meta[ substr($key, 1) ][0] = $original_id;
-											update_post_meta($inserted_post_id, substr($key, 1), $original_id);
+											switch_to_blog($_GET['blog_id']);
+											$original_id = get_post_meta($meta_value, '_wp_original_attachment_id', true);
 
-											continue;
+											restore_current_blog();
+
+											if( $original_id )
+											{
+												$meta[$meta_key][0] = $original_id;
+												update_post_meta($inserted_post_id, substr($key, 1), $original_id);
+
+												continue;
+											}
 										}
-									}
-									else
-									{
-										$attachments = get_posts(['numberposts'=>1, 'post_type'=>'attachment', 'meta_value'=>$meta[ substr($key, 1) ][0], 'meta_key'=>'_wp_original_attachment_id', 'fields'=>'ids']);
-										if( count($attachments) )
+										else
 										{
-											$meta[ substr($key, 1) ][0] = $attachments[0];
-											update_post_meta($inserted_post_id, substr($key, 1), $attachments[0]);
+											$attachments = get_posts(['numberposts'=>1, 'post_type'=>'attachment', 'meta_value'=>$meta_value, 'meta_key'=>'_wp_original_attachment_id', 'fields'=>'ids']);
+											if( count($attachments) )
+											{
+												$meta[$meta_key][0] = $attachments[0];
+												update_post_meta($inserted_post_id, substr($key, 1), $attachments[0]);
 
-											continue;
+												continue;
+											}
 										}
 									}
 								}

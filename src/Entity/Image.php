@@ -181,13 +181,13 @@ class Image extends Entity
 		$ext = function_exists('imagewebp') ? 'webp' : null;
 		$mime = function_exists('imagewebp') ? 'image/webp' : $this->mime_type;
 
-		if($this->mime_type == 'image/svg+xml' || (!$sources && $ext == null) ){
+		$html = '<picture>';
 
-			$html = '<img src="'.$this->resize($w, $h, null, $params).'" alt="'.$this->alt.'">';
+		if($this->mime_type == 'image/svg+xml' || !$sources ){
+
+			$html .= '<img src="'.$this->resize($w, $h, null, $params).'" alt="'.$this->alt.'">';
 		}
 		else{
-
-			$html = '<picture>';
 
 			if( $sources && is_array($sources) ){
 
@@ -200,8 +200,9 @@ class Image extends Entity
 
 			$html .='	<source srcset="'.$this->resize($w, $h, $ext, $params).'" type="'.$mime.'">';
 			$html .= '<img src="'.$this->resize($w, $h, null, $params).'" alt="'.$this->alt.'">';
-			$html .='</picture>';
 		}
+
+		$html .='</picture>';
 
 		return new \Twig\Markup($html, 'UTF-8');
 	}
