@@ -45,6 +45,9 @@ class EditorPlugin {
 		}
 
 		$wp_admin_bar->remove_node('themes');
+		$wp_admin_bar->remove_node('updates');
+		$wp_admin_bar->remove_node('comments');
+		$wp_admin_bar->remove_node('wp-logo');
 	}
 
 	/**

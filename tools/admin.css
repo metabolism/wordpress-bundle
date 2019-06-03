@@ -52,7 +52,6 @@ th#mslscol{ width: 25px }
 #minor-publishing-actions .preview{ width: 100% }
 #post-body #visibility:before, #post-body .misc-pub-post-status:before, #post-body .misc-pub-revisions:before, .curtime #timestamp:before{ font-size: 18px }
 #wp-admin-bar-site-name > a, #wp-admin-bar-my-sites > a{ font-size: 0 }
-#wp-admin-bar-wp-logo, #wp-admin-bar-updates, #wp-admin-bar-comments{ display: none }
 #wp-admin-bar-new-content .ab-label, #contextual-help-link-wrap{ display: none }
 #wp-admin-bar-root-default{ padding-left: 10px!important }
 #comment-link-box, #edit-slug-box{ padding-left: 0 }

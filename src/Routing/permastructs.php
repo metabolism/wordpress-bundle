@@ -104,7 +104,7 @@ class Permastruct{
 		if( $search_post_type_structure )
 			$this->addRoute('search_post_type', $search_post_type_structure, [], true);
 
-		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[^/]{3,}']);
+		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
 	}
 
 
