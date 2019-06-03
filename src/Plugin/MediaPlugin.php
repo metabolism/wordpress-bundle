@@ -503,7 +503,7 @@ class MediaPlugin {
 			add_action('admin_init', [$this, 'adminInit'] );
 			add_action('wpmu_options', [$this, 'wpmuOptions'] );
 			add_action('wp_handle_upload', [$this, 'uploadResize']);
-			add_filter( 'intermediate_image_sizes_advanced', [$this, 'intermediateImageSizesAdvanced'] );
+			add_filter('intermediate_image_sizes_advanced', [$this, 'intermediateImageSizesAdvanced'] );
 
 			// Replicate media on network
 			if( $this->config->get('multisite.shared_media') && is_multisite() )

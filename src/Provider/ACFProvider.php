@@ -25,6 +25,30 @@ class ACFProvider {
 			acf_update_setting($name, $value);
 	}
 
+
+	/**
+	 * Add wordpress configuration 'options_page' fields as ACF Options pages
+	 */
+	public function addOptionPages()
+	{
+		if( function_exists('acf_add_options_page') )
+		{
+			acf_add_options_page();
+
+			$options = $this->config->get('acf.options_page', []);
+
+			//retro compat
+			$options = array_merge($options, $this->config->get('options_page', []));
+
+ 			foreach ( $options as $name )
+				acf_add_options_sub_page($name);
+		}
+	}
+
+
+	/**
+	 * Add settings button
+	 */
 	public function adminInit(){
 
 		if( !current_user_can('administrator') || WP_ENV != 'dev' )
@@ -45,7 +69,10 @@ class ACFProvider {
 
 		}, 'general');
 	}
-	
+
+	/**
+	 * Clean acf meta
+	 */
 	public function deleteUnusedMeta(){
 
 		global $wpdb;
@@ -72,6 +99,10 @@ class ACFProvider {
 		exit;
 	}
 
+
+	/**
+	 * Count unused meta
+	 */
 	public function getUnusedMeta(){
 
 		global $wpdb;
@@ -113,6 +144,7 @@ class ACFProvider {
 			// Setup ACF Settings
 			add_action( 'acf/init', [$this, 'addSettings'] );
 			add_action( 'admin_init', [$this, 'adminInit'] );
+			add_action( 'init', [$this, 'addOptionPages'] );
 		}
 	}
 }

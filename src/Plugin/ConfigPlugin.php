@@ -187,26 +187,6 @@ class ConfigPlugin {
 
 
 	/**
-	 * Add wordpress configuration 'options_page' fields as ACF Options pages
-	 */
-	protected function addOptionPages()
-	{
-		if( function_exists('acf_add_options_page') )
-		{
-			acf_add_options_page();
-
-			foreach ( $this->config->get('options_page', []) as $name )
-			{
-				if( isset($name['menu_slug']) )
-					$name['menu_slug'] = 'acf-options-'.$name['menu_slug'];
-
-				acf_add_options_sub_page($name);
-			}
-		}
-	}
-
-
-	/**
 	 * Create Menu instances from configs
 	 * @see Menu
 	 */
@@ -504,10 +484,7 @@ class ConfigPlugin {
 				$this->setPermalink();
 			
 			if( is_admin() )
-			{
 				$this->addTableViews();
-				$this->addOptionPages();
-			}
 		});
 
 
