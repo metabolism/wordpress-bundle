@@ -17,10 +17,9 @@ class EditorPlugin {
 	 */
 	public function TinyMceButtons( $mce_buttons )
 	{
-		$mce_buttons = array(
-			'formatselect','bold','italic','underline','strikethrough','bullist','numlist','blockquote','hr','alignleft',
-			'aligncenter','alignright','alignjustify','link','unlink','wp_more','spellchecker','wp_adv','dfw'
-		);
+		$mce_buttons = $this->config->get('mce_buttons', ['formatselect','bold','italic','underline','sup','strikethrough','bullist','numlist','blockquote','hr','alignleft',
+			'aligncenter','alignright','alignjustify','link','unlink','wp_more','spellchecker','wp_adv','dfw']);
+
 		return $mce_buttons;
 	}
 

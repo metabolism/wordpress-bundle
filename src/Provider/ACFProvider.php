@@ -19,7 +19,11 @@ class ACFProvider {
 	 */
 	public function addSettings()
 	{
-		$acf_settings = $this->config->get('acf', []);
+		$acf_settings = $this->config->get('acf.settings');
+
+		//retro compat
+		if(!$acf_settings)
+			$acf_settings = ['google_api_key'=>$this->config->get('acf.google_api_key')];
 
 		foreach ($acf_settings as $name=>$value)
 			acf_update_setting($name, $value);
@@ -128,6 +132,17 @@ class ACFProvider {
 
 	
 	/**
+	 * Customize basic toolbar
+	 */
+	public function editToolbars($toolbars){
+
+		$custom_toolbars = $this->config->get('acf.toolbars');
+
+		return $custom_toolbars ? $custom_toolbars : $toolbars;
+	}
+
+
+	/**
 	 * ACFPlugin constructor.
 	 * @param Data $config
 	 */
@@ -143,6 +158,7 @@ class ACFProvider {
 		{
 			// Setup ACF Settings
 			add_action( 'acf/init', [$this, 'addSettings'] );
+			add_filter( 'acf/fields/wysiwyg/toolbars' , [$this, 'editToolbars']  );
 			add_action( 'admin_init', [$this, 'adminInit'] );
 			add_action( 'init', [$this, 'addOptionPages'] );
 		}

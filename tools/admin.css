@@ -56,3 +56,4 @@ th#mslscol{ width: 25px }
 #wp-admin-bar-root-default{ padding-left: 10px!important }
 #comment-link-box, #edit-slug-box{ padding-left: 0 }
 .mce-top-part::before{ display: none }
+.wp-core-ui .notice.is-dismissible, .update-nag{ box-shadow: 0 1px 4px rgba(0,0,0,0.15)!important; width: calc(100% - 350px); margin-top: 10px }
