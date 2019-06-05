@@ -25,6 +25,8 @@ class MultisitePlugin {
 
 		add_action( 'load-post-new.php', function(){
 
+			global $wpdb;
+
 			if( isset($_GET['blog_id'], $_GET['post_id'], $_GET['clone']))
 			{
 				$main_site_id = get_main_network_id();
@@ -50,8 +52,12 @@ class MultisitePlugin {
 					// return to target blog
 					restore_current_blog();
 
-					// insert the post
+					// insert the post as draft
+					$post['post_status'] = 'draft';
 					$inserted_post_id = wp_insert_post($post);
+
+					// delete post_name
+					$wpdb->query("UPDATE $wpdb->posts SET `post_name`='' WHERE `ID`=".$inserted_post_id);
 
 					// register original post
 					add_option('msls_'.$inserted_post_id, [$language => $_GET['post_id']], '', 'no');

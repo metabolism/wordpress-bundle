@@ -73,11 +73,17 @@ class UrlPlugin {
 	/**
 	 * Save post name when requesting for preview link
 	 */
-	public function previewPostLink($preview_link, $post){
+	public function getPreviewPermalink($id){
+
+		$post = get_post($id);
+
+		if( $post->post_name )
+			return get_permalink($post);
 
 		$filter = isset($post->filter) ? $post->filter : false;
 
 		list($permalink, $post_name) = get_sample_permalink($post);
+		$preview_permalink = str_replace( array( '%pagename%', '%postname%' ), $post_name, esc_html( urldecode( $permalink ) ) );
 
 		$post->filter = $filter;
 
@@ -88,7 +94,7 @@ class UrlPlugin {
 			]);
 		}
 
-		return $preview_link;
+		return $preview_permalink;
 	}
 
 	/**
@@ -107,8 +113,8 @@ class UrlPlugin {
 
 		require_once(ABSPATH . 'wp-admin/includes/post.php');
 
-		list($permalink, $post_name) =  get_sample_permalink($_GET['p']);
-		$permalink = str_replace( array( '%pagename%', '%postname%' ), $post_name, esc_html( urldecode( $permalink ) ) );
+		$id = isset($_GET['p'])?$_GET['p']:$_GET['page_id'];
+		$permalink = $this->getPreviewPermalink($id);
 
 		$query_args['preview'] = 'true';
 		$permalink = add_query_arg( $query_args, $permalink );
@@ -134,8 +140,6 @@ class UrlPlugin {
 	 */
 	public function __construct($config){
 
-		add_filter('preview_post_link', [$this, 'previewPostLink'], 10, 2 );
-
 		add_filter('post_link', [$this, 'relativeLink']);
 		add_filter('page_link', [$this, 'relativeLink']);
 		add_filter('post_type_link', [$this, 'relativeLink']);
@@ -157,7 +161,7 @@ class UrlPlugin {
 			if ( is_feed() || get_query_var( 'sitemap' ) )
 				return;
 
-			if( isset($_GET['preview'], $_GET['p']) )
+			if( isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id']) )
 				$this->redirect();
 
 			$filters = array(

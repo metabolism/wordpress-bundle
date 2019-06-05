@@ -34,11 +34,12 @@
 
 
 /* Quick redesign */
-.post-php, body[class*="_page_"] { background: linear-gradient(-90deg, rgba(238,238,238,1) 0%, rgba(238,238,238,1) 290px, rgba(230,230,230,1) 300px, rgba(255,255,255,1) 300px, rgba(255,255,255,1) 100%); }
+.post-php, body[class*="_page_"], .post-new-php { background: linear-gradient(-90deg, rgba(238,238,238,1) 0%, rgba(238,238,238,1) 290px, rgba(230,230,230,1) 300px, rgba(255,255,255,1) 300px, rgba(255,255,255,1) 100%); }
 @media only screen and (max-width: 850px){
-    .post-php, body[class*="_page_"]{ background: #fff }
+    .post-php, body[class*="_page_"], .post-new-php{ background: #fff }
 }
-.post-php .wrap h1{ font-size: 16px }
+.post-php .wrap h1, .post-new-php .wrap h1{ font-size: 16px }
+.post-new-php .wp-core-ui .notice.is-dismissible, .post-new-php .update-nag, .post-new-php .notice, .post-new-php div.error, .post-new-php div.updated,
 .post-php .wp-core-ui .notice.is-dismissible, .post-php .update-nag, .post-php .notice, .post-php div.error, .post-php div.updated,
 body[class*="_page_"] .wp-core-ui .notice.is-dismissible, body[class*="_page_"] .update-nag, body[class*="_page_"] .notice, body[class*="_page_"] div.error,
 body[class*="_page_"] div.updated{
@@ -62,3 +63,9 @@ th#mslscol{ width: 25px }
 .mce-top-part::before{ display: none }
 .misc-pub-section a{ float: right }
 .misc-pub-section a.edit-timestamp{ float: none }
+#save-post, #save-action .spinner{ float: right }
+#save-action:after, #poststuff .inside:after{ content: ''; display: table; clear: both }
+#save-action+#preview-action{ margin-top: 10px }
+.postbox-container .inside{ margin: 10px 0 }
+
+#msls_noncename ~ .button-secondary{ float: right }
