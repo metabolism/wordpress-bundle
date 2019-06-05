@@ -51,10 +51,28 @@ class FrontController {
 
 		if ( $query->is_archive )
 		{
-			if( get_class($object) == 'WP_Post_Type' && $ppp = $this->config->get('post_type.'.$object->name.'.posts_per_page') )
+			if( get_class($object) == 'WP_Post_Type' ){
+
+				if( $ppp= $this->config->get('post_type.'.$object->name.'.posts_per_page') )
 				$query->set( 'posts_per_page', $ppp );
-			elseif( get_class($object) == 'WP_Term' && $ppp = $this->config->get('taxonomy.'.$object->taxonomy.'.posts_per_page') )
+
+				if( $orderby = $this->config->get('post_type.'.$object->name.'.orderby') )
+					$query->set( 'orderby', $orderby );
+
+				if( $order = $this->config->get('post_type.'.$object->name.'.order') )
+					$query->set( 'order', $order );
+			}
+			elseif( get_class($object) == 'WP_Term' ){
+
+				if( $ppp = $this->config->get('taxonomy.'.$object->taxonomy.'.posts_per_page') )
 				$query->set( 'posts_per_page', $ppp );
+
+				if( $orderby = $this->config->get('taxonomy.'.$object->name.'.orderby') )
+					$query->set( 'orderby', $orderby );
+
+				if( $order = $this->config->get('taxonomy.'.$object->name.'.order') )
+					$query->set( 'order', $order );
+			}
 		}
 
 		if ( $query->is_tax && !get_query_var('post_type') )

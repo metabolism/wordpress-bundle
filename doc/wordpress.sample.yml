@@ -168,6 +168,8 @@ post_type:
     #has_options: true
     capability_type: post
     #posts_per_page: 11
+    #orderby: name #https://codex.wordpress.org/Class_Reference/WP_Query#Order_.26_Orderby_Parameters
+    #order: ASC
     supports:
       - title
       - excerpt
@@ -196,6 +198,8 @@ taxonomy:
 
   item:
     #posts_per_page: 11
+    #orderby: name #https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
+    #order: ASC
     object_type:
       - guide
     #labels:

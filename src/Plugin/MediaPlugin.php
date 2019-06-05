@@ -16,7 +16,7 @@ class MediaPlugin {
 	/**
 	 * Quickly upload file
 	 */
-	public static function upload($file='file', $allowed_type = ['image/jpeg', 'image/gif', 'image/png'], $path='/user', $max_size=1048576){
+	public static function upload($file='file', $allowed_type = ['image/jpeg', 'image/jpg', 'image/gif', 'image/png'], $path='/user', $max_size=1048576){
 
 		if( !isset($_FILES[$file]) || empty($_FILES[$file]) )
 			return new \WP_Error('empty', 'File '.$file.' is empty');
@@ -40,7 +40,7 @@ class MediaPlugin {
 		$upload_dir = WP_UPLOADS_DIR.$path;
 
 		if( !is_dir($upload_dir) )
-			mkdir($upload_dir, 0777, true);
+			mkdir($upload_dir, 0755, true);
 
 		if( !is_writable($upload_dir) )
 			return new \WP_Error('right', 'Upload directory is not writable.');
