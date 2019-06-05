@@ -89,7 +89,7 @@ acf:
   settings:
     autoload: true
     #https://developers.google.com/maps/documentation/javascript/get-api-key
-    google_api_key: AIzaSyC04Jf64MQq8mqG6ImEEYBES4Cq_FubKOE
+    google_api_key: XXXYYYZZZ
   options_page:
     - 'Personnalisation'
   toolbars:
