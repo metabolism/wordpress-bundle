@@ -119,6 +119,9 @@ namespace {
 
 	function get_page_by_state($state, $output = OBJECT)
 	{
+		if( !is_string($state) )
+			return false;
+		
 		$page = get_option('page_on_'.$state);
 
 		if( $page )

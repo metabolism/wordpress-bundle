@@ -32,12 +32,17 @@ class TwigExtension extends AbstractExtension{
 			new TwigFunction( "function", [$this,'execFunction'] ),
 			new TwigFunction( "shortcode", "shortcode" ),
 			new TwigFunction( "archive_url", "get_post_type_archive_link" ),
-			new TwigFunction( "post_url", "get_permalink" ),
+			new TwigFunction( "post_url", [$this, 'getPermalink'] ),
 			new TwigFunction( "term_url", "get_term_link" ),
 			new TwigFunction( "bloginfo", "bloginfo" )
 		];
 	}
 
+
+	/**
+	 * @param $function_name
+	 * @return mixed
+	 */
 	public function execFunction( $function_name )
 	{
 		$args = func_get_args();
@@ -48,6 +53,38 @@ class TwigExtension extends AbstractExtension{
 			$function_name = trim($function_name);
 
 		return call_user_func_array($function_name, ($args));
+	}
+
+
+	/**
+	 * @param $function_name
+	 * @param $by
+	 * @return mixed
+	 */
+	public function getPermalink( $page, $by=false )
+	{
+		switch ( $by ){
+
+			case 'state':
+
+				$page = get_page_by_state($page);
+				break;
+
+			case 'path':
+
+				$page = get_page_by_path($page);
+				break;
+
+			case 'title':
+
+				$page = get_page_by_title($page);
+				break;
+		}
+
+		if( $page )
+			return get_permalink($page);
+		else
+			return false;
 	}
 
 
