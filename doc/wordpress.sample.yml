@@ -58,13 +58,94 @@ install-multisite: true
 #define:
 #  disallow_file_edit: false
 
-## Acf options
+##WYSIWYG Editor TinyMCE Buttons
+##https://www.tiny.cloud/docs/advanced/editor-control-identifiers/
+mce_buttons:
+  - formatselect
+  - bold
+  - italic
+  - underline
+  - sup
+  - strikethrough
+  - superscript
+  - bullist
+  - numlist
+  - blockquote
+  - hr
+  - table
+  - alignleft
+  - aligncenter
+  - alignright
+  - alignjustify
+  - link
+  - unlink
+  - wp_more
+  - spellchecker
+  - wp_adv
+  - dfw
+
+##ACF configurations
 acf:
-  autoload: true
-  #https://developers.google.com/maps/documentation/javascript/get-api-key
-  google_api_key: AIzaSyDEv5UrZbosf5H8MFSFLvoVS7djfsTCQFc
+  settings:
+    autoload: true
+    #https://developers.google.com/maps/documentation/javascript/get-api-key
+    google_api_key: AIzaSyC04Jf64MQq8mqG6ImEEYBES4Cq_FubKOE
   options_page:
-    - Option
+    - 'Personnalisation'
+  toolbars:
+    Full:
+      1:
+        - bold
+        - italic
+        - underline
+        - blockquote
+        - strikethrough
+        - superscript
+        - bullist
+        - numlist
+        - blockquote
+        - hr
+        - table
+        - alignleft
+        - aligncenter
+        - alignright
+        - alignjustify
+        - link
+        - unlink
+        - wp_more
+        - spellchecker
+        - wp_adv
+        - dfw
+      2:
+        - strikethrough
+        - hr
+        - forecolor
+        - pastetext
+        - removeformat
+        - charmap
+        - outdent
+        - indent
+        - undo
+        - redo
+        - wp_help
+    Basic:
+      1:
+        - bold
+        - italic
+        - underline
+        - blockquote
+        - strikethrough
+        - superscript
+        - bullist
+        - numlist
+        - table
+        - alignleft
+        - aligncenter
+        - alignright
+        - undo
+        - redo
+        - link
+        - fullscreen
 
 ## Activate features
 support:

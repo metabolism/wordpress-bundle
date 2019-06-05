@@ -90,20 +90,34 @@ Trait ContextTrait
 		{
 			$sites = get_sites(['public'=>1]);
 			$current_blog_id = get_current_blog_id();
+			$alternates      = false;
 
 			if( !function_exists('format_code_lang') )
 				require_once(ABSPATH . 'wp-admin/includes/ms.php');
 
+			if( $post_id )
+				$alternates = maybe_unserialize(get_option('msls_'.$post_id));
+
 			foreach($sites as $site)
 			{
-				$lang = get_blog_option($site->blog_id, 'WPLANG');
-				$lang = empty($lang)?'en':(explode('_', $lang)[0]);
+				$locale    = get_blog_option($site->blog_id, 'WPLANG');
+				$locale    = empty($locale)? 'en_US' : $locale;
+				$lang      = explode('_', $locale)[0];
+				$alternate = false;
+
+				if($post_id && isset($alternates[$locale])){
+					switch_to_blog($site->blog_id);
+					$alternate = get_permalink($alternates[$locale]);
+					restore_current_blog();
+				}
+
 				$languages[] = [
 					'id' => $site->blog_id,
 					'active' => $current_blog_id==$site->blog_id,
 					'name' => format_code_lang($lang),
-					'url' => get_home_url($site->blog_id, '/'),
-					'language_code' => $lang
+					'home_url'      => get_home_url($site->blog_id, '/'),
+					'language_code' => $lang,
+					'url'           => $alternate
 				];
 			}
 		}

@@ -29,7 +29,7 @@ class EditorPlugin {
 	 */
 	public function editBarMenu($wp_admin_bar)
 	{
-		if( is_post_type_archive() )
+		if( is_post_type_archive() && !is_admin() )
 		{
 			$object = get_queried_object();
 
@@ -175,10 +175,8 @@ class EditorPlugin {
 				return implode(' ', $caps).$classes;
 			});
 		}
-		else
-		{
-			add_action( 'admin_bar_menu', [$this, 'editBarMenu'], 80);
-		}
+
+		add_action( 'admin_bar_menu', [$this, 'editBarMenu'], 80);
 
 		if( $config->get('optimizations.disable_update', true) )
 			$this->disableUpdate();

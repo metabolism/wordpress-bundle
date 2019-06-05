@@ -78,7 +78,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 				foreach ($post_states as $post_state=>$label){
 
 					printf(
-						__( $label.' : %s' ),
+						__( $label.' : %s <br/><br/>' ),
 						wp_dropdown_pages(
 							array(
 								'name'              => 'page_on_'.$post_state,
