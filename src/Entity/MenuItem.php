@@ -10,10 +10,12 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class MenuItem extends Entity
 {
+	/** @var bool $menu_item_parent */
 	public $menu_item_parent;
+
+	/** @var [] $classes */
 	public $classes;
 	public $class;
-	public $attr_title;
 	public $description;
 	public $target;
 	public $title;
@@ -21,6 +23,9 @@ class MenuItem extends Entity
 	public $object_id;
 	public $object;
 	public $link;
+
+	/** @var MenuItem[] $children */
+	public $children;
 
 	/**
 	 * MenuItem constructor.

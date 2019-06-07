@@ -46,6 +46,11 @@ class WordpressBundle extends Bundle
 		$GLOBALS['query_string'] = $wp->query_string;
 		$GLOBALS['posts'] = & $wp_query->posts;
 		$GLOBALS['post'] = isset( $wp_query->post ) ? $wp_query->post : null;
+
+		if( !$wp_query->get_queried_object() ){
+			$wp_query->is_single = false;
+			$wp_query->is_singular = false;
+		}
 	}
 
 }

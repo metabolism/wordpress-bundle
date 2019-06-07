@@ -70,16 +70,10 @@ Trait ContextTrait
 
 
 	/**
-	 * Add global data
+	 * Get multisite multilangue data
 	 */
-	protected function addSite()
-	{
-		global $wp_query, $wp_rewrite;
+	protected function getLanguagesData($queried_object){
 
-		$blog_language = get_bloginfo('language');
-		$post_id = $wp_query->get_queried_object_id();
-
-		$language = explode('-', $blog_language);
 		$languages = [];
 
 		if( defined('ICL_LANGUAGE_CODE') )
@@ -95,8 +89,8 @@ Trait ContextTrait
 			if( !function_exists('format_code_lang') )
 				require_once(ABSPATH . 'wp-admin/includes/ms.php');
 
-			if( $post_id )
-				$alternates = maybe_unserialize(get_option('msls_'.$post_id));
+			if( is_singular() )
+				$alternates = maybe_unserialize(get_option('msls_'.$queried_object->ID));
 
 			foreach($sites as $site)
 			{
@@ -105,9 +99,19 @@ Trait ContextTrait
 				$lang      = explode('_', $locale)[0];
 				$alternate = false;
 
-				if($post_id && isset($alternates[$locale])){
+				if( is_singular() ){
+
+					if( $queried_object->ID && isset($alternates[$locale]) ){
+
 					switch_to_blog($site->blog_id);
 					$alternate = get_permalink($alternates[$locale]);
+					restore_current_blog();
+				}
+				}
+				elseif( is_archive() ){
+					$post_type = $queried_object->name;
+					switch_to_blog($site->blog_id);
+					$alternate = get_post_type_archive_link($post_type);
 					restore_current_blog();
 				}
 
@@ -122,12 +126,26 @@ Trait ContextTrait
 			}
 		}
 
+		return $languages;
+	}
+
+	/**
+	 * Add global data
+	 */
+	protected function addSite()
+	{
+		global $wp_query, $wp_rewrite;
+
+		$blog_language = get_bloginfo('language');
+		$queried_object = $wp_query->get_queried_object();
+
+		$language  = explode('-', $blog_language);
+
 		$this->data = [
 			'debug'              => WP_DEBUG,
 			'environment'        => $this->config->get('environment', 'production'),
 			'locale'             => count($language) ? $language[0] : 'en',
 			'language'           => $blog_language,
-			'languages'          => $languages,
 			'is_admin'           => current_user_can('manage_options'),
 			'home_url'           => home_url('/'),
 			'maintenance_mode'   => wp_maintenance_mode(),
@@ -136,18 +154,24 @@ Trait ContextTrait
 			'posts_per_page'     => get_option( 'posts_per_page' )
 		];
 
-		if( is_multisite() )
-			$this->data['network_home_url'] = trim(network_home_url(), '/');
+		if( is_multisite() ){
 
-		if( WP_FRONT && (!is_singular() || $post_id) )
+			$languages = $this->getLanguagesData($queried_object);
+
+			$this->data['network_home_url'] = trim(network_home_url(), '/');
+			$this->data['languages'] = $languages;
+		}
+
+		if( WP_FRONT )
 		{
 			$wp_title = trim(wp_title(' ', false));
+			$body_class = $queried_object ? implode(' ', get_body_class()) : '';
 
 			$this->data = array_merge($this->data, [
 				'search_url'         => get_search_link(),
 				'privacy_policy_url' => get_privacy_policy_url(),
 				'is_front_page'      => is_front_page(),
-				'body_class'         => $blog_language . ' ' . implode(' ', get_body_class()),
+				'body_class'         => $blog_language . ' ' . $body_class,
 				'page_title'         => empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title,
 				'system' => [
 					'head'   => $this->getOutput('wp_head'),

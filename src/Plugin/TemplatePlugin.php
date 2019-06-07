@@ -55,7 +55,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 		 */
 		public function addPostState($post_states, $post) {
 
-			if( in_array($post->ID, array_keys($this->post_states)) ) {
+			if( is_array($this->post_states) && in_array($post->ID, array_keys($this->post_states)) ) {
 				$post_states[] = $this->post_states[$post->ID];
 			}
 
