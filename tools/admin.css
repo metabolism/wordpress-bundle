@@ -68,4 +68,4 @@ th#mslscol{ width: 25px }
 #save-action+#preview-action{ margin-top: 10px }
 .postbox-container .inside{ margin: 10px 0 }
 
-#msls_noncename ~ .button-secondary{ float: right }
+#msls_noncename ~ .button-secondary{ display: none }

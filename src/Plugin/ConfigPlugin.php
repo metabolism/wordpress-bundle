@@ -461,6 +461,39 @@ class ConfigPlugin {
 
 
 	/**
+	 * Disable category
+	 */
+	public function disableCategory()
+	{
+		add_action('init', function() {
+			register_taxonomy('category', array());
+		});
+	}
+
+
+	/**
+	 * Disable category
+	 */
+	public function disableTag()
+	{
+		add_action('init', function() {
+			register_taxonomy('post_tag', array());
+		});
+	}
+
+
+	/**
+	 * Enable post formats
+	 * See https://wordpress.org/support/article/post-formats/#supported-formats
+	 */
+	public function addPostFormats()
+	{
+		if( $this->config->get('post_formats') )
+			add_theme_support('post-formats', $this->config->get('post_formats'));
+	}
+
+
+	/**
 	 * ConfigPlugin constructor.
 	 * @param Data $config
 	 */
@@ -472,10 +505,17 @@ class ConfigPlugin {
 		if( $jpeg_quality = $this->config->get('jpeg_quality') )
 			add_filter( 'jpeg_quality', function() use ($jpeg_quality){ return $jpeg_quality; });
 
+		if( !$config->get('support.category') )
+			$this->disableCategory();
+
+		if( !$config->get('support.tag') )
+			$this->disableTag();
+
 		// Global init action
 		add_action( 'init', function()
 		{
 			$this->addPostTypes();
+			$this->addPostFormats();
 			$this->addTaxonomies();
 			$this->addMenus();
 			$this->addRoles();
@@ -496,9 +536,7 @@ class ConfigPlugin {
 			
 			add_action('admin_head', [$this, 'loadStyle']);
 
-			$support = $this->config->get('support', []);
-
-			if( in_array('post_thumbnails', $support ) )
+			if( $this->config->get('support.post_thumbnails') )
 				add_theme_support( 'post-thumbnails' );
 
 			add_post_type_support( 'page', 'excerpt' );

@@ -99,20 +99,22 @@ Trait ContextTrait
 				$lang      = explode('_', $locale)[0];
 				$alternate = false;
 
-				if( is_singular() ){
+				if( $current_blog_id != $site->blog_id ){
+					if( is_singular() ){
 
-					if( $queried_object->ID && isset($alternates[$locale]) ){
+						if( $queried_object->ID && isset($alternates[$locale]) ){
 
-					switch_to_blog($site->blog_id);
-					$alternate = get_permalink($alternates[$locale]);
-					restore_current_blog();
-				}
-				}
-				elseif( is_archive() ){
-					$post_type = $queried_object->name;
-					switch_to_blog($site->blog_id);
-					$alternate = get_post_type_archive_link($post_type);
-					restore_current_blog();
+							switch_to_blog($site->blog_id);
+							$alternate = get_permalink($alternates[$locale]);
+							restore_current_blog();
+						}
+					}
+					elseif( is_archive() ){
+						$post_type = $queried_object->name;
+						switch_to_blog($site->blog_id);
+						$alternate = get_post_type_archive_link($post_type);
+						restore_current_blog();
+					}
 				}
 
 				$languages[] = [
@@ -386,7 +388,7 @@ Trait ContextTrait
 			if( !isset($this->data['found_'.$key]) )
 				$this->data['found_'.$key] = 0;
 			else
-			$this->data['found_'.$key] += $wp_query->found_posts;
+				$this->data['found_'.$key] += $wp_query->found_posts;
 		}
 
 		if( $callback && is_callable($callback) )
@@ -667,7 +669,7 @@ Trait ContextTrait
 			else{
 				$this->data['post']->$key = $comments;
 				$this->data['post']->comments_count = $comments_count;
-		}
+			}
 		}
 		else{
 

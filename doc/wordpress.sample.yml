@@ -149,8 +149,10 @@ acf:
 
 ## Activate features
 support:
-  - templates #remove for api only backoffice
+  - templates #uncomment for api only backoffice
   - post_thumbnails #add post thumbnails to page
+#  - tag #enable tag
+#  - category #enable category
 
 ## Declare menus
 menu:
@@ -226,6 +228,12 @@ template:
 ## Add page states
 #page_states:
   #archive_guide: 'Archive des guides'
+
+## Add post formats
+## https://wordpress.org/support/article/post-formats/#supported-formats
+#post_formats:
+#  - video
+#  - gallery
 
 ## Configure search
 #search:
