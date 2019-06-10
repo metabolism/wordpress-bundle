@@ -460,6 +460,22 @@ class ConfigPlugin {
 	}
 
 
+	public function loadJS(){
+
+		echo '<script>jQuery(document).ready(function(jQuery){';
+
+		foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args )
+		{
+			if( isset($args['radio']) && $args['radio'] ){
+
+				echo 'jQuery(\'#taxonomy-'.$taxonomy.' [name="tax_input['.$taxonomy.'][]"][type="checkbox"]\').attr("type", "radio");';
+			}
+		}
+
+		echo '})</script>';
+	}
+
+
 	/**
 	 * Disable category
 	 */
@@ -505,10 +521,12 @@ class ConfigPlugin {
 		if( $jpeg_quality = $this->config->get('jpeg_quality') )
 			add_filter( 'jpeg_quality', function() use ($jpeg_quality){ return $jpeg_quality; });
 
-		if( !$config->get('support.category') )
+		$support = $config->get('support');
+
+		if( !in_array('category', $support) )
 			$this->disableCategory();
 
-		if( !$config->get('support.tag') )
+		if( !in_array('tag', $support) )
 			$this->disableTag();
 
 		// Global init action
@@ -535,8 +553,9 @@ class ConfigPlugin {
 				add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
 			
 			add_action('admin_head', [$this, 'loadStyle']);
+			add_action('admin_head', [$this, 'loadJS']);
 
-			if( $this->config->get('support.post_thumbnails') )
+			if( in_array('post_thumbnails', $support) )
 				add_theme_support( 'post-thumbnails' );
 
 			add_post_type_support( 'page', 'excerpt' );
