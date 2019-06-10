@@ -15,6 +15,11 @@ class MediaPlugin {
 
 	/**
 	 * Quickly upload file
+	 * @param string $file
+	 * @param array $allowed_type
+	 * @param string $path
+	 * @param int $max_size
+	 * @return array|\WP_Error
 	 */
 	public static function upload($file='file', $allowed_type = ['image/jpeg', 'image/jpg', 'image/gif', 'image/png'], $path='/user', $max_size=1048576){
 
@@ -54,6 +59,9 @@ class MediaPlugin {
 
 	/**
 	 * delete attachment reference on other blog
+	 * @param $data
+	 * @param $attachment_ID
+	 * @return mixed
 	 */
 	public function updateAttachment($data, $attachment_ID )
 	{
@@ -69,6 +77,9 @@ class MediaPlugin {
 
 		$original_attachment_id = $main_site_id == $current_site_id ? $attachment_ID : get_post_meta( $attachment_ID, '_wp_original_attachment_id', true );
 
+		if( !$original_attachment_id )
+			return $data;
+
 		foreach ( get_sites() as $site ) {
 
 			if ( (int) $site->blog_id !== $current_site_id ) {
@@ -77,9 +88,9 @@ class MediaPlugin {
 
 				if( $main_site_id == $site->blog_id )
 				{
-					wp_update_attachment_metadata($attachment_ID, $data);
+					wp_update_attachment_metadata($original_attachment_id, $data);
 				}
-				elseif( $original_attachment_id )
+				else
 				{
 					$results = $wpdb->get_results( "select `post_id` from $wpdb->postmeta where `meta_value` = '$original_attachment_id' AND `meta_key` = '_wp_original_attachment_id'", ARRAY_A );
 
@@ -99,6 +110,7 @@ class MediaPlugin {
 
 	/**
 	 * delete attachment reference on other blog
+	 * @param $attachment_ID
 	 */
 	public function deleteAttachment( $attachment_ID )
 	{
@@ -114,6 +126,9 @@ class MediaPlugin {
 
 		$original_attachment_id = $main_site_id == $current_site_id ? $attachment_ID : get_post_meta( $attachment_ID, '_wp_original_attachment_id', true );
 
+		if( !$original_attachment_id )
+			return;
+
 		foreach ( get_sites() as $site ) {
 
 			if ( (int) $site->blog_id !== $current_site_id ) {
@@ -124,7 +139,7 @@ class MediaPlugin {
 				{
 					wp_delete_attachment($original_attachment_id);
 				}
-				elseif( $original_attachment_id )
+				else
 				{
 					$results = $wpdb->get_results( "select `post_id` from $wpdb->postmeta where `meta_value` = '$original_attachment_id' AND `meta_key` = '_wp_original_attachment_id'", ARRAY_A );
 					if( !empty($results) )
@@ -142,6 +157,7 @@ class MediaPlugin {
 
 	/**
 	 * add attachment to other blog by reference
+	 * @param $attachment_ID
 	 */
 	public function addAttachment( $attachment_ID )
 	{
@@ -216,7 +232,7 @@ class MediaPlugin {
 							wp_update_attachment_metadata( $inserted_id, $attachment_metadata );
 
 							if( $main_site_id != $site->blog_id )
-								add_post_meta( $inserted_id, '_wp_original_attachment_id', $attachment_ID );
+								update_post_meta( $inserted_id, '_wp_original_attachment_id', $attachment_ID );
 							else
 								$original_id = $inserted_id;
 						}
@@ -224,7 +240,7 @@ class MediaPlugin {
 					else
 					{
 						if( $main_site_id != $site->blog_id )
-							add_post_meta( $attachment[0], '_wp_original_attachment_id', $attachment_ID );
+							update_post_meta( $attachment[0], '_wp_original_attachment_id', $attachment_ID );
 						else
 							$original_id = $attachment[0];
 					}
@@ -240,7 +256,64 @@ class MediaPlugin {
 		switch_to_blog( $current_site_id );
 
 		if( $main_site_id != $current_site_id && $original_id )
-			add_post_meta( $attachment_ID, '_wp_original_attachment_id', $original_id );
+			update_post_meta( $attachment_ID, '_wp_original_attachment_id', $original_id );
+
+		$this->prevent_recurssion = false;
+	}
+
+
+	/**
+	 * Unset thumbnail image
+	 * @param $post_ID
+	 * @return void
+	 */
+	public function editAttachment($post_ID )
+	{
+		if( $this->prevent_recurssion ){
+			return;
+		}
+
+		$this->prevent_recurssion = true;
+
+		global $wpdb;
+
+		$main_site_id = get_main_network_id();
+		$current_site_id = get_current_blog_id();
+
+		$original_attachment_id = $main_site_id == $current_site_id ? $post_ID : get_post_meta( $post_ID, '_wp_original_attachment_id', true );
+
+		if( !$original_attachment_id || empty( $_REQUEST['attachments'] ) || empty( $_REQUEST['attachments'][ $post_ID ] ) )
+			return;
+
+		$attachment_data = $_REQUEST['attachments'][ $post_ID ];
+
+		foreach ( get_sites() as $site ) {
+
+			$attachement_id = false;
+			if ( (int) $site->blog_id !== $current_site_id ) {
+
+				switch_to_blog( $site->blog_id );
+
+				if( $main_site_id == $site->blog_id ) {
+					$attachement_id = $original_attachment_id;
+				}
+				else
+				{
+					$results = $wpdb->get_results( "select `post_id` from $wpdb->postmeta where `meta_value` = '$original_attachment_id' AND `meta_key` = '_wp_original_attachment_id'", ARRAY_A );
+
+					if( !empty($results) )
+						$attachement_id = $results[0]['post_id'];
+				}
+
+				if( $attachement_id ){
+
+					foreach ($attachment_data as $key=>$value)
+						update_post_meta( $attachement_id, $key, $value );
+				}
+			}
+		}
+
+		switch_to_blog($current_site_id);
 
 		$this->prevent_recurssion = false;
 	}
@@ -307,6 +380,8 @@ class MediaPlugin {
 
 	/**
 	 * Get all thumbnails
+	 * @param bool $all
+	 * @return array
 	 */
 	private function getThumbnails($all=false)
 	{
@@ -335,6 +410,7 @@ class MediaPlugin {
 
 	/**
 	 * Remove all thumbnails
+	 * @param bool $all
 	 */
 	private function clearThumbnails($all=false)
 	{
@@ -399,9 +475,11 @@ class MediaPlugin {
 		exit;
 	}
 
-	
+
 	/**
 	 * Redefine upload dir
+	 * @param $dirs
+	 * @return mixed
 	 */
 	public function uploadDir($dirs)
 	{
@@ -418,6 +496,8 @@ class MediaPlugin {
 
 	/**
 	 * Redefine attachment url
+	 * @param $url
+	 * @return string
 	 */
 	public function attachmentUrl($url)
 	{
@@ -429,6 +509,8 @@ class MediaPlugin {
 
 	/**
 	 * Add relative key
+	 * @param $arr
+	 * @return mixed
 	 */
 	public static function add_relative_upload_dir_key( $arr )
 	{
@@ -442,6 +524,8 @@ class MediaPlugin {
 
 	/**
 	 * Resize image on upload to ensure max size
+	 * @param $image_data
+	 * @return mixed
 	 */
 	public function uploadResize( $image_data )
 	{
@@ -512,6 +596,7 @@ class MediaPlugin {
 				add_action('delete_attachment', [$this, 'deleteAttachment']);
 				add_filter('wp_update_attachment_metadata', [$this, 'updateAttachment'], 10, 2);
 				add_filter('wpmu_delete_blog_upload_dir', '__return_false' );
+				add_action('edit_attachment', [$this, 'editAttachment'], 10 ,2);
 			}
 		}
 	}
