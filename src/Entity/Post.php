@@ -51,7 +51,9 @@ class Post extends Entity
 		if( $post = $this->get($id) ) {
 
 			$this->import($post, false, 'post_');
-			$this->addCustomFields($id);
+			$this->content = wpautop($this->content);
+
+			$this->addCustomFields($post->ID);
 		}
 	}
 

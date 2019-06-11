@@ -69,3 +69,8 @@ th#mslscol{ width: 25px }
 .postbox-container .inside{ margin: 10px 0 }
 
 #msls_noncename ~ .button-secondary{ display: none }
+
+.select2-container--default .select2-selection--single { border-color: #ddd }
+.acf-field .acf-label label, .post-attributes-label, .acf-flexible-content .layout .acf-fc-layout-handle span{ font-weight: normal }
+.acf-flexible-content .layout .acf-fc-layout-handle, .acf-accordion .acf-accordion-title label{ font-weight: 600 }
+.acf-field.acf-accordion .acf-accordion-title{ padding: 9px }
