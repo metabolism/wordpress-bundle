@@ -168,6 +168,19 @@ class Image extends Entity
 
 
 	/**
+	 * @param int $w
+	 * @param int $h
+	 * @return string
+	 */
+	private function placeholder($w, $h=0){
+
+		$width = $w == 0 ? 1280 : $w;
+		$height = $h > 0 ? 'x'.$h : '';
+
+		return 'https://via.placeholder.com/'.$width.$height.'.jpg';
+	}
+
+	/**
 	 * @param $w
 	 * @param int $h
 	 * @param bool $sources
@@ -175,8 +188,8 @@ class Image extends Entity
 	 */
 	public function toHTML($w, $h=0, $sources=false, $params=false){
 
-		if( !file_exists($this->src) )
-			return '<img src="/404.png" alt="image not found">';
+		if( empty($this->src) || !file_exists($this->src) )
+			return '<img src="'.$this->placeholder($w, $h).'" alt="image not found or empty">';
 
 		$ext = function_exists('imagewebp') ? 'webp' : null;
 		$mime = function_exists('imagewebp') ? 'image/webp' : $this->mime_type;
@@ -216,11 +229,11 @@ class Image extends Entity
 	 */
 	protected function crop($w, $h=0, $ext=null, $params=false){
 
+		if( empty($this->src) || !file_exists($this->src) )
+			return $this->placeholder($w, $h);
+
 		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
 			$this->focus_point = false;
-
-		if( !file_exists($this->src) )
-			return '/404.png';
 
 		$src_ext = pathinfo($this->src, PATHINFO_EXTENSION);
 

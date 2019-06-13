@@ -35,6 +35,9 @@ class NoticePlugin {
 				$notices [] = $folder.' folder is not writable';
 		}
 
+		if( get_option( 'siteurl' ) !== get_home_url() )
+			$notices [] = 'Site url and Home url are different, please check your database configuration';
+
 		if( !empty($notices) )
 			echo '<div class="error"><p>'.implode('<br/>', $notices ).'</p></div>';
 	}

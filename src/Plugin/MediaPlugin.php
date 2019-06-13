@@ -516,7 +516,9 @@ class MediaPlugin {
 	{
 		$arr['url'] = str_replace('edition/../', '', $arr['url']);
 		$arr['baseurl'] = str_replace('edition/../', '', $arr['baseurl']);
-		$arr['relative'] = str_replace(get_home_url(), '', $arr['baseurl']);
+		
+		$arr['relative'] = str_replace(get_home_url(null,'','http'), '', $arr['baseurl']);
+		$arr['relative'] = str_replace(get_home_url(null,'','https'), '', $arr['relative']);
 
 		return $arr;
 	}

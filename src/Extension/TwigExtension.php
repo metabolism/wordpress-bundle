@@ -9,6 +9,7 @@
 
 namespace Metabolism\WordpressBundle\Extension;
 
+use Metabolism\WordpressBundle\Entity\Image;
 use Twig\Extension\AbstractExtension,
 	Twig\TwigFilter,
 	Twig\TwigFunction;
@@ -19,6 +20,7 @@ class TwigExtension extends AbstractExtension{
 	{
 		return [
 			new TwigFilter( "more", [$this, 'more'] ),
+			new TwigFilter( "placeholder", [$this, 'placeholder'] )
 		];
 	}
 
@@ -95,5 +97,18 @@ class TwigExtension extends AbstractExtension{
 	public function more($text, $cta='Lire la suite')
 	{
 		return str_replace('<p><!--more--></p>', '<more cta="'.$cta.'">'.$text.'</more>', $text);
+	}
+
+
+	/**
+	 * @param $image
+	 * @return Image
+	 */
+	public function placeholder($image, $params=false)
+	{
+		if( !$image || !$image instanceof Image )
+			return new Image();
+
+		return $image;
 	}
 }
