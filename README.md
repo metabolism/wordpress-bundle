@@ -259,6 +259,17 @@ Image entity provide a nice on the fly resize function, add width and height to 
 <img src="{{ post.thumbnail.resize(800, 0) }}" alt="{{ post.thumbnail.alt }}">
 ```
 
+Generate picture element ( width, height, media queries ), it use wepb if enabled in PHP
+```twig
+data.image.toHTML(664, 443, {'max-width: 1023px':[438,246]})|raw 
+(data.image|default|placeholder).toHTML(664, 443, {'max-width: 1023px':[438,246]})|raw 
+```
+
+Use a placeholder if the image doesn't exists
+```twig
+<img src="{{ (post.thumbnail|default|placeholder).resize(800, 0) }}" alt="{{ post.thumbnail.alt }}">
+```
+
 ### Custom posts
 
 Custom posts can extend the `Post` entity to add some preprocess or new functions,
@@ -334,12 +345,9 @@ You must declare a new repository like bellow
         "name": "elliotcondon/advanced-custom-fields-pro",
         "version": "5.7.10",
         "type": "wordpress-plugin",
-        "dist": {
-          "type": "zip",
-          "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download"
-        },
+        "dist": {"type": "zip", "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download&k={%ACF_PRO_KEY}&t={%version}"},
         "require": {
-          "philippbaschke/acf-pro-installer": "^1.0",
+          "ffraenz/private-composer-installer": "^2.0",
           "composer/installers": "^1.0"
         }
       }

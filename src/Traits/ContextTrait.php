@@ -392,10 +392,15 @@ Trait ContextTrait
 		}
 
 		if( $callback && is_callable($callback) )
-			array_map($callback, $raw_posts);
+			$raw_posts = array_map($callback, $raw_posts);
 
-		foreach ($raw_posts as $post)
+		foreach ($raw_posts as $post){
+
+			if( isset($post->ID) )
 			$posts[$post->ID] = $post;
+			else
+				$posts[] = $post;
+		}
 
 		if( !isset($this->data[$key]) )
 			$this->data[$key] = $posts;
