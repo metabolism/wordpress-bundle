@@ -150,8 +150,7 @@ class ACF
 				break;
 
 			case 'post':
-				$post_status = get_post_status( $id );
-				$value = ( $post_status && $post_status !== 'publish' ) ? false : PostFactory::create( $id );
+				$value = PostFactory::create( $id );
 				break;
 
 			case 'user':

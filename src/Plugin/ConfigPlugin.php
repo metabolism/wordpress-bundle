@@ -37,10 +37,15 @@ class ConfigPlugin {
 
 		$is_admin = is_admin();
 
+		$current_blog_id = get_current_blog_id();
+
 		foreach ( $this->config->get('post_type', []) as $post_type => $args )
 		{
 			if( $post_type != 'post' && $post_type != 'page' )
 			{
+				if( (isset($args['enable_for_blogs']) && !in_array($current_blog_id, (array)$args['enable_for_blogs'])) || (isset($args['disable_for_blogs']) && in_array($current_blog_id, (array)$args['disable_for_blogs'])))
+					continue;
+
 				$args = array_merge($default_args, $args);
 				$name = str_replace('_', ' ', $post_type);
 

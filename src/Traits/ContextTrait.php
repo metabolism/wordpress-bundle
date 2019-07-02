@@ -576,7 +576,7 @@ Trait ContextTrait
 		}
 
 		if( $callback && is_callable($callback) )
-			array_map($callback, $terms);
+			$terms = array_map($callback, $terms);
 
 		if( !isset($this->data[$key]) )
 			$this->data[$key] = $terms;
