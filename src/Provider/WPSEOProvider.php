@@ -83,9 +83,6 @@ class WPSEOProvider
 	 */
 	public function __construct()
 	{
-		if( !class_exists( 'WPSEO' ) )
-			return;
-
 		add_action( 'admin_init', [$this, 'init'] );
 
 		if( is_admin() ) {
@@ -93,7 +90,8 @@ class WPSEOProvider
 		}
 		else{
 			add_action('init', function() {
-				if( method_exists( 'WPSEO_Frontend', 'debug_mark' ) )
+
+				if( class_exists( 'WPSEO_Frontend' ) && method_exists( 'WPSEO_Frontend', 'debug_mark' ) )
 					remove_action( 'wpseo_head', [\WPSEO_Frontend::get_instance(), 'debug_mark'], 2);
 			});
 
