@@ -9,6 +9,8 @@ namespace Metabolism\WordpressBundle\Provider;
  */
 class WPSEOProvider
 {
+	public static $preventRecursion=false;
+
 	/**
 	 * Disable editor options for seo taxonomy edition
 	 */
@@ -57,13 +59,15 @@ class WPSEOProvider
 	 */
 	public function changeTermsOrder($terms, $postID, $taxonomy){
 
-		if ( class_exists('WPSEO_Primary_Term') ) {
+		if ( class_exists('WPSEO_Primary_Term') && !self::$preventRecursion ) {
+
+			self::$preventRecursion = true;
 
 			$wpseo_primary_term = new \WPSEO_Primary_Term( $taxonomy, $postID);
-
-			if( $wpseo_primary_term ){
-
 				$primary_term_id = $wpseo_primary_term->get_primary_term();
+
+			if( $primary_term_id ){
+
 				foreach ($terms as $key=>$term){
 
 					if( $term->term_id == $primary_term_id)
@@ -72,6 +76,8 @@ class WPSEOProvider
 
 				$terms = array_merge([$primary_term_id], $terms);
 			}
+
+			self::$preventRecursion = false;
 		}
 
 		return $terms;
