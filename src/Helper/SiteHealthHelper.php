@@ -85,11 +85,13 @@ class SiteHealth {
 
 	private function checkPosts(){
 
+		//todo: check post taxonomy
+		
 		global $wp_post_types, $wp_rewrite;
 
 		foreach ($wp_post_types as $post_type)
 		{
-			if( $post_type->public && isset($wp_rewrite->extra_permastructs[$post_type->name]) ){
+			if( $post_type->public && $post_type->publicly_queryable && isset($wp_rewrite->extra_permastructs[$post_type->name]) ){
 
 				$posts = get_posts(['post_type'=>$post_type->name, 'numberposts'=>1]);
 
@@ -130,7 +132,8 @@ class SiteHealth {
 
 		foreach ($wp_taxonomies as $taxonomy){
 
-			if( $taxonomy->public && isset($wp_rewrite->extra_permastructs[$taxonomy->name]) ){
+			//todo: better category handle
+			if( $taxonomy->public && $taxonomy->publicly_queryable && $taxonomy->name != 'category' && isset($wp_rewrite->extra_permastructs[$taxonomy->name]) ){
 
 				$terms = get_terms(['taxonomy'=>$taxonomy->name, 'number'=>1]);
 

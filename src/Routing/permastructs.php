@@ -32,7 +32,7 @@ class Permastruct{
 
 		foreach ($wp_post_types as $post_type)
 		{
-			if( $post_type->public ){
+			if( $post_type->public && $post_type->publicly_queryable ){
 
 				if( isset($this->wp_rewrite->extra_permastructs[$post_type->name]) ){
 
@@ -63,7 +63,7 @@ class Permastruct{
 
 		foreach ($wp_taxonomies as $taxonomy){
 
-			if( $taxonomy->public ){
+			if( $taxonomy->public && $taxonomy->publicly_queryable ){
 
 				if( isset($this->wp_rewrite->extra_permastructs[$taxonomy->name]) ){
 
