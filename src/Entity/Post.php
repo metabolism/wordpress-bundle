@@ -151,6 +151,20 @@ class Post extends Entity
 
 
 	/**
+	 * Get parent post
+	 *
+	 * @return Post|false
+	 */
+	public function getParent() {
+
+		if( $this->parent )
+			return PostFactory::create($this->parent);
+
+		return false;
+	}
+
+
+	/**
 	 * Get previous post
 	 * See: https://developer.wordpress.org/reference/functions/get_previous_post/
 	 *
@@ -242,10 +256,13 @@ class Post extends Entity
 			return $term_array;
 	}
 
-
-	/*
-	 * Retro compatibility
+	/**
+	 * @deprecated
 	 */
 	public function get_terms( $tax='' ) { return $this->getTerms($tax); }
+
+	/**
+	 * @deprecated
+	 */
 	public function get_term( $tax='' ) { return $this->getTerm($tax); }
 }
