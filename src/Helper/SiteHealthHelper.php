@@ -10,11 +10,14 @@ class SiteHealth {
 	private $has_error = false;
 	private $base_url = '';
 	private $output = false;
+	private $full = false;
 
 	public function __construct(){
 
 		$this->base_url = get_home_url();
 		$this->output = $_REQUEST['output']??false;
+		$this->full = $_REQUEST['full']??false;
+		$this->password = $_SERVER['APP_PASSWORD']??false;
 	}
 
 	public function check(){
@@ -23,7 +26,7 @@ class SiteHealth {
 
 		$this->checkPosts();
 		$this->checkTaxonomies();
-		$this->checkPages();
+		$this->checkPagesWithState();
 		
 		if( !$this->output ){
 			$output = $this->has_error ? '0' : '1';
@@ -33,6 +36,8 @@ class SiteHealth {
 		}
 
 		$response = new Response($output, $this->has_error ? 406 : 200);
+		$response->setSharedMaxAge(0);
+
 		return $response;
 	}
 
@@ -46,12 +51,12 @@ class SiteHealth {
 		$html .= '<style type="text/css">body{ padding: 20px; font-family: Roboto, sans-serif }</style>';
 		$html .= '</head>';
 		$html .= '<body><table class="pure-table pure-table-striped" style="width:100%">';
-		$html .= '<thead><tr><th>Label</th><th>Url</th><th style="text-align:center">Code</th><th style="text-align:center">Empty?</th></tr></thead>';
+		$html .= '<thead><tr><th>Label</th><th>Url</th><th style="text-align:center">Code</th><th style="text-align:center">Empty</th><th style="text-align:center">Body tag</th></tr></thead>';
 
 		$i=0;
 		foreach ( $this->status as $status){
 
-			$html .= '<tr><td>'.$status['label'].'</td><td><a href="'.$this->base_url.$status['url'].'" target="_blank">'.$status['url'].'</a></td><td style="text-align:center;color:'.($status['code']!=200?'red':'').'">'.$status['code'].'</td><td style="text-align:center">'.($status['empty']?'yes':'no').'</td></tr>';
+			$html .= '<tr><td>'.$status['label'].'</td><td><a href="'.$this->base_url.$status['url'].'" target="_blank">'.$status['url'].'</a></td><td style="text-align:center;color:'.($status['code']!=200?'red':'').'">'.$status['code'].'</td><td style="text-align:center">'.($status['empty']?'yes':'no').'</td><td style="text-align:center">'.($status['body']>0?'yes':'no').'</td></tr>';
 			$i++;
 		}
 
@@ -65,7 +70,8 @@ class SiteHealth {
 		if( is_wp_error($url) )
 			return;
 
-		$response = wp_remote_get($this->base_url.$url);
+		$response = wp_remote_get($this->base_url.$url.($this->password?'?APP_PASSWORD='.$this->password:''), ['timeout'=>30]);
+
 		$response_code = wp_remote_retrieve_response_code( $response );
 		$response_body = wp_remote_retrieve_body( $response );
 
@@ -73,10 +79,11 @@ class SiteHealth {
 			'label'=>$label,
 			'url'=>$url,
 			'code'=>$response_code,
-			'empty'=>empty($response_body)
+			'empty'=>empty($response_body),
+			'body'=>strpos($response_body, '</body>')
 		];
 
-		$status['valid'] = $status['code']==200 && !$status['empty'];
+		$status['valid'] = $status['code']==200 && !$status['empty'] && $status['body']>0;
 
 		$this->has_error = $this->has_error || !$status['valid'];
 
@@ -85,19 +92,18 @@ class SiteHealth {
 
 	private function checkPosts(){
 
-		//todo: check post taxonomy
-		
 		global $wp_post_types, $wp_rewrite;
 
 		foreach ($wp_post_types as $post_type)
 		{
-			if( $post_type->public && $post_type->publicly_queryable && isset($wp_rewrite->extra_permastructs[$post_type->name]) ){
+			if( $post_type->public && ($post_type->publicly_queryable || $post_type->name == 'page') && !in_array($post_type->name, ['attachment']) ){
 
-				$posts = get_posts(['post_type'=>$post_type->name, 'numberposts'=>1]);
+				$posts = get_posts(['post_type'=>$post_type->name, 'numberposts'=>($this->full?-1:1)]);
 
 				if( count($posts) ){
 
-					$url = get_post_permalink($posts[0]);
+					$url = get_permalink($posts[0]);
+
 					$this->getStatus('Post '.$post_type->name, $url);
 				}
 				
@@ -110,7 +116,11 @@ class SiteHealth {
 		}
 	}
 
-	private function checkPages(){
+	private function checkPagesWithState(){
+
+		//allready checked with checkPosts
+		if( $this->full )
+			return;
 
 		global $_config;
 
@@ -133,9 +143,9 @@ class SiteHealth {
 		foreach ($wp_taxonomies as $taxonomy){
 
 			//todo: better category handle
-			if( $taxonomy->public && $taxonomy->publicly_queryable && $taxonomy->name != 'category' && isset($wp_rewrite->extra_permastructs[$taxonomy->name]) ){
+			if( $taxonomy->public && $taxonomy->publicly_queryable && !in_array($taxonomy->name, ['post_tag','post_format','category']) ){
 
-				$terms = get_terms(['taxonomy'=>$taxonomy->name, 'number'=>1]);
+				$terms = get_terms(['taxonomy'=>$taxonomy->name, 'number'=>($this->full?-1:1)]);
 
 				if( count($terms) ){
 
