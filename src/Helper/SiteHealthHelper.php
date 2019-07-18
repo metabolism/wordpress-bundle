@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Helper;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class SiteHealth {
@@ -22,20 +23,26 @@ class SiteHealth {
 
 	public function check(){
 
-		$this->getStatus( 'Home', '/' );
-
 		$this->checkPosts();
 		$this->checkTaxonomies();
 		$this->checkPagesWithState();
 		
+		$status = $this->has_error ? 406 : 200;
+
 		if( !$this->output ){
-			$output = $this->has_error ? '0' : '1';
+			$content = $this->has_error ? '0' : '1';
 		}
 		else{
-			$output = $this->_toHTML();
+			if( $this->output == 'json' ){
+				$content = ['has_error'=>$this->has_error, 'status'=>$this->status];
+				$response = new JsonResponse($content, $status);
+		}
+		else{
+				$content = $this->_toHTML();
+				$response = new Response($content, $status);
+			}
 		}
 
-		$response = new Response($output, $this->has_error ? 406 : 200);
 		$response->setSharedMaxAge(0);
 
 		return $response;
@@ -51,14 +58,10 @@ class SiteHealth {
 		$html .= '<style type="text/css">body{ padding: 20px; font-family: Roboto, sans-serif }</style>';
 		$html .= '</head>';
 		$html .= '<body><table class="pure-table pure-table-striped" style="width:100%">';
-		$html .= '<thead><tr><th>Label</th><th>Url</th><th style="text-align:center">Code</th><th style="text-align:center">Empty</th><th style="text-align:center">Body tag</th></tr></thead>';
+		$html .= '<thead><tr><th>Label</th><th>Url</th><th style="text-align:center">Code</th><th style="text-align:center">Empty</th><th style="text-align:center">Body</th><th style="text-align:center">Timing</th></tr></thead>';
 
-		$i=0;
-		foreach ( $this->status as $status){
-
-			$html .= '<tr><td>'.$status['label'].'</td><td><a href="'.$this->base_url.$status['url'].'" target="_blank">'.$status['url'].'</a></td><td style="text-align:center;color:'.($status['code']!=200?'red':'').'">'.$status['code'].'</td><td style="text-align:center">'.($status['empty']?'yes':'no').'</td><td style="text-align:center">'.($status['body']>0?'yes':'no').'</td></tr>';
-			$i++;
-		}
+		foreach ( $this->status as $status)
+			$html .= '<tr><td>'.$status['label'].'</td><td><a href="'.$this->base_url.$status['url'].'" target="_blank">'.$status['url'].'</a></td><td style="text-align:center;color:'.($status['code']!=200?'red':'').'">'.$status['code'].'</td><td style="text-align:center">'.($status['empty']?'yes':'no').'</td><td style="text-align:center">'.($status['body']>0?'yes':'no').'</td><td style="text-align:center">'.$status['response_time'].'ms</td></tr>';
 
 		$html .= '<table></body></html>';
 
@@ -70,17 +73,21 @@ class SiteHealth {
 		if( is_wp_error($url) )
 			return;
 
+		$time_start = microtime(true);
 		$response = wp_remote_get($this->base_url.$url.($this->password?'?APP_PASSWORD='.$this->password:''), ['timeout'=>30]);
+		$time_end = microtime(true);
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 		$response_body = wp_remote_retrieve_body( $response );
+		$response_headers = wp_remote_retrieve_headers( $response );
 
 		$status = [
 			'label'=>$label,
 			'url'=>$url,
 			'code'=>$response_code,
+			'response_time'=>round($time_end*1000-$time_start*1000),
 			'empty'=>empty($response_body),
-			'body'=>strpos($response_body, '</body>')
+			'body'=>strpos($response_body, '</body>')>0
 		];
 
 		$status['valid'] = $status['code']==200 && !$status['empty'] && $status['body']>0;
@@ -98,12 +105,11 @@ class SiteHealth {
 		{
 			if( $post_type->public && ($post_type->publicly_queryable || $post_type->name == 'page') && !in_array($post_type->name, ['attachment']) ){
 
-				$posts = get_posts(['post_type'=>$post_type->name, 'numberposts'=>($this->full?-1:1)]);
+				$posts = get_posts(['post_type'=>$post_type->name, 'posts_per_page'=>($this->full?-1:1)]);
 
-				if( count($posts) ){
+				foreach ($posts as $post){
 
-					$url = get_permalink($posts[0]);
-
+					$url = get_permalink($post);
 					$this->getStatus('Post '.$post_type->name, $url);
 				}
 				
@@ -117,10 +123,6 @@ class SiteHealth {
 	}
 
 	private function checkPagesWithState(){
-
-		//allready checked with checkPosts
-		if( $this->full )
-			return;
 
 		global $_config;
 
@@ -136,6 +138,8 @@ class SiteHealth {
 			$url = get_page_link($page);
 			$this->getStatus('State '.$state, $url);
 		}
+
+		$this->getStatus( 'Home', '/' );
 	}
 
 	private function checkTaxonomies(){
@@ -148,11 +152,11 @@ class SiteHealth {
 			//todo: better category handle
 			if( $taxonomy->public && $taxonomy->publicly_queryable && !in_array($taxonomy->name, ['post_tag','post_format','category']) ){
 
-				$terms = get_terms(['taxonomy'=>$taxonomy->name, 'number'=>($this->full?-1:1)]);
+				$terms = get_terms(['taxonomy'=>$taxonomy->name, 'number'=>($this->full?0:1)]);
 
-				if( count($terms) ){
+				foreach ($terms as $term){
 
-					$url = get_term_link($terms[0], $taxonomy->name);
+					$url = get_term_link($term, $taxonomy->name);
 					$this->getStatus('Taxonomy '.$taxonomy->name, $url);
 				}
 			}
