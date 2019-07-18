@@ -130,6 +130,9 @@ class SiteHealth {
 
 			$page = get_option('page_on_'.$state);
 
+			if( !$page || is_wp_error($page) )
+				continue;
+
 			$url = get_page_link($page);
 			$this->getStatus('State '.$state, $url);
 		}

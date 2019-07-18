@@ -149,8 +149,8 @@ acf:
 support:
   - templates #uncomment for api only backoffice
   - post_thumbnails #add post thumbnails to page
+  - page #enable page
 #  - post #enable post
-#  - page #enable page
 
 ## Declare menus
 menu:
