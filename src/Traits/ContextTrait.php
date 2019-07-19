@@ -145,7 +145,7 @@ Trait ContextTrait
 
 		$this->data = [
 			'debug'              => WP_DEBUG,
-			'environment'        => $this->config->get('environment', 'production'),
+			'environment'        => WP_ENV,
 			'locale'             => count($language) ? $language[0] : 'en',
 			'language'           => $blog_language,
 			'is_admin'           => current_user_can('manage_options'),

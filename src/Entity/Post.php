@@ -5,6 +5,7 @@ namespace Metabolism\WordpressBundle\Entity;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
+use Metabolism\WordpressBundle\Helper\Query;
 
 /**
  * Class Post
@@ -102,14 +103,29 @@ class Post extends Entity
 
 
 	/**
-	 * Get sibling post
+	 * Get sibling post using wordpress natural order
+	 * @param $args
+	 * @param $loop
+	 * @return array[
+	 *  'prev' => Post,
+	 *  'next' => Post
+	 * ]|false
+	 */
+	public function adjacents($args=[], $loop=false){
+
+		return Query::get_adjacent_posts($this->ID, $args, $loop);
+	}
+
+
+	/**
+	 * Get sibling post using date order
 	 * @param $direction
 	 * @param $in_same_term
 	 * @param $excluded_terms
 	 * @param $taxonomy
 	 * @return Post|false
 	 */
-	protected function getSibling($direction, $in_same_term , $excluded_terms, $taxonomy){
+	protected function getSibling($direction, $in_same_term = false , $excluded_terms = '', $taxonomy = 'category'){
 
 		global $post;
 		
