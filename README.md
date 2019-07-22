@@ -56,6 +56,7 @@ From the bundle itself :
 * Image filename clean on upload
 * Custom datatable support with view and delete actions in admin
 * Extensible, entities, controller and bundle plugins can be extended in the app
+* Site health checker
  
  
 Drawbacks
@@ -243,8 +244,9 @@ ACF fields are directly available so let say you've added a `copyright` text fie
 Available functions :
 - next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category')
 - prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category')
-- get_term( $tax='' )
-- get_terms( $tax='' )
+- getTerm( $tax='' )
+- getTerms( $tax='' )
+- getParent()
 
 ### Image
 
@@ -399,15 +401,21 @@ This file allow you to manage :
  * Post type templates
 
         
+Site health
+-----------
+
+You can check site health using `/_site-health`, url
+options are:
+- output : 1 | json
+- full : 0 | 1
+
+        
 Roadmap
 --------
 
 * Woo-commerce Provider rework + samples
 * Global maintenance mode for multi-site
-* Better Symfony 4.1 Support
 * Unit tests
-* Better code comments
-* Post/Term/User Repository
        
        
 Why not using Bedrock
