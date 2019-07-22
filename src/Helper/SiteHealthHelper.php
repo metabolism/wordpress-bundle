@@ -140,11 +140,13 @@ class SiteHealth {
 
 		global $wp_post_types, $wp_rewrite;
 
+		$home = get_option('page_on_front');
+
 		foreach ($wp_post_types as $post_type)
 		{
 			if( $post_type->public && ($post_type->publicly_queryable || $post_type->name == 'page') && !in_array($post_type->name, ['attachment']) ){
 
-				$posts = get_posts(['post_type'=>$post_type->name, 'posts_per_page'=>($this->full?-1:1)]);
+				$posts = get_posts(['post_type'=>$post_type->name, 'exclude'=>$home, 'posts_per_page'=>($this->full?-1:1)]);
 
 				foreach ($posts as $post){
 
