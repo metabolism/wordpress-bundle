@@ -80,9 +80,23 @@ namespace Metabolism\WordpressBundle\Plugin {
 				$wp_admin_bar->add_node( $args );
 
 			}, 999 );
+
+			if ( current_user_can('administrator') ){
+
+				add_action( 'admin_bar_menu', function( $wp_admin_bar ) {
+					$args = [
+						'id'    => 'cache',
+						'title' => __('Clear cache'),
+						'href'  => get_admin_url().'?clear_cache'
+					];
+
+					$wp_admin_bar->add_node( $args );
+
+				}, 999 );
+			}
 		}
 
-
+		
 		/**
 		 * CachePlugin constructor.
 		 * @param Data $config
@@ -96,6 +110,9 @@ namespace Metabolism\WordpressBundle\Plugin {
 
 			if( isset($_GET['purge_cache']) )
 				$this->purge();
+
+			if( isset($_GET['clear_cache']) && current_user_can('administrator') )
+				$this->cacheHelper->clear();
 
 			if( !$debug ) {
 
