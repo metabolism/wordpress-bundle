@@ -12,32 +12,28 @@ namespace Metabolism\WordpressBundle\Plugin {
 	class CachePlugin
 	{
 
-		private $noticeMessage,  $errorMessage;
+		private $noticeMessage,  $errorMessage, $cacheHelper;
+
 
 		/**
 		 * Add maintenance button and checkbox
 		 */
 		public function purgeCache($pid=false)
 		{
-			$url = false;
-
 			if( $pid ){
 
 				$post = get_post($pid);
 
-				if( $post->post_status === 'publish' ){
+				if( $post && $post->post_status === 'publish' ){
 
 					$home_url = get_home_url(null);
 					$url = $home_url.get_permalink($pid);
+
+					return $this->purge($url);
 				}
 			}
-			else{
 
-				$url = get_home_url(null, '*');
-			}
-
-			if( $url )
-				$this->purgeUrl($url);
+			return false;
 		}
 
 
@@ -54,13 +50,14 @@ namespace Metabolism\WordpressBundle\Plugin {
 		/**
 		 * Add maintenance button and checkbox
 		 */
-		private function purgeUrl($url)
+		private function purge($url=false)
 		{
-			$args = ['method' => 'PURGE', 'headers' => ['Host' => $_SERVER['HTTP_HOST']], 'sslverify' => false];
+			$response = $this->cacheHelper->purge($url);
+
+			if( !$url )
+				$url = get_home_url(null, '*');
 
 			$url = str_replace($_SERVER['HTTP_HOST'], $_SERVER['SERVER_ADDR'], $url);
-
-			$response = wp_remote_request($url, $args);
 
 			if ( is_wp_error($response) ) {
 				$this->errorMessage = $url.' : '.$response->get_error_code().' '.$response->get_error_message();
@@ -93,16 +90,6 @@ namespace Metabolism\WordpressBundle\Plugin {
 
 
 		/**
-		 * Clear cache folder
-		 */
-		private function clearCacheFolder(){
-
-			$cacheHelper = new Cache();
-			$cacheHelper->purge();
-		}
-
-
-		/**
 		 * CachePlugin constructor.
 		 * @param Data $config
 		 */
@@ -111,10 +98,12 @@ namespace Metabolism\WordpressBundle\Plugin {
 			$env = $_SERVER['APP_ENV'] ?? 'dev';
 			$debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env));
 
+			$this->cacheHelper = new Cache();
+
 			if( isset($_GET['purge_cache']) ){
 
-				$this->purgeCache();
-				$this->clearCacheFolder();
+				$this->cacheHelper->remove();
+				$this->purge();
 			}
 
 			if( !$debug ) {

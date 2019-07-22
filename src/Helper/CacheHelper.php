@@ -13,11 +13,13 @@ class Cache {
 	}
 
 	/**
-	 * Clear cache url
+	 * Clear cache completely
 	 */
 	public function clear(){
 
-		if( $this->purge() )
+		$response = $this->purge();
+
+		if( $this->remove() && !is_wp_error($response) )
 			$response = new Response('1');
 		else
 			$response = new Response('0', 500);
@@ -27,9 +29,9 @@ class Cache {
 	}
 
 	/**
-	 * Purge cache
+	 * Remove cache folder
 	 */
-	public function purge(){
+	public function remove(){
 
 		if( !empty(BASE_URI) ){
 
@@ -40,6 +42,23 @@ class Cache {
 		return false;
 	}
 
+
+	/**
+	 * Purge cache
+	 */
+	public function purge($url=false){
+
+		if( !$url )
+			$url = get_home_url(null, '*');
+
+		$args = ['method' => 'PURGE', 'headers' => ['Host' => $_SERVER['HTTP_HOST']], 'sslverify' => false];
+
+		$url = str_replace($_SERVER['HTTP_HOST'], $_SERVER['SERVER_ADDR'], $url);
+
+		return wp_remote_request($url, $args);
+	}
+
+	
 	/**
 	 * Recursive rmdir
 	 * @param string $dir
