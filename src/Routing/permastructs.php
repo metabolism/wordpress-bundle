@@ -110,7 +110,9 @@ class Permastruct{
 		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
 
 		$this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealth::check');
-		$this->addRoute('cache-clear', '_clear-cache', [], false, 'Metabolism\WordpressBundle\Helper\Cache::clear');
+
+		$this->addRoute('cache-purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\Cache::purge');
+		$this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\Cache::clear');
 	}
 
 

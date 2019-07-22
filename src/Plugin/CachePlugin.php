@@ -49,22 +49,16 @@ namespace Metabolism\WordpressBundle\Plugin {
 
 		/**
 		 * Add maintenance button and checkbox
+		 * @param bool $url
 		 */
 		private function purge($url=false)
 		{
-			$response = $this->cacheHelper->purge($url);
+			$response = $this->cacheHelper->purgeUrl($url);
 
-			if( !$url )
-				$url = get_home_url(null, '*');
-
-			$url = str_replace($_SERVER['HTTP_HOST'], $_SERVER['SERVER_ADDR'], $url);
-
-			if ( is_wp_error($response) ) {
+			if ( is_wp_error($response) )
 				$this->errorMessage = $url.' : '.$response->get_error_code().' '.$response->get_error_message();
-			} elseif ( is_array($response) and isset($response['response']) ) {
+			elseif ( is_array($response) and isset($response['response']) )
 				$this->noticeMessage = $url.' : '.$response['response']['code'].' '.$response['response']['message'];
-			}
-
 
 			add_action('admin_notices', [$this, 'purgeMessage'], 999);
 		}
@@ -100,11 +94,8 @@ namespace Metabolism\WordpressBundle\Plugin {
 
 			$this->cacheHelper = new Cache();
 
-			if( isset($_GET['purge_cache']) ){
-
-				$this->cacheHelper->remove();
+			if( isset($_GET['purge_cache']) )
 				$this->purge();
-			}
 
 			if( !$debug ) {
 

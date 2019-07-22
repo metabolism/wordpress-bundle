@@ -410,10 +410,12 @@ options are:
 - full : 0 | 1
 
         
-Clear cache
+Cache
 -----------
 
-You can completely remove cache using `/_clear-cache`, url or using purge cache button in backoffice
+You can purge cache using `/_cache/purge`, url or using purge cache button in backoffice
+
+You can completely remove and purge cache using `/_cache/clear`, url
 
         
 Roadmap

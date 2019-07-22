@@ -2,24 +2,39 @@
 
 namespace Metabolism\WordpressBundle\Helper;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class Cache {
 
-	public function __construct(){
+	public function __construct(){}
 
-		$this->output = $_REQUEST['output']??false;
-	}
 
 	/**
 	 * Clear cache completely
 	 */
 	public function clear(){
 
-		$response = $this->purge();
+		$status = $this->purge() && $this->rrmdir(BASE_URI.'/var/cache');
 
-		if( $this->remove() && !is_wp_error($response) )
+		if( $status )
+			$response = new Response('1');
+		else
+			$response = new Response('0', 500);
+
+		$response->setSharedMaxAge(0);
+
+		return $response;
+	}
+
+
+	/**
+	 * Purge cache
+	 */
+	public function purge(){
+
+		$status = $this->purgeUrl();
+
+		if( !is_wp_error($status) )
 			$response = new Response('1');
 		else
 			$response = new Response('0', 500);
@@ -28,25 +43,13 @@ class Cache {
 		return $response;
 	}
 
-	/**
-	 * Remove cache folder
-	 */
-	public function remove(){
-
-		if( !empty(BASE_URI) ){
-
-			$this->rrmdir(BASE_URI.'/var/cache');
-			return true;
-		}
-
-		return false;
-	}
-
 
 	/**
 	 * Purge cache
+	 * @param bool $url
+	 * @return array|\WP_Error
 	 */
-	public function purge($url=false){
+	public function purgeUrl($url=false){
 
 		if( !$url )
 			$url = get_home_url(null, '*');
@@ -58,24 +61,29 @@ class Cache {
 		return wp_remote_request($url, $args);
 	}
 
-	
+
 	/**
 	 * Recursive rmdir
 	 * @param string $dir
+	 * @return bool
 	 */
 	private function rrmdir($dir) {
+
+		$status = true;
 
 		if (is_dir($dir)) {
 			$objects = scandir($dir);
 			foreach ($objects as $object) {
 				if ($object != "." && $object != "..") {
 					if (is_dir($dir."/".$object))
-						$this->rrmdir($dir."/".$object);
+						$status = $this->rrmdir($dir."/".$object) && $status;
 					else
-						unlink($dir."/".$object);
+						$status = @unlink($dir."/".$object) && $status;
 				}
 			}
-			rmdir($dir);
+			$status = rmdir($dir) && $status;
 		}
+
+		return $status;
 	}
 }
