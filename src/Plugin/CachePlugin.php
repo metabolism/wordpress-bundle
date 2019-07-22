@@ -37,19 +37,18 @@ namespace Metabolism\WordpressBundle\Plugin {
 		}
 
 
-		public function purgeMessage()
+		public function message()
 		{
 			if( !empty($this->noticeMessage) )
-				echo '<div id="message" class="updated fade"><p><strong>' . __('Cache purge') . '</strong><br />' . $this->noticeMessage . '</p></div>';
+				echo '<div id="message" class="updated fade"><p><strong>' . __('Cache') . '</strong><br />' . $this->noticeMessage . '</p></div>';
 
 			if( !empty($this->errorMessage) )
-				echo '<div id="message" class="error fade"><p><strong>' . __('Cache purge') . '</strong><br />' . $this->errorMessage . '</p></div>';
+				echo '<div id="message" class="error fade"><p><strong>' . __('Cache') . '</strong><br />' . $this->errorMessage . '</p></div>';
 		}
 
 
 		/**
-		 * Add maintenance button and checkbox
-		 * @param bool $url
+		 * Purge cache
 		 */
 		private function purge($url=false)
 		{
@@ -60,7 +59,23 @@ namespace Metabolism\WordpressBundle\Plugin {
 			elseif ( is_array($response) and isset($response['response']) )
 				$this->noticeMessage = $url.' : '.$response['response']['code'].' '.$response['response']['message'];
 
-			add_action('admin_notices', [$this, 'purgeMessage'], 999);
+			add_action('admin_notices', [$this, 'message'], 999);
+		}
+
+
+		/**
+		 * Clear cache
+		 */
+		private function clear()
+		{
+			$response = $this->cacheHelper->clear();
+
+			if ( !$response )
+				$this->errorMessage = 'Unable to clear cache';
+			else
+				$this->noticeMessage = 'Cleared';
+
+			add_action('admin_notices', [$this, 'message'], 999);
 		}
 
 
@@ -72,31 +87,28 @@ namespace Metabolism\WordpressBundle\Plugin {
 			add_action( 'admin_bar_menu', function( $wp_admin_bar )
 			{
 				$args = [
-					'id'    => 'cache',
+					'id'    => 'cache-purge',
 					'title' => __('Purge cache'),
-					'href'  => get_admin_url().'?purge_cache'
+					'href'  => get_admin_url().'?cache=purge'
 				];
 
 				$wp_admin_bar->add_node( $args );
 
-			}, 999 );
-
 			if ( current_user_can('administrator') ){
 
-				add_action( 'admin_bar_menu', function( $wp_admin_bar ) {
 					$args = [
-						'id'    => 'cache',
+						'id'    => 'cache-clear',
 						'title' => __('Clear cache'),
-						'href'  => get_admin_url().'?clear_cache'
+						'href'  => get_admin_url().'?cache=clear'
 					];
 
 					$wp_admin_bar->add_node( $args );
+				}
 
 				}, 999 );
 			}
-		}
 
-		
+
 		/**
 		 * CachePlugin constructor.
 		 * @param Data $config
@@ -108,11 +120,11 @@ namespace Metabolism\WordpressBundle\Plugin {
 
 			$this->cacheHelper = new Cache();
 
-			if( isset($_GET['purge_cache']) )
+			if( isset($_GET['cache']) && $_GET['cache'] == 'purge' )
 				$this->purge();
 
-			if( isset($_GET['clear_cache']) && current_user_can('administrator') )
-				$this->cacheHelper->clear();
+			if( isset($_GET['cache']) && $_GET['cache'] == 'clear' )
+				$this->clear();
 
 			if( !$debug ) {
 
