@@ -28,10 +28,18 @@ CHANGELOG
 - Core upgrade with a provider and plugin design patterns for maintenability.
 
 ##1.0.6
-- WebP thumbnail generation
+###Features
+- WebP image generation
+- Auto-resize for images
+- Focus point for smart cropping is now available from backoffice media page
+- Table prefix is now supported in .env file
+- Entity support, check [README.md](README.md)
+###Fixes
 - Fix SSL errors
-- enhanced form helper
-- better media syncing for multisite
+- Enhanced form helper
+- Better media syncing for multisite
+- Better Headless support for API Calls
+
 
 
 
