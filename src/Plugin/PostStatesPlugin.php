@@ -62,15 +62,13 @@ namespace Metabolism\WordpressBundle\Plugin{
 
 					printf(
 						__( $label.' : %s <br/><br/>' ),
-						wp_dropdown_pages(
-							array(
-								'name'              => 'page_on_'.$post_state,
-								'echo'              => 0,
-								'show_option_none'  => __( '&mdash; Select &mdash;' ),
-								'option_none_value' => '0',
-								'selected'          => get_option( 'page_on_'.$post_state ),
-							)
-						)
+						wp_dropdown_pages([
+							'name'              => 'page_on_'.$post_state,
+							'echo'              => 0,
+							'show_option_none'  => __( '&mdash; Select &mdash;' ),
+							'option_none_value' => '0',
+							'selected'          => get_option( 'page_on_'.$post_state ),
+						])
 					);
 				}
 

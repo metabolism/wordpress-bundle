@@ -44,13 +44,17 @@ class Query
 	 * @param bool $loop
 	 * @return array
 	 */
-	public static function get_adjacent_posts($post_id, $args=[], $loop=false)
+	public static function get_adjacent_posts($pid, $args=[], $loop=false)
 	{
+		if( !$post = get_post($pid) )
+			return false;
+
 		$default_args = [
 			'orderby' => 'menu_order',
 			'order' => 'ASC',
 			'posts_per_page' => -1,
-			'fields' => 'ids'
+			'fields' => 'ids',
+			'post_type' => $post->post_type
 		];
 
 		$args = array_merge($default_args, $args);
@@ -60,7 +64,7 @@ class Query
 		$next_id = $prev_id = false;
 
 		foreach($query->posts as $key => $_post_id) {
-			if($_post_id == $post_id){
+			if($_post_id == $post->ID){
 				$next_id = isset($query->posts[$key + 1]) ? $query->posts[$key + 1] : false;
 				$prev_id = isset($query->posts[$key - 1]) ? $query->posts[$key - 1] : false;
 				break;

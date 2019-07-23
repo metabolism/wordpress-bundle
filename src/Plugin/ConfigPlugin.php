@@ -11,6 +11,7 @@ use Metabolism\WordpressBundle\Helper\Table;
 class ConfigPlugin {
 
 	protected $config;
+	protected $support;
 
 	/**
 	 * Get plural from name
@@ -484,22 +485,13 @@ class ConfigPlugin {
 	/**
 	 * Disable category
 	 */
-	public function disableCategory()
+	public function disableFeatures()
 	{
-		add_action('init', function() {
-			register_taxonomy('category', array());
-		});
-	}
+		if( !in_array('post', $this->support) )
+			register_post_type('post', []);
 
-
-	/**
-	 * Disable category
-	 */
-	public function disableTag()
-	{
-		add_action('init', function() {
-			register_taxonomy('post_tag', array());
-		});
+		if( !in_array('page', $this->support) )
+			register_post_type('page', []);
 	}
 
 
@@ -522,21 +514,15 @@ class ConfigPlugin {
 	{
 
 		$this->config = $config;
+		$this->support = $config->get('support');
 
 		if( $jpeg_quality = $this->config->get('jpeg_quality') )
 			add_filter( 'jpeg_quality', function() use ($jpeg_quality){ return $jpeg_quality; });
 
-		$support = $config->get('support');
-
-		if( !in_array('category', $support) )
-			$this->disableCategory();
-
-		if( !in_array('tag', $support) )
-			$this->disableTag();
-
 		// Global init action
 		add_action( 'init', function()
 		{
+			$this->disableFeatures();
 			$this->addPostTypes();
 			$this->addPostFormats();
 			$this->addTaxonomies();
@@ -560,7 +546,7 @@ class ConfigPlugin {
 			add_action('admin_head', [$this, 'loadStyle']);
 			add_action('admin_head', [$this, 'loadJS']);
 
-			if( in_array('post_thumbnails', $support) )
+			if( in_array('post_thumbnails', $this->support) )
 				add_theme_support( 'post-thumbnails' );
 
 			add_post_type_support( 'page', 'excerpt' );

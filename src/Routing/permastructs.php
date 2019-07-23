@@ -32,7 +32,7 @@ class Permastruct{
 
 		foreach ($wp_post_types as $post_type)
 		{
-			if( $post_type->public ){
+			if( $post_type->public && $post_type->publicly_queryable ){
 
 				if( isset($this->wp_rewrite->extra_permastructs[$post_type->name]) ){
 
@@ -63,19 +63,22 @@ class Permastruct{
 
 		foreach ($wp_taxonomies as $taxonomy){
 
-			if( $taxonomy->public ){
+			if( $taxonomy->public && $taxonomy->publicly_queryable ){
 
-				$base_struct = $this->wp_rewrite->extra_permastructs[$taxonomy->name]['struct'];
-				$translated_slug = get_option( $taxonomy->name. '_rewrite_slug' );
+				if( isset($this->wp_rewrite->extra_permastructs[$taxonomy->name]) ){
 
-				if( !empty($translated_slug) )
-					$struct = str_replace('/'.$taxonomy->rewrite['slug'].'/', '/'.$translated_slug.'/', $base_struct);
-				else
-					$struct = $base_struct;
+					$base_struct = $this->wp_rewrite->extra_permastructs[$taxonomy->name]['struct'];
+					$translated_slug = get_option( $taxonomy->name. '_rewrite_slug' );
 
-				$this->addRoute($taxonomy->name, $struct, [], $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
+					if( !empty($translated_slug) )
+						$struct = str_replace('/'.$taxonomy->rewrite['slug'].'/', '/'.$translated_slug.'/', $base_struct);
+					else
+						$struct = $base_struct;
 
-				$registered[] = $taxonomy->name;
+					$this->addRoute($taxonomy->name, $struct, [], $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
+
+					$registered[] = $taxonomy->name;
+				}
 			}
 		}
 
@@ -105,6 +108,11 @@ class Permastruct{
 			$this->addRoute('search_post_type', $search_post_type_structure, [], true);
 
 		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
+
+		$this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealth::check');
+
+		$this->addRoute('cache-purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\Cache::purge');
+		$this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\Cache::clear');
 	}
 
 
@@ -122,11 +130,11 @@ class Permastruct{
 		return ['singular'=>$path, 'archive'=>$path.'/'.$this->wp_rewrite->pagination_base.'/{page}'];
 	}
 
-	public function addRoute( $name, $struct, $requirements=[], $paginate=false )
+	public function addRoute( $name, $struct, $requirements=[], $paginate=false, $controllerName=false )
 	{
 		$name = str_replace('_structure', '', $name);
 
-		$controller = $this->getControllerName($name);
+		$controller = $controllerName ? $controllerName : $this->getControllerName($name);
 		$paths = $this->getPaths($struct);
 		$locale = $this->locale?'.'.$this->locale:'';
 

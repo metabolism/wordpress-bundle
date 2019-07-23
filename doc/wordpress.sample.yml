@@ -28,9 +28,7 @@ maintenance: true
 
 ## Hide page from menu
 remove_menu_page:
-  - edit.php #Posts
   - edit-comments.php #Comments
-#  - edit.php?post_type=page #Pages
 #  - index.php #Dashboard
 #  - jetpack #Jetpack
 #  - upload.php #Media
@@ -151,8 +149,8 @@ acf:
 support:
   - templates #uncomment for api only backoffice
   - post_thumbnails #add post thumbnails to page
-#  - tag #enable tag
-#  - category #enable category
+  - page #enable page
+#  - post #enable post
 
 ## Declare menus
 menu:
