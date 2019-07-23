@@ -78,7 +78,7 @@ class EditorPlugin {
 		{
 			foreach ( $submenu[ 'themes.php' ] as $index => $menu_item )
 			{
-				if ( in_array( 'Customize', $menu_item ) )
+				if ( in_array( 'customize', $menu_item ) )
 					unset( $submenu[ 'themes.php' ][ $index ] );
 			}
 

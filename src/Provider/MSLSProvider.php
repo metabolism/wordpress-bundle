@@ -162,60 +162,6 @@ class MSLSProvider {
 	}
 
 
-	public function msls_head()
-	{
-		if( !class_exists('MslsBlogCollection') || !class_exists('MslsOptions') )
-			return;
-
-		$blogs  = \MslsBlogCollection::instance();
-		$mydata = \MslsOptions::create();
-
-		$home_url = rtrim(network_site_url(), '/');
-
-		foreach ( $blogs->get_objects() as $blog ) {
-			$language = $blog->get_language();
-			$url      = $mydata->get_current_link();
-			$current  = ( $blog->userblog_id == \MslsBlogCollection::instance()->get_current_blog_id() );
-
-			if ( ! $current ) {
-				switch_to_blog( $blog->userblog_id );
-
-				if ( 'MslsOptions' != get_class( $mydata ) && ( is_null( $mydata ) || ! $mydata->has_value( $language ) ) ) {
-					restore_current_blog();
-					continue;
-				}
-				$url = $mydata->get_permalink( $language );
-				$title = $blog->get_description();
-
-				restore_current_blog();
-			}
-
-			if ( has_filter( 'msls_head_hreflang' ) ) {
-				/**
-				 * Overrides the hreflang value
-				 * @since 0.9.9
-				 * @param string $language
-				 */
-				$hreflang = (string) apply_filters( 'msls_head_hreflang', $language );
-			}
-			else {
-				$hreflang = $blog->get_alpha2();
-			}
-
-			//fix: ensure it's absolute
-			if( strpos($url, $home_url) === false )
-				$url = $home_url.$url;
-
-			printf(
-				'<link rel="alternate" hreflang="%s" href="%s"/>',
-				$hreflang,
-				$url
-			);
-			echo "\n";
-		}
-	}
-
-
 	public function postTypeArchiveLink($link, $post_type){
 
 		if( !empty($GLOBALS['_wp_switched_stack'] ) ){
@@ -280,10 +226,6 @@ class MSLSProvider {
 
 					add_filter('post_type_archive_link', [$this, 'postTypeArchiveLink'], 10, 2);
 					add_filter('post_type_link', [$this, 'postTypeLink'], 10, 2);
-
-					//fix broken msls_head function
-					remove_action('wp_head', 'msls_head');
-					add_action('wp_head', [$this, 'msls_head']);
 				});
 			}
 		}
