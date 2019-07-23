@@ -14,7 +14,7 @@ class Cache {
 	 */
 	public function clear(){
 
-		$status = $this->purge() && $this->rrmdir(BASE_URI.'/var/cache');
+		$status = $this->rrmdir(BASE_URI.'/var/cache');
 
 		if( $status )
 			$response = new Response('1');
@@ -67,7 +67,7 @@ class Cache {
 	 * @param string $dir
 	 * @return bool
 	 */
-	private function rrmdir($dir) {
+	public function rrmdir($dir) {
 
 		$status = true;
 
@@ -78,7 +78,7 @@ class Cache {
 					if (is_dir($dir."/".$object))
 						$status = $this->rrmdir($dir."/".$object) && $status;
 					else
-						$status = @unlink($dir."/".$object) && $status;
+						$status = unlink($dir."/".$object) && $status;
 				}
 			}
 			$status = rmdir($dir) && $status;
