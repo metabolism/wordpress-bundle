@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+##1.2.1
+#### Fix
+- cache button
+
 ##1.2.0
 #### Feature
 - Site health is now available by typing `/_site-health` url [README.md](README.md)
@@ -8,7 +12,7 @@ CHANGELOG
 - New API url are available for cache clearing
   - `/_cache/purge` call varnish cache
   - `/_cache/clear` remove filecache and purge varnish cache
-#### Fixe
+#### Fix
 - Purge cache button will now clear varnish cache efficiently
 
 
