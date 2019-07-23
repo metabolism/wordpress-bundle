@@ -164,7 +164,7 @@ class Table extends \WP_List_Table {
 		if( in_array($column_name, $this->fields) )
 			$value = $item[$column_name];
 
-		return apply_filters('list_table_column', $value, $column_name, $this->table);
+		return apply_filters('list_table_column', $value, $column_name, $this->table, $item);
 	}
 
 
@@ -256,7 +256,7 @@ class Table extends \WP_List_Table {
 		echo '<div class="wrap">'.
 			     '<h2>'.$this->args['page_title'].'</h2>'.
 			     '<form id="'.$this->table.'-filter" method="get">'.
-			         '<input type="hidden" name="page" value="'.$_REQUEST['page'].'" />';
+			         '<input type="hidden" name="page" value="'.sanitize_text_field($_REQUEST['page']).'" />';
 		             parent::display();
 		echo     '</form>'.
 			 '</div>';
@@ -268,7 +268,7 @@ class Table extends \WP_List_Table {
 		global $wpdb;
 
 		$per_page     = $this->args['per_page'];
-		$order        = isset($_REQUEST['orderby'], $_REQUEST['order'])? 'ORDER BY '.$_REQUEST['orderby'].' '.$_REQUEST['order']:'';
+		$order        = isset($_REQUEST['orderby'], $_REQUEST['order'])? 'ORDER BY '.sanitize_text_field($_REQUEST['orderby']).' '.sanitize_text_field($_REQUEST['order']):'';
 		$current_page = $this->get_pagenum();
 
 		$column_title = $this->args['column_title'];

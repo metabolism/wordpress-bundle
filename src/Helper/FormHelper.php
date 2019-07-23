@@ -16,7 +16,7 @@ class Form {
 	public static function getField( $data, $key, $limit_lengh=500 )
 	{
 		if( !$data )
-			$data = $_REQUEST;
+			$data = json_decode(file_get_contents('php://input'), true);
 
 		if( isset($_FILES[$key]))
 		{
@@ -25,7 +25,10 @@ class Form {
 			if( is_wp_error($upload) )
 				return false;
 
-			return $upload['filename'];
+			if( is_multisite() )
+				return trim(network_home_url(), '/').$upload['filename'];
+			else
+				return trim(home_url('/'), '/').$upload['filename'];
 		}
 		elseif ( !isset( $data[ $key ] ) )
 		{
@@ -46,7 +49,7 @@ class Form {
 
 		foreach ( $fields as $key )
 		{
-			$value = self::getField( $data, $key );
+			$form[$key] = self::getField( $data, $key );
 		}
 
 		return $form;
@@ -60,11 +63,13 @@ class Form {
 		if( !in_array($email_id, $fields) )
 			$fields[] = $email_id;
 
+		$fields = array_merge($fields, $attachements);
+
 		$form = self::get($fields);
 
 		if ( is_email( $form[$email_id] ) )
 		{
-			if(!$to || $to='admin')
+			if(!$to || $to=='admin')
 				$to = get_option( 'admin_email' );
 
 			$body = $subject." :\n\n";
@@ -72,19 +77,11 @@ class Form {
 
 			foreach ( $fields as $key ) {
 
-				if ( !$form[$key] or !file_exists( $form[$key] ) )
+				if ( !$form[$key] || !file_exists( $form[$key] ) )
 				$body .= ($form[$key] ? ' - ' . $key . ' : ' . $form[$key] . "\n" : '');
 			}
 
-			foreach ( $attachements as $attachement )
-			{
-				if ( $form[$attachement] and file_exists( $form[$attachement] ) )
-				{
-					$attachments[] = $form[$attachement];
-				}
-			}
-
-			if ( wp_mail( $to, $subject, $body, $attachments ) )
+			if ( wp_mail( $to, $subject, $body ) )
 				return $form;
 			else
 				return new \WP_Error('send_mail', "The server wasn't able to send the email.");

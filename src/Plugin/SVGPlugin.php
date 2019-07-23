@@ -112,7 +112,7 @@ class SVGPlugin {
 
 	public function sanitizeSVG( $file ) {
 
-		if ( $file['type'] === 'image/svg+xml' ) {
+		if ( $file && isset($file['type']) && $file['type'] === 'image/svg+xml' ) {
 			if ( ! $this->sanitize( $file['tmp_name'] ) ) {
 				$file['error'] = __( "Sorry, this file couldn't be sanitized so for security reasons wasn't uploaded", 'wordpress-bundle' );
 			}

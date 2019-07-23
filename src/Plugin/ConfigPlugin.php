@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
+use Dflydev\DotAccessData\Data;
 use Metabolism\WordpressBundle\Helper\Table;
 
 /**
@@ -16,7 +17,7 @@ class ConfigPlugin {
 	 */
 	public function plural($name)
 	{
-		return substr($name, -1) == 's' ? $name : (substr($name, -1) == 'y' ? substr($name, 0, -1).'ies' : $name.'s');
+		return substr($name, -1) == 's' ? $name : (substr($name, -1) == 'y' && !in_array(substr($name, -2, 1), ['a','e','i','o','u']) ? substr($name, 0, -1).'ies' : $name.'s');
 	}
 
 
@@ -29,15 +30,22 @@ class ConfigPlugin {
 		$default_args = [
 			'public' => true,
 			'has_archive' => true,
-			'menu_position' => 25
+			'supports' => [],
+			'menu_position' => 25,
+			'map_meta_cap' => true
 		];
 
 		$is_admin = is_admin();
+
+		$current_blog_id = get_current_blog_id();
 
 		foreach ( $this->config->get('post_type', []) as $post_type => $args )
 		{
 			if( $post_type != 'post' && $post_type != 'page' )
 			{
+				if( (isset($args['enable_for_blogs']) && !in_array($current_blog_id, (array)$args['enable_for_blogs'])) || (isset($args['disable_for_blogs']) && in_array($current_blog_id, (array)$args['disable_for_blogs'])))
+					continue;
+
 				$args = array_merge($default_args, $args);
 				$name = str_replace('_', ' ', $post_type);
 
@@ -64,6 +72,9 @@ class ConfigPlugin {
 				if( isset($args['menu_icon']) )
 					$args['menu_icon'] = 'dashicons-'.$args['menu_icon'];
 
+				if( !isset($args['capability_type']) && $args['map_meta_cap'] )
+					$args['capability_type'] = [$post_type, $this->plural($post_type)];
+
 				$slug = get_option( $post_type. '_rewrite_slug' );
 
 				if( !is_null($slug) && !empty($slug) )
@@ -77,6 +88,9 @@ class ConfigPlugin {
 						$args['has_archive'] = $archive;
 				}
 
+				if( !WP_FRONT )
+					$args['publicly_queryable'] = false;
+
 				register_post_type($post_type, $args);
 
 				if( $is_admin )
@@ -88,17 +102,38 @@ class ConfigPlugin {
 							foreach ( $args['columns'] as &$column )
 								$column = ucfirst(str_replace('_', ' ', $column));
 
-							return array_merge ( $columns, $args['columns'] );
+							$columns = array_merge ( $columns, $args['columns'] );
+
+							if( isset($columns['date']) ){
+								$date = $columns['date'];
+								unset($columns['date']);
+								$columns['date'] = $date;
+							}
+
+							return $columns;
 						});
 
 						add_action ( 'manage_'.$post_type.'_posts_custom_column', function ( $column, $post_id ) use ( $args )
 						{
 							if( isset($args['columns'][$column]) )
 							{
-								if( $args['columns'][$column] == 'thumbnail')
-									echo '<a class="attachment-thumbnail-container">'.get_the_post_thumbnail($post_id, 'thumbnail').get_the_post_thumbnail($post_id, 'thumbnail').'</a>';
-								else
+								if( $args['columns'][$column] == 'thumbnail'){
+
+									if( in_array('thumbnail', $args['supports']) ){
+										echo '<a class="attachment-thumbnail-container">'.get_the_post_thumbnail($post_id, 'thumbnail').get_the_post_thumbnail($post_id, 'thumbnail').'</a>';
+									}
+									else{
+
+										$thumbnail_id = get_post_meta( $post_id, 'thumbnail', true );
+										$image = wp_get_attachment_image_src($thumbnail_id, 'thumbnail');
+
+										if( $image && count($image) )
+											echo '<a class="attachment-thumbnail-container"><img class="attachment-thumbnail size-thumbnail wp-post-image" src="'.$image[0].'"><img class="attachment-thumbnail size-thumbnail wp-post-image" src="'.$image[0].'"></a>';
+									}
+								}
+								else{
 									echo get_post_meta( $post_id, $args['columns'][$column], true );
+								}
 							}
 
 						}, 10, 2 );
@@ -122,26 +157,35 @@ class ConfigPlugin {
 					}
 				}
 
+			}else{
+				wp_die($post_type. 'is not allowed, reserved keyword');
 			}
-		};
-	}
+		}
 
+		$roles = array('editor','administrator');
 
-	/**
-	 * Add wordpress configuration 'options_page' fields as ACF Options pages
-	 */
-	protected function addOptionPages()
-	{
-		if( function_exists('acf_add_options_page') )
-		{
-			acf_add_options_page();
+		// Loop through each role and assign capabilities
+		foreach($roles as $the_role) {
 
-			foreach ( $this->config->get('options_page', []) as $name )
-			{
-				if( isset($name['menu_slug']) )
-					$name['menu_slug'] = 'acf-options-'.$name['menu_slug'];
+			$role = get_role($the_role);
 
-				acf_add_options_sub_page($name);
+			foreach ( $this->config->get('post_type', []) as $post_type => $args ){
+
+				if( (!isset($args['map_meta_cap']) || $args['map_meta_cap']) && (!isset($args['capability_type']) || ($args['capability_type'] != 'page' && $args['capability_type'] != 'post'))){
+
+					$post_types = $this->plural($post_type);
+
+					$role->add_cap( 'read_'.$post_type);
+					$role->add_cap( 'read_private_'.$post_types );
+					$role->add_cap( 'edit_'.$post_type );
+					$role->add_cap( 'edit_'.$post_types );
+					$role->add_cap( 'edit_others_'.$post_types );
+					$role->add_cap( 'edit_published_'.$post_types );
+					$role->add_cap( 'publish_'.$post_types );
+					$role->add_cap( 'delete_others_'.$post_types );
+					$role->add_cap( 'delete_private_'.$post_types );
+					$role->add_cap( 'delete_published_'.$post_types );
+				}
 			}
 		}
 	}
@@ -173,7 +217,7 @@ class ConfigPlugin {
 
 		foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args )
 		{
-			if( $taxonomy != 'type' && $taxonomy != 'category' && $taxonomy != 'tag' ) {
+			if( $taxonomy != 'type' && $taxonomy != 'category' && $taxonomy != 'tag' && $taxonomy != 'product' ) {
 
 				$args = array_merge($default_args, $args);
 				$name = str_replace('_', ' ', isset($args['name']) ? $args['name'] : $taxonomy);
@@ -190,11 +234,22 @@ class ConfigPlugin {
 
 				$slug = get_option( $taxonomy. '_rewrite_slug' );
 
-				if( !is_null($slug) and !empty($slug) )
+				if( !is_null($slug) && !empty($slug) )
 					$args['rewrite'] = ['slug'=>$slug];
 
 				if (!isset($args['hierarchical']))
 					$args['hierarchical'] = true;
+
+				if (!isset($args['capabilities'])){
+
+					$taxonomies = $this->plural($taxonomy);
+					$args['capabilities'] = [
+						'manage_terms' => 'manage_'.$taxonomies,
+						'edit_terms' => 'edit_'.$taxonomies,
+						'delete_terms' => 'delete_'.$taxonomies,
+						'assign_terms' => 'assign_'.$taxonomies
+					];
+				}
 
 				if (!isset($args['show_admin_column']))
 					$args['show_admin_column'] = true;
@@ -211,7 +266,41 @@ class ConfigPlugin {
 					$object_type = 'post';
 				}
 
+				if( !WP_FRONT )
+					$args['publicly_queryable'] = false;
+
 				register_taxonomy($taxonomy, $object_type, $args);
+
+			} else{
+				wp_die($taxonomy. 'is not allowed, reserved keyword');
+			}
+		}
+
+		$roles = array('editor','administrator');
+
+		// Loop through each role and assign capabilities
+		foreach($roles as $the_role) {
+
+			$role = get_role($the_role);
+
+			foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args ){
+
+				if( !isset($args['capabilities']) ){
+
+					$taxonomies = $this->plural($taxonomy);
+
+					$role->add_cap( 'manage_'.$taxonomies);
+					$role->add_cap( 'edit_'.$taxonomies );
+					$role->add_cap( 'delete_'.$taxonomies );
+					$role->add_cap( 'assign_'.$taxonomies );
+				}
+				else{
+
+					foreach ($args['capabilities'] as $type=>$capability){
+
+						$role->add_cap( $capability );
+					}
+				}
 			}
 		}
 	}
@@ -219,6 +308,7 @@ class ConfigPlugin {
 	/**
 	 * Adds User role
 	 * @see Taxonomy
+	 * see https://codex.wordpress.org/Function_Reference/add_role
 	 */
 	public function addRoles()
 	{
@@ -226,12 +316,11 @@ class ConfigPlugin {
 
 		foreach ( $this->config->get('role', []) as $role => $args )
 		{
-			if( !isset($wp_roles->roles[$role]))
+			if( isset($args['force']) && $args['force'] )
+				remove_role($role);
+
 				add_role($role, $args['display_name'], $args['capabilities']);
 		}
-
-		$wp_roles->add_cap( 'editor', 'wpseo_edit_advanced_metadata' );
-		$wp_roles->add_cap( 'editor', 'wpseo_manage_options' );
 	}
 
 
@@ -275,7 +364,7 @@ class ConfigPlugin {
 		{
 			foreach( ['slug', 'archive'] as $type)
 			{
-				if( $type == 'slug' or ($type == 'archive' and $args->has_archive ))
+				if( $type == 'slug' || ($type == 'archive' && $args->has_archive ))
 				{
 					if( isset( $_POST[$post_type. '_rewrite_'.$type] ) && !empty($_POST[$post_type. '_rewrite_'.$type]) )
 					{
@@ -367,15 +456,68 @@ class ConfigPlugin {
 
 		echo '<style>
                #the-list .attachment-thumbnail-container{ position: relative; display: inline-block }
-               #the-list .attachment-thumbnail-container:hover .attachment-thumbnail{ display: block }
+               #the-list .attachment-thumbnail-container:hover .attachment-thumbnail{ display: block; z-index: 999 }
                #the-list .attachment-thumbnail{ width: 60px; height: auto; border-radius: 2px; display: block }
                #the-list .attachment-thumbnail+.attachment-thumbnail{ width: auto; position: absolute; left: 50%; top: 50%; display: none; transform: translate(-50%, -50%); box-shadow: 0 0 4px rgba(0,0,0,0.2) }
+               #the-list .attachment-thumbnail-container+a{ display: none!important } 
                .manage-column.num{ text-align: left } 
               </style>';
 	}
 
 
+	public function loadJS(){
 
+		echo '<script>jQuery(document).ready(function(jQuery){';
+
+		foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args )
+		{
+			if( isset($args['radio']) && $args['radio'] ){
+
+				echo 'jQuery(\'#taxonomy-'.$taxonomy.' [name="tax_input['.$taxonomy.'][]"][type="checkbox"]\').attr("type", "radio");';
+			}
+		}
+
+		echo '})</script>';
+	}
+
+
+	/**
+	 * Disable category
+	 */
+	public function disableCategory()
+	{
+		add_action('init', function() {
+			register_taxonomy('category', array());
+		});
+	}
+
+
+	/**
+	 * Disable category
+	 */
+	public function disableTag()
+	{
+		add_action('init', function() {
+			register_taxonomy('post_tag', array());
+		});
+	}
+
+
+	/**
+	 * Enable post formats
+	 * See https://wordpress.org/support/article/post-formats/#supported-formats
+	 */
+	public function addPostFormats()
+	{
+		if( $this->config->get('post_formats') )
+			add_theme_support('post-formats', $this->config->get('post_formats'));
+	}
+
+
+	/**
+	 * ConfigPlugin constructor.
+	 * @param Data $config
+	 */
 	public function __construct($config)
 	{
 
@@ -384,36 +526,42 @@ class ConfigPlugin {
 		if( $jpeg_quality = $this->config->get('jpeg_quality') )
 			add_filter( 'jpeg_quality', function() use ($jpeg_quality){ return $jpeg_quality; });
 
+		$support = $config->get('support');
+
+		if( !in_array('category', $support) )
+			$this->disableCategory();
+
+		if( !in_array('tag', $support) )
+			$this->disableTag();
+
 		// Global init action
 		add_action( 'init', function()
 		{
 			$this->addPostTypes();
+			$this->addPostFormats();
 			$this->addTaxonomies();
-			$this->addRoles();
 			$this->addMenus();
-			$this->setPermalink();
+			$this->addRoles();
+
+			if( WP_FRONT )
+				$this->setPermalink();
 			
 			if( is_admin() )
-			{
 				$this->addTableViews();
-				$this->addOptionPages();
-			}
 		});
 
 
 		// When viewing admin
 		if( is_admin() )
 		{
-			add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
+			if( WP_FRONT )
+				add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
+			
 			add_action('admin_head', [$this, 'loadStyle']);
+			add_action('admin_head', [$this, 'loadJS']);
 
-			$support = $this->config->get('support', []);
-
-			if( in_array('post_thumbnails', $support ) )
+			if( in_array('post_thumbnails', $support) )
 				add_theme_support( 'post-thumbnails' );
-
-			if( in_array('woocommerce', $support ) )
-				add_theme_support( 'woocommerce' );
 
 			add_post_type_support( 'page', 'excerpt' );
 		}

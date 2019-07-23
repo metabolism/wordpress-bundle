@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
+use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 
@@ -19,6 +20,22 @@ class Post extends Entity
 
 	public $link = '';
 	public $template = '';
+	public $comment_status;
+	public $menu_order;
+	public $comment_count;
+	public $author;
+	public $date;
+	public $date_gmt;
+	public $modified;
+	public $modified_gmt;
+	public $title;
+	public $status;
+	public $password;
+	public $parent;
+	public $type;
+	public $slug;
+	public $name;
+	public $content;
 
 	private $_next = null;
 	private $_prev = null;
@@ -31,38 +48,71 @@ class Post extends Entity
 	 */
 	public function __construct($id = null) {
 
-		if( $post = $this->get($id) )
-		{
+		if( $post = $this->get($id) ) {
+
 			$this->import($post, false, 'post_');
-			$this->addCustomFields($id);
+			$this->content = wpautop($this->content);
+
+			$this->addCustomFields($post->ID);
 		}
 	}
 
 
-	protected function get( $pid ) {
+	/**
+	 * Validate class
+	 * @param \WP_Post $post
+	 * @return bool
+	 */
+	protected function isValidClass($post){
 
-		if( $post = get_post($pid) )
-		{
-			if( !$post || is_wp_error($post) )
+		$class =  explode('\\', get_class($this));
+		$class =  end($class);
+
+		return $class == "Post" || Factory::getClassname($post->post_type) == $class;
+	}
+
+
+	/**
+	 * @param $pid
+	 * @return array|bool|\WP_Post|null
+	 */
+	protected function get($pid ) {
+
+		if( $post = get_post($pid) ) {
+
+			if( is_wp_error($post) || !$this->isValidClass($post) )
 				return false;
 
 			$this->_post = clone $post;
 
-			$post->link = get_permalink( $post );
+			if( WP_FRONT )
+				$post->link = get_permalink( $post );
+
 			$post->template = get_page_template_slug( $post );
 			$post->thumbnail = get_post_thumbnail_id( $post );
 
 			if( $post->thumbnail )
-				$post->thumbnail = PostFactory::create($post->thumbnail, 'image');
+				$post->thumbnail = Factory::create($post->thumbnail, 'image');
+
+			$post->slug = $post->post_name;
 		}
 
 		return $post;
 	}
 
 
-	protected function getSibling($direction='prev', $in_same_term , $excluded_terms, $taxonomy){
+	/**
+	 * Get sibling post
+	 * @param $direction
+	 * @param $in_same_term
+	 * @param $excluded_terms
+	 * @param $taxonomy
+	 * @return Post|false
+	 */
+	protected function getSibling($direction, $in_same_term , $excluded_terms, $taxonomy){
 
 		global $post;
+		
 		$old_global = $post;
 		$post = $this->_post;
 
@@ -80,6 +130,15 @@ class Post extends Entity
 	}
 
 
+	/**
+	 * Get next post
+	 * See: https://developer.wordpress.org/reference/functions/get_next_post/
+	 *
+	 * @param bool $in_same_term
+	 * @param string $excluded_terms
+	 * @param string $taxonomy
+	 * @return Post|false
+	 */
 	public function next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
 
 		if( !is_null($this->_next) )
@@ -91,6 +150,15 @@ class Post extends Entity
 	}
 
 
+	/**
+	 * Get previous post
+	 * See: https://developer.wordpress.org/reference/functions/get_previous_post/
+	 *
+	 * @param bool $in_same_term
+	 * @param string $excluded_terms
+	 * @param string $taxonomy
+	 * @return Post|false
+	 */
 	public function prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
 
 		if( !is_null($this->_prev) )
@@ -102,23 +170,20 @@ class Post extends Entity
 	}
 
 
-	public function get_term( $tax='' ) {
+	/**
+	 * Get term
+	 * See: https://developer.wordpress.org/reference/functions/get_the_terms/
+	 *
+	 * @param string $tax
+	 * @return Term|bool
+	 */
+	public function getTerm( $tax='' ) {
 
 		$term = false;
 
-		if ( class_exists('WPSEO_Primary_Term') )
-		{
-			$wpseo_primary_term = new \WPSEO_Primary_Term( $tax, $this->ID );
-
-			if( $wpseo_primary_term )
-				$term = $wpseo_primary_term->get_primary_term();
-		}
-
-		if(!$term){
-			$terms = get_the_terms($this->ID, $tax);
-			if( $terms && !is_wp_error($terms) && count($terms) )
-				$term = $terms[0];
-		}
+		$terms = get_the_terms($this->ID, $tax);
+		if( $terms && !is_wp_error($terms) && count($terms) )
+			$term = $terms[0];
 
 		if( $term )
 			return TaxonomyFactory::create( $term );
@@ -126,8 +191,13 @@ class Post extends Entity
 			return false;
 	}
 
-
-	public function get_terms( $tax = '' ) {
+	/**
+	 * Get term list
+	 *
+	 * @param string $tax
+	 * @return Term[]|[]
+	 */
+	public function getTerms( $tax = '' ) {
 		
 		$taxonomies = array();
 
@@ -171,4 +241,11 @@ class Post extends Entity
 		else
 			return $term_array;
 	}
+
+
+	/*
+	 * Retro compatibility
+	 */
+	public function get_terms( $tax='' ) { return $this->getTerms($tax); }
+	public function get_term( $tax='' ) { return $this->getTerm($tax); }
 }

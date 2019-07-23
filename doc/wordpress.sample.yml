@@ -1,6 +1,6 @@
 domain_name: rocket
 
-# bind custom post type permalink structure to controller
+## bind custom post type permalink structure to controller
 extra_permastructs:
   controller: MainController
 
@@ -16,6 +16,17 @@ salt:
   logged_in : 'w/iowiks]_i5b#/SqYuD2`28o</-L|P4H3vq@!<OrH 7Q!gxB[Q4m`/*CiVdylGs'
   nonce : 'gelPRQb4NzO=4pOG_5YnuN(5G~YJCIutY*BL%!:ds(TqwDd;F[PsI,gT_1J-9;;D'
 
+## Image options
+image:
+  compression: 90 #on the fly compression ration
+  resize: #resize image on upload to save server space
+    max_width: 1920
+    max_height: 2160
+
+## Enable maintenance mode
+maintenance: true
+
+## Hide page from menu
 remove_menu_page:
   - edit.php #Posts
   - edit-comments.php #Comments
@@ -29,37 +40,128 @@ remove_menu_page:
 #  - tools.php #Tools
 #  - options-general.php #Settings
 
+## Hide page from submenu
 remove_submenu_page:
   themes.php: customize.php?return=%2Fedition%2Fwp-admin%2F
 
+## Allow multisite installation
+install-multisite: true
+
+## Multisite configuration ( after install )
 # multisite:
 #  subdomain_install: true
 #  shared_media: true
-#  multilangue: true
 #  multidomain: true
 #  clone_post: true
-#  default_locale: 'fr'
 
+## Declare constant
 #define:
 #  disallow_file_edit: false
 
-#options
+##WYSIWYG Editor TinyMCE Buttons
+##https://www.tiny.cloud/docs/advanced/editor-control-identifiers/
+mce_buttons:
+  - formatselect
+  - bold
+  - italic
+  - underline
+  - sup
+  - strikethrough
+  - superscript
+  - bullist
+  - numlist
+  - blockquote
+  - hr
+  - table
+  - alignleft
+  - aligncenter
+  - alignright
+  - alignjustify
+  - link
+  - unlink
+  - wp_more
+  - spellchecker
+  - wp_adv
+  - dfw
+
+##ACF configurations
 acf:
-  autoload: true
-  #https://developers.google.com/maps/documentation/javascript/get-api-key
-  google_api_key: AIzaSyDEv5UrZbosf5H8MFSFLvoVS7djfsTCQFc
+  settings:
+    autoload: true
+    #https://developers.google.com/maps/documentation/javascript/get-api-key
+    google_api_key: XXXYYYZZZ
+  options_page:
+    - 'Personnalisation'
+  toolbars:
+    Full:
+      1:
+        - bold
+        - italic
+        - underline
+        - blockquote
+        - strikethrough
+        - superscript
+        - bullist
+        - numlist
+        - blockquote
+        - hr
+        - table
+        - alignleft
+        - aligncenter
+        - alignright
+        - alignjustify
+        - link
+        - unlink
+        - wp_more
+        - spellchecker
+        - wp_adv
+        - dfw
+      2:
+        - strikethrough
+        - hr
+        - forecolor
+        - pastetext
+        - removeformat
+        - charmap
+        - outdent
+        - indent
+        - undo
+        - redo
+        - wp_help
+    Basic:
+      1:
+        - bold
+        - italic
+        - underline
+        - blockquote
+        - strikethrough
+        - superscript
+        - bullist
+        - numlist
+        - table
+        - alignleft
+        - aligncenter
+        - alignright
+        - undo
+        - redo
+        - link
+        - fullscreen
 
+## Activate features
 support:
-  - templates
-  - post_thumbnails
-#  - woocommerce
+  - templates #uncomment for api only backoffice
+  - post_thumbnails #add post thumbnails to page
+#  - tag #enable tag
+#  - category #enable category
 
+## Declare menus
 menu:
   footer: Footer
   header: Header
 
-# https://codex.wordpress.org/Function_Reference/register_post_type
-# see vendor/metabolism/wordpress-bundle/doc/custom_taxonomy.yml for a full sample
+## Declare custom post types
+## https://codex.wordpress.org/Function_Reference/register_post_type
+## see vendor/metabolism/wordpress-bundle/doc/custom_taxonomy.yml for a full sample
 post_type:
 
   guide:
@@ -68,49 +170,55 @@ post_type:
     #has_options: true
     capability_type: post
     #posts_per_page: 11
+    #orderby: name #https://codex.wordpress.org/Class_Reference/WP_Query#Order_.26_Orderby_Parameters
+    #order: ASC
     supports:
       - title
       - excerpt
       - thumbnail
     #columns:
      # - thumbnail
-    labels:
-      name:           'Guides'
-      singular_name:  'Guide'
-      all_items:      'Tous les guides'
-      edit_item:      'Editer le guide'
-      view_item:      'Voir le guide'
-      update_item:    'Mettre à jour le guide'
-      add_new_item:   'Ajouter un guide'
-      new_item_name:  'Nouveau guide'
-      search_items:   'Rechercher un guide'
-      popular_items:  'Guides populaires'
-      not_found:      'Aucun guide trouvé'
+    #taxonomies:
+     # - category
+    #labels:
+    #  name:           'Guides'
+    #  singular_name:  'Guide'
+    #  all_items:      'Tous les guides'
+    #  edit_item:      'Editer le guide'
+    #  view_item:      'Voir le guide'
+    #  update_item:    'Mettre à jour le guide'
+    #  add_new_item:   'Ajouter un guide'
+    #  new_item_name:  'Nouveau guide'
+    #  search_items:   'Rechercher un guide'
+    #  popular_items:  'Guides populaires'
+    #  not_found:      'Aucun guide trouvé'
 
-# https://codex.wordpress.org/Function_Reference/register_taxonomy
-# see vendor/metabolism/wordpress-bundle/doc/custom_post_type.yml for a full sample
+## Declare custom taxonomies
+## https://codex.wordpress.org/Function_Reference/register_taxonomy
+## see vendor/metabolism/wordpress-bundle/doc/custom_post_type.yml for a full sample
 taxonomy:
 
-  guide_category:
+  item:
     #posts_per_page: 11
+    #orderby: name #https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
+    #order: ASC
+    #radio: true
     object_type:
       - guide
-    labels:
-      name:           'Catégories'
-      singular_name:  'Catégorie'
-      all_items:      'Toutes les catégories'
-      edit_item:      'Editer la catégorie'
-      view_item:      'Voir la catégorie'
-      update_item:    'Mettre à jour la catégorie'
-      add_new_item:   'Ajouter une catégorie'
-      new_item_name:  'Nouvelle catégorie'
-      search_items:   'Rechercher une catégorie'
-      popular_items:  'Catégories populaires'
-      not_found:      'Aucune catégorie trouvée'
+    #labels:
+    #  name:           'Catégories'
+    #  singular_name:  'Catégorie'
+    #  all_items:      'Toutes les catégories'
+    #  edit_item:      'Editer la catégorie'
+    #  view_item:      'Voir la catégorie'
+    #  update_item:    'Mettre à jour la catégorie'
+    #  add_new_item:   'Ajouter une catégorie'
+    #  new_item_name:  'Nouvelle catégorie'
+    #  search_items:   'Rechercher une catégorie'
+    #  popular_items:  'Catégories populaires'
+    #  not_found:      'Aucune catégorie trouvée'
 
-options_page:
-  - 'Personnalisation'
-
+## Add post type template
 template:
   page:
     coming_soon: 'Coming Soon'
@@ -118,9 +226,21 @@ template:
   post:
     video: 'Video'
 
+## Add page states
+#page_states:
+  #archive_guide: 'Archive des guides'
+
+## Add post formats
+## https://wordpress.org/support/article/post-formats/#supported-formats
+#post_formats:
+#  - video
+#  - gallery
+
+## Configure search
 #search:
  # posts_per_page: 12
 
+## Declare custom database tables
 #table:
 #  newsletter:
 #    page_title: Newsletter
@@ -142,3 +262,28 @@ template:
 #      company: Company
 #      request: Request
 
+## Add new roles
+#role:
+#  translator:
+#    display_name: Traducteur
+#    force: true
+#    capabilities:
+#      read: true
+#      publish: false
+#
+#      edit_others_guides: true
+#      read_guide: true
+#      edit_guides: true
+#      publish_guides: false
+#      edit_published_guides: true
+#
+#      acf_edit_layout: false
+#      acf_edit_repeater: false
+#      acf_edit_true-false: false
+#      acf_edit_radio: false
+#      acf_edit_image: false
+#      acf_edit_file: false
+#      acf_edit_post-object: false
+#
+#      manage_items: true
+#      edit_items: true

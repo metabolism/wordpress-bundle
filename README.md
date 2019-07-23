@@ -70,163 +70,314 @@ No support for Gutemberg, activate the Classic Editor until further notice.
 Installation
 -----------
 
-    composer require metabolism/wordpress-bundle
+```
+composer require metabolism/wordpress-bundle
+```
     
-  register the bundle in the Kernel
+register the bundle in the Kernel
   
-    public function registerBundles()
-    {
-        $bundles = [
-    	    new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-    	    new \Symfony\Bundle\TwigBundle\TwigBundle(),
-    	    ...
-    	];
-    	
-        $bundles[] = new \Metabolism\WordpressBundle\WordpressBundle();
-    	
-        return $bundles;
-    }
+```php
+public function registerBundles()
+{
+   $bundles = [
+      new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
+      new \Symfony\Bundle\TwigBundle\TwigBundle(),
+      ...
+  ];
+  	
+  $bundles[] = new \Metabolism\WordpressBundle\WordpressBundle();
+  	
+  return $bundles;
+}
+```
     
-  add wordpress permastruct in the routing
+add wordpress permastruct in the routing
   
-    _wordpress:
-        resource: "@WordpressBundle/Routing/permastructs.php"
-        
-  add a context service and use context trait from the Wordpress bundle
+```
+_wordpress:
+    resource: "@WordpressBundle/Routing/permastructs.php"
+```
   
-    <?php
-    
-    namespace App\Service;
-    
-    use Metabolism\WordpressBundle\Traits\ContextTrait as WordpressContext;
-    
-    class Context
-    {
-    	use WordpressContext;
-    
-    	protected $data;
-    
-    	/**
-    	 * Return Context as Array
-    	 * @return array
-    	 */
-    	public function toArray()
-    	{    	    
-    	    return is_array($this->data) ? $this->data : [];
-    	}
-    }
-      
-  inject the context in the controller
+add a context service and use context trait from the Wordpress bundle
   
-    public function articleAction(Context $context)
-    {
-        //use wordpress function directly ex:is_user_logged_in()
-        if( is_user_logged_in() )
-           return $this->render( 'page/article-unlocked.twig', $context->toArray() );
-        else   
-           return $this->render( 'page/article.twig', $context->toArray() );
-    }
+```php
+<?php
+
+namespace App\Service;
+
+use Metabolism\WordpressBundle\Traits\ContextTrait as WordpressContext;
+
+class Context
+{
+	use WordpressContext;
+
+	protected $data;
+
+	/**
+	 * Return Context as Array
+	 * @return array
+	 */
+	public function toArray()
+	{    	    
+	    return is_array($this->data) ? $this->data : [];
+	}
+}
+```
     
+inject the context in the controller
+
+```php
+public function frontAction(Context $context)
+{
+    //use wordpress function directly ex:is_user_logged_in()
+    if( is_user_logged_in() )
+       return $this->render( 'page/article-unlocked.twig', $context->toArray() );
+    else   
+       return $this->render( 'page/article.twig', $context->toArray() );
+}
+``` 
 
 Context trait
 -----------
     
- Wordpress data wrapper, allow to query :   
- * Post
- * Posts
- * Term
- * Terms
- * Pagination
- * Breadcrumb
- * Comments
+Wordpress data wrapper, allow to query post, term, pagination, breadcrumb, comments and sitemap.
+
+Critical data are added automatically, such as current post or posts for archive, locale, home url, search url, ...
  
- 
-    public function articleAction(Context $context)
-    {
-        $context->addPosts(['category__and' => [1,3], 'posts_per_page' => 2, 'orderby' => 'title']);
-        return $this->render( 'page/article.twig', $context->toArray() );
+```php
+public function articleAction(Context $context)
+{
+    $context->addPosts(['category__and' => [1,3], 'posts_per_page' => 2, 'orderby' => 'title'], 'portraits');
+    $context->addSitemap();
+    return $this->render( 'page/article.twig', $context->toArray() );
+}
+```
+### Preview
+
+To preview/debug context, just add `?debug=context` to any url, it will output a json representation of itself.
+
+```json
+{
+  "debug": false,
+  "environment": "prod",
+  "locale": "fr",
+  "language": "fr-FR",
+  "languages": [],
+  "is_admin": false,
+  "home_url": "http://brilliant-wordpress-site.fr/",
+  "search_url": "/search",
+  "privacy_policy_url": "",
+  "maintenance_mode": false,
+  "tagline": "Un site utilisant WordPress",
+  "posts_per_page": "10",
+  "body_class": "fr-FR home page-template-default page page-id-38",
+  "page_title": "Home",
+  "system": "-- Removed from debug --",
+  "menu": [...],
+  "post": {
+    "excerpt": "",
+    "thumbnail": "",
+    "link": "/",
+    "template": "",
+    "ID": 38,
+    "comment_status": "closed",
+    "menu_order": 0,
+    "comment_count": "0",
+    "author": "1",
+    "date": "15 January 2019",
+    "date_gmt": "2019-01-15 11:45:59",
+    "content": "",
+    "title": "Home",
+    "status": "publish",
+    "password": "",
+    "name": "home",
+    "modified": "17 January 2019",
+    "modified_gmt": "2019-01-17 14:07:13",
+    "parent": 0,
+    "type": "page",
+    "splashscreen": {
+      "text": "La France et le Japon partagent les valeurs ...",
+      "partner": {
+        "link": "http://www.japon.fr"
+      }
     }
-     
+  },
+  "portraits": [...],
+  "sitemap": [...],
+  "layout": "default"
+}
+```   
+
+Entities
+-----------
+
+### Post
+
+```php
+//MainController.php
+
+public function articleAction(Context $context)
+{
+    $article = $context->addPost(12, 'article');
+    return $this->render( 'page/article.twig', $context->toArray() );
+}
+```
+
+```twig
+{# page/article.twig #}
+
+<h1>{{ article.title }}</h1>
+{% set next_article = article.next() %}
+{% if next_article %}
+    <a href="{{ next_article.link }}">next</a>
+{% endif %}
+```
+
+ACF fields are directly available so let say you've added a `copyright` text field :
+
+```twig
+<h1>{{ post.title }}</h1>
+<small>{{ post.copyright }}</small>
+```
+
+Available functions :
+- next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category')
+- prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category')
+- get_term( $tax='' )
+- get_terms( $tax='' )
+
+### Image
+
+Image entity provide a nice on the fly resize function, add width and height to crop-resize, set width or height to 0 to resize
+
+[wp-smartcrop](https://wordpress.org/plugins/wp-smartcrop/) plugin is supported
+
+```twig
+<h1>{{ post.title }}</h1>
+<img src="{{ post.thumbnail.resize(800, 600) }}" alt="{{ post.thumbnail.alt }}">
+<img src="{{ post.thumbnail.resize(0, 600) }}" alt="{{ post.thumbnail.alt }}">
+<img src="{{ post.thumbnail.resize(800, 0) }}" alt="{{ post.thumbnail.alt }}">
+```
+
+Generate picture element ( width, height, media queries ), it use wepb if enabled in PHP
+```twig
+data.image.toHTML(664, 443, {'max-width: 1023px':[438,246]})|raw 
+(data.image|default|placeholder).toHTML(664, 443, {'max-width: 1023px':[438,246]})|raw 
+```
+
+Use a placeholder if the image doesn't exists
+```twig
+<img src="{{ (post.thumbnail|default|placeholder).resize(800, 0) }}" alt="{{ post.thumbnail.alt }}">
+```
+
+### Custom posts
+
+Custom posts can extend the `Post` entity to add some preprocess or new functions,
+in the `/src` folder, add an `Entity` folder, then create a new class for the post_type using Pascal case
+
+```php
+namespace App\Entity;
+
+use Metabolism\WordpressBundle\Entity\Post;
+use Metabolism\WordpressBundle\Entity\Image;
+
+class Keyfact extends Post
+{
+	public function __construct($id = null)
+	{
+		parent::__construct($id);
+
+		if( isset($this->picto) && $this->picto instanceof Image)
+			$this->picto = $this->picto->getFileContent();
+	}
+}
+```
+
+### Other entities
+
+Menu, Comment, MenuItem, Product, Term and User can be extended by creating the same file in the `/src/Entity` folder. 
+
 Wordpress core and plugin installation
 -----------
 
- Plugin have to be declared to your composer.json, but first you must declare wpackagist.org as a replacement repository to your composer.json
+Plugin have to be declared to your composer.json, but first you must declare wpackagist.org as a replacement repository to your composer.json
 
- Then define install paths, for mu-plugin, plugin and core
+Then define install paths, for mu-plugin, plugin and core
  
-    {
-        "name": "acme/brilliant-wordpress-site",
-        "description": "My brilliant WordPress site",
-        "repositories":[
-            {
-                "type":"composer",
-                "url":"https://wpackagist.org"
-            }
-        ],
-        "require": {
-            ...
-            "wpackagist-plugin/wordpress-seo":">=7.0.2"
-            ...
-        },
-        "extra": {
-          "installer-paths": {
-            "web/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
-            "web/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
-            "web/edition/": ["type:wordpress-core"]
-          }
-        },
-        "autoload": {
-            "psr-0": {
-                "Acme": "src/"
-            }
+```json
+{
+    "name": "acme/brilliant-wordpress-site",
+    "description": "My brilliant WordPress site",
+    "repositories":[
+        {
+            "type":"composer",
+            "url":"https://wpackagist.org"
+        }
+    ],
+    "require": {
+        "wpackagist-plugin/wordpress-seo":">=7.0.2"
+    },
+    "extra": {
+      "installer-paths": {
+        "web/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+        "web/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
+        "web/edition/": ["type:wordpress-core"]
+      }
+    },
+    "autoload": {
+        "psr-0": {
+            "Acme": "src/"
         }
     }
+}
+```
     
 Wordpress ACF PRO installation
 -----------
 
 You must declare a new repository like bellow
 
-    "repositories": [
-        {
-          "type": "package",
-          "package": {
-            "name": "elliotcondon/advanced-custom-fields-pro",
-            "version": "5.7.9",
-            "type": "wordpress-plugin",
-            "dist": {
-              "type": "zip",
-              "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download"
-            },
-            "require": {
-              "philippbaschke/acf-pro-installer": "^1.0",
-              "composer/installers": "^1.0"
-            }
-          }
-        },
-        {
-          "type":"composer", "url":"https://wpackagist.org"
+```
+"repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "elliotcondon/advanced-custom-fields-pro",
+        "version": "5.7.10",
+        "type": "wordpress-plugin",
+        "dist": {"type": "zip", "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download&k={%ACF_PRO_KEY}&t={%version}"},
+        "require": {
+          "ffraenz/private-composer-installer": "^2.0",
+          "composer/installers": "^1.0"
         }
-      ]
+      }
+    },
+    {
+      "type":"composer", "url":"https://wpackagist.org"
+    }
+  ]
+```
 
 Still in composer.json, add ACF to the require section
 
-    "require": {
-        ...
-        "elliotcondon/advanced-custom-fields-pro": "5.*",
-        ...
-      }
+```
+"require": {
+     "elliotcondon/advanced-custom-fields-pro": "5.*",
+}
+```
       
 Set the environment variable ACF_PRO_KEY to your ACF PRO key. Add an entry to your .env file:
 
-    ACF_PRO_KEY=Your-Key-Here      
+```
+ACF_PRO_KEY=Your-Key-Here      
+```
 
 Environment
 -----------
 
 The environment configuration ( debug, database, cookie ) is managed via the `.env` file like any other SF4 project, there is a sample file in `doc/sample.env`
 
-We've added an option to handle cookie prefix named `COOKIE_PREFIX`
+We've added an option to handle cookie prefix named `COOKIE_PREFIX` and table prefix named `TABLE_PREFIX`
 
 
 Wordpress configuration
@@ -237,7 +388,7 @@ This file allow you to manage :
  * Domain name for translation
  * Controller name
  * Keys and Salts
- * Admin page removal
+ * Admin pages removal
  * Multi-site configuration
  * Constants
  * Support
@@ -251,13 +402,12 @@ This file allow you to manage :
 Roadmap
 --------
 
-* Woocommerce Provider rework + samples
+* Woo-commerce Provider rework + samples
 * Global maintenance mode for multi-site
 * Better Symfony 4.1 Support
 * Unit tests
 * Better code comments
 * Post/Term/User Repository
-* Test support for Wordpress 5
        
        
 Why not using Bedrock

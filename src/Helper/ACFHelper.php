@@ -12,6 +12,7 @@ use Metabolism\WordpressBundle\Entity\Post,
 	Metabolism\WordpressBundle\Entity\Image,
 	Metabolism\WordpressBundle\Entity\Product;
 
+use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 
@@ -141,7 +142,7 @@ class ACF
 		switch ($type)
 		{
 			case 'image':
-				$value = PostFactory::create($id, 'image');
+				$value = Factory::create($id, 'image');
 				break;
 
 			case 'file':
@@ -149,12 +150,11 @@ class ACF
 				break;
 
 			case 'post':
-				$post_status = get_post_status( $id );
-				$value = ( $post_status && $post_status !== 'publish' ) ? false : PostFactory::create( $id );
+				$value = PostFactory::create( $id );
 				break;
 
 			case 'user':
-				$value = new User( $id );
+				$value = Factory::create($id, 'user');
 				break;
 
 			case 'term':
@@ -181,7 +181,7 @@ class ACF
 	{
 		$objects = [];
 
-		if( !$raw_objects or !is_array($raw_objects) )
+		if( !$raw_objects || !is_array($raw_objects) )
 			return $objects;
 
 		// Start analyzing
@@ -195,13 +195,19 @@ class ACF
 
 				case 'clone';
 
-					foreach ($object['sub_fields'] as &$sub_field)
-					{
-						if( isset($object['value'][$sub_field['name']]))
-							$sub_field['value'] = $object['value'][$sub_field['name']];
-					}
+					if( $object['display'] == 'group' ){
 
-					$objects[$object['name']] = $this->clean($object['sub_fields']);
+						foreach ($object['sub_fields'] as &$sub_field)
+						{
+							if( isset($object['value'][$sub_field['name']])){
+
+								$sub_field['value'] = $object['value'][$sub_field['name']];
+								$sub_field['name'] = $sub_field['_name'];
+							}
+						}
+
+						$objects[$object['name']] = $this->clean($object['sub_fields']);
+					}
 
 					break;
 
@@ -219,7 +225,7 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id' or is_int($object['value']) )
+					if ($object['return_format'] == 'id' || is_int($object['value']) )
 						$objects[$object['name']] = $this->load('image', $object['value']);
 					elseif ($object['return_format'] == 'array')
 						$objects[$object['name']] = $this->load('image', $object['value']['id']);
@@ -248,12 +254,22 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id')
+					if ($object['return_format'] == 'id'){
+
 						$objects[$object['name']] = $this->load('file', $object['value']);
-					elseif ($object['return_format'] == 'array')
-						$objects[$object['name']] = $object['value']['url'];
-					else
-						$objects[$object['name']] = $object['value'];
+					}
+					else {
+
+						$object_value = $object['value'];
+						$remove = ['id', 'link', 'name', 'status', 'uploaded_to', 'menu_order', 'icon', 'author'];
+
+						foreach($remove as $prop){
+							if( isset($object_value[$prop]) )
+								unset($object_value[$prop]);
+						}
+
+						$objects[$object['name']] = $object_value;
+					}
 
 					break;
 
@@ -265,8 +281,8 @@ class ACF
 
 						foreach ($object['value'] as $value) {
 
-							if ($object['return_format'] == 'id' or is_int($value) )
-								$element = $this->load('post', $value);
+							if ($object['return_format'] == 'id' || is_int($value) )
+								$element = $value;
 							elseif ($object['return_format'] == 'object')
 								$element = $this->load('post', $value->ID);
 							else
@@ -283,8 +299,8 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id' or is_int($object['value']) )
-						$objects[$object['name']] = $this->load('post', $object['value']);
+					if ($object['return_format'] == 'id' || is_int($object['value']) )
+						$objects[$object['name']] = $object['value'];
 					elseif ($object['return_format'] == 'object')
 						$objects[$object['name']] = $this->load('post', $object['value']->ID);
 					else
@@ -313,10 +329,10 @@ class ACF
 							$value = $this->bindLayoutsFields($value, $layouts);
 							$data = $this->clean($value);
 
-							if( is_array($value) and count($value) == 1 and is_string(key($value)) )
+							if( is_array($value) && count($value) == 1 && is_string(key($value)) )
 								$data = reset($data);
 
-							$objects[$object['name']][] = ['@type'=>$type, 'data'=>$data];
+							$objects[$object['name']][] = ['type'=>$type, 'data'=>$data];
 						}
 					}
 
@@ -347,35 +363,34 @@ class ACF
 
 						foreach ($object['value'] as $value) {
 
-							$id = false;
-
-							if ($object['return_format'] == 'id')
-								$id = $value;
-							elseif (is_object($value) && $object['return_format'] == 'object')
-								$id = $value->term_id;
-
-							if( $id )
-								$objects[$object['name']][] = $this->load('term', $id);
+							if ($object['return_format'] == 'id'){
+								if( $value )
+									$objects[$object['name']][] = $value;
+							}
+							elseif (is_object($value) && $object['return_format'] == 'object'){
+								if( $value->term_id )
+									$objects[$object['name']][] = $this->load('term', $value->term_id);
+							}
 						}
 					}
 					else{
 
-						$id = false;
+						if ($object['return_format'] == 'id'){
+							if( $object['value'] )
+								$objects[$object['name']] = $object['value'];
+						}
+						elseif (is_object($object['value']) && $object['return_format'] == 'object'){
 
-						if ($object['return_format'] == 'id')
-							$id = $object['value'];
-						elseif (is_object($object['value']) && $object['return_format'] == 'object')
-							$id = $object['value']->term_id;
-
-						if( $id )
-							$objects[$object['name']] = $this->load('term', $id);
+							if( $object['value']->term_id )
+								$objects[$object['name']] = $this->load('term', $object['value']->term_id);
+						}
 					}
 
 					break;
 
 				case 'select';
 
-					if( !$object['multiple'] and is_array($object['value']) and count($object['value']) )
+					if( !$object['multiple'] && is_array($object['value']) &&($object['value']) )
 						$objects[$object['name']] = $object['value'][0];
 					else
 						$objects[$object['name']] = $object['value'];

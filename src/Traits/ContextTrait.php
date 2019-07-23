@@ -1,7 +1,4 @@
 <?php
-/**
- * User: Paul Coudeville <paul@metabolism.fr>
- */
 
 namespace Metabolism\WordpressBundle\Traits;
 
@@ -10,7 +7,6 @@ use Metabolism\WordpressBundle\Factory\PostFactory,
 use Metabolism\WordpressBundle\Helper\ACF,
 	Metabolism\WordpressBundle\Helper\Query;
 use Metabolism\WordpressBundle\Plugin\TermsPlugin;
-use Metabolism\WordpressBundle\Provider\WooCommerceProvider;
 
 use Metabolism\WordpressBundle\Entity\Post,
 	Metabolism\WordpressBundle\Entity\Term,
@@ -28,7 +24,7 @@ use Metabolism\WordpressBundle\Entity\Post,
  */
 Trait ContextTrait
 {
-	public $has_templates, $config;
+	public $config;
 
 
 	/**
@@ -39,8 +35,6 @@ Trait ContextTrait
 		global $_config;
 		$this->config = $_config;
 
-		$this->has_templates = in_array('templates', $_config->get('support', []));
-
 		$this->addSite();
 		$this->addMenus();
 		$this->addOptions();
@@ -50,6 +44,7 @@ Trait ContextTrait
 
 	/**
 	 * load ACF options
+	 * @return void
 	 */
 	protected function addOptions()
 	{
@@ -58,22 +53,10 @@ Trait ContextTrait
 
 
 	/**
-	 * Get ACF Fields wrapper
-	 * @param $id
-	 * @return array|bool|\Metabolism\WordpressBundle\Entity\User|\WP_Error
-	 */
-	protected function getFields($id)
-	{
-		$fields = new ACF($id);
-		return $fields->get();
-	}
-
-
-	/**
 	 * Return function echo
 	 * @param $function
 	 * @param array $args
-	 * @return false|string
+	 * @return string
 	 */
 	protected function getOutput($function, $args=[])
 	{
@@ -87,6 +70,68 @@ Trait ContextTrait
 
 
 	/**
+	 * Get multisite multilangue data
+	 */
+	protected function getLanguagesData($queried_object){
+
+		$languages = [];
+
+		if( defined('ICL_LANGUAGE_CODE') )
+		{
+			$languages = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc' );
+		}
+		elseif(  defined('MSLS_PLUGIN_VERSION') && is_multisite() )
+		{
+			$sites = get_sites(['public'=>1]);
+			$current_blog_id = get_current_blog_id();
+			$alternates      = false;
+
+			if( !function_exists('format_code_lang') )
+				require_once(ABSPATH . 'wp-admin/includes/ms.php');
+
+			if( is_singular() )
+				$alternates = maybe_unserialize(get_option('msls_'.$queried_object->ID));
+
+			foreach($sites as $site)
+			{
+				$locale    = get_blog_option($site->blog_id, 'WPLANG');
+				$locale    = empty($locale)? 'en_US' : $locale;
+				$lang      = explode('_', $locale)[0];
+				$alternate = false;
+
+				if( $current_blog_id != $site->blog_id ){
+					if( is_singular() ){
+
+						if( $queried_object->ID && isset($alternates[$locale]) ){
+
+							switch_to_blog($site->blog_id);
+							$alternate = get_permalink($alternates[$locale]);
+							restore_current_blog();
+						}
+					}
+					elseif( is_archive() ){
+						$post_type = $queried_object->name;
+						switch_to_blog($site->blog_id);
+						$alternate = get_post_type_archive_link($post_type);
+						restore_current_blog();
+					}
+				}
+
+				$languages[] = [
+					'id' => $site->blog_id,
+					'active' => $current_blog_id==$site->blog_id,
+					'name' => format_code_lang($lang),
+					'home_url'      => get_home_url($site->blog_id, '/'),
+					'language_code' => $lang,
+					'url'           => $alternate
+				];
+			}
+		}
+
+		return $languages;
+	}
+
+	/**
 	 * Add global data
 	 */
 	protected function addSite()
@@ -94,83 +139,55 @@ Trait ContextTrait
 		global $wp_query, $wp_rewrite;
 
 		$blog_language = get_bloginfo('language');
-		$post_id = $wp_query->get_queried_object_id();
+		$queried_object = $wp_query->get_queried_object();
 
-		$language = explode('-', $blog_language);
-		$languages = [];
-
-		if( defined('ICL_LANGUAGE_CODE') )
-		{
-			$languages = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc' );
-		}
-		elseif(  defined('MSLS_PLUGIN_VERSION') and is_multisite() )
-		{
-			$sites = get_sites(['public'=>1]);
-			$current_blog_id = get_current_blog_id();
-
-			if( !function_exists('format_code_lang') )
-				require_once(ABSPATH . 'wp-admin/includes/ms.php');
-
-			foreach($sites as $site)
-			{
-				$lang = get_blog_option($site->blog_id, 'WPLANG');
-				$lang = empty($lang)?'en':(explode('_', $lang)[0]);
-				$languages[] = [
-					'id' => $site->blog_id,
-					'active' => $current_blog_id==$site->blog_id,
-					'name' => format_code_lang($lang),
-					'url' => get_home_url($site->blog_id, '/'),
-					'language_code' => $lang
-				];
-			}
-		}
+		$language  = explode('-', $blog_language);
 
 		$this->data = [
 			'debug'              => WP_DEBUG,
 			'environment'        => $this->config->get('environment', 'production'),
 			'locale'             => count($language) ? $language[0] : 'en',
 			'language'           => $blog_language,
-			'languages'          => $languages,
 			'is_admin'           => current_user_can('manage_options'),
 			'home_url'           => home_url('/'),
-			'search_url'         => get_search_link(),
-			'privacy_policy_url' => get_privacy_policy_url(),
-			'maintenance_mode'   => wp_maintenance_mode()
+			'maintenance_mode'   => wp_maintenance_mode(),
+			'tagline'            => get_bloginfo('description'),
+			'site_title'         => get_bloginfo('name'),
+			'posts_per_page'     => get_option( 'posts_per_page' )
 		];
 
-		if( is_multisite() )
+		if( is_multisite() ){
+
+			$languages = $this->getLanguagesData($queried_object);
+
 			$this->data['network_home_url'] = trim(network_home_url(), '/');
+			$this->data['languages'] = $languages;
+		}
 
-		$this->data = array_merge($this->data, [
-			'maintenance_mode' => wp_maintenance_mode(),
-			'tagline' => get_bloginfo('description'),
-			'posts_per_page' => get_option( 'posts_per_page' )
-		]);
-
-		if( $this->has_templates && (!is_singular() || $post_id) )
+		if( WP_FRONT )
 		{
-			$wp_title = wp_title(' ', false);
+			$wp_title = trim(wp_title(' ', false));
+			$body_class = $queried_object ? implode(' ', get_body_class()) : '';
 
 			$this->data = array_merge($this->data, [
-				'body_class' => $blog_language . ' ' . implode(' ', get_body_class()),
-				'page_title' => empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title,
+				'search_url'         => get_search_link(),
+				'privacy_policy_url' => get_privacy_policy_url(),
+				'is_front_page'      => is_front_page(),
+				'body_class'         => $blog_language . ' ' . $body_class,
+				'page_title'         => empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title,
 				'system' => [
 					'head'   => $this->getOutput('wp_head'),
 					'footer' => $this->getOutput('wp_footer')
 				]
 			]);
-
-			if (class_exists('WooCommerce'))
-			{
-				$wcProvider = WooCommerceProvider::getInstance();
-				$wcProvider->globalContext($this->data);
-			}
 		}
 	}
 
 
 	/**
 	 * Add wordpress defined menus
+	 * @return Menu[]
+	 *
 	 */
 	protected function addMenus()
 	{
@@ -181,7 +198,7 @@ Trait ContextTrait
 		{
 			$menu = new Menu($location);
 
-			if( $menu->id )
+			if( $menu->ID )
 				$this->data['menu'][$location] = new Menu($location);
 		}
 
@@ -190,9 +207,45 @@ Trait ContextTrait
 
 
 	/**
-	 * Add list of all wordpress post, page and custom post
+	 * Get ACF Fields wrapper
+	 * @param $id
+	 * @return object|bool
 	 */
-	protected function addSitemap($args=[], $title_meta='_yoast_wpseo_title')
+	public function getFields($id)
+	{
+		$fields = new ACF($id);
+		return $fields->get();
+	}
+
+
+	/**
+	 * Get current post
+	 * @return Post|bool
+	 */
+	public function getPost()
+	{
+		return $this->get('post');
+	}
+
+
+	/**
+	 * Get current posts
+	 * @return Post[]|bool
+	 */
+	public function getPosts()
+	{
+		return $this->get('posts');
+	}
+
+
+	/**
+	 * Add list of all wordpress post, page and custom post
+	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters
+	 * @param string $title_meta
+	 * @return array
+	 *
+	 */
+	public function addSitemap($args=[], $title_meta=false)
 	{
 		$sitemap = [];
 
@@ -208,7 +261,7 @@ Trait ContextTrait
 			foreach ($query->posts as $post)
 			{
 				$template = get_page_template_slug($post);
-				$title = get_post_meta($post->ID, $title_meta, true);
+				$title = $title_meta ? get_post_meta($post->ID, $title_meta, true) : false;
 				$sitemap[] = [
 					'link'=> get_permalink($post),
 					'template' => empty($template)?'default':$template,
@@ -229,11 +282,11 @@ Trait ContextTrait
 
 	/**
 	 * Get default wordpress data
-	 * @return array|bool|mixed|void
+	 * @return Post|array|bool
 	 */
 	protected function addCurrent()
 	{
-		if( (is_single() or is_page()) and !is_attachment() )
+		if( (is_single() || is_page()) && !is_attachment() )
 		{
 			return $this->addPost();
 		}
@@ -253,10 +306,10 @@ Trait ContextTrait
 	/**
 	 * Add post to context from id
 	 *
-	 * @see Post
 	 * @param null $id
 	 * @param string $key
-	 * @return mixed
+	 * @param callable|bool $callback
+	 * @return Post|bool
 	 */
 	public function addPost($id = null, $key='post', $callback=false)
 	{
@@ -267,7 +320,7 @@ Trait ContextTrait
 		{
 			$post = PostFactory::create($id);
 
-			if( $callback and is_callable($callback) )
+			if( $callback && is_callable($callback) )
 				call_user_func($callback, $post);
 
 			$this->data[$key] = $post;
@@ -285,7 +338,8 @@ Trait ContextTrait
 	 * @see Post
 	 * @param null $id
 	 * @param string $key
-	 * @return mixed
+	 * @param callable|bool $callback
+	 * @return Term|bool
 	 */
 	public function addTerm($id = null, $key='term', $callback=false)
 	{
@@ -302,7 +356,7 @@ Trait ContextTrait
 		{
 			$term = TaxonomyFactory::create($id);
 
-			if( $callback and is_callable($callback) )
+			if( $callback && is_callable($callback) )
 				call_user_func($callback, $term);
 
 			$this->data[$key] = $term;
@@ -319,38 +373,47 @@ Trait ContextTrait
 	 *
 	 * @see Post
 	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters
-	 * @param string $key the key name to store data
-	 * @param bool $found_posts include found posts value
-	 * @param bool $callback execute a function for each result via array_map
+	 * @param bool|string $key the key name to store data
+	 * @param callable|bool $callback execute a function for each result via array_map
+	 * @return Post[]
 	 */
-	public function addPosts($args=[], $key='posts', $found_posts=false, $callback=false)
-	{
-		if( !isset($this->data[$key]) )
-			$this->data[$key] = [];
+	public function addPosts($args=[], $key='posts', $callback=false){
 
-		if( $found_posts )
-		{
-			$wp_query = Query::wp_query($args);
-			$posts = $wp_query->posts;
+		$wp_query = Query::wp_query($args);
+		$raw_posts = $wp_query->posts;
+		$posts = [];
+
+		if( isset($args['found_posts']) && $args['found_posts']) {
 
 			if( !isset($this->data['found_'.$key]) )
 				$this->data['found_'.$key] = 0;
-
-			$this->data['found_'.$key] += $wp_query->found_posts;
+			else
+				$this->data['found_'.$key] += $wp_query->found_posts;
 		}
-		else
-			$posts = Query::get_posts($args);
 
 		if( $callback && is_callable($callback) )
-			array_map($callback, $posts);
+			$raw_posts = array_map($callback, $raw_posts);
 
-		$this->data[$key] = array_merge($this->data[$key], $posts);
+		foreach ($raw_posts as $post){
+
+			if( isset($post->ID) )
+			$posts[$post->ID] = $post;
+			else
+				$posts[] = $post;
+		}
+
+		if( !isset($this->data[$key]) )
+			$this->data[$key] = $posts;
+		else
+			$this->data[$key] = array_merge($this->data[$key], $posts);
+
+		return $this->data[$key];
 	}
 
 
 	/**
 	 * Retrieve paginated link for archive post pages.
-	 * @see paginate_links
+	 * @return object|bool
 	 */
 	public function addPagination($args=[])
 	{
@@ -472,9 +535,12 @@ Trait ContextTrait
 
 	/**
 	 * Query terms
-	 * @see Term
+	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
+	 * @param string $key
+	 * @param false|callable $callback
+	 * @return Term[]
 	 */
-	public function addTerms($args=[], $key='terms', $sort=true)
+	public function addTerms($args=[], $key='terms', $callback=false)
 	{
 		$raw_terms = Query::get_terms($args);
 		$terms = [];
@@ -484,7 +550,7 @@ Trait ContextTrait
 			foreach ($raw_terms as $term)
 				$terms[$term->taxonomy][$term->term_id] = $term;
 
-			if( $sort ){
+			if( !isset($args['sort']) || $args['sort'] ){
 
 				foreach ($terms as &$term_group)
 					$term_group = TermsPlugin::sortHierarchically( $term_group );
@@ -502,21 +568,31 @@ Trait ContextTrait
 		}
 		else
 		{
-			if( $sort )
+			if( !isset($args['sort']) || $args['sort']  )
 				$raw_terms = TermsPlugin::sortHierarchically( $raw_terms );
 
 			foreach ($raw_terms as $term)
-				$terms[$term->term_id] = $term;
+				$terms[$term->ID] = $term;
 		}
 
-		$this->data[$key] = $terms;
+		if( $callback && is_callable($callback) )
+			$terms = array_map($callback, $terms);
+
+		if( !isset($this->data[$key]) )
+			$this->data[$key] = $terms;
+		else
+			$this->data[$key] = array_merge($this->data[$key], $terms);
 
 		return $this->data[$key];
 	}
 
 
 	/**
-	 * Add breadcrumd entries
+	 * Add breadcrumb entries
+	 * @param array $data
+	 * @param bool $add_current
+	 * @param bool $add_home
+	 * @return object[]
 	 *
 	 */
 	public function addBreadcrumb($data=[], $add_current=true, $add_home=true)
@@ -554,7 +630,9 @@ Trait ContextTrait
 
 	/**
 	 * Add comments entries
-	 * See : https://codex.wordpress.org/get_comments
+	 * @param array $args see https://codex.wordpress.org/get_comments
+	 * @param string $key
+	 * @return Comment[]
 	 *
 	 */
 	public function addComments($args=[], $key='comments')
@@ -596,7 +674,7 @@ Trait ContextTrait
 			else{
 				$this->data['post']->$key = $comments;
 				$this->data['post']->comments_count = $comments_count;
-		}
+			}
 		}
 		else{
 

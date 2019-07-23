@@ -21,8 +21,11 @@ class NoticePlugin {
 
 		$notices = [];
 
-		//check folder wright
-		foreach (['web/wp-bundle/languages', 'web/uploads', 'web/wp-bundle/upgrade', 'config/acf-json'] as $folder ){
+		//check folder right
+		$folders = ['web/wp-bundle/languages', 'web/uploads', 'web/uploads/acf-thumbnails', 'web/wp-bundle/upgrade', 'config/acf-json', 'var/cache', 'var/log'];
+		$folders = apply_filters('notice/folders', $folders);
+
+		foreach ($folders as $folder ){
 
 			$path = BASE_URI.'/'.$folder;
 
@@ -31,6 +34,9 @@ class NoticePlugin {
 			elseif( !is_writable($path) )
 				$notices [] = $folder.' folder is not writable';
 		}
+
+		if( str_replace('/edition','', get_option( 'siteurl' )) !== get_home_url() )
+			$notices [] = 'Site url and Home url are different, please check your database configuration';
 
 		if( !empty($notices) )
 			echo '<div class="error"><p>'.implode('<br/>', $notices ).'</p></div>';
@@ -55,16 +61,30 @@ class NoticePlugin {
 	}
 
 
+	/**
+	 * remove wpdb error
+	 */
+	public function suppressError(){
+
+		global $wpdb;
+		$wpdb->suppress_errors = true;
+	}
+
+
 	public function __construct($config)
 	{
 		$this->config = $config;
-
 		if( is_admin() )
 		{
 			add_action( 'admin_notices', [$this, 'adminNotices']);
 
 			if( WP_DEBUG )
 				add_action( 'init', [$this, 'debugInfo']);
+		}
+		else{
+
+			if( !WP_FRONT)
+				add_action( 'init', [$this, 'suppressError']);
 		}
 	}
 }

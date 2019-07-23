@@ -10,10 +10,22 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class Menu extends Entity
 {
-	public $items, $id, $title, $slug, $description;
+	/** @var MenuItem[] $items */
+	public $items;
+
+	public $title;
+
+	public $slug;
+
+	public $description;
+
 	private $menuItemClass;
 
-	public function __construct( $slug = 0 ) {
+	/**
+	 * Menu constructor.
+	 * @param int $slug
+	 */
+	public function __construct($slug = 0 ) {
 
 		$app_classname = 'App\Entity\MenuItem';
 
@@ -32,12 +44,16 @@ class Menu extends Entity
 		else if ( $slug === false )
 			$menu_id = false;
 
-		if ( $menu_id )
-			$this->get($menu_id);
+		if ( $menu_id && $menu = $this->get($menu_id))
+			$this->addCustomFields($menu_id);
 	}
 
 
-	protected function get( $menu_id )
+	/**
+	 * @param $menu_id
+	 * @return bool
+	 */
+	protected function get($menu_id )
 	{
 		$menu_items = wp_get_nav_menu_items($menu_id);
 
@@ -50,14 +66,19 @@ class Menu extends Entity
 
 		$menu_info = wp_get_nav_menu_object($menu_id);
 
-		$this->id = $menu_id;
+		$this->ID = $menu_id;
 		$this->title = $menu_info->name;
 		$this->slug = $menu_info->slug;
 		$this->description = $menu_info->description;
 
+		return true;
 	}
 
 
+	/**
+	 * @param $menu_items
+	 * @return array
+	 */
 	protected function orderItems($menu_items)
 	{
 		$ordered_menu = [];
@@ -84,7 +105,7 @@ class Menu extends Entity
 	 * @internal
 	 * @param string $slug
 	 * @param array $locations
-	 * @return integer
+	 * @return false|integer
 	 */
 	protected function get_menu_id_from_locations( $slug, $locations )
 	{
@@ -96,5 +117,7 @@ class Menu extends Entity
 
 			return $menu_id;
 		}
+
+		return false;
 	}
 }

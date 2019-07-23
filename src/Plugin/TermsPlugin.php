@@ -2,6 +2,10 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
+/**
+ * Class TermsPlugin
+ * @package Metabolism\WordpressBundle\Plugin
+ */
 class TermsPlugin{
 
 	public function wp_terms_checklist_args( $args )
@@ -52,7 +56,7 @@ class TermsPlugin{
 		{
 			if ($cat->parent == $parentId)
 			{
-				$into[$cat->term_id] = $cat;
+				$into[$cat->ID] = $cat;
 				unset($cats[$i]);
 			}
 		}
@@ -60,7 +64,7 @@ class TermsPlugin{
 		foreach ($into as $topCat)
 		{
 			$topCat->children = array();
-			self::sort($cats, $topCat->children, $topCat->term_id);
+			self::sort($cats, $topCat->children, $topCat->ID);
 
 			if( empty($topCat->children) )
 				unset($topCat->children);

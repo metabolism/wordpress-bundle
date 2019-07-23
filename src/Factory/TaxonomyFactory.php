@@ -4,6 +4,12 @@ namespace Metabolism\WordpressBundle\Factory;
 
 class TaxonomyFactory {
 
+	/**
+	 * Create entity from taxonomy name
+	 * @param null $id
+	 * @param bool $taxonomy_name
+	 * @return bool|mixed|\WP_Error
+	 */
 	public static function create($id=null, $taxonomy_name = false){
 
 		if( is_array($id) ) {

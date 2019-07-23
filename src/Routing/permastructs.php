@@ -5,7 +5,7 @@ namespace Metabolism\WordpressBundle;
 use Symfony\Component\Routing\Route,
 	Symfony\Component\Routing\RouteCollection;
 
-class Permastuct{
+class Permastruct{
 
 	public $collection;
 	private $controller_name, $wp_rewrite, $locale;
@@ -82,22 +82,29 @@ class Permastuct{
 		$this->addRoute('author', $this->wp_rewrite->author_structure);
 
 		$translated_search_slug = get_option( 'search_rewrite_slug' );
+		$search_post_type_structure = false;
 
 		if( !empty($translated_search_slug) ){
 
 			$search_structure = str_replace($this->wp_rewrite->search_base.'/', $translated_search_slug.'/', $this->wp_rewrite->search_structure);
-			$search_post_type_structure = str_replace($this->wp_rewrite->search_base.'/', $translated_search_slug.'/', $this->wp_rewrite->search_post_type_structure);
+
+			if( isset($this->wp_rewrite->search_post_type_structure) )
+				$search_post_type_structure = str_replace($this->wp_rewrite->search_base.'/', $translated_search_slug.'/', $this->wp_rewrite->search_post_type_structure);
 		}
 		else{
 
 			$search_structure = $this->wp_rewrite->search_structure;
-			$search_post_type_structure = $this->wp_rewrite->search_post_type_structure;
+
+			if( isset($this->wp_rewrite->search_post_type_structure) )
+				$search_post_type_structure = $this->wp_rewrite->search_post_type_structure;
 		}
 
 		$this->addRoute('search', $search_structure, [], true);
-		$this->addRoute('search_post_type', $search_post_type_structure, [], true);
 
-		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[^/]{3,}']);
+		if( $search_post_type_structure )
+			$this->addRoute('search_post_type', $search_post_type_structure, [], true);
+
+		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
 	}
 
 
@@ -123,7 +130,7 @@ class Permastuct{
 		$paths = $this->getPaths($struct);
 		$locale = $this->locale?'.'.$this->locale:'';
 
-		if( !empty($paths['singular']) or $name == 'front' ){
+		if( !empty($paths['singular']) || $name == 'front' ){
 
 			$route = new Route( $paths['singular'], ['_controller'=>$controller], $requirements);
 			$this->collection->add($name.$locale, $route);
@@ -142,21 +149,23 @@ $controller_name = $_config->get('extra_permastructs.controller', 'MainControlle
 
 $collection = new RouteCollection();
 
-if( $_config->get('multisite') && !$_config->get('multisite.multilangue') && !$_config->get('multisite.subdomain_install') )
+if( $_config->get('multisite') && !$_config->get('multisite.subdomain_install') )
 {
+	$current_site_id = get_current_blog_id();
+
 	foreach (get_sites() as $site)
 	{
 		switch_to_blog( $site->blog_id );
 
 		$locale = trim($site->path, '/');
-		new Permastuct($collection, $locale, $controller_name);
+		new Permastruct($collection, $locale, $controller_name);
 	}
 
-	restore_current_blog();
+	switch_to_blog($current_site_id);
 }
 else{
 
-	new Permastuct($collection, '', $controller_name);
+	new Permastruct($collection, '', $controller_name);
 }
 
 return $collection;

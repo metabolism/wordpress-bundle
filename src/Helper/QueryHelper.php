@@ -2,6 +2,8 @@
 
 namespace Metabolism\WordpressBundle\Helper;
 
+use Metabolism\WordpressBundle\Entity\Post;
+use Metabolism\WordpressBundle\Entity\Term;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 
@@ -18,21 +20,30 @@ class Query
 		return $acf_helper->get();
 	}
 
-
+	/**
+	 * Query terms
+	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
+	 * @return Term[]
+	 */
 	public static function get_terms($args=[])
 	{
 		$args['fields'] = 'ids';
 
 		$terms = get_terms( $args );
 
-		foreach ($terms as &$term)
-		{
+		foreach ($terms as &$term) {
 			$term = TaxonomyFactory::create( $term );
 		}
 
 		return $terms;
 	}
 
+	/**
+	 * @param $post_id
+	 * @param array $args
+	 * @param bool $loop
+	 * @return array
+	 */
 	public static function get_adjacent_posts($post_id, $args=[], $loop=false)
 	{
 		$default_args = [
@@ -69,6 +80,12 @@ class Query
 	}
 
 
+	/**
+	 * @param $field
+	 * @param $value
+	 * @param $taxonomy
+	 * @return bool|Term|\WP_Error
+	 */
 	public static function get_term_by($field, $value, $taxonomy)
 	{
 		$term = get_term_by( $field, $value, $taxonomy );
@@ -80,18 +97,10 @@ class Query
 	}
 
 
-	public static function get_post_terms($id, $primary=false)
-	{
-		$taxonomies = get_post_taxonomies( $id );
-		$post_terms = [];
-
-		foreach($taxonomies as $taxonomy)
-			$post_terms[$taxonomy] = self::get_post_term($id, $taxonomy, $primary);
-
-		return $post_terms;
-	}
-
-
+	/**
+	 * @param array $args
+	 * @return array|bool|Post|\WP_Error
+	 */
 	public static function get_post($args=[])
 	{
 		if( empty($args) )
@@ -107,10 +116,14 @@ class Query
 		if( count($posts) )
 			return $posts[0];
 
-		return $posts;
+		return false;
 	}
 
 
+	/**
+	 * @param array $args
+	 * @return Post[]
+	 */
 	public static function get_posts($args=[])
 	{
 		$query = self::wp_query($args);
@@ -119,20 +132,22 @@ class Query
 	}
 
 
+	/**
+	 * @param array $args
+	 * @return bool|mixed
+	 */
 	public static function wp_query($args=[])
 	{
 		global $wp_query;
 
-		if( empty($args) )
-		{
+		if( empty($args) ) {
 			$query = $wp_query;
 		}
-		else
-		{
+		else {
 			if( !isset($args['post_type']) )
 				$args = array_merge($wp_query->query, $args);
 
-			if( !isset($args['posts_per_page']) and !isset($args['numberposts']))
+			if( !isset($args['posts_per_page']) && !isset($args['numberposts']))
 				$args['posts_per_page'] = get_option( 'posts_per_page' );
 
 			$args['fields'] = 'ids';
@@ -142,8 +157,7 @@ class Query
 		if( !isset($query->posts) || !is_array($query->posts) )
 			return false;
 
-		foreach ($query->posts as &$post)
-		{
+		foreach ($query->posts as &$post) {
 			$post = PostFactory::create( $post );
 		}
 

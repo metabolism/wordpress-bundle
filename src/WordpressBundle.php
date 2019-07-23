@@ -2,17 +2,20 @@
 
 namespace Metabolism\WordpressBundle;
 
+use Metabolism\WordpressBundle\Extension\TwigExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class WordpressBundle extends Bundle
 {
+	/**
+	 * 	@see wp-includes/class-wp.php, main function
+	 */
 	public function boot()
 	{
 		$rootDir = $this->container->get('kernel')->getRootDir();
 
 		include $rootDir.'/../web/edition/wp-load.php';
 
-		//see wp-includes/class-wp.php, main function
 		global $wp;
 
 		$wp->init();
@@ -22,8 +25,16 @@ class WordpressBundle extends Bundle
 		$this->registerGlobals();
 
 		do_action_ref_array( 'wp', array( &$wp ) );
+
+		do_action('template-redirect');
+
+		$twigExtension = new TwigExtension();
+		$this->container->get('twig')->addExtension($twigExtension);
 	}
 
+	/**
+	 * Analyse query and load posts
+	 */
 	protected function registerGlobals() {
 
 		global $wp_query, $wp;
@@ -35,6 +46,11 @@ class WordpressBundle extends Bundle
 		$GLOBALS['query_string'] = $wp->query_string;
 		$GLOBALS['posts'] = & $wp_query->posts;
 		$GLOBALS['post'] = isset( $wp_query->post ) ? $wp_query->post : null;
+
+		if( !$wp_query->get_queried_object() ){
+			$wp_query->is_single = false;
+			$wp_query->is_singular = false;
+		}
 	}
 
 }

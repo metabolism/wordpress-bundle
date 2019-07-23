@@ -74,16 +74,13 @@ class ConfigLoader {
 		define( 'WP_ENV', $env);
 		define( 'WP_DEBUG', $env === 'dev');
 		define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
-		define( 'WC_TEMPLATE_DEBUG_MODE', WP_DEBUG );
+
+		define( 'WP_FRONT', in_array('templates', $_config->get('support', [])) );
 
 		/**
 		 * Enable multisite
 		 */
-		if( $_config->get('install-multisite') )
-		{
-			define( 'WP_ALLOW_MULTISITE', true );
-		}
-		elseif( $_config->get('multisite') )
+		if( $_config->get('multisite') && (!isset($_ENV['MULTISITE']) || getenv('MULTISITE')) )
 		{
 			define( 'MULTISITE', true );
 			define( 'SUBDOMAIN_INSTALL', $_config->get('multisite.subdomain_install') );
@@ -91,17 +88,23 @@ class ConfigLoader {
 			define( 'SITE_ID_CURRENT_SITE', $_config->get('multisite.site_id', 1));
 			define( 'BLOG_ID_CURRENT_SITE', $_config->get('multisite.blog_id', 1));
 		}
-
+		elseif( $_config->get('install-multisite') )
+		{
+			define( 'WP_ALLOW_MULTISITE', true );
+		}
 
 		/**
 		 * Configure URLs
 		 */
 		$isSecure = false;
 
-		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'){
 			$isSecure = true;
-		elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on')
+		}
+		elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on'){
 			$isSecure = true;
+			$_SERVER['HTTPS']='on';
+		}
 
 		$base_uri = ( $isSecure ? 'https' : 'http' ) . '://'.trim($_SERVER['HTTP_HOST'], '/');
 
@@ -179,6 +182,7 @@ class ConfigLoader {
 		if (!defined('WP_CONTENT_URL'))
 			define( 'WP_CONTENT_URL', WP_HOME.'/wp-bundle' );
 
+		define('WP_UPLOADS_DIR', WP_CONTENT_DIR.'/'.UPLOADS);
 
 		/**
 		 * Custom Settings
@@ -189,6 +193,8 @@ class ConfigLoader {
 		if (!defined('WP_POST_REVISIONS'))
 			define( 'WP_POST_REVISIONS', 3);
 
+		if (!defined('DISABLE_WP_CRON'))
+			define('DISABLE_WP_CRON', true);
 
 		/**
 		 * Bootstrap WordPress

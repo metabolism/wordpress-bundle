@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Plugin{
 	
+	use Dflydev\DotAccessData\Data;
 	use Ifsnop\Mysqldump as IMysqldump;
 	use Metabolism\WordpressBundle\Helper\DirFilterHelper;
 	use Metabolism\WordpressBundle\Helper\Stream;
@@ -17,6 +18,10 @@ namespace Metabolism\WordpressBundle\Plugin{
 		
 		/**
 		 * Export folder, recursif
+		 * @param $source
+		 * @param array $exclude
+		 * @param bool $exclude_pattern
+		 * @return bool
 		 */
 		public function dumpFolder($source, $exclude = [], $exclude_pattern=false)
 		{
@@ -76,6 +81,8 @@ namespace Metabolism\WordpressBundle\Plugin{
 					}
 				}
 			}
+
+			return true;
 		}
 		
 		
@@ -111,6 +118,8 @@ namespace Metabolism\WordpressBundle\Plugin{
 		
 		/**
 		 * Create zip file
+		 * @param $destination
+		 * @return \WP_Error|\ZipArchive
 		 */
 		public function init($destination){
 			
@@ -128,8 +137,12 @@ namespace Metabolism\WordpressBundle\Plugin{
 		
 		/**
 		 * Bundle SQL and Uploads
+		 * @param $global
+		 * @param $type
+		 * @param $filename
+		 * @return bool|string
 		 */
-		private function bundle($global=false, $type='all', $filename)
+		private function bundle($global, $type, $filename)
 		{
 			$backup = false;
 			
@@ -158,7 +171,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 				
 				if( $type == 'all' || $type == 'uploads'){
 					
-					$uploads = $this->dumpFolder($rootPath, ['wpallimport', 'cache', 'wpcf7_uploads', 'wp-personal-data-exports'], '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/');
+					$uploads = $this->dumpFolder($rootPath, ['wpallimport', 'cache', 'wpcf7_uploads', 'acf-thumbnails', 'wp-personal-data-exports'], '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/');
 					
 					if( is_wp_error($uploads) )
 						wp_die( $uploads->get_error_message() );
@@ -181,6 +194,8 @@ namespace Metabolism\WordpressBundle\Plugin{
 		
 		/**
 		 * Generate and download zip file
+		 * @param bool $global
+		 * @param string $type
 		 */
 		private function download($global=false, $type='all')
 		{
@@ -197,7 +212,8 @@ namespace Metabolism\WordpressBundle\Plugin{
 				}
 			}
 			
-			wp_redirect( get_admin_url(null, $global?'network/settings.php':'options-general.php') );
+			wp_redirect( get_admin_url(null, $global?'network/settings.php':'options-'.($type=='uploads'?'media':'general').'.php') );
+			exit;
 		}
 		
 		
@@ -225,6 +241,9 @@ namespace Metabolism\WordpressBundle\Plugin{
 		 */
 		public function wpmuOptions()
 		{
+			if(!current_user_can('administrator'))
+				return;
+			
 			echo '<table id="backup" class="form-table">
 			<tbody><tr>
 				<th scope="row"><h2>'.__('Backup').'</h2></th>
@@ -243,6 +262,9 @@ namespace Metabolism\WordpressBundle\Plugin{
 		 */
 		public function adminInit()
 		{
+			if(!current_user_can('administrator'))
+				return;
+
 			if( isset($_GET['download_backup']) )
 				$this->download(false, isset($_GET['type'])?$_GET['type']:'all');
 			
@@ -265,12 +287,13 @@ namespace Metabolism\WordpressBundle\Plugin{
 		
 		/**
 		 * Constructor
+		 * @param Data $config
 		 */
-		public function __construct($config=false)
+		public function __construct($config)
 		{
 			$this->config = $config;
 			
-			if( !is_admin() or (isset($_SERVER['BACKUP']) && !$_SERVER['BACKUP']) )
+			if( !is_admin() || (isset($_SERVER['BACKUP']) && !$_SERVER['BACKUP']) )
 				return;
 			
 			add_action( 'admin_init', [$this, 'adminInit'] );
@@ -287,7 +310,9 @@ namespace {
 	
 	function wp_backup($source_folder, $zip_file, $exclude_folders = [], $exclude_pattern=false)
 	{
-		$backup = new BackupPlugin();
+		global $_config;
+
+		$backup = new BackupPlugin($_config);
 		$status = $backup->init($zip_file);
 		
 		if( is_wp_error($status))

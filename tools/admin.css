@@ -1,0 +1,92 @@
+/* Roles */
+.no-publish a.page-title-action,
+.no-publish a[href^="post-new.php"],
+.no-publish .taxonomy-add-new,
+.no-publish.taxonomy-item #col-container #col-left,
+.no-publish #wp-admin-bar-new-content{ display: none!important; }
+
+.no-publish.taxonomy-item #col-container #col-right{ width: 100%; float: none }
+
+.no-acf_edit_layout [data-name="add-layout"],
+.no-acf_edit_layout [data-name="remove-layout"]
+{ display: none!important }
+
+.no-acf_edit_image .acf-field-image .acf-actions.-hover,
+.no-acf_edit_file .acf-field-file .acf-actions.-hover{ display: none!important }
+
+.no-acf_edit_layout .acf-repeater .acf-actions,
+.no-acf_edit_layout [data-event="add-row"],
+.no-acf_edit_layout [data-event="remove-row"]
+{ display: none!important }
+
+.no-acf_edit_layout .acf-flexible-content .layout .acf-fc-layout-handle{ cursor: pointer!important }
+
+.no-acf_edit_true-false .acf-field-true-false .acf-input label,
+.no-acf_edit_radio .acf-field-radio .acf-input label,
+.no-acf_edit_post-object .acf-field-post-object .select2
+{ pointer-events: none!important; opacity: 0.5; }
+
+/* Bundle specific */
+.options-media-php .wrap .form-table tr:nth-child(2),
+.options-media-php .wrap .form-table tr:nth-child(3){ display: none }
+
+
+/* Bugfix */
+.js .tmce-active .wp-editor-area { color: inherit!important }
+
+
+/* Quick redesign */
+.post-php, body[class*="toplevel_page_acf-options"], .post-new-php { background: linear-gradient(-90deg, rgba(238,238,238,1) 0%, rgba(238,238,238,1) 290px, rgba(230,230,230,1) 300px, rgba(255,255,255,1) 300px, rgba(255,255,255,1) 100%); }
+@media only screen and (max-width: 850px){
+    .post-php, body[class*="_page_"], .post-new-php{ background: #fff }
+}
+.post-php .wrap h1, .post-new-php .wrap h1{ font-size: 16px }
+.post-new-php .wp-core-ui .notice.is-dismissible, .post-new-php .update-nag, .post-new-php .notice, .post-new-php div.error, .post-new-php div.updated,
+.post-php .wp-core-ui .notice.is-dismissible, .post-php .update-nag, .post-php .notice, .post-php div.error, .post-php div.updated,
+body[class*="_page_"] .wp-core-ui .notice.is-dismissible, body[class*="_page_"] .update-nag, body[class*="_page_"] .notice, body[class*="_page_"] div.error,
+body[class*="_page_"] div.updated{
+    box-shadow: 0 0 3px rgba(0,0,0,0.15)!important; width: calc(100% - 300px); margin-top: 10px; box-sizing: border-box;
+}
+
+#side-sortables .postbox{ background: none; border: 0; border-bottom: 1px solid #ddd; margin-bottom: 0; padding: 10px 0 }
+#side-sortables .postbox:last-of-type{ border-bottom: 0 }
+#major-publishing-actions{ background: none; padding-bottom: 0 }
+input[type=email], input[type=number], input[type=password], input[type=search], input[type=tel], input[type=text], input[type=url], textarea { box-shadow: inset 0 1px 2px rgba(0,0,0,.07)!important }
+.meta-box-sortables select { width: 100%; border-radius: 3px }
+#post-body.columns-2 #postbox-container-1 { width: 270px }
+*{ box-shadow: none!important; text-shadow: none!important }
+#footer-thankyou{ display: none }
+th#mslscol{ width: 25px }
+.fixed th.column-date{ width: 15% }
+#minor-publishing-actions .preview{ width: 100% }
+#post-body #visibility:before, #post-body .misc-pub-post-status:before, #post-body .misc-pub-revisions:before, .curtime #timestamp:before{ font-size: 18px }
+#contextual-help-link-wrap{ display: none }
+#comment-link-box, #edit-slug-box{ padding-left: 0 }
+.mce-top-part::before{ display: none }
+.misc-pub-section a{ float: right }
+.misc-pub-section a.edit-timestamp{ float: none }
+#save-post, #save-action .spinner{ float: right }
+#save-action:after, #poststuff .inside:after{ content: ''; display: table; clear: both }
+#save-action+#preview-action{ margin-top: 10px }
+.postbox-container .inside{ margin: 10px 0 }
+
+
+/* MSLS */
+#msls_noncename ~ .button-secondary{ display: none }
+
+
+/* ACF */
+.acf-image-uploader .image-wrap img{ max-width: 86px }
+.acf-icon.-pencil { font-size: 11px }
+.select2-container--default .select2-selection--single{ border-radius: 0 }
+.select2-container--default .select2-selection--single .select2-selection__arrow b{ border-color: #000 transparent transparent transparent }
+.select2-container--default .select2-selection--single { border-color: #ddd }
+.acf-field .acf-label label, .post-attributes-label, .acf-flexible-content .layout .acf-fc-layout-handle span{ font-weight: normal }
+.acf-flexible-content .layout .acf-fc-layout-handle, .acf-accordion .acf-accordion-title label{ font-weight: 600 }
+.acf-field.acf-accordion .acf-accordion-title{ padding: 9px }
+
+
+/* User */
+#your-profile select, #your-profile textarea, #your-profile .description, #your-profile .select2, #your-profile .acf-taxonomy-field{ max-width: 25em; width: 100% }
+#your-profile .description{ line-height: 1; opacity: 0.5 }
+#your-profile label, #your-profile th[scope=row], #your-profile .user-profile-picture th{ font-weight: normal }

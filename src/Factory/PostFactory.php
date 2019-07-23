@@ -4,6 +4,12 @@ namespace Metabolism\WordpressBundle\Factory;
 
 class PostFactory {
 
+	/**
+	 * Create entity from post_type
+	 * @param null $id
+	 * @param bool $post_type
+	 * @return bool|mixed|\WP_Error
+	 */
 	public static function create($id=null, $post_type = false){
 
 		if( is_array($id) ) {
@@ -41,6 +47,13 @@ class PostFactory {
 
 		if( !$post_type )
 			return new \WP_Error('post_factory_invalid_post_type', 'Unable to get post type');
+
+		$post_status = get_post_status( $id );
+
+		if( $post_status && $post_status == 'private' && (!is_user_logged_in() || current_user_can( 'read_private_posts' )) )
+			return false;
+		elseif( $post_status && $post_status != 'publish' )
+			return false;
 
 		return Factory::create($id, $post_type, 'post');
 	}

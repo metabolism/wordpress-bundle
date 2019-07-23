@@ -22,7 +22,9 @@ class FrontController {
 	 */
 	public function redirect()
 	{
-		if( rtrim($_SERVER['REQUEST_URI'], '/') == WP_FOLDER ){
+		$path = rtrim($_SERVER['REQUEST_URI'], '/');
+
+		if( !empty($path) && ($path == WP_FOLDER || $path == '/web'.WP_FOLDER) ){
 
 			wp_redirect(is_user_logged_in() ? admin_url() : wp_login_url());
 
@@ -35,6 +37,8 @@ class FrontController {
 
 	/**
 	 * Add custom post type for taxonomy archive page
+	 * @param \WP_Query $query
+	 * @return mixed
 	 */
 	public function preGetPosts( $query )
 	{
@@ -47,13 +51,31 @@ class FrontController {
 
 		if ( $query->is_archive )
 		{
-			if( get_class($object) == 'WP_Post_Type' && $ppp = $this->config->get('post_type.'.$object->name.'.posts_per_page') )
+			if( get_class($object) == 'WP_Post_Type' ){
+
+				if( $ppp= $this->config->get('post_type.'.$object->name.'.posts_per_page') )
 				$query->set( 'posts_per_page', $ppp );
-			elseif( get_class($object) == 'WP_Term' && $ppp = $this->config->get('taxonomy.'.$object->taxonomy.'.posts_per_page') )
+
+				if( $orderby = $this->config->get('post_type.'.$object->name.'.orderby') )
+					$query->set( 'orderby', $orderby );
+
+				if( $order = $this->config->get('post_type.'.$object->name.'.order') )
+					$query->set( 'order', $order );
+			}
+			elseif( get_class($object) == 'WP_Term' ){
+
+				if( $ppp = $this->config->get('taxonomy.'.$object->taxonomy.'.posts_per_page') )
 				$query->set( 'posts_per_page', $ppp );
+
+				if( $orderby = $this->config->get('taxonomy.'.$object->name.'.orderby') )
+					$query->set( 'orderby', $orderby );
+
+				if( $order = $this->config->get('taxonomy.'.$object->name.'.order') )
+					$query->set( 'order', $order );
+			}
 		}
 
-		if ( $query->is_tax and !get_query_var('post_type') )
+		if ( $query->is_tax && !get_query_var('post_type') )
 		{
 			global $wp_taxonomies;
 
@@ -79,22 +101,20 @@ class FrontController {
 	public function registerFilters()
 	{
 		add_filter('posts_request', [$this, 'postsRequest'] );
-
-		add_filter('woocommerce_template_path', function($array){ return '../../../WoocommerceBundle/'; });
-		add_filter('woocommerce_enqueue_styles', '__return_empty_array' );
-
-		add_filter('wp_calculate_image_srcset_meta', '__return_null');
 	}
 
 
 	/**
-	 * Create Menu instances from configs
-	 * @see Menu
+	 * Display sql requests
 	 */
 	public function postsRequest($input)
 	{
-		if( $this->config->get('debug.show_query'))
-			var_dump($input);
+		if( isset($_REQUEST['debug']) && $_REQUEST['debug'] == 'query' && $_SERVER['APP_ENV'] == 'dev' ){
+
+			header('Content-Type: application/json');
+			echo json_encode($input);
+			exit(0);
+		}
 
 		return $input;
 	}
@@ -116,7 +136,7 @@ class FrontController {
 
 	public function __construct()
 	{
-		if( defined('WP_INSTALLING') and WP_INSTALLING )
+		if( defined('WP_INSTALLING') && WP_INSTALLING )
 			return;
 
 		$this->loadConfig();
