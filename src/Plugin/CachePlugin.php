@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\Plugin {
 
 	use Dflydev\DotAccessData\Data;
+	use Metabolism\WordpressBundle\Helper\Cache;
 
 
 /**
@@ -11,19 +12,28 @@ namespace Metabolism\WordpressBundle\Plugin {
 	class CachePlugin
 	{
 
-		private $noticeMessage,  $errorMessage;
+		private $noticeMessage,  $errorMessage, $cacheHelper;
+
 
 		/**
 		 * Add maintenance button and checkbox
 		 */
-		public function purgeCache($postId=false)
+		public function purgeCache($pid=false)
 		{
-			if( $postId )
-				$url = get_permalink($postId);
-			else
-				$url = get_home_url(null, '*');
+			if( $pid ){
 
-			$this->purgeUrl($url);
+				$post = get_post($pid);
+
+				if( $post && $post->post_status === 'publish' ){
+
+					$home_url = get_home_url(null);
+					$url = $home_url.get_permalink($pid);
+
+					return $this->purge($url);
+				}
+			}
+
+			return false;
 		}
 
 
@@ -39,21 +49,16 @@ namespace Metabolism\WordpressBundle\Plugin {
 
 		/**
 		 * Add maintenance button and checkbox
+		 * @param bool $url
 		 */
-		private function purgeUrl($url)
+		private function purge($url=false)
 		{
-			$args = ['method' => 'PURGE', 'headers' => ['Host' => $_SERVER['HTTP_HOST']], 'sslverify' => false];
+			$response = $this->cacheHelper->purgeUrl($url);
 
-			$url = str_replace($_SERVER['HTTP_HOST'], $_SERVER['SERVER_ADDR'], $url);
-
-			$response = wp_remote_request($url, $args);
-
-			if ( is_wp_error($response) ) {
+			if ( is_wp_error($response) )
 				$this->errorMessage = $url.' : '.$response->get_error_code().' '.$response->get_error_message();
-			} elseif ( is_array($response) and isset($response['response']) ) {
+			elseif ( is_array($response) and isset($response['response']) )
 				$this->noticeMessage = $url.' : '.$response['response']['code'].' '.$response['response']['message'];
-			}
-
 
 			add_action('admin_notices', [$this, 'purgeMessage'], 999);
 		}
@@ -75,58 +80,23 @@ namespace Metabolism\WordpressBundle\Plugin {
 				$wp_admin_bar->add_node( $args );
 
 			}, 999 );
-		}
 
+			if ( current_user_can('administrator') ){
 
-		/**
-		 * Clear cache folder
-		 */
-		private function clearCache(){
-			if( !empty(BASE_URI) )
-				$this->rrmdir(BASE_URI.'/var/cache');
+				add_action( 'admin_bar_menu', function( $wp_admin_bar ) {
+					$args = [
+						'id'    => 'cache',
+						'title' => __('Clear cache'),
+						'href'  => get_admin_url().'?clear_cache'
+					];
 
-			wp_redirect( get_admin_url(null, 'options-general.php' ));
-			exit;
-		}
+					$wp_admin_bar->add_node( $args );
 
-
-		/**
-		 * Recursive rmdir
-		 * @param string $dir
-		 */
-		private function rrmdir($dir) {
-			
-			if (is_dir($dir)) {
-				$objects = scandir($dir);
-				foreach ($objects as $object) {
-					if ($object != "." && $object != "..") {
-						if (is_dir($dir."/".$object))
-							$this->rrmdir($dir."/".$object);
-						else
-							unlink($dir."/".$object);
-					}
-				}
-				rmdir($dir);
+				}, 999 );
 			}
 		}
 
-
-		/**
-		 * add admin parameters
-		 */
-		public function adminInit(){
-
-			if( isset($_GET['forceclearcache']) )
-				$this->clearCache();
-
-			add_settings_field('cache', __('Cache'), function(){
-
-				echo '<a class="button button-primary" href="'.get_admin_url().'?forceclearcache">'.__('Force clear').'</a>';
-
-			}, 'general');
-		}
-
-
+		
 		/**
 		 * CachePlugin constructor.
 		 * @param Data $config
@@ -136,10 +106,13 @@ namespace Metabolism\WordpressBundle\Plugin {
 			$env = $_SERVER['APP_ENV'] ?? 'dev';
 			$debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env));
 
-			if( isset($_GET['purge_cache']) )
-				$this->purgeCache();
+			$this->cacheHelper = new Cache();
 
-			add_action( 'admin_init', [$this, 'adminInit']);
+			if( isset($_GET['purge_cache']) )
+				$this->purge();
+
+			if( isset($_GET['clear_cache']) && current_user_can('administrator') )
+				$this->cacheHelper->clear();
 
 			if( !$debug ) {
 
