@@ -1,12 +1,24 @@
 CHANGELOG
 ---------
 
+##1.2.0
+#### Feature
+- Site health is now available by typing `/_site-health` url [README.md](README.md)
+- Cache clear button is now available for administrators to remove filecache.
+- New API url are available for cache clearing
+  - `/_cache/purge` call varnish cache
+  - `/_cache/clear` remove filecache and purge varnish cache
+#### Fixe
+- Purge cache button will now clear varnish cache efficiently
+
+
 ##1.1.0
+**Post and page supports must now be explicitly declared in `wordpress.yml`**
 ####Backoffice Feature
 - New interface for Wordpress backoffice
 - WebP thumbnail generation enhance
 - Placeholder for image slots when empty
-- Export database and Uploads files are now availables in Options pages for easy backuping
+- Export database and Uploads files are now available in Options pages for easy backuping
 - Sup button is available in WYSIWYG
 ####Advanced custom fields fixes
 - ACF Fields are now available in menus
@@ -14,13 +26,13 @@ CHANGELOG
 - Metadata removal for a cleaner DOM
 - Role handling in configuration file with permissions
 ####Multisite optimization
-- Better url management for multisites
-- Meta informations are no longer global to multisites
+- Better url management for multisite
+- Meta information are no longer global to multisite
 #### Fixes
 - Maintenance page is no longer active editor and administrator users.
 - Data withdrawing optimization in requests for recurring post and ACF fields
 - Enhanced image compression to 90%
-- Generated thumbnails are now handled with raterized file names.
+- Generated thumbnails are now handled with rasterized file names.
 
 
 
