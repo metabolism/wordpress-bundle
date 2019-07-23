@@ -94,7 +94,7 @@ namespace Metabolism\WordpressBundle\Plugin {
 
 				$wp_admin_bar->add_node( $args );
 
-			if ( current_user_can('administrator') ){
+				if ( current_user_can('administrator') ){
 
 					$args = [
 						'id'    => 'cache-clear',
@@ -105,8 +105,8 @@ namespace Metabolism\WordpressBundle\Plugin {
 					$wp_admin_bar->add_node( $args );
 				}
 
-				}, 999 );
-			}
+			}, 999 );
+		}
 
 
 		/**
