@@ -32,7 +32,7 @@ class Cache {
 	 */
 	public function purge(){
 
-		$status = $this->purgeUrl();
+		list($url, $status) = $this->purgeUrl();
 
 		if( !is_wp_error($status) )
 			$response = new Response('1');
@@ -54,11 +54,18 @@ class Cache {
 		if( !$url )
 			$url = get_home_url(null, '*');
 
-		$args = ['method' => 'PURGE', 'headers' => ['Host' => $_SERVER['HTTP_HOST']], 'sslverify' => false];
+		$varnish = $_SERVER['VARNISH_IP'] ?? false;
 
-		$url = str_replace($_SERVER['HTTP_HOST'], $_SERVER['SERVER_ADDR'], $url);
+		$args = [
+			'method' => 'PURGE',
+			'headers' => ['Host' => $_SERVER['HTTP_HOST']],
+			'sslverify' => false
+		];
 
-		return wp_remote_request($url, $args);
+		if( $varnish )
+			$url = str_replace($_SERVER['HTTP_HOST'], $host, $url);
+
+		return [$url, wp_remote_request($url, $args)];
 	}
 
 
@@ -78,10 +85,10 @@ class Cache {
 					if (is_dir($dir."/".$object))
 						$status = $this->rrmdir($dir."/".$object) && $status;
 					else
-						$status = unlink($dir."/".$object) && $status;
+						$status = @unlink($dir."/".$object) && $status;
 				}
 			}
-			$status = rmdir($dir) && $status;
+			$status = @rmdir($dir) && $status;
 		}
 
 		return $status;

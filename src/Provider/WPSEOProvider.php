@@ -55,6 +55,18 @@ class WPSEOProvider
 
 
 	/**
+	 * make url absolute
+	 */
+	public function makeAbsolute($entry){
+
+		if( isset($entry['loc']) && strpos( WP_HOME, $entry['loc']) === false )
+			$link['loc'] = WP_HOME.$entry['loc'];
+
+		return $entry;
+	}
+
+
+	/**
 	 * Add primary flagged term in first position
 	 */
 	public function changeTermsOrder($terms, $postID, $taxonomy){
@@ -99,6 +111,8 @@ class WPSEOProvider
 
 				if( class_exists( 'WPSEO_Frontend' ) && method_exists( 'WPSEO_Frontend', 'debug_mark' ) )
 					remove_action( 'wpseo_head', [\WPSEO_Frontend::get_instance(), 'debug_mark'], 2);
+
+				add_filter('wpseo_sitemap_entry', [$this, 'makeAbsolute'], 10, 3);
 			});
 
 			add_filter( 'get_the_terms', [$this, 'changeTermsOrder'], 10, 3);
