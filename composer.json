@@ -1,6 +1,6 @@
 {
   "name":"metabolism/wordpress-bundle",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Wordpress bundle for Symfony 4",
   "license": "GPL-3.0-or-later",
   "require": {

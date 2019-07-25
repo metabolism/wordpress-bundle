@@ -52,8 +52,8 @@ class CachePlugin
 	 */
 	private function purge($url=false)
 	{
-		$response = $this->cacheHelper->purgeUrl($url);
-
+		list($url, $response) = $this->cacheHelper->purgeUrl($url);
+		
 		if ( is_wp_error($response) )
 			$this->errorMessage = $url.' : '.$response->get_error_code().' '.$response->get_error_message();
 		elseif ( is_array($response) and isset($response['response']) )
