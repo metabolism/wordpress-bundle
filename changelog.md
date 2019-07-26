@@ -1,15 +1,22 @@
 CHANGELOG
 ---------
 
+##1.2.3
+#### Fix
+- Yoast SEO sitemap urls
+
+
 ##1.2.2
 #### Feature
 - new VARNISH_IP env variable for better cache purge
 #### Fix
 - Yoast SEO sitemap urls
 
+
 ##1.2.1
 #### Fix
 - cache button
+
 
 ##1.2.0
 #### Feature

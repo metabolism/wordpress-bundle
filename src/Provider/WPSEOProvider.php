@@ -60,7 +60,7 @@ class WPSEOProvider
 	public function makeAbsolute($entry){
 
 		if( isset($entry['loc']) && strpos( WP_HOME, $entry['loc']) === false )
-			$link['loc'] = WP_HOME.$entry['loc'];
+			$entry['loc'] = WP_HOME.$entry['loc'];
 
 		return $entry;
 	}
