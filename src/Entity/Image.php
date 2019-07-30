@@ -237,7 +237,7 @@ class Image extends Entity
 
 		$src_ext = pathinfo($this->src, PATHINFO_EXTENSION);
 
-		if( $this->mime_type == 'image/svg+xml' )
+		if( $this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' )
 			return $this->src;
 
 		if( $ext == null )
