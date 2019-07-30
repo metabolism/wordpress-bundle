@@ -15,10 +15,12 @@ class MailPlugin {
     {
         if( !empty($_SERVER['MAILER_URL']) ){
             $this->setSMTPConfig();
-            add_action( 'phpmailer_init', array( $this, 'configureSmtp' ) );
-            add_filter( 'wp_mail_content_type', function($content_type) { return "text/html"; } );
-            add_filter( 'wp_mail_from', array( $this, 'fromEmail' ) );
-            add_filter( 'wp_mail_from_name', array( $this, 'fromName' ) );
+            if($this->_smtp_config['scheme'] != null) {
+                add_action( 'phpmailer_init', array( $this, 'configureSmtp' ) );
+                add_filter( 'wp_mail_content_type', function($content_type) { return "text/html"; } );
+                add_filter( 'wp_mail_from', array( $this, 'fromEmail' ) );
+                add_filter( 'wp_mail_from_name', array( $this, 'fromName' ) );
+            }
         }
     }
 
@@ -74,7 +76,7 @@ class MailPlugin {
         $phpmailer->isSMTP();
         $phpmailer->Host = $this->_smtp_config['host'];
 
-        $SMTPAuth = !empty($this->_smtp_config['auth_mode'] && $this->_smtp_config['auth_mode'] == 'login');
+        $SMTPAuth = (!empty($this->_smtp_config['auth_mode']) && $this->_smtp_config['auth_mode'] == 'login');
         $phpmailer->SMTPAuth = $SMTPAuth;
         if((bool) $SMTPAuth){
             $phpmailer->Port = $this->_smtp_config['port'] ?? 25;
