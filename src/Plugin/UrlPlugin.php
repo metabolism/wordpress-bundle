@@ -13,6 +13,8 @@ class UrlPlugin {
 
 	/**
 	 * Add edition folder to option url
+	 * @param $url
+	 * @return mixed
 	 */
 	public function networkSiteURL($url)
 	{
@@ -30,6 +32,8 @@ class UrlPlugin {
 
 	/**
 	 * Add edition folder to option url
+	 * @param $url
+	 * @return string
 	 */
 	public function optionSiteURL($url)
 	{
@@ -42,6 +46,8 @@ class UrlPlugin {
 
 	/**
 	 * Add edition folder to option url
+	 * @param $url
+	 * @return mixed
 	 */
 	public function homeURL($url)
 	{
@@ -72,6 +78,8 @@ class UrlPlugin {
 
 	/**
 	 * Save post name when requesting for preview link
+	 * @param $id
+	 * @return mixed
 	 */
 	public function getPreviewPermalink($id){
 
@@ -99,6 +107,8 @@ class UrlPlugin {
 
 	/**
 	 * Make link relative
+	 * @param $link
+	 * @return mixed
 	 */
 	public function relativeLink($link){
 

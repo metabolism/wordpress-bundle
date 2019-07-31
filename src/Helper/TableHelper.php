@@ -9,6 +9,11 @@ class Table extends \WP_List_Table {
 
 	private $table, $args, $fields, $column_title, $total_items, $delimiter;
 
+	/**
+	 * Table constructor.
+	 * @param $table
+	 * @param $args
+	 */
 	function __construct($table, $args)
 	{
 		if( isset($args['columns'], $args['columns']['email']) )
@@ -54,7 +59,11 @@ class Table extends \WP_List_Table {
 	}
 
 
-	function registerTableDataEraser( $erasers ) {
+	/**
+	 * @param $erasers
+	 * @return mixed
+	 */
+	function registerTableDataEraser($erasers ) {
 		$erasers[$this->table.'-eraser'] = array(
 			'eraser_friendly_name' => __( $this->args['page_title'].' eraser' ),
 			'callback'  => function( $email ) {
@@ -74,7 +83,11 @@ class Table extends \WP_List_Table {
 		return $erasers;
 	}
 
-	function registerTableDataExporter( $exporters ) {
+	/**
+	 * @param $exporters
+	 * @return mixed
+	 */
+	function registerTableDataExporter($exporters ) {
 
 		$exporters[$this->table.'-exporter'] = [
 			'exporter_friendly_name' => __( $this->args['page_title'] . ' exporter' ),
@@ -150,13 +163,21 @@ class Table extends \WP_List_Table {
 	}
 
 
-	function extra_tablenav( $which ) {
+	/**
+	 * @param $which
+	 */
+	function extra_tablenav($which ) {
 
 		if( $this->args['export'] && $this->total_items )
 			echo '<a class="button button-primary" href="'.sprintf('?page=%s&action=export', $_REQUEST['page']).'" style="display: inline-block;float: right;margin-left: 10px;margin-right: 0;margin-bottom: 10px;">'.__('Export all').'</a>';
 	}
 
 
+	/**
+	 * @param $item
+	 * @param $column_name
+	 * @return mixed
+	 */
 	function column_default($item, $column_name)
 	{
 		$value = '';
@@ -168,6 +189,10 @@ class Table extends \WP_List_Table {
 	}
 
 
+	/**
+	 * @param $item
+	 * @return string
+	 */
 	function column_title($item){
 
 		$actions = [];
@@ -192,6 +217,10 @@ class Table extends \WP_List_Table {
 	}
 
 
+	/**
+	 * @param $item
+	 * @return string
+	 */
 	function column_cb($item)
 	{
 		return sprintf('<input type="checkbox" name="%1$s[]" value="%2$s" />','id', $item['id']);

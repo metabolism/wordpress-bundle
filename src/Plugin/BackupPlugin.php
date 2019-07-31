@@ -17,7 +17,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 		
 		
 		/**
-		 * Export folder, recursif
+		 * Export folder, recursive
 		 * @param $source
 		 * @param array $exclude
 		 * @param bool $exclude_pattern
@@ -84,10 +84,12 @@ namespace Metabolism\WordpressBundle\Plugin{
 
 			return true;
 		}
-		
-		
+
+
 		/**
 		 * Export database
+		 * @param $path
+		 * @return bool|\WP_Error
 		 */
 		private function dumpDatabase($path)
 		{
@@ -224,10 +226,11 @@ namespace Metabolism\WordpressBundle\Plugin{
 		{
 			return $this->zip->close();
 		}
-		
-		
+
+
 		/**
 		 * Stream file to browser
+		 * @param $file
 		 */
 		private function stream($file)
 		{
@@ -307,7 +310,14 @@ namespace {
 	
 	use Metabolism\WordpressBundle\Helper\Stream;
 	use Metabolism\WordpressBundle\Plugin\BackupPlugin;
-	
+
+	/**
+	 * @param $source_folder
+	 * @param $zip_file
+	 * @param array $exclude_folders
+	 * @param bool $exclude_pattern
+	 * @return bool|WP_Error|ZipArchive
+	 */
 	function wp_backup($source_folder, $zip_file, $exclude_folders = [], $exclude_pattern=false)
 	{
 		global $_config;

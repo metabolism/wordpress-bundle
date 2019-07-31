@@ -204,7 +204,7 @@ class MediaPlugin {
 
 				switch_to_blog( $site->blog_id );
 
-				// check if post is allready synced
+				// check if post is already synced
 				$attachment = get_posts(['post_type'=>'attachment', 'meta_key' => '_wp_original_attachment_id', 'meta_value' => $attachment_ID, 'fields'=>'ids']);
 
 				if( !count($attachment) )

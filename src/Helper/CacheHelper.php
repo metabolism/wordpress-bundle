@@ -63,7 +63,7 @@ class Cache {
 		];
 
 		if( $varnish )
-			$url = str_replace($_SERVER['HTTP_HOST'], $host, $url);
+			$url = str_replace($_SERVER['HTTP_HOST'], $varnish, $url);
 
 		return [$url, wp_remote_request($url, $args)];
 	}

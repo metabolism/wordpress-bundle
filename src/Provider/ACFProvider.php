@@ -130,9 +130,11 @@ class ACFProvider {
 		return $wpdb->get_var($selectSql);
 	}
 
-	
+
 	/**
 	 * Customize basic toolbar
+	 * @param $toolbars
+	 * @return
 	 */
 	public function editToolbars($toolbars){
 

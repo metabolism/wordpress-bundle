@@ -71,6 +71,8 @@ Trait ContextTrait
 
 	/**
 	 * Get multisite multilangue data
+	 * @param $queried_object
+	 * @return array
 	 */
 	protected function getLanguagesData($queried_object){
 
@@ -413,6 +415,7 @@ Trait ContextTrait
 
 	/**
 	 * Retrieve paginated link for archive post pages.
+	 * @param array $args
 	 * @return object|bool
 	 */
 	public function addPagination($args=[])

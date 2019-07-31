@@ -39,10 +39,10 @@ class Query
 	}
 
 	/**
-	 * @param $post_id
+	 * @param $pid
 	 * @param array $args
 	 * @param bool $loop
-	 * @return array
+	 * @return array|bool
 	 */
 	public static function get_adjacent_posts($pid, $args=[], $loop=false)
 	{

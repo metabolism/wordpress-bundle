@@ -12,7 +12,7 @@ class NoticePlugin {
 
 
 	/**
-	 * Check symlinks and forders
+	 * Check symlinks and folders
 	 */
 	public function adminNotices(){
 
@@ -71,6 +71,10 @@ class NoticePlugin {
 	}
 
 
+	/**
+	 * NoticePlugin constructor.
+	 * @param $config
+	 */
 	public function __construct($config)
 	{
 		$this->config = $config;

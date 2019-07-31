@@ -13,6 +13,9 @@ class WPSEOProvider
 
 	/**
 	 * Disable editor options for seo taxonomy edition
+	 * @param $settings
+	 * @param $editor_id
+	 * @return mixed
 	 */
 	public function editorSettings( $settings, $editor_id ){
 
@@ -56,6 +59,8 @@ class WPSEOProvider
 
 	/**
 	 * make url absolute
+	 * @param $entry
+	 * @return mixed
 	 */
 	public function makeAbsolute($entry){
 
@@ -68,6 +73,10 @@ class WPSEOProvider
 
 	/**
 	 * Add primary flagged term in first position
+	 * @param $terms
+	 * @param $postID
+	 * @param $taxonomy
+	 * @return array
 	 */
 	public function changeTermsOrder($terms, $postID, $taxonomy){
 

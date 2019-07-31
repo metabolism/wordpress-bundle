@@ -14,6 +14,8 @@ class EditorPlugin {
 
 	/**
 	 * Configure Tiny MCE first line buttons
+	 * @param $mce_buttons
+	 * @return
 	 */
 	public function TinyMceButtons( $mce_buttons )
 	{
@@ -26,6 +28,7 @@ class EditorPlugin {
 
 	/**
 	 * Add quick link top bar archive button
+	 * @param $wp_admin_bar
 	 */
 	public function editBarMenu($wp_admin_bar)
 	{

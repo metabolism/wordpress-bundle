@@ -8,7 +8,11 @@ namespace Metabolism\WordpressBundle\Plugin;
  */
 class TermsPlugin{
 
-	public function wp_terms_checklist_args( $args )
+	/**
+	 * @param $args
+	 * @return mixed
+	 */
+	public function wp_terms_checklist_args($args )
 	{
 		$args['checked_ontop'] = false;
 		return $args;
@@ -37,6 +41,10 @@ class TermsPlugin{
 	}
 
 
+	/**
+	 * @param $raw_cats
+	 * @return array
+	 */
 	public static function sortHierarchically($raw_cats){
 
 		$cats = [];
@@ -50,6 +58,11 @@ class TermsPlugin{
 	}
 
 
+	/**
+	 * @param $cats
+	 * @param $into
+	 * @param int $parentId
+	 */
 	public static function sort(&$cats, &$into, $parentId = 0)
 	{
 		foreach ($cats as $i => $cat)
@@ -72,6 +85,10 @@ class TermsPlugin{
 	}
 
 
+	/**
+	 * TermsPlugin constructor.
+	 * @param $config
+	 */
 	public function __construct($config)
 	{
 		// When viewing admin

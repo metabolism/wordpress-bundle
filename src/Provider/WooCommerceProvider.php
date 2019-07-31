@@ -64,7 +64,10 @@ class WooCommerceProvider
     }
 
 
-    /** Add cart content to TemplateEngine context */
+	/** Add cart content to TemplateEngine context
+	 * @param $context
+	 * @return mixed
+	 */
     public function cartContext(&$context)
     {
 

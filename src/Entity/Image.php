@@ -115,7 +115,7 @@ class Image extends Entity
 
 		unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
 
-		if( isset($post['mime_type']) && $post['mime_type'] == 'image/svg+xml')
+		if( isset($post['mime_type']) && ($post['mime_type'] == 'image/svg+xml' || $this->mime_type == 'image/svg') )
 			unset($metadata['meta'],$metadata['width'],$metadata['height']);
 
 		if( is_array($metadata) )
@@ -145,8 +145,8 @@ class Image extends Entity
 	/**
 	 * @param $w
 	 * @param int $h
-	 * @param bool $name
 	 * @param null $ext
+	 * @param bool $params
 	 * @return mixed
 	 */
 	public function resize($w, $h = 0, $ext=null, $params=false){
@@ -184,19 +184,20 @@ class Image extends Entity
 	 * @param $w
 	 * @param int $h
 	 * @param bool $sources
+	 * @param bool $params
 	 * @return \Twig\Markup
 	 */
 	public function toHTML($w, $h=0, $sources=false, $params=false){
 
 		if( empty($this->src) || !file_exists($this->src) )
-			return '<img src="'.$this->placeholder($w, $h).'" alt="image not found or empty">';
+			return new \Twig\Markup('<img src="'.$this->placeholder($w, $h).'" alt="image not found or empty">', 'UTF-8');;
 
 		$ext = function_exists('imagewebp') ? 'webp' : null;
 		$mime = function_exists('imagewebp') ? 'image/webp' : $this->mime_type;
 
 		$html = '<picture>';
 
-		if($this->mime_type == 'image/svg+xml' || !$sources ){
+		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || !$sources ){
 
 			$html .= '<img src="'.$this->resize($w, $h, null, $params).'" alt="'.$this->alt.'">';
 		}
@@ -225,6 +226,7 @@ class Image extends Entity
 	 * @param $w
 	 * @param int $h
 	 * @param null $ext
+	 * @param bool $params
 	 * @return mixed|string
 	 */
 	protected function crop($w, $h=0, $ext=null, $params=false){
@@ -237,7 +239,7 @@ class Image extends Entity
 
 		$src_ext = pathinfo($this->src, PATHINFO_EXTENSION);
 
-		if( $this->mime_type == 'image/svg+xml' )
+		if( $this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' )
 			return $this->src;
 
 		if( $ext == null )

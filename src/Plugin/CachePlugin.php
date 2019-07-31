@@ -17,6 +17,8 @@ class CachePlugin
 
 	/**
 	 * Add maintenance button and checkbox
+	 * @param bool $pid
+	 * @return bool|void
 	 */
 	public function purgeCache($pid=false)
 	{
@@ -49,6 +51,7 @@ class CachePlugin
 
 	/**
 	 * Purge cache
+	 * @param bool $url
 	 */
 	private function purge($url=false)
 	{
