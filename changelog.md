@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 ##1.2.4
+#### Feature
+- add wpackagist-plugin/redirection plugin, role configuration
 #### Fix
 - SVG detection ( merge request from @undefinedfr )
 - Update functions comment

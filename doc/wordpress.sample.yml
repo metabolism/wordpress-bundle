@@ -285,3 +285,7 @@ template:
 #
 #      manage_items: true
 #      edit_items: true
+
+#plugins:
+#  redirection:
+#    redirection_role: edit_others_posts
