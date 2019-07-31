@@ -29,6 +29,7 @@ namespace Metabolism\WordpressBundle\Plugin;
 
 		/**
 		 * Initializes the plugin by setting filters and administration functions.
+		 * @param $config
 		 */
 		public function __construct($config) {
 

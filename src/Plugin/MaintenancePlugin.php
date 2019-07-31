@@ -64,6 +64,10 @@ use Dflydev\DotAccessData\Data;
 
 namespace {
 
+	/**
+	 * @param bool $strict
+	 * @return bool
+	 */
 	function wp_maintenance_mode($strict = false)
 	{
 		if ($strict)

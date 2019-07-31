@@ -9,7 +9,12 @@ use enshrined\svgSanitize\Sanitizer;
  */
 class SVGPlugin {
 
-	public function metadataErrorFix( $data, $post_id ) {
+	/**
+	 * @param $data
+	 * @param $post_id
+	 * @return mixed
+	 */
+	public function metadataErrorFix($data, $post_id ) {
 
 		if ( is_wp_error( $data ) ) {
 			$data = wp_generate_attachment_metadata( $post_id, get_attached_file( $post_id ) );
@@ -19,20 +24,36 @@ class SVGPlugin {
 		return $data;
 	}
 
-	public function fileIsDisplayableImage( $result , $path )
+	/**
+	 * @param $result
+	 * @param $path
+	 * @return bool
+	 */
+	public function fileIsDisplayableImage($result , $path )
 	{
 		return pathinfo( $path , PATHINFO_EXTENSION ) == 'svg' || $result;
 	}
 
-	public function uploadMimes( $mimes )
+	/**
+	 * @param $mimes
+	 * @return mixed
+	 */
+	public function uploadMimes($mimes )
 	{
-		$mimes['svg'] = 'image/svg+xml';
+		$mimes['svg'] = 'image/svg';
 		$mimes['svgz'] = 'image/svg+xml';
 
 		return $mimes;
 	}
 
-	public function fixMimeTypeSvg( $data = null, $file = null, $filename = null, $mimes = null )
+	/**
+	 * @param null $data
+	 * @param null $file
+	 * @param null $filename
+	 * @param null $mimes
+	 * @return null
+	 */
+	public function fixMimeTypeSvg($data = null, $file = null, $filename = null, $mimes = null )
 	{
 		$ext = isset( $data['ext'] ) ? $data['ext'] : '';
 		if ( strlen( $ext ) < 1 ) {
@@ -40,7 +61,7 @@ class SVGPlugin {
 			$ext      = strtolower( end( $exploded ) );
 		}
 		if ( $ext === 'svg' ) {
-			$data['type'] = 'image/svg+xml';
+			$data['type'] = 'image/svg';
 			$data['ext']  = 'svg';
 		} elseif ( $ext === 'svgz' ) {
 			$data['type'] = 'image/svg+xml';
@@ -50,11 +71,20 @@ class SVGPlugin {
 		return $data;
 	}
 
-	public function getImageTag( $html, $id, $alt, $title, $align, $size ) {
+	/**
+	 * @param $html
+	 * @param $id
+	 * @param $alt
+	 * @param $title
+	 * @param $align
+	 * @param $size
+	 * @return mixed
+	 */
+	public function getImageTag($html, $id, $alt, $title, $align, $size ) {
 
 		$mime = get_post_mime_type( $id );
 
-		if ( 'image/svg+xml' === $mime ) {
+		if ( 'image/svg+xml' === $mime || 'image/svg' === $mime ) {
 			if( is_array( $size ) ) {
 				$width = $size[0];
 				$height = $size[1];
@@ -75,7 +105,11 @@ class SVGPlugin {
 		return $html;
 	}
 
-	protected function sanitize( $file ) {
+	/**
+	 * @param $file
+	 * @return bool
+	 */
+	protected function sanitize($file ) {
 
 		$dirty = file_get_contents( $file );
 
@@ -101,7 +135,11 @@ class SVGPlugin {
 		return true;
 	}
 
-	protected function is_gzipped( $contents ) {
+	/**
+	 * @param $contents
+	 * @return bool
+	 */
+	protected function is_gzipped($contents ) {
 
 		if ( function_exists( 'mb_strpos' ) ) {
 			return 0 === mb_strpos( $contents, "\x1f" . "\x8b" . "\x08" );
@@ -110,9 +148,13 @@ class SVGPlugin {
 		}
 	}
 
-	public function sanitizeSVG( $file ) {
+	/**
+	 * @param $file
+	 * @return mixed
+	 */
+	public function sanitizeSVG($file ) {
 
-		if ( $file && isset($file['type']) && $file['type'] === 'image/svg+xml' ) {
+		if ( $file && isset($file['type']) && ($file['type'] === 'image/svg+xml' || $file['type'] === 'image/svg' )) {
 			if ( ! $this->sanitize( $file['tmp_name'] ) ) {
 				$file['error'] = __( "Sorry, this file couldn't be sanitized so for security reasons wasn't uploaded", 'wordpress-bundle' );
 			}
@@ -121,8 +163,16 @@ class SVGPlugin {
 		return $file;
 	}
 
-	public function onePixelFix( $image, $attachment_id, $size, $icon ) {
-		if ( get_post_mime_type( $attachment_id ) == 'image/svg+xml' ) {
+	/**
+	 * @param $image
+	 * @param $attachment_id
+	 * @param $size
+	 * @param $icon
+	 * @return mixed
+	 */
+	public function onePixelFix($image, $attachment_id, $size, $icon ) {
+		$mime = get_post_mime_type( $attachment_id );
+		if ( $mime === 'image/svg+xml' || $mime === 'image/svg' ) {
 			$image['1'] = false;
 			$image['2'] = false;
 		}
@@ -130,6 +180,10 @@ class SVGPlugin {
 		return $image;
 	}
 
+	/**
+	 * SVGPlugin constructor.
+	 * @param $config
+	 */
 	public function __construct($config)
 	{
 		$this->config = $config;

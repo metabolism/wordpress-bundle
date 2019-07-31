@@ -18,6 +18,9 @@ class Loader{
 		}
 	}
 
+	/**
+	 * @param $classname
+	 */
 	public static function load($classname){
 
 		if( ( defined('WP_INSTALLING') && WP_INSTALLING ) || !defined('WPINC') )

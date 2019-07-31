@@ -59,8 +59,8 @@ class TwigExtension extends AbstractExtension{
 
 
 	/**
-	 * @param $function_name
-	 * @param $by
+	 * @param $page
+	 * @param bool $by
 	 * @return mixed
 	 */
 	public function getPermalink( $page, $by=false )
@@ -92,6 +92,7 @@ class TwigExtension extends AbstractExtension{
 
 	/**
 	 * @param $text
+	 * @param string $cta
 	 * @return mixed
 	 */
 	public function more($text, $cta='Lire la suite')
@@ -102,6 +103,7 @@ class TwigExtension extends AbstractExtension{
 
 	/**
 	 * @param $image
+	 * @param bool $params
 	 * @return Image
 	 */
 	public function placeholder($image, $params=false)

@@ -37,9 +37,11 @@ class SecurityPlugin {
 		wp_deregister_script( 'wp-embed' );
 	}
 
-	
+
 	/**
 	 * Clean filename
+	 * @param $file
+	 * @return mixed
 	 */
 	function cleanFilename($file) {
 
@@ -146,6 +148,10 @@ class SecurityPlugin {
 	}
 
 
+	/**
+	 * SecurityPlugin constructor.
+	 * @param $config
+	 */
 	public function __construct($config)
 	{
 		add_filter( 'flush_rewrite_rules_hard', '__return_false');

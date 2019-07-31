@@ -162,6 +162,11 @@ class MSLSProvider {
 	}
 
 
+	/**
+	 * @param $link
+	 * @param $post_type
+	 * @return mixed
+	 */
 	public function postTypeArchiveLink($link, $post_type){
 
 		if( !empty($GLOBALS['_wp_switched_stack'] ) ){
@@ -180,6 +185,11 @@ class MSLSProvider {
 	}
 
 
+	/**
+	 * @param $permalink
+	 * @param $post
+	 * @return mixed
+	 */
 	public function postTypeLink($permalink, $post){
 
 		if( !empty($GLOBALS['_wp_switched_stack'] ) ){
@@ -209,6 +219,10 @@ class MSLSProvider {
 	}
 
 
+	/**
+	 * MSLSProvider constructor.
+	 * @param $config
+	 */
 	public function __construct($config){
 
 		$this->config = $config;

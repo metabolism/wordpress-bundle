@@ -1,4 +1,4 @@
-# Symfony 4.X Bundle for Wordpress
+# Wordpress & Symfony, with ♥
 
 Introduction
 ------------

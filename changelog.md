@@ -1,6 +1,12 @@
 CHANGELOG
 ---------
 
+##1.2.4
+#### Fix
+- SVG detection ( merge request from @undefinedfr )
+- Update functions comment
+- Update composer required php extensions
+
 ##1.2.3
 #### Fix
 - Yoast SEO sitemap urls
@@ -9,8 +15,6 @@ CHANGELOG
 ##1.2.2
 #### Feature
 - new VARNISH_IP env variable for better cache purge
-#### Fix
-- Yoast SEO sitemap urls
 
 
 ##1.2.1

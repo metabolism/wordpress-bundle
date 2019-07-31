@@ -35,6 +35,9 @@ namespace Metabolism\WordpressBundle\Plugin{
 
 		/**
 		 * Display post state
+		 * @param $post_states
+		 * @param $post
+		 * @return array
 		 */
 		public function addPostState($post_states, $post) {
 
@@ -77,6 +80,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 
 		/**
 		 * Initializes the plugin by setting filters and administration functions.
+		 * @param $config
 		 */
 		public function __construct($config) {
 
@@ -97,6 +101,11 @@ namespace Metabolism\WordpressBundle\Plugin{
 
 namespace {
 
+	/**
+	 * @param $state
+	 * @param $output
+	 * @return bool
+	 */
 	function get_page_by_state($state, $output = OBJECT)
 	{
 		if( !is_string($state) )

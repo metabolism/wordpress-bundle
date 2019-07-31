@@ -12,6 +12,10 @@ class Form {
 
 	/**
 	 * Get request parameter
+	 * @param $data
+	 * @param $key
+	 * @param int $limit_lengh
+	 * @return bool|string
 	 */
 	public static function getField( $data, $key, $limit_lengh=500 )
 	{
@@ -42,6 +46,9 @@ class Form {
 
 	/**
 	 * Get whole form
+	 * @param array $fields
+	 * @param bool $data
+	 * @return array
 	 */
 	public static function get($fields=[], $data=false){
 
@@ -57,6 +64,12 @@ class Form {
 
 	/**
 	 * Send form
+	 * @param string $to
+	 * @param string $subject
+	 * @param array $fields
+	 * @param array $attachements
+	 * @param string $email_id
+	 * @return array|\WP_Error
 	 */
 	public static function send($to='admin', $subject='New message from website', $fields=[], $attachements=[], $email_id='email' ){
 
