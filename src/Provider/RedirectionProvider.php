@@ -14,16 +14,13 @@ class RedirectionProvider
 	 */
 	public function __construct($config)
 	{
-		if( is_admin() ) {
+		$role = $config->get('plugins.redirection.redirection_role');
 
-			$role = $config->get('plugins.redirection.redirection_role');
+		if( $role ){
 
-			if( $role ){
-
-				add_filter('redirection_role', function($cap) use($role) {
-					return $role;
-				});
-			}
+			add_filter('redirection_role', function($cap) use($role) {
+				return $role;
+			});
 		}
 	}
 }
