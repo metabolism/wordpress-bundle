@@ -1,13 +1,20 @@
 CHANGELOG
 ---------
 
+##1.2.5
+#### Fix
+- Entity->addCustomFields bug on non object ( merge request from @undefinedfr )
+- Update function comments
+
+
 ##1.2.4
 #### Feature
 - add wpackagist-plugin/redirection plugin, role configuration
 #### Fix
 - SVG detection ( merge request from @undefinedfr )
-- Update functions comment
+- Update functions comments
 - Update composer required php extensions
+
 
 ##1.2.3
 #### Fix
