@@ -74,10 +74,13 @@ class Entity
 		{
 			$this->custom_fields = new ACF( $id );
 
-			foreach ($this->custom_fields->get() as $name => $value )
-			{
-				$this->$name = $value;
-			}
+			$custom_fields = $this->custom_fields->get();
+			if(is_array($custom_fields)){
+                foreach ($custom_fields as $name => $value )
+                {
+                    $this->$name = $value;
+                }
+            }
 		}
 	}
 
