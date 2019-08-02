@@ -6,6 +6,7 @@
  */
 namespace Metabolism\WordpressBundle\Helper;
 
+use Metabolism\WordpressBundle\Entity\Entity;
 use Metabolism\WordpressBundle\Entity\Post,
 	Metabolism\WordpressBundle\Entity\Term,
 	Metabolism\WordpressBundle\Entity\User,
@@ -23,7 +24,11 @@ class ACF
 	protected static $MAX_DEPTH = 2;
 	protected static $DEPTH = 0;
 
-	public function __construct( $post_id )
+	/**
+	 * ACF constructor.
+	 * @param $post_id
+	 */
+	public function __construct($post_id )
 	{
 		self::$DEPTH++;
 
@@ -47,23 +52,37 @@ class ACF
 	}
 
 
+	/**
+	 * @return bool|int
+	 */
 	public function loaded()
 	{
 		return $this->loaded;
 	}
 
-	public static function setMaxDepth( $value )
+
+	/**
+	 * @param $value
+	 */
+	public static function setMaxDepth($value )
 	{
 		self::$MAX_DEPTH = $value;
 	}
 
 
+	/**
+	 * @return array|bool|Entity|mixed|\WP_Error
+	 */
 	public function get()
 	{
 		return $this->objects;
 	}
 
 
+	/**
+	 * @param $raw_layouts
+	 * @return array
+	 */
 	public function layoutsAsKeyValue($raw_layouts)
 	{
 		$layouts = [];
@@ -85,6 +104,11 @@ class ACF
 	}
 
 
+	/**
+	 * @param $fields
+	 * @param $layouts
+	 * @return array|bool
+	 */
 	public function bindLayoutsFields($fields, $layouts){
 
 		$data = [];
@@ -109,7 +133,11 @@ class ACF
 	}
 
 
-	public function layoutAsKeyValue( $raw_layout )
+	/**
+	 * @param $raw_layout
+	 * @return array
+	 */
+	public function layoutAsKeyValue($raw_layout )
 	{
 		$data = [];
 
@@ -120,6 +148,11 @@ class ACF
 	}
 
 
+	/**
+	 * @param $fields
+	 * @param $layout
+	 * @return array
+	 */
 	public function bindLayoutFields($fields, $layout){
 
 		$data = [];
@@ -135,6 +168,11 @@ class ACF
 		return $data;
 	}
 
+	/**
+	 * @param $type
+	 * @param $id
+	 * @return array|bool|Entity|mixed|\WP_Error
+	 */
 	public function load($type, $id)
 	{
 		$value = false;
@@ -177,6 +215,10 @@ class ACF
 	}
 
 
+	/**
+	 * @param $raw_objects
+	 * @return array
+	 */
 	public function clean($raw_objects)
 	{
 		$objects = [];
