@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 use Dflydev\DotAccessData\Data;
+use Metabolism\WordpressBundle\Helper\Query;
 use Metabolism\WordpressBundle\Helper\Table;
 
 /**
@@ -77,6 +78,7 @@ class ConfigPlugin {
 					$args['capability_type'] = [$post_type, $this->plural($post_type)];
 
 				$slug = get_option( $post_type. '_rewrite_slug' );
+				$slug = str_replace('%', '}', str_replace('/%', '/{', $slug));
 
 				if( !is_null($slug) && !empty($slug) )
 					$args['rewrite'] = ['slug'=>$slug];
@@ -89,8 +91,24 @@ class ConfigPlugin {
 						$args['has_archive'] = $archive;
 				}
 
-				if( !WP_FRONT )
+				if( !WP_FRONT ){
+
 					$args['publicly_queryable'] = false;
+				}
+				else{
+
+					preg_match_all('/\/{.+?}/', $slug, $toks);
+
+					if( count($toks) && count($toks[0]) ){
+
+						$rule = '^'.$slug.'/([^/]+)/?$';
+						foreach ($toks[0] as $tok){
+							$rule = str_replace($tok, '/[^/]+', $rule);
+						}
+
+						add_rewrite_rule($rule, 'index.php?'.$post_type.'=$matches[1]', 'top');
+					}
+				}
 
 				register_post_type($post_type, $args);
 
@@ -141,17 +159,18 @@ class ConfigPlugin {
 
 					}
 
-					if( isset($args['has_options']) && function_exists('acf_add_options_page') )
+					if( isset($args['has_options']) && function_exists('acf_add_options_sub_page') )
 					{
 						if( is_bool($args['has_options']) )
 						{
 							$args = [
 								'page_title' 	=> ucfirst($name).' archive options',
-								'menu_title' 	=> 'Archive options'
+								'menu_title' 	=> 'Archive options',
+								'autoload'   	=> true
 							];
 						}
 
-						$args['menu_slug'] = 'options_'.$post_type;
+						$args['menu_slug']   = 'options_'.$post_type;
 						$args['parent_slug'] = 'edit.php?post_type='.$post_type;
 
 						acf_add_options_sub_page($args);
@@ -159,7 +178,7 @@ class ConfigPlugin {
 				}
 
 			}else{
-				wp_die($post_type. 'is not allowed, reserved keyword');
+				wp_die($post_type. ' is not allowed, reserved keyword');
 			}
 		}
 
@@ -218,7 +237,7 @@ class ConfigPlugin {
 
 		foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args )
 		{
-			if( $taxonomy != 'type' && $taxonomy != 'category' && $taxonomy != 'tag' && $taxonomy != 'product' ) {
+			if( $taxonomy != 'category' && $taxonomy != 'tag' && $taxonomy != 'product' ) {
 
 				$args = array_merge($default_args, $args);
 				$name = str_replace('_', ' ', isset($args['name']) ? $args['name'] : $taxonomy);
@@ -234,6 +253,7 @@ class ConfigPlugin {
 				];
 
 				$slug = get_option( $taxonomy. '_rewrite_slug' );
+				$slug = str_replace('%', '}', str_replace('/%', '/{', $slug));
 
 				if( !is_null($slug) && !empty($slug) )
 					$args['rewrite'] = ['slug'=>$slug];
@@ -267,13 +287,43 @@ class ConfigPlugin {
 					$object_type = 'post';
 				}
 
-				if( !WP_FRONT )
+				if( !WP_FRONT ){
+
 					$args['publicly_queryable'] = false;
+				}
+				else{
+
+					preg_match_all('/\/{.+?}/', $slug, $toks);
+
+					if( count($toks) && count($toks[0]) ){
+
+						$rule = '^'.$slug.'/([^/]+)/?$';
+						$has_parent = false;
+
+						foreach ($toks[0] as $tok){
+
+							$has_parent = $has_parent || $tok == '/{parent}';
+
+							if( $tok != '/{parent}' )
+								$rule = str_replace($tok, '/[^/]+', $rule);
+						}
+
+						if( $has_parent ){
+
+							add_rewrite_rule(str_replace('/{parent}', '/[^/]+', $rule), 'index.php?'.$taxonomy.'=$matches[1]', 'top');
+							add_rewrite_rule(str_replace('/{parent}', '', $rule), 'index.php?'.$taxonomy.'=$matches[1]', 'top');
+						}
+						else{
+
+							add_rewrite_rule($rule, 'index.php?'.$taxonomy.'=$matches[1]', 'top');
+						}
+					}
+				}
 
 				register_taxonomy($taxonomy, $object_type, $args);
 
 			} else{
-				wp_die($taxonomy. 'is not allowed, reserved keyword');
+				wp_die($taxonomy. ' is not allowed, reserved keyword');
 			}
 		}
 
@@ -326,7 +376,7 @@ class ConfigPlugin {
 
 
 	/**
-	 * Set permalink stucture
+	 * Set permalink structure
 	 */
 	public function setPermalink()
 	{
@@ -335,8 +385,6 @@ class ConfigPlugin {
 		$wp_rewrite->set_permalink_structure($this->config->get('permalink_structure', '/%postname%'));
 
 		update_option( 'rewrite_rules', FALSE );
-
-		$wp_rewrite->flush_rules( true );
 	}
 
 
@@ -369,7 +417,7 @@ class ConfigPlugin {
 				{
 					if( isset( $_POST[$post_type. '_rewrite_'.$type] ) && !empty($_POST[$post_type. '_rewrite_'.$type]) )
 					{
-						update_option( $post_type. '_rewrite_'.$type, sanitize_title_with_dashes( $_POST[$post_type. '_rewrite_'.$type] ) );
+						update_option( $post_type. '_rewrite_'.$type, $_POST[$post_type. '_rewrite_'.$type] );
 						$updated = true;
 					}
 
@@ -392,7 +440,7 @@ class ConfigPlugin {
 		{
 			if( isset( $_POST[$taxonomy. '_rewrite_slug'] ) && !empty($_POST[$taxonomy. '_rewrite_slug']) )
 			{
-				update_option( $taxonomy. '_rewrite_slug', sanitize_title_with_dashes( $_POST[$taxonomy. '_rewrite_slug'] ) );
+				update_option( $taxonomy. '_rewrite_slug', $_POST[$taxonomy. '_rewrite_slug'] );
 				$updated = true;
 			}
 
@@ -413,7 +461,7 @@ class ConfigPlugin {
 			global $wp_rewrite;
 			$wp_rewrite->flush_rules( true );
 
-			do_action('purge_cache');
+			do_action('reset_cache');
 		}
 	}
 
@@ -507,6 +555,70 @@ class ConfigPlugin {
 
 
 	/**
+	 * Update permalink if structure is custom
+	 */
+	public  function updatePostTypePermalink($post_link, $post){
+
+		if ( is_object( $post ) ){
+
+			preg_match_all('/\/{.+?}/', $post_link, $toks);
+
+			if( count($toks) && count($toks[0]) ){
+
+				foreach ($toks[0] as $tok){
+
+					$taxonomy = str_replace('}', '', str_replace('/{', '', $tok));
+
+					$terms = get_the_terms( $post, $taxonomy );
+
+					if( count($terms) )
+						$post_link = str_replace( '{'.$taxonomy.'}', $terms[0]->slug, $post_link );
+					else
+						$post_link = str_replace( '{'.$taxonomy.'}', 'default', $post_link );
+				}
+			}
+		}
+
+		return $post_link;
+	}
+
+
+	/**
+	 * Update permalink if structure is custom
+	 */
+	public  function updateTermPermalink($term_link, $term){
+
+		if ( is_object( $term ) ){
+
+			preg_match_all('/\/{.+?}/', $term_link, $toks);
+
+			if( count($toks) ){
+
+				foreach ($toks[0] as $tok){
+
+					$match = str_replace('}', '', str_replace('/{', '', $tok));
+
+					if( $match == 'parent' ){
+
+						if( $term->parent ){
+							$parent_term = get_term($term->parent, $term->taxonomy);
+
+							if( $parent_term )
+								$term_link = str_replace( '{'.$match.'}', $parent_term->slug, $term_link );
+						}
+					}
+
+					$term_link = str_replace( '/{'.$match.'}', '', $term_link );
+				}
+			}
+		}
+
+		return $term_link;
+
+	}
+
+
+	/**
 	 * ConfigPlugin constructor.
 	 * @param Data $config
 	 */
@@ -529,9 +641,12 @@ class ConfigPlugin {
 			$this->addMenus();
 			$this->addRoles();
 
-			if( WP_FRONT )
+			if( WP_FRONT ){
 				$this->setPermalink();
-			
+				add_filter( 'post_type_link', [$this, 'updatePostTypePermalink'], 10, 2);
+				add_filter( 'term_link', [$this, 'updateTermPermalink'], 10, 2);
+			}
+
 			if( is_admin() )
 				$this->addTableViews();
 		});

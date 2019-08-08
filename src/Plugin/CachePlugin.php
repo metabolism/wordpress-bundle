@@ -31,11 +31,9 @@ class CachePlugin
 				$home_url = get_home_url(null);
 				$url = $home_url.get_permalink($pid);
 
-				return $this->purge($url);
+				$this->purge($url);
 			}
 		}
-
-		return false;
 	}
 
 
@@ -137,6 +135,9 @@ class CachePlugin
 				add_action( $action, [$this, 'purgeCache']);
 		}
 
-		add_action( 'purge_cache', [$this, 'purgeCache']);
+		add_action( 'reset_cache', function(){
+			$this->purge();
+			$this->clear();
+		});
 	}
 }

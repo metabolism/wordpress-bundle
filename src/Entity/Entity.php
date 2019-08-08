@@ -18,12 +18,17 @@ class Entity
 
 	public $ID;
 
-	private $custom_fields;
+	private $custom_fields=false;
 	private $imported=false;
 
 	public static $date_format = false;
 
-	public function import( $info, $remove=false , $replace=false )
+	/**
+	 * @param $info
+	 * @param bool $remove
+	 * @param bool $replace
+	 */
+	public function import($info, $remove=false , $replace=false )
 	{
 		$info = self::normalize($info, $remove, $replace);
 
@@ -56,6 +61,25 @@ class Entity
 
 
 	/**
+	 * Magic method to load async properties
+	 *
+	 * @param $method
+	 * @param $arguments
+	 * @return string
+	 */
+	public function __call($method, $arguments) {
+
+		if( !$this->loaded() )
+		{
+			$this->bindCustomFields(true);
+			return isset($this->$method)?$this->$method:'';
+		}
+
+		return '';
+	}
+
+
+	/**
 	 * Return true if id exists
 	 */
 	public function exist()
@@ -65,24 +89,36 @@ class Entity
 
 
 	/**
-	 * Add custom fields as members of the post
+	 * load custom fields data
 	 * @param $id
 	 */
-	protected function addCustomFields( $id )
+	protected function addCustomFields( $id)
 	{
-		if( class_exists('ACF') )
+		if( class_exists('ACF') && !$this->custom_fields )
 		{
 			$this->custom_fields = new ACF( $id );
+			$this->bindCustomFields();
+		}
+	}
 
-			$objects = $this->custom_fields->get();
+
+	/**
+	 * Bind custom fields as members of the post
+	 * @param bool $force
+	 */
+	protected function bindCustomFields($force=false )
+	{
+		if( $this->custom_fields )
+		{
+			$objects = $this->custom_fields->get($force);
 
 			if( $objects && is_array($objects) )
 			{
-                foreach ($objects as $name => $value )
-                {
-                    $this->$name = $value;
-                }
-            }
+				foreach ($objects as $name => $value )
+				{
+					$this->$name = $value;
+				}
+			}
 		}
 	}
 

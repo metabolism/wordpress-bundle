@@ -16,23 +16,26 @@ use Metabolism\WordpressBundle\Entity\Post,
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
+use Metabolism\WordpressBundle\Provider\ACFProvider;
 
 class ACF
 {
-	private $raw_objects, $objects, $loaded=false;
+	private $raw_objects, $objects, $id, $loaded=false;
 
-	protected static $MAX_DEPTH = 2;
+	protected static $MAX_DEPTH = 1;
 	protected static $DEPTH = 0;
 
 	/**
 	 * ACF constructor.
-	 * @param $post_id
+	 * @param $id
 	 */
-	public function __construct($post_id )
+	public function __construct( $id )
 	{
+		$this->id = $id;
+
 		self::$DEPTH++;
 
-		if( $cached = wp_cache_get( $post_id.'::'.self::$DEPTH, 'acf_helper' ) ){
+		if( $cached = wp_cache_get( $id.'::'.self::$DEPTH, 'acf_helper' ) ){
 			$this->objects = $cached;
 		}
 		else{
@@ -41,10 +44,10 @@ class ACF
 				$this->objects = [];
 			}
 			else {
-				$this->objects = $this->load('objects', $post_id);
 				$this->loaded = self::$DEPTH;
+				$this->objects = $this->load('objects', $id);
 
-				wp_cache_set( $post_id.'::'.self::$DEPTH, $this->objects, 'acf_helper' );
+				wp_cache_set( $id.'::'.self::$DEPTH, $this->objects, 'acf_helper' );
 			}
 		}
 
@@ -71,10 +74,18 @@ class ACF
 
 
 	/**
+	 * @param bool $force
 	 * @return array|bool|Entity|mixed|\WP_Error
 	 */
-	public function get()
+	public function get($force=false)
 	{
+		if( !$this->loaded() && $force ){
+
+			$this->loaded  = self::$DEPTH;
+			$this->objects = $this->load('objects', $this->id);
+			wp_cache_set( $this->id.'::'.self::$DEPTH, $this->objects, 'acf_helper' );
+		}
+
 		return $this->objects;
 	}
 

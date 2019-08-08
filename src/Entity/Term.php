@@ -24,8 +24,13 @@ class Term extends Entity
 	public $order;
 	public $title;
 
+
+	/** @var bool|Term[] $children */
+	public $children;
+
 	protected $term_id;
 	protected $term_taxonomy_id;
+
 
 	/**
 	 * Post constructor.
@@ -91,5 +96,4 @@ class Term extends Entity
 
 		return $term;
 	}
-
 }

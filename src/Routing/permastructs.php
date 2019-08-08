@@ -75,17 +75,22 @@ class Permastruct{
 					else
 						$struct = $base_struct;
 
+
 					$this->addRoute($taxonomy->name, $struct, [], $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
+
+					if( strpos($struct, '/%parent%') !== false )
+						$this->addRoute($taxonomy->name.'_parent', str_replace('/%parent%', '', $struct), [], $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
 
 					$registered[] = $taxonomy->name;
 				}
 			}
 		}
 
-		$this->addRoute('author', $this->wp_rewrite->author_structure);
+		if( isset($this->wp_rewrite->author_structure) )
+			$this->addRoute('author', $this->wp_rewrite->author_structure);
 
 		$translated_search_slug = get_option( 'search_rewrite_slug' );
-		$search_post_type_structure = false;
+		$search_post_type_structure = $search_structure = false;
 
 		if( !empty($translated_search_slug) ){
 
@@ -96,18 +101,21 @@ class Permastruct{
 		}
 		else{
 
-			$search_structure = $this->wp_rewrite->search_structure;
+			if( isset($this->wp_rewrite->search_structure) )
+				$search_structure = $this->wp_rewrite->search_structure;
 
 			if( isset($this->wp_rewrite->search_post_type_structure) )
 				$search_post_type_structure = $this->wp_rewrite->search_post_type_structure;
 		}
 
-		$this->addRoute('search', $search_structure, [], true);
+		if( $search_structure )
+			$this->addRoute('search', $search_structure, [], true);
 
 		if( $search_post_type_structure )
 			$this->addRoute('search_post_type', $search_post_type_structure, [], true);
 
-		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
+		if( isset($this->wp_rewrite->page_structure) )
+			$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
 
 		$this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealth::check');
 
@@ -117,7 +125,11 @@ class Permastruct{
 
 
 	private function getControllerName( $name ){
-		return 'App\Controller\\'.$this->controller_name.'::'.str_replace(' ', '',lcfirst(ucwords(str_replace('_', ' ', $name))).'Action');
+
+		$methodName = str_replace('_parent', '', $name);
+		$methodName = str_replace(' ', '',lcfirst(ucwords(str_replace('_', ' ', $methodName))));
+
+		return 'App\Controller\\'.$this->controller_name.'::'.$methodName.'Action';
 	}
 
 	private function getPaths( $struct ){

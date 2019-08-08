@@ -58,25 +58,6 @@ class UrlPlugin {
 	}
 
 	/**
-	 * Add search post type filtered
-	 */
-	public function addRewriteRules(){
-
-		global $wp_rewrite;
-
-		$search_slug = get_option( 'search_rewrite_slug' );
-		if( !empty($search_slug) )
-			$wp_rewrite->search_base = $search_slug;
-
-		$search_post_type_permastuct = str_replace('/%search%', '/%post_type%/%search%', $wp_rewrite->get_search_permastruct());
-		$regex = str_replace('%search%', '([^/]*)', str_replace('%post_type%', '([^/]*)', $search_post_type_permastuct));
-		add_rewrite_rule('^'.$regex.'/'.$wp_rewrite->pagination_base.'/([0-9]{1,})/?', 'index.php?s=$matches[2]&post_type=$matches[1]&paged=$matches[3]', 'top');
-		add_rewrite_rule('^'.$regex.'/?', 'index.php?s=$matches[2]&post_type=$matches[1]', 'top');
-
-		$wp_rewrite->search_post_type_structure = $search_post_type_permastuct;
-	}
-
-	/**
 	 * Save post name when requesting for preview link
 	 * @param $id
 	 * @return mixed
@@ -105,6 +86,7 @@ class UrlPlugin {
 		return $preview_permalink;
 	}
 
+
 	/**
 	 * Make link relative
 	 * @param $link
@@ -114,6 +96,7 @@ class UrlPlugin {
 
 		return str_replace(WP_HOME, '', $link);
 	}
+
 
 	/**
 	 * Symfony require real url so redirect preview url to real url
@@ -132,6 +115,7 @@ class UrlPlugin {
 		wp_redirect($permalink);
 		exit;
 	}
+
 
 	/**
 	 * Remove link when there is no template support

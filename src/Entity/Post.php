@@ -42,6 +42,7 @@ class Post extends Entity
 	private $_prev = null;
 	private $_post = null;
 
+
 	/**
 	 * Post constructor.
 	 *
@@ -57,7 +58,7 @@ class Post extends Entity
 			$this->addCustomFields($post->ID);
 		}
 	}
-
+	
 
 	/**
 	 * Validate class

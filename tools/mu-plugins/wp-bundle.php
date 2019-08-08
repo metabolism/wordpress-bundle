@@ -27,6 +27,7 @@ PluginLoader::all();
 
 if( is_admin() )
 {
+	//load back only controller
 	if( class_exists('App\Controller\AdminController') )
 		new App\Controller\AdminController();
 	else
@@ -34,8 +35,15 @@ if( is_admin() )
 }
 else
 {
+	//load front only controller
 	if( class_exists('App\Controller\FrontController') )
 		new App\Controller\FrontController();
 	else
 		new Metabolism\WordpressBundle\Controller\FrontController();
 }
+
+//load both case controller
+if( class_exists('App\Controller\WordpressController') )
+	new App\Controller\WordpressController();
+else
+	new Metabolism\WordpressBundle\Controller\WordpressController();

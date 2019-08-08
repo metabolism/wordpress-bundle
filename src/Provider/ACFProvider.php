@@ -37,15 +37,24 @@ class ACFProvider {
 	{
 		if( function_exists('acf_add_options_page') )
 		{
-			acf_add_options_page();
+			$args = ['autoload' => true, 'page_title'=>__('Options', 'acf')];
+
+			acf_add_options_page($args);
 
 			$options = $this->config->get('acf.options_page', []);
 
 			//retro compat
 			$options = array_merge($options, $this->config->get('options_page', []));
 
- 			foreach ( $options as $name )
-				acf_add_options_sub_page($name);
+ 			foreach ( $options as $args ){
+
+ 				if( is_array($args) )
+				    $args['autoload'] = true;
+ 				else
+				    $args = ['page_title'=>$name, 'autoload'=>true];
+
+			    acf_add_options_sub_page($args);
+		    }
 		}
 	}
 

@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+##1.2.6
+#### Fix
+- Add more check before foreach in ACFHelper
+
 ##1.2.5
 #### Fix
 - Entity->addCustomFields bug on non object ( merge request from @undefinedfr )

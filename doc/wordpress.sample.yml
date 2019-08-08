@@ -19,6 +19,7 @@ salt:
 ## Image options
 image:
   compression: 90 #on the fly compression ration
+  show_meta: false #add metadata to Image entity
   resize: #resize image on upload to save server space
     max_width: 1920
     max_height: 2160
@@ -223,6 +224,15 @@ template:
     not_found: '404'
   post:
     video: 'Video'
+
+## Add/remove rewrite rules
+rewrite_rules:
+  remove:
+    - attachment
+    - embed
+    - trackback
+    - feed
+    - comment
 
 ## Add page states
 #page_states:

@@ -19,8 +19,7 @@ class TwigExtension extends AbstractExtension{
 	public function getFilters()
 	{
 		return [
-			new TwigFilter( "more", [$this, 'more'] ),
-			new TwigFilter( "placeholder", [$this, 'placeholder'] )
+			new TwigFilter( 'placeholder', [$this, 'placeholder'] )
 		];
 	}
 
@@ -30,13 +29,14 @@ class TwigExtension extends AbstractExtension{
 	public function getFunctions()
 	{
 		return [
-			new TwigFunction( "fn", [$this,'execFunction'] ),
-			new TwigFunction( "function", [$this,'execFunction'] ),
-			new TwigFunction( "shortcode", "shortcode" ),
-			new TwigFunction( "archive_url", "get_post_type_archive_link" ),
-			new TwigFunction( "post_url", [$this, 'getPermalink'] ),
-			new TwigFunction( "term_url", "get_term_link" ),
-			new TwigFunction( "bloginfo", "bloginfo" )
+			new TwigFunction( '__', '__' ),
+			new TwigFunction( 'fn', [$this,'execFunction'] ),
+			new TwigFunction( 'function', [$this,'execFunction'] ),
+			new TwigFunction( 'shortcode', 'shortcode' ),
+			new TwigFunction( 'archive_url', 'get_post_type_archive_link' ),
+			new TwigFunction( 'post_url', [$this, 'getPermalink'] ),
+			new TwigFunction( 'term_url', 'get_term_link' ),
+			new TwigFunction( 'bloginfo', 'bloginfo' )
 		];
 	}
 
@@ -87,17 +87,6 @@ class TwigExtension extends AbstractExtension{
 			return get_permalink($page);
 		else
 			return false;
-	}
-
-
-	/**
-	 * @param $text
-	 * @param string $cta
-	 * @return mixed
-	 */
-	public function more($text, $cta='Lire la suite')
-	{
-		return str_replace('<p><!--more--></p>', '<more cta="'.$cta.'">'.$text.'</more>', $text);
 	}
 
 
