@@ -47,18 +47,20 @@ class Post extends Entity
 	 * Post constructor.
 	 *
 	 * @param null $id
+	 * @param array $args
 	 */
-	public function __construct($id = null) {
+	public function __construct($id = null, $args = []) {
 
 		if( $post = $this->get($id) ) {
 
 			$this->import($post, false, 'post_');
 			$this->content = wpautop($this->content);
 
-			$this->addCustomFields($post->ID);
+			if( !isset($args['depth']) || $args['depth'] )
+				$this->addCustomFields($post->ID);
 		}
 	}
-	
+
 
 	/**
 	 * Validate class

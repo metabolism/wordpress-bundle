@@ -8,9 +8,10 @@ class PostFactory {
 	 * Create entity from post_type
 	 * @param null $id
 	 * @param bool $post_type
+	 * @param array $args
 	 * @return bool|mixed|\WP_Error
 	 */
-	public static function create($id=null, $post_type = false){
+	public static function create($id=null, $post_type = false, $args = []){
 
 		if( is_array($id) ) {
 
@@ -55,6 +56,6 @@ class PostFactory {
 		elseif( $post_status && $post_status != 'publish' )
 			return false;
 
-		return Factory::create($id, $post_type, 'post');
+		return Factory::create($id, $post_type, 'post', $args);
 	}
 }

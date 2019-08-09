@@ -37,7 +37,7 @@ class ACFProvider {
 	{
 		if( function_exists('acf_add_options_page') )
 		{
-			$args = ['autoload' => true, 'page_title'=>__('Options', 'acf')];
+			$args = ['autoload' => true, 'page_title' => __('Options', 'acf'), 'menu_slug' => 'acf-options'];
 
 			acf_add_options_page($args);
 
@@ -51,7 +51,7 @@ class ACFProvider {
  				if( is_array($args) )
 				    $args['autoload'] = true;
  				else
-				    $args = ['page_title'=>$name, 'autoload'=>true];
+				    $args = ['page_title'=>$args, 'autoload'=>true];
 
 			    acf_add_options_sub_page($args);
 		    }

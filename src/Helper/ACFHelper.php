@@ -98,12 +98,15 @@ class ACF
 	{
 		$layouts = [];
 
+		if( !$raw_layouts || !is_iterable($raw_layouts) )
+			return $layouts;
+
 		foreach ($raw_layouts as $layout){
 
 			$layouts[$layout['name']] = [];
 
-			if( isset($layout['sub_fields']) )
-			{
+			if( isset($layout['sub_fields']) && is_iterable($layout['sub_fields']) ) {
+
 				$subfields = $layout['sub_fields'];
 				foreach ($subfields as $subfield){
 					$layouts[$layout['name']][$subfield['name']] = $subfield;
@@ -132,6 +135,9 @@ class ACF
 
 		unset($fields['acf_fc_layout']);
 
+		if( !$fields || !is_iterable($fields) )
+			return $data;
+
 		foreach ($fields as $name=>$value){
 
 			if( isset($layout[$name]) )
@@ -152,6 +158,9 @@ class ACF
 	{
 		$data = [];
 
+		if( !$raw_layout || !is_iterable($raw_layout) )
+			return $data;
+
 		foreach ($raw_layout as $value)
 			$data[$value['name']] = $value;
 
@@ -167,6 +176,9 @@ class ACF
 	public function bindLayoutFields($fields, $layout){
 
 		$data = [];
+
+		if( !$fields || !is_iterable($fields) )
+			return $data;
 
 		foreach ($fields as $name=>$value){
 
@@ -234,7 +246,7 @@ class ACF
 	{
 		$objects = [];
 
-		if( !$raw_objects || !is_array($raw_objects) )
+		if( !$raw_objects || !is_iterable($raw_objects) )
 			return $objects;
 
 		// Start analyzing
@@ -248,7 +260,7 @@ class ACF
 
 				case 'clone';
 
-					if( $object['display'] == 'group' ){
+					if( $object['display'] == 'group' && isset($object['sub_fields']) && is_iterable($object['sub_fields']) ){
 
 						foreach ($object['sub_fields'] as &$sub_field)
 						{
@@ -268,8 +280,10 @@ class ACF
 
 					$objects[$object['name']] = [];
 
+					if( isset($object['value']) && is_iterable($object['value']) ){
 					foreach($object['value'] as $post)
 						$objects[$object['name']][] = $this->load('post', $post->ID);
+					}
 
 					break;
 
@@ -296,8 +310,11 @@ class ACF
 
 						$objects[$object['name']] = [];
 
+						if( isset($object['value']) && is_iterable($object['value']) ){
+
 						foreach ($object['value'] as $value)
 							$objects[$object['name']][] = $this->load('image', $value['id']);
+					}
 					}
 
 					break;
@@ -330,7 +347,7 @@ class ACF
 
 					$objects[$object['name']] = [];
 
-					if( is_array($object['value']) ){
+					if( isset($object['value']) && is_iterable($object['value']) ){
 
 						foreach ($object['value'] as $value) {
 
@@ -373,7 +390,7 @@ class ACF
 
 					$objects[$object['name']] = [];
 
-					if( is_array($object['value']) ){
+					if( isset($object['value']) && is_iterable($object['value']) ){
 
 						$layouts = $this->layoutsAsKeyValue($object['layouts']);
 
@@ -395,7 +412,7 @@ class ACF
 
 					$objects[$object['name']] = [];
 
-					if( is_array($object['value']) )
+					if( isset($object['value']) && is_iterable($object['value']) )
 					{
 						$layout = $this->layoutAsKeyValue($object['sub_fields']);
 
@@ -412,7 +429,7 @@ class ACF
 
 					$objects[$object['name']] = [];
 
-					if( is_array($object['value']) ){
+					if( isset($object['value']) && is_iterable($object['value']) ){
 
 						foreach ($object['value'] as $value) {
 

@@ -8,9 +8,10 @@ class TaxonomyFactory {
 	 * Create entity from taxonomy name
 	 * @param null $id
 	 * @param bool $taxonomy_name
+	 * @param array $args
 	 * @return bool|mixed|\WP_Error
 	 */
-	public static function create($id=null, $taxonomy_name = false){
+	public static function create($id=null, $taxonomy_name = false, $args = []){
 
 		if( is_array($id) ) {
 
@@ -52,6 +53,6 @@ class TaxonomyFactory {
 		if( !$taxonomy_name )
 			return new \WP_Error('taxonomy_factory_invalid_taxonomy_name', 'Unable to get taxonomy name');
 
-		return Factory::create($id, $taxonomy_name, 'term');
+		return Factory::create($id, $taxonomy_name, 'term', $args);
 	}
 }

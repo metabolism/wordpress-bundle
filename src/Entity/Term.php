@@ -36,8 +36,9 @@ class Term extends Entity
 	 * Post constructor.
 	 *
 	 * @param null $id
+	 * @param array $args
 	 */
-	public function __construct($id)
+	public function __construct($id, $args = [])
 	{
 		if( is_array($id) )
 		{
@@ -51,8 +52,11 @@ class Term extends Entity
 		{
 			$this->import($term, false, 'term_');
 
-			if( !empty($term->taxonomy) )
-				$this->addCustomFields($term->taxonomy.'_'.$id);
+			if( !empty($term->taxonomy) ){
+
+				if( !isset($args['depth']) || $args['depth'] )
+					$this->addCustomFields($term->taxonomy.'_'.$id);
+			}
 		}
 	}
 

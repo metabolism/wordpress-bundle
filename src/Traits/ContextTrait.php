@@ -203,7 +203,7 @@ Trait ContextTrait
 			$menu = new Menu($location);
 
 			if( $menu->ID )
-				$this->data['menu'][$location] = new Menu($location);
+				$this->data['menu'][$location] = $menu;
 		}
 
 		return $this->data['menu'];

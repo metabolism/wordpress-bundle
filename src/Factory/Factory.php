@@ -23,39 +23,45 @@ class Factory {
 		return $str;
 	}
 
+
 	/**
 	 * Retrieves the cache contents from the cache by key and group.
 	 * @param $id
 	 * @param string $type
+	 * @param bool $full
 	 * @return bool|mixed
 	 */
-	protected static function loadFromCache($id, $type='object'){
+	protected static function loadFromCache($id, $type='object', $args=[]){
 
-		return wp_cache_get( $id, $type.'_factory' );
+		return wp_cache_get( $id, $type.'_factory_'.crc32(json_encode($args)) );
 	}
+
 
 	/**
 	 * Saves the data to the cache.
 	 * @param $id
 	 * @param $object
 	 * @param $type
+	 * @param bool $full
 	 * @return bool
 	 */
-	protected static function saveToCache($id, $object, $type){
+	protected static function saveToCache($id, $object, $type, $args=[]){
 
-		return wp_cache_set( $id, $object, $type.'_factory' );
+		return wp_cache_set( $id, $object, $type.'_factory_'.crc32(json_encode($args)) );
 	}
+
 
 	/**
 	 * Create entity
 	 * @param $id
 	 * @param $class
 	 * @param bool $default_class
+	 * @param array $args
 	 * @return Entity|mixed
 	 */
-	public static function create($id, $class, $default_class=false){
+	public static function create($id, $class, $default_class=false, $args = []){
 
-		$item = self::loadFromCache($id, $class);
+		$item = self::loadFromCache($id, $class, $args);
 
 		if( $item )
 			return $item;
@@ -66,7 +72,7 @@ class Factory {
 
 		if( class_exists($app_classname) ){
 
-			$item = new $app_classname($id);
+			$item = new $app_classname($id, $args);
 		}
 		else{
 
@@ -74,11 +80,11 @@ class Factory {
 
 			if( class_exists($bundle_classname) ){
 
-				$item = new $bundle_classname($id);
+				$item = new $bundle_classname($id, $args);
 			}
 			elseif( $default_class ){
 
-				$item = self::create($id, $default_class);
+				$item = self::create($id, $default_class, false, $args);
 			}
 		}
 
@@ -86,7 +92,7 @@ class Factory {
 			$item = false;
 
 		if( !$item || $item->loaded() )
-			self::saveToCache($id, $item, $class);
+			self::saveToCache($id, $item, $class, $args);
 
 		return $item;
 	}
