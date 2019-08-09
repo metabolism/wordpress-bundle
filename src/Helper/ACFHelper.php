@@ -44,7 +44,7 @@ class ACF
 				$this->objects = [];
 			}
 			else {
-				$this->loaded = self::$DEPTH;
+				$this->loaded = true;
 				$this->objects = $this->load('objects', $id);
 
 				wp_cache_set( $id.'::'.self::$DEPTH, $this->objects, 'acf_helper' );
@@ -81,7 +81,7 @@ class ACF
 	{
 		if( !$this->loaded() && $force ){
 
-			$this->loaded  = self::$DEPTH;
+			$this->loaded  = true;
 			$this->objects = $this->load('objects', $this->id);
 			wp_cache_set( $this->id.'::'.self::$DEPTH, $this->objects, 'acf_helper' );
 		}

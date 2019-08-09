@@ -85,7 +85,7 @@ class WPSEOProvider
 			self::$preventRecursion = true;
 
 			$wpseo_primary_term = new \WPSEO_Primary_Term( $taxonomy, $postID);
-				$primary_term_id = $wpseo_primary_term->get_primary_term();
+			$primary_term_id = $wpseo_primary_term->get_primary_term();
 
 			if( $primary_term_id ){
 
@@ -95,7 +95,7 @@ class WPSEOProvider
 						unset($terms[$key]);
 				}
 
-				$terms = array_merge([$primary_term_id], $terms);
+				$terms = array_merge([get_term($primary_term_id)], $terms);
 			}
 
 			self::$preventRecursion = false;
@@ -111,6 +111,7 @@ class WPSEOProvider
 	public function __construct()
 	{
 		add_action( 'admin_init', [$this, 'init'] );
+		add_filter( 'get_the_terms', [$this, 'changeTermsOrder'], 10, 3);
 
 		if( is_admin() ) {
 			add_filter( 'wp_editor_settings', [$this, 'editorSettings'], 10, 2);
@@ -123,8 +124,6 @@ class WPSEOProvider
 
 				add_filter('wpseo_sitemap_entry', [$this, 'makeAbsolute'], 10, 3);
 			});
-
-			add_filter( 'get_the_terms', [$this, 'changeTermsOrder'], 10, 3);
 		}
 	}
 }

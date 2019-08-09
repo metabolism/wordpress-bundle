@@ -9,6 +9,8 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class User extends Entity
 {
+	public $entity = 'user';
+
 	public $login;
 	public $nicename;
 	public $email;

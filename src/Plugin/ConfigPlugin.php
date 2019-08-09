@@ -429,6 +429,13 @@ class ConfigPlugin {
 
 						echo '<input type="text" value="' . esc_attr( $value ) . '" name="'.$post_type.'_rewrite_'.$type.'" placeholder="'.$post_type.'" id="'.$post_type.'_rewrite_'.$type.'" class="regular-text" />';
 
+						if( $type == 'slug' ){
+
+							$taxonomy_objects = get_object_taxonomies( $post_type );
+							if( !empty($taxonomy_objects) )
+								echo '<p class="description">You can use %'.implode('%, %', $taxonomy_objects).'% as custom structure</p>';
+						}
+
 					}, 'permalink', 'custom_post_type_rewrite' );
 				}
 			}
@@ -451,6 +458,7 @@ class ConfigPlugin {
 					$value = $this->config->get('taxonomy.'.$taxonomy.'.rewrite.slug', $taxonomy);
 
 				echo '<input type="text" value="' . esc_attr( $value ) . '" name="'.$taxonomy.'_rewrite_slug" placeholder="'.$taxonomy.'" id="'.$taxonomy.'_rewrite_slug" class="regular-text" />';
+				echo '<p class="description">You can use %parent% as custom structure</p>';
 
 			}, 'permalink', 'custom_taxonomy_rewrite' );
 		}
@@ -571,7 +579,7 @@ class ConfigPlugin {
 
 					$terms = get_the_terms( $post, $taxonomy );
 
-					if( count($terms) )
+					if( count($terms) && is_object($terms[0]) )
 						$post_link = str_replace( '{'.$taxonomy.'}', $terms[0]->slug, $post_link );
 					else
 						$post_link = str_replace( '{'.$taxonomy.'}', 'default', $post_link );

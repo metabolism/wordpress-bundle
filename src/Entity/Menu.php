@@ -10,17 +10,15 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class Menu extends Entity
 {
+	public $entity = 'menu';
+
 	/** @var MenuItem[] $items */
 	public $items;
-
 	public $title;
-
 	public $slug;
-
 	public $description;
 
 	private $menuItemClass;
-
 	private $args;
 
 	/**

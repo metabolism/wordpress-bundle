@@ -17,11 +17,12 @@ class Entity
 	];
 
 	public $ID;
+	public $entity;
+	public static $date_format = false;
 
 	private $custom_fields=false;
 	private $imported=false;
 
-	public static $date_format = false;
 
 	/**
 	 * @param $info
@@ -71,6 +72,7 @@ class Entity
 
 		if( !$this->loaded() )
 		{
+			echo ' loaded for '.$method.' ';
 			$this->bindCustomFields(true);
 			return isset($this->$method)?$this->$method:'';
 		}
@@ -139,6 +141,12 @@ class Entity
 
 		if( isset($object['url']) )
 			$object['link'] = $object['url'];
+
+		if( isset($object['post_author']) && is_string($object['post_author']) )
+			$object['post_author'] = intval($object['post_author']);
+
+		if( isset($object['comment_count']) && is_string($object['comment_count']) )
+			$object['comment_count'] = intval($object['comment_count']);
 
 		if( isset($object['name']) && !isset($object['title']) )
 			$object['title'] = $object['name'];

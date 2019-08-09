@@ -161,6 +161,7 @@ class Query
 				$args['depth'] = 1;
 
 			$args['fields'] = 'ids';
+
 			$query = new \WP_Query( $args );
 		}
 

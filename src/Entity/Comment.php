@@ -10,6 +10,8 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class Comment extends Entity
 {
+	public $entity = 'comment';
+
 	public $post_ID;
 	public $author;
 	public $author_email;

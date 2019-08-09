@@ -14,11 +14,12 @@ use Metabolism\WordpressBundle\Helper\Query;
  */
 class Post extends Entity
 {
+	public $entity = 'post';
+
 	public $excerpt ='';
 
 	/** @var Image */
 	public $thumbnail = false;
-
 	public $link = '';
 	public $template = '';
 	public $comment_status;

@@ -35,9 +35,25 @@ class TwigExtension extends AbstractExtension{
 			new TwigFunction( 'shortcode', 'shortcode' ),
 			new TwigFunction( 'archive_url', 'get_post_type_archive_link' ),
 			new TwigFunction( 'post_url', [$this, 'getPermalink'] ),
-			new TwigFunction( 'term_url', 'get_term_link' ),
+			new TwigFunction( 'term_url', [$this,'getTermLink'] ),
 			new TwigFunction( 'bloginfo', 'bloginfo' )
 		];
+	}
+
+
+	/**
+	 * @param object|int|string $term
+	 * @param string $taxonomy
+	 * @return mixed
+	 */
+	public function getTermLink( $term, $taxonomy = '' )
+	{
+		$link = get_term_link($term, $taxonomy);
+
+		if( !is_string($link) )
+			return false;
+
+		return $link;
 	}
 
 
@@ -83,8 +99,15 @@ class TwigExtension extends AbstractExtension{
 				break;
 		}
 
-		if( $page )
-			return get_permalink($page);
+		if( $page ){
+
+			$link = get_permalink($page);
+
+			if( !is_string($link) )
+				return false;
+
+			return $link;
+		}
 		else
 			return false;
 	}

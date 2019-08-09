@@ -12,18 +12,19 @@ use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
  */
 class Term extends Entity
 {
+	public $entity = 'term';
+
 	public $excerpt;
 	public $link;
 	public $ID;
 	public $current;
 	public $slug;
 	public $taxonomy;
-	public $description;
 	public $parent;
 	public $count;
 	public $order;
 	public $title;
-
+	public $thumbnail;
 
 	/** @var bool|Term[] $children */
 	public $children;
@@ -96,6 +97,12 @@ class Term extends Entity
 			$term->ID = $term->term_id;
 			$term->term_order = intval($term->term_order);
 			$term->current = get_queried_object_id() == $pid;
+
+			// load thumbnail if set to optimize loading by preventing full acf load
+			if( class_exists('ACF') && $thumbnail_id = get_field('thumbnail', $term->taxonomy.'_'.$term->ID) )
+				$term->thumbnail = Factory::create($thumbnail_id, 'image');
+			else
+				$term->thumbnail = false;
 		}
 
 		return $term;

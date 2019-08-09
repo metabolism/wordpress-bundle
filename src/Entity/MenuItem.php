@@ -10,6 +10,8 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class MenuItem extends Entity
 {
+	public $entity = 'menu-item';
+
 	/** @var bool $menu_item_parent */
 	public $menu_item_parent;
 

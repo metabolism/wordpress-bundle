@@ -154,6 +154,22 @@ class ACFProvider {
 
 
 	/**
+	 * Disable database query for non editable field
+	 * @param $unused
+	 * @param $post_id
+	 * @param $field
+	 * @return
+	 */
+	public function preLoadValue($unused, $post_id, $field){
+
+		if( $field['type'] == 'message' || $field['type'] == 'tab' )
+			return '';
+
+		return null;
+	}
+
+
+	/**
 	 * ACFPlugin constructor.
 	 * @param Data $config
 	 */
@@ -163,6 +179,7 @@ class ACFProvider {
 
 		add_filter('acf/settings/save_json', function(){ return $this::$folder; });
 		add_filter('acf/settings/load_json', function(){ return [$this::$folder]; });
+		add_filter('acf/pre_load_value', [$this, 'preLoadValue'], 10, 3);
 
 		// When viewing admin
 		if( is_admin() )

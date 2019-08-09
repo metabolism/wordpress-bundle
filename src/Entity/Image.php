@@ -11,13 +11,9 @@ use Intervention\Image\ImageManagerStatic;
  */
 class Image extends Entity
 {
+	public $entity = 'image';
+
 	public static $wp_upload_dir = false;
-
-	private $compression = 90;
-	private $show_meta = false;
-
-	protected $src;
-
 	public $focus_point = false;
 	public $file;
 	public $meta;
@@ -30,8 +26,12 @@ class Image extends Entity
 	public $modified;
 	public $modified_gmt;
 	public $title;
-
 	public $sizes = [];
+
+	private $compression = 90;
+	private $show_meta = false;
+
+	protected $src;
 
 	/**
 	 * Post constructor.
@@ -94,7 +94,7 @@ class Image extends Entity
 			else
 			{
 				$value = (is_array($value) && count($value)==1) ? $value[0] : $value;
-				$unserialized = @unserialize($value);
+				$unserialized = is_string($value)?@unserialize($value):false;
 
 				if( substr($key, 0, 1) == '_')
 					$key = substr($key, 1);
@@ -110,7 +110,7 @@ class Image extends Entity
 		}
 		//imagefocus plugin support
 		elseif( isset($post_meta['focus_point']) ){
-			$this->focus_point = @unserialize($post_meta['focus_point']);
+			$this->focus_point = $post_meta['focus_point'];
 		}
 
 		if( file_exists($metadata['src']) )

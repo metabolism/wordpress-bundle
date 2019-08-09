@@ -33,7 +33,10 @@ class Factory {
 	 */
 	protected static function loadFromCache($id, $type='object', $args=[]){
 
-		return wp_cache_get( $id, $type.'_factory_'.crc32(json_encode($args)) );
+		if( $id == null )
+			return false;
+
+		return wp_cache_get( $id.'_'.crc32(json_encode($args)), $type.'_factory' );
 	}
 
 
@@ -47,7 +50,10 @@ class Factory {
 	 */
 	protected static function saveToCache($id, $object, $type, $args=[]){
 
-		return wp_cache_set( $id, $object, $type.'_factory_'.crc32(json_encode($args)) );
+		if( $id == null )
+			return false;
+
+		return wp_cache_set( $id.'_'.crc32(json_encode($args)), $object, $type.'_factory' );
 	}
 
 

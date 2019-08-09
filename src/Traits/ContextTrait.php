@@ -156,7 +156,7 @@ Trait ContextTrait
 			'maintenance_mode'   => function_exists('wp_maintenance_mode') ? wp_maintenance_mode() : false,
 			'tagline'            => get_bloginfo('description'),
 			'site_title'         => get_bloginfo('name'),
-			'posts_per_page'     => get_option( 'posts_per_page' ),
+			'posts_per_page'     => intval(get_option( 'posts_per_page' )),
 			'paged'              => $paged ? $paged : 1
 		];
 
