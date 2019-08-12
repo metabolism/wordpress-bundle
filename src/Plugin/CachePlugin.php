@@ -48,6 +48,16 @@ class CachePlugin
 
 
 	/**
+	 * Reset cache
+	 */
+	public function reset()
+	{
+		$this->purge();
+		$this->clear();
+	}
+
+
+	/**
 	 * Purge cache
 	 * @param bool $url
 	 */
@@ -135,9 +145,6 @@ class CachePlugin
 				add_action( $action, [$this, 'purgeCache']);
 		}
 
-		add_action( 'reset_cache', function(){
-			$this->purge();
-			$this->clear();
-		});
+		add_action( 'reset_cache', [$this, 'reset']);
 	}
 }

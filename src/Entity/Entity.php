@@ -70,14 +70,8 @@ class Entity
 	 */
 	public function __call($method, $arguments) {
 
-		if( !$this->loaded() )
-		{
-			echo ' loaded for '.$method.' ';
-			$this->bindCustomFields(true);
-			return isset($this->$method)?$this->$method:'';
-		}
-
-		return '';
+		$this->load();
+		return isset($this->$method)?$this->$method:'';
 	}
 
 
@@ -87,6 +81,16 @@ class Entity
 	public function exist()
 	{
 		return is_int( $this->ID );
+	}
+
+
+	/**
+	 * Load ACF Fields
+	 */
+	public function load()
+	{
+		if( !$this->loaded() )
+			$this->bindCustomFields(true);
 	}
 
 

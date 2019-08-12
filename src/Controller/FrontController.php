@@ -36,6 +36,12 @@ class FrontController {
 
 
 	/**
+	 * Init placeholder
+	 */
+	public function init(){}
+
+
+	/**
 	 * Add custom post type for taxonomy archive page
 	 * @param \WP_Query $query
 	 * @return mixed
@@ -142,6 +148,7 @@ class FrontController {
 		$this->loadConfig();
 		$this->registerFilters();
 
+		add_action( 'init', [$this, 'init']);
 		add_action( 'init', [$this, 'redirect']);
 		add_action( 'init', '_wp_admin_bar_init', 0 );
 

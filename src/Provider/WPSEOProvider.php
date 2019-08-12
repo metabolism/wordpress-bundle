@@ -72,6 +72,26 @@ class WPSEOProvider
 
 
 	/**
+	 * Remove trailing slash & query parameters
+	 * @param $canonical
+	 * @return mixed
+	 */
+	public function filterCanonical($canonical) {
+
+		if( is_archive() ){
+			$canon_page = get_pagenum_link(1);
+			$canonical = explode('?', $canon_page);
+			return $canonical[0];
+		}
+
+		$canonical = explode('?', $canonical);
+		$canonicalFormat = (substr($canonical[0], -1) == '/') ? substr($canonical[0], 0, -1) : $canonical[0];
+
+		return $canonicalFormat;
+	}
+
+
+	/**
 	 * Add primary flagged term in first position
 	 * @param $terms
 	 * @param $postID
@@ -122,6 +142,7 @@ class WPSEOProvider
 				if( class_exists( 'WPSEO_Frontend' ) && method_exists( 'WPSEO_Frontend', 'debug_mark' ) )
 					remove_action( 'wpseo_head', [\WPSEO_Frontend::get_instance(), 'debug_mark'], 2);
 
+				add_filter('wpseo_canonical', [$this, 'filterCanonical']);
 				add_filter('wpseo_sitemap_entry', [$this, 'makeAbsolute'], 10, 3);
 			});
 		}

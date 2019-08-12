@@ -18,7 +18,7 @@ class AdminController {
 
 
 	/**
-	 * Init admin
+	 * Init placeholder
 	 */
 	public function init(){}
 

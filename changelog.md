@@ -10,6 +10,7 @@ CHANGELOG
 - taxonomy tag support for post permalink 
 - parent tag support for term permalink
 - Added `output` arg for Context `get_terms` & `get_posts` to allow array without key
+- Maintenance mode now call its own maintenanceAction
 
 #### Optimisation
 - Added rewrite removal rules in config
@@ -31,6 +32,7 @@ CHANGELOG
 - search rewrite rule
 - html entity decode in page title
 - add menu called twice
+- WPSeo canonical for page and url with query parameters
 
 #### Removed
 - Twig more function

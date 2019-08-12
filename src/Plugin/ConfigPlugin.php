@@ -370,7 +370,7 @@ class ConfigPlugin {
 			if( isset($args['force']) && $args['force'] )
 				remove_role($role);
 
-				add_role($role, $args['display_name'], $args['capabilities']);
+			add_role($role, $args['display_name'], $args['capabilities']);
 		}
 	}
 
@@ -465,12 +465,7 @@ class ConfigPlugin {
 
 
 		if( $updated )
-		{
-			global $wp_rewrite;
-			$wp_rewrite->flush_rules( true );
-
 			do_action('reset_cache');
-		}
 	}
 
 
