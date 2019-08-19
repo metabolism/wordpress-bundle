@@ -148,10 +148,12 @@ acf:
 
 ## Activate features
 support:
-  - templates #uncomment for api only backoffice
-  - post_thumbnails #add post thumbnails to page
+  - template #uncomment for api only backoffice
+  - thumbnail #add thumbnails to page
   - page #enable page
 #  - post #enable post
+#  - tag #enable tag taxonomy for post
+#  - category #enable category taxonomy for post
 
 ## Declare menus
 menu:
@@ -166,8 +168,13 @@ post_type:
   guide:
     menu_icon: book #https://developer.wordpress.org/resource/dashicons/
     has_archive: true
+    #enable_for_blogs:
+    #  - 1
+    #disable_for_blogs:
+    #  - 2#
     #has_options: true
     capability_type: post
+    #publicly_queryable: false
     #posts_per_page: 11
     #orderby: name #https://codex.wordpress.org/Class_Reference/WP_Query#Order_.26_Orderby_Parameters
     #order: ASC
@@ -202,6 +209,7 @@ taxonomy:
     #orderby: name #https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
     #order: ASC
     #radio: true
+    #publicly_queryable: false
     object_type:
       - guide
     #labels:

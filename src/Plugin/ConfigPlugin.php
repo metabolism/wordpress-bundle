@@ -110,6 +110,12 @@ class ConfigPlugin {
 					}
 				}
 
+				if( isset($args['publicly_queryable']) && !$args['publicly_queryable'] ){
+					$args['query_var'] = false;
+					$args['exclude_from_search'] = false;
+					$args['rewrite'] = false;
+				}
+
 				register_post_type($post_type, $args);
 
 				if( $is_admin )
@@ -318,6 +324,11 @@ class ConfigPlugin {
 							add_rewrite_rule($rule, 'index.php?'.$taxonomy.'=$matches[1]', 'top');
 						}
 					}
+				}
+
+				if( isset($args['publicly_queryable']) && !$args['publicly_queryable'] ){
+					$args['query_var'] = false;
+					$args['rewrite'] = false;
 				}
 
 				register_taxonomy($taxonomy, $object_type, $args);
@@ -543,6 +554,12 @@ class ConfigPlugin {
 
 		if( !in_array('page', $this->support) )
 			register_post_type('page', []);
+
+		if( !in_array('category', $this->support) )
+			register_taxonomy( 'category', array() );
+
+		if( !in_array('tag', $this->support) )
+			register_taxonomy( 'post_tag', array() );
 	}
 
 
@@ -664,7 +681,7 @@ class ConfigPlugin {
 			add_action('admin_head', [$this, 'loadStyle']);
 			add_action('admin_head', [$this, 'loadJS']);
 
-			if( in_array('post_thumbnails', $this->support) )
+			if( in_array('post_thumbnails', $this->support) || in_array('thumbnail', $this->support) )
 				add_theme_support( 'post-thumbnails' );
 
 			add_post_type_support( 'page', 'excerpt' );

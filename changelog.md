@@ -2,15 +2,16 @@ CHANGELOG
 ---------
 
 ##1.3.0
+**Category and tag taxonomy supports must now be explicitly declared in `wordpress.yml`**
+
 #### Feature
-- Added `query-monitor` plugin as dev dependency
 - `WordpressController` can be loaded on front and back side in `App\Controller`
 - added public entity field to image/post/term/user/menu/menu-item
 - added `__` function in TwigExtension
-- taxonomy tag support for post permalink 
-- parent tag support for term permalink
+- taxonomy tag support for post permalink ( see permalink in BO )
+- parent tag support for term permalink ( see permalink in BO )
 - Added `output` arg for Context `get_terms` & `get_posts` to allow array without key
-- Maintenance mode now call its own maintenanceAction
+- Maintenance mode call its own maintenanceAction
 
 #### Optimisation
 - Added rewrite removal rules in config
@@ -21,7 +22,8 @@ CHANGELOG
 - Added `depth` arg for Context `get_terms` & `get_posts` to prevent acf loading ( 0, to prevent )
 - Better factory cache based on args crc32
 - Reduced ACFHelper depth digging to 1
-- Message and tab field in options do not trigger sql query to get value anymore
+- ACF Message and tab field in options do not trigger sql query to get value anymore
+- when publicly_queryable is set to false, it forces rewrite, query_vars and exclude_from_search to false
 - ACF Options are now autoloaded to save queries, note that previously saved options are not affected, you can do a `UPDATE {$table_prefix}_options set autoload = 'yes' WHERE option_name LIKE 'options_%'` to enable autoload
 
 #### Fix
@@ -29,13 +31,13 @@ CHANGELOG
 - Added `imagefocus` plugin fallback support
 - `term_url` & `post_url` twig functions now return false on error instead of WP_error
 - `reset_cache` action
-- search rewrite rule
-- html entity decode in page title
-- add menu called twice
+- search rewrite rule loading
+- added html entity decode in page title
+- addMenu context function called twice
 - WPSeo canonical for page and url with query parameters
 
 #### Removed
-- Twig more function
+- Twig `more` function
 
 ##1.2.6
 #### Fix
