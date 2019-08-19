@@ -12,6 +12,7 @@ CHANGELOG
 - parent tag support for term permalink ( see permalink in BO )
 - Added `output` arg for Context `get_terms` & `get_posts` to allow array without key
 - Maintenance mode call its own maintenanceAction
+- Added args support to Post getTerms/getTerm
 
 #### Optimisation
 - Added rewrite removal rules in config
