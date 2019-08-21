@@ -13,18 +13,19 @@ CHANGELOG
 - Added `output` arg for Context `get_terms` & `get_posts` to allow array without key
 - Maintenance mode call its own maintenanceAction
 - Added args support to Post getTerms/getTerm
+- Added `?debug=image` to display via.placeholder.com image and view requested size
 
 #### Optimisation
 - Added rewrite removal rules in config
 - Added option in image to remove meta from object
-- Entity now implement the magic `__call` function to allow async acf data loading
+- Entity now implements the magic `__call` function to allow async acf data loading
 - Entities can now receive args options
 - Added `depth` arg for Entities to prevent acf loading
 - Added `depth` arg for Context `get_terms` & `get_posts` to prevent acf loading ( 0, to prevent )
 - Better factory cache based on args crc32
 - Reduced ACFHelper depth digging to 1
 - ACF Message and tab field in options do not trigger sql query to get value anymore
-- when publicly_queryable is set to false, it forces rewrite, query_vars and exclude_from_search to false
+- when publicly_queryable is set to false, it forces rewrite, query_vars, and exclude_from_search to false
 - ACF Options are now autoloaded to save queries, note that previously saved options are not affected, you can do a `UPDATE {$table_prefix}_options set autoload = 'yes' WHERE option_name LIKE 'options_%'` to enable autoload
 
 #### Fix
@@ -36,6 +37,7 @@ CHANGELOG
 - added html entity decode in page title
 - addMenu context function called twice
 - WPSeo canonical for page and url with query parameters
+- Removed non functional `?debug=query`
 
 #### Removed
 - Twig `more` function
@@ -78,7 +80,7 @@ CHANGELOG
 #### Feature
 - Site health is now available by typing `/_site-health` url [README.md](README.md)
 - Cache clear button is now available for administrators to remove filecache.
-- New API url are available for cache clearing
+- New API URLs are available for cache clearing
   - `/_cache/purge` call varnish cache
   - `/_cache/clear` remove filecache and purge varnish cache
 #### Fix
@@ -91,16 +93,16 @@ CHANGELOG
 - New interface for Wordpress backoffice
 - WebP thumbnail generation enhance
 - Placeholder for image slots when empty
-- Export database and Uploads files are now available in Options pages for easy backuping
+- Export database and Uploads files are now available in Options pages for easy backup
 - Sup button is available in WYSIWYG
 ####Advanced custom fields fixes
 - ACF Fields are now available in menus
 - Capabilities are now supported in menus
 - Metadata removal for a cleaner DOM
-- Role handling in configuration file with permissions
+- Role handling in the configuration file with permissions
 ####Multisite optimization
 - Better url management for multisite
-- Meta information are no longer global to multisite
+- Meta information is no longer global to multisite
 #### Fixes
 - Maintenance page is no longer active editor and administrator users.
 - Data withdrawing optimization in requests for recurring post and ACF fields
@@ -110,7 +112,7 @@ CHANGELOG
 
 
 ##1.0.7
-- Core upgrade with a provider and plugin design patterns for maintenability.
+- Core upgrade with a provider and plugin design patterns for maintainability.
 
 ##1.0.6
 ###Features

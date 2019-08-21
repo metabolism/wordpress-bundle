@@ -45,8 +45,13 @@ class Image extends Entity
 		$this->compression = $_config->get('image.compression', 90);
 		$this->show_meta = $_config->get('image.show_meta');
 
-		if( $data = $this->get($id) )
+		if( isset($_REQUEST['debug']) && $_REQUEST['debug'] == 'image' && WP_ENV == 'dev' ){
+			$this->ID = 0;
+		}
+		elseif( $data = $this->get($id) ){
+
 			$this->import($data, false, 'post_');
+		}
 	}
 
 

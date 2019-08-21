@@ -1,7 +1,7 @@
 {
   "name":"metabolism/wordpress-bundle",
   "version": "1.3.0",
-  "description": "Wordpress bundle for Symfony 4",
+  "description": "Use Wordpress 5 as a backend for a Symfony 4 application",
   "license": "GPL-3.0-or-later",
   "require": {
     "php" : ">=7.1.0",

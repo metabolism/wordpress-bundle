@@ -6,27 +6,8 @@ use Metabolism\WordpressBundle\Controller\AdminController as WordpressAdminContr
 
 class AdminController extends WordpressAdminController
 {
-	public function __construct()
+	public function init()
 	{
-		parent::__construct();
-
-		$this->addColorToTinyMCE();
-	}
-
-	public function addColorToTinyMCE()
-	{
-		add_filter('tiny_mce_before_init', function ($init) {
-
-			$custom_colours[] = '"269988", "Couleur du theme"';
-
-			// build colour grid default+custom colors
-			$init['textcolor_map'] = '['.implode(',', $custom_colours).']';
-
-			// change the number of rows in the grid if the number of colors changes
-			// 8 swatches per row
-			$init['textcolor_rows'] = 1;
-
-			return $init;
-		});
+		//add_action
 	}
 }

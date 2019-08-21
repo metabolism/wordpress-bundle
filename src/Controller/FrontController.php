@@ -60,7 +60,7 @@ class FrontController {
 			if( get_class($object) == 'WP_Post_Type' ){
 
 				if( $ppp= $this->config->get('post_type.'.$object->name.'.posts_per_page') )
-				$query->set( 'posts_per_page', $ppp );
+					$query->set( 'posts_per_page', $ppp );
 
 				if( $orderby = $this->config->get('post_type.'.$object->name.'.orderby') )
 					$query->set( 'orderby', $orderby );
@@ -71,7 +71,7 @@ class FrontController {
 			elseif( get_class($object) == 'WP_Term' ){
 
 				if( $ppp = $this->config->get('taxonomy.'.$object->taxonomy.'.posts_per_page') )
-				$query->set( 'posts_per_page', $ppp );
+					$query->set( 'posts_per_page', $ppp );
 
 				if( $orderby = $this->config->get('taxonomy.'.$object->name.'.orderby') )
 					$query->set( 'orderby', $orderby );
@@ -102,31 +102,6 @@ class FrontController {
 
 
 	/**
-	 * Allows user to add specific process on Wordpress functions
-	 */
-	public function registerFilters()
-	{
-		add_filter('posts_request', [$this, 'postsRequest'] );
-	}
-
-
-	/**
-	 * Display sql requests
-	 */
-	public function postsRequest($input)
-	{
-		if( isset($_REQUEST['debug']) && $_REQUEST['debug'] == 'query' && $_SERVER['APP_ENV'] == 'dev' ){
-
-			header('Content-Type: application/json');
-			echo json_encode($input);
-			exit(0);
-		}
-
-		return $input;
-	}
-
-
-	/**
 	 * Load App configuration
 	 */
 	private function loadConfig()
@@ -146,7 +121,6 @@ class FrontController {
 			return;
 
 		$this->loadConfig();
-		$this->registerFilters();
 
 		add_action( 'init', [$this, 'init']);
 		add_action( 'init', [$this, 'redirect']);
