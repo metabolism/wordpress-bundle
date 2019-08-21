@@ -126,6 +126,28 @@ class WPSEOProvider
 
 
 	/**
+	 * return true if wpseo title is filled
+	 * @param $postID
+	 * @return bool
+	 */
+	public static function hasTitle($postID){
+
+		return strlen(get_post_meta($postID, '_yoast_wpseo_title', true)) > 1 ? true : false;
+	}
+
+
+	/**
+	 * return true if wpseo description is filled
+	 * @param $postID
+	 * @return bool
+	 */
+	public static function hasDescription($postID){
+
+		return strlen(get_post_meta($postID, '_yoast_wpseo_metadesc', true)) > 1 ? true : false;
+	}
+
+
+	/**
 	 * Construct
 	 */
 	public function __construct()

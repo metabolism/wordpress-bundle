@@ -14,6 +14,7 @@ CHANGELOG
 - Maintenance mode call its own maintenanceAction
 - Added args support to Post getTerms/getTerm
 - Added `?debug=image` to display via.placeholder.com image and view requested size
+- Added `WPSEOProvider::hasTitle($post_id)` & `WPSEOProvider::hasDescription($post_id)`;
 
 #### Optimisation
 - Added rewrite removal rules in config
