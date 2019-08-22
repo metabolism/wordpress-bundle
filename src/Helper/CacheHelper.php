@@ -8,11 +8,48 @@ class Cache {
 
 	public function __construct(){}
 
+	/**
+	 * Set cache, redundant with WP_Object_Cache::add
+	 */
+	public static function set($key, $data, $group='app', $expire=60*60*12){
+
+		if( !is_string($key) )
+			$key = json_encode($key);
+
+		return wp_cache_add($key, $data, $group, $expire);
+	}
+
+
+	/**
+	 * Get cache, redundant with WP_Object_Cache::add
+	 */
+	public static function get($key, $group='app'){
+
+		if( !is_string($key) )
+			$key = json_encode($key);
+
+		return wp_cache_get($key, $group);
+	}
+
+
+	/**
+	 * Delete cache, redundant with WP_Object_Cache::add
+	 */
+	public static function delete($key, $group='app'){
+
+		if( !is_string($key) )
+			$key = json_encode($key);
+
+		return wp_cache_delete($key, $group);
+	}
+
 
 	/**
 	 * Clear cache completely
 	 */
 	public function clear(){
+
+		wp_cache_flush();
 
 		$status = $this->rrmdir(BASE_URI.'/var/cache');
 
