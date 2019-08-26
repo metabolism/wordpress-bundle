@@ -204,8 +204,21 @@ class Image extends Entity
 	 */
 	public function toHTML($w, $h=0, $sources=false, $params=false){
 
-		if( empty($this->src) || !file_exists($this->src) )
-			return new \Twig\Markup('<img src="'.$this->placeholder($w, $h).'" alt="image not found or empty">', 'UTF-8');;
+		if( empty($this->src) || !file_exists($this->src) ){
+
+			$html = '<picture>';
+			if( $sources && is_array($sources) ){
+
+				foreach ($sources as $media=>$size)
+					$html .='	<source media="('.$media.')"  srcset="'.$this->placeholder($size[0], $size[1] ?? 0).'">';
+			}
+
+			$html .='	<source srcset="'.$this->placeholder($w, $h).'">';
+			$html .= '<img src="'.$this->placeholder($w, $h).'">';
+			$html .='</picture>';
+
+			return new \Twig\Markup($html, 'UTF-8');;
+		}
 
 		$ext = function_exists('imagewebp') ? 'webp' : null;
 		$mime = function_exists('imagewebp') ? 'image/webp' : $this->mime_type;
