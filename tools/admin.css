@@ -70,6 +70,7 @@ th#mslscol{ width: 25px }
 #save-action+#preview-action{ margin-top: 10px }
 .postbox-container .inside{ margin: 10px 0 }
 .form-wrap p, p.description, p.help, span.description { line-height: 110%; opacity: 0.8 }
+#wp-content-editor-tools{ background: none }
 
 /* MSLS */
 #msls_noncename ~ .button-secondary{ display: none }
@@ -84,7 +85,7 @@ th#mslscol{ width: 25px }
 .acf-field .acf-label label, .post-attributes-label, .acf-flexible-content .layout .acf-fc-layout-handle span, #edittag .form-table th{ font-weight: normal }
 .acf-flexible-content .layout .acf-fc-layout-handle, .acf-accordion .acf-accordion-title label{ font-weight: 600 }
 .acf-field.acf-accordion .acf-accordion-title{ padding: 9px }
-
+.acf-relationship .filters .filter input { border: 1px solid #ddd }
 
 /* User */
 #your-profile select, #your-profile textarea, #your-profile .description, #your-profile .select2, #your-profile .acf-taxonomy-field{ max-width: 25em; width: 100% }
