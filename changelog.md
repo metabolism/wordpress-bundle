@@ -31,6 +31,7 @@ CHANGELOG
 - ACF Options are now autoloaded to save queries, note that previously saved options are not affected, you can do a `UPDATE {$table_prefix}_options set autoload = 'yes' WHERE option_name LIKE 'options_%'` to enable autoload
 
 #### Fix
+- Better post status management
 - Add more check before foreach in ACFHelper
 - Added `imagefocus` plugin fallback support
 - `term_url` & `post_url` twig functions now return false on error instead of WP_error

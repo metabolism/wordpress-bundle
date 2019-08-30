@@ -51,10 +51,28 @@ class PostFactory {
 
 		$post_status = get_post_status( $id );
 
-		if( $post_status && $post_status == 'private' && (!is_user_logged_in() || current_user_can( 'read_private_posts' )) )
+		switch($post_status){
+
+			case '':
+			case false:
+			case 'trash':
+			case 'auto-draft':
 			return false;
-		elseif( $post_status && $post_status != 'publish' )
+
+			case 'private':
+
+				if( !is_user_logged_in() || !current_user_can( 'read_private_posts' ) )
 			return false;
+				break;
+
+			case 'draft':
+			case 'pending':
+			case 'inherit':
+			case 'future':
+				if( !is_user_logged_in() || !current_user_can( 'edit_posts' ) )
+					return false;
+				break;
+		}
 
 		return Factory::create($id, $post_type, 'post', $args);
 	}
