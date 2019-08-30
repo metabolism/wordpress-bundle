@@ -66,8 +66,10 @@ class UrlPlugin {
 
 		$post = get_post($id);
 
-		if( $post->post_name )
+		if( $post->post_name ){
+			$post->post_status = 'publish';
 			return get_permalink($post);
+		}
 
 		$filter = isset($post->filter) ? $post->filter : false;
 
@@ -118,6 +120,21 @@ class UrlPlugin {
 
 
 	/**
+	 * Symfony require real url so redirect preview url to real url
+	 * ex /?post_type=project&p=899&preview=true redirect to /project/post-title?preview=true
+	 */
+	public function previewPostLink($permalink, $post){
+
+		$permalink = $this->getPreviewPermalink($post);
+
+		$query_args['preview'] = 'true';
+		$permalink = add_query_arg( $query_args, $permalink );
+
+		return $permalink;
+	}
+
+
+	/**
 	 * Remove link when there is no template support
 	 */
 	public function removeAdminBarLinks(){
@@ -138,6 +155,7 @@ class UrlPlugin {
 		add_filter('page_link', [$this, 'relativeLink']);
 		add_filter('post_type_link', [$this, 'relativeLink']);
 		add_filter('post_type_archive_link', [$this, 'relativeLink']);
+		add_filter('preview_post_link', [$this, 'previewPostLink'], 10, 2);
 
 		add_filter('option_siteurl', [$this, 'optionSiteURL'] );
 		add_filter('network_site_url', [$this, 'networkSiteURL'] );
