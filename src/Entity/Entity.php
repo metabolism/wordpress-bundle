@@ -17,13 +17,19 @@ class Entity
 	];
 
 	public $ID;
-
-	private $custom_fields;
-	private $imported=false;
-
+	public $entity;
 	public static $date_format = false;
 
-	public function import( $info, $remove=false , $replace=false )
+	private $custom_fields=false;
+	private $imported=false;
+
+
+	/**
+	 * @param $info
+	 * @param bool $remove
+	 * @param bool $replace
+	 */
+	public function import($info, $remove=false , $replace=false )
 	{
 		$info = self::normalize($info, $remove, $replace);
 
@@ -56,6 +62,20 @@ class Entity
 
 
 	/**
+	 * Magic method to load async properties
+	 *
+	 * @param $method
+	 * @param $arguments
+	 * @return string
+	 */
+	public function __call($method, $arguments) {
+
+		$this->load();
+		return isset($this->$method)?$this->$method:'';
+	}
+
+
+	/**
 	 * Return true if id exists
 	 */
 	public function exist()
@@ -65,24 +85,46 @@ class Entity
 
 
 	/**
-	 * Add custom fields as members of the post
+	 * Load ACF Fields
+	 */
+	public function load()
+	{
+		if( !$this->loaded() )
+			$this->bindCustomFields(true);
+	}
+
+
+	/**
+	 * load custom fields data
 	 * @param $id
 	 */
-	protected function addCustomFields( $id )
+	protected function addCustomFields( $id)
 	{
-		if( class_exists('ACF') )
+		if( class_exists('ACF') && !$this->custom_fields )
 		{
 			$this->custom_fields = new ACF( $id );
+			$this->bindCustomFields();
+		}
+	}
 
-			$objects = $this->custom_fields->get();
+
+	/**
+	 * Bind custom fields as members of the post
+	 * @param bool $force
+	 */
+	protected function bindCustomFields($force=false )
+	{
+		if( $this->custom_fields )
+		{
+			$objects = $this->custom_fields->get($force);
 
 			if( $objects && is_array($objects) )
 			{
-                foreach ($objects as $name => $value )
-                {
-                    $this->$name = $value;
-                }
-            }
+				foreach ($objects as $name => $value )
+				{
+					$this->$name = $value;
+				}
+			}
 		}
 	}
 
@@ -103,6 +145,12 @@ class Entity
 
 		if( isset($object['url']) )
 			$object['link'] = $object['url'];
+
+		if( isset($object['post_author']) && is_string($object['post_author']) )
+			$object['post_author'] = intval($object['post_author']);
+
+		if( isset($object['comment_count']) && is_string($object['comment_count']) )
+			$object['comment_count'] = intval($object['comment_count']);
 
 		if( isset($object['name']) && !isset($object['title']) )
 			$object['title'] = $object['name'];

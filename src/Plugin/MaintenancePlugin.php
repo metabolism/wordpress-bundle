@@ -29,6 +29,9 @@ use Dflydev\DotAccessData\Data;
 
 						echo '<input type="checkbox" id="maintenance_field" name="maintenance_field" value="1" ' . checked( 1, get_option('maintenance_field'), false ) . ' />'.__('Activate maintenance mode');
 
+						if( isset($_REQUEST['settings-updated']) )
+							do_action('reset_cache');
+
 					}, 'general');
 
 					register_setting('general', 'maintenance_field');

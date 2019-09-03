@@ -55,20 +55,18 @@ class SiteHealth {
 		$this->checkTaxonomies();
 		$this->checkPagesWithState();
 
-		$status = $this->status['has_error'] ? 406 : 200;
-
 		if( !$this->output ){
 			$content = $this->status['has_error'] ? '0' : '1';
-			$response = new Response($content, $status);
+			$response = new Response($content);
 		}
 		else{
 			if( $this->output == 'json' ){
 				$content  = $this->status;
-				$response = new JsonResponse($content, $status);
+				$response = new JsonResponse($content);
 			}
 			else{
 				$content  = $this->_toHTML();
-				$response = new Response($content, $status);
+				$response = new Response($content);
 			}
 		}
 

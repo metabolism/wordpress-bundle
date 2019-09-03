@@ -37,97 +37,25 @@ class ACFProvider {
 	{
 		if( function_exists('acf_add_options_page') )
 		{
-			acf_add_options_page();
+			$args = ['autoload' => true, 'page_title' => __('Options', 'acf'), 'menu_slug' => 'acf-options'];
+
+			acf_add_options_page($args);
 
 			$options = $this->config->get('acf.options_page', []);
 
 			//retro compat
 			$options = array_merge($options, $this->config->get('options_page', []));
 
- 			foreach ( $options as $name )
-				acf_add_options_sub_page($name);
+ 			foreach ( $options as $args ){
+
+ 				if( is_array($args) )
+				    $args['autoload'] = true;
+ 				else
+				    $args = ['page_title'=>$args, 'autoload'=>true];
+
+			    acf_add_options_sub_page($args);
+		    }
 		}
-	}
-
-
-	/**
-	 * Add settings button
-	 */
-	public function adminInit(){
-
-		if( !current_user_can('administrator') || WP_ENV != 'dev' )
-			return;
-
-		if( isset($_GET['clear_acf_meta']) )
-			$this->deleteUnusedMeta();
-
-		// Remove generated thumbnails option
-		add_settings_field('clean_unused_acf_meta', __('Advanced Custom Fields'), function(){
-
-			$unusedMeta = $this->getUnusedMeta();
-
-			if( $unusedMeta )
-				echo '<a class="button button-primary" href="'.get_admin_url().'?clear_acf_meta" title="Be carefull, fields must be synchronised">'.__('Remove').' '.$unusedMeta.' unused meta</a>';
-			else
-				echo __('Nothing to remove');
-
-		}, 'general');
-	}
-
-	/**
-	 * Clean acf meta
-	 */
-	public function deleteUnusedMeta(){
-
-		global $wpdb;
-
-		$deleteSql = "DELETE FROM `{$wpdb->prefix}postmeta` 
-	    WHERE `meta_key` IN 
-		( SELECT TRIM(LEADING '_' FROM `meta_key`) AS mk 
-			FROM (SELECT * FROM {$wpdb->prefix}postmeta) as pm
-			WHERE pm.`meta_value` regexp '^field_[0-9a-f]+' 
-				AND pm.`meta_value` NOT IN 
-					(SELECT `post_name` FROM `{$wpdb->prefix}posts` WHERE `post_type` = 'acf-field') 
-		) 
-		OR `meta_key` IN 
-		( SELECT `meta_key` AS mk 
-			FROM (SELECT * FROM {$wpdb->prefix}postmeta) as pm 
-			WHERE pm.`meta_value` regexp '^field_[0-9a-f]+' 
-				AND pm.`meta_value` NOT IN 
-					(SELECT `post_name` FROM `{$wpdb->prefix}posts` WHERE `post_type` = 'acf-field') 
-		)";
-
-		$wpdb->query($deleteSql);
-
-		wp_redirect( get_admin_url(null, 'options-general.php') );
-		exit;
-	}
-
-
-	/**
-	 * Count unused meta
-	 */
-	public function getUnusedMeta(){
-
-		global $wpdb;
-
-		$selectSql = "SELECT count(`meta_id`) FROM `{$wpdb->prefix}postmeta` 
-	    WHERE `meta_key` IN 
-		( SELECT TRIM(LEADING '_' FROM `meta_key`) AS mk 
-			FROM `{$wpdb->prefix}postmeta` 
-			WHERE `meta_value` regexp '^field_[0-9a-f]+' 
-				AND `meta_value` NOT IN 
-					(SELECT `post_name` FROM `{$wpdb->prefix}posts` WHERE `post_type` = 'acf-field') 
-		) 
-		OR `meta_key` IN 
-		( SELECT `meta_key` AS mk 
-			FROM `{$wpdb->prefix}postmeta` 
-			WHERE `meta_value` regexp '^field_[0-9a-f]+' 
-				AND `meta_value` NOT IN 
-					(SELECT `post_name` FROM `{$wpdb->prefix}posts` WHERE `post_type` = 'acf-field') 
-		)";
-
-		return $wpdb->get_var($selectSql);
 	}
 
 
@@ -145,6 +73,22 @@ class ACFProvider {
 
 
 	/**
+	 * Disable database query for non editable field
+	 * @param $unused
+	 * @param $post_id
+	 * @param $field
+	 * @return
+	 */
+	public function preLoadValue($unused, $post_id, $field){
+
+		if( $field['type'] == 'message' || $field['type'] == 'tab' )
+			return '';
+
+		return null;
+	}
+
+
+	/**
 	 * ACFPlugin constructor.
 	 * @param Data $config
 	 */
@@ -154,6 +98,7 @@ class ACFProvider {
 
 		add_filter('acf/settings/save_json', function(){ return $this::$folder; });
 		add_filter('acf/settings/load_json', function(){ return [$this::$folder]; });
+		add_filter('acf/pre_load_value', [$this, 'preLoadValue'], 10, 3);
 
 		// When viewing admin
 		if( is_admin() )
@@ -161,7 +106,6 @@ class ACFProvider {
 			// Setup ACF Settings
 			add_action( 'acf/init', [$this, 'addSettings'] );
 			add_filter( 'acf/fields/wysiwyg/toolbars' , [$this, 'editToolbars']  );
-			add_action( 'admin_init', [$this, 'adminInit'] );
 			add_action( 'init', [$this, 'addOptionPages'] );
 		}
 	}

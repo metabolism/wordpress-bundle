@@ -72,6 +72,26 @@ class WPSEOProvider
 
 
 	/**
+	 * Remove trailing slash & query parameters
+	 * @param $canonical
+	 * @return mixed
+	 */
+	public function filterCanonical($canonical) {
+
+		if( is_archive() ){
+			$canon_page = get_pagenum_link(1);
+			$canonical = explode('?', $canon_page);
+			return $canonical[0];
+		}
+
+		$canonical = explode('?', $canonical);
+		$canonicalFormat = (substr($canonical[0], -1) == '/') ? substr($canonical[0], 0, -1) : $canonical[0];
+
+		return $canonicalFormat;
+	}
+
+
+	/**
 	 * Add primary flagged term in first position
 	 * @param $terms
 	 * @param $postID
@@ -85,7 +105,7 @@ class WPSEOProvider
 			self::$preventRecursion = true;
 
 			$wpseo_primary_term = new \WPSEO_Primary_Term( $taxonomy, $postID);
-				$primary_term_id = $wpseo_primary_term->get_primary_term();
+			$primary_term_id = $wpseo_primary_term->get_primary_term();
 
 			if( $primary_term_id ){
 
@@ -95,7 +115,7 @@ class WPSEOProvider
 						unset($terms[$key]);
 				}
 
-				$terms = array_merge([$primary_term_id], $terms);
+				$terms = array_merge([get_term($primary_term_id)], $terms);
 			}
 
 			self::$preventRecursion = false;
@@ -106,11 +126,34 @@ class WPSEOProvider
 
 
 	/**
+	 * return true if wpseo title is filled
+	 * @param $postID
+	 * @return bool
+	 */
+	public static function hasTitle($postID){
+
+		return strlen(get_post_meta($postID, '_yoast_wpseo_title', true)) > 1 ? true : false;
+	}
+
+
+	/**
+	 * return true if wpseo description is filled
+	 * @param $postID
+	 * @return bool
+	 */
+	public static function hasDescription($postID){
+
+		return strlen(get_post_meta($postID, '_yoast_wpseo_metadesc', true)) > 1 ? true : false;
+	}
+
+
+	/**
 	 * Construct
 	 */
 	public function __construct()
 	{
 		add_action( 'admin_init', [$this, 'init'] );
+		add_filter( 'get_the_terms', [$this, 'changeTermsOrder'], 10, 3);
 
 		if( is_admin() ) {
 			add_filter( 'wp_editor_settings', [$this, 'editorSettings'], 10, 2);
@@ -121,10 +164,9 @@ class WPSEOProvider
 				if( class_exists( 'WPSEO_Frontend' ) && method_exists( 'WPSEO_Frontend', 'debug_mark' ) )
 					remove_action( 'wpseo_head', [\WPSEO_Frontend::get_instance(), 'debug_mark'], 2);
 
+				add_filter('wpseo_canonical', [$this, 'filterCanonical']);
 				add_filter('wpseo_sitemap_entry', [$this, 'makeAbsolute'], 10, 3);
 			});
-
-			add_filter( 'get_the_terms', [$this, 'changeTermsOrder'], 10, 3);
 		}
 	}
 }

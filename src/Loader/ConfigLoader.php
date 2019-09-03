@@ -75,7 +75,8 @@ class ConfigLoader {
 		define( 'WP_DEBUG', $env === 'dev');
 		define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
 
-		define( 'WP_FRONT', in_array('templates', $_config->get('support', [])) );
+		$support = $_config->get('support', []);
+		define( 'WP_FRONT', in_array('templates', $support)||in_array('template', $support) );
 
 		/**
 		 * Enable multisite

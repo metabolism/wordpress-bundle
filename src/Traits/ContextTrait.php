@@ -144,6 +144,7 @@ Trait ContextTrait
 		$queried_object = $wp_query->get_queried_object();
 
 		$language  = explode('-', $blog_language);
+		$paged     = get_query_var('paged', 1);
 
 		$this->data = [
 			'debug'              => WP_DEBUG,
@@ -152,10 +153,11 @@ Trait ContextTrait
 			'language'           => $blog_language,
 			'is_admin'           => current_user_can('manage_options'),
 			'home_url'           => home_url('/'),
-			'maintenance_mode'   => wp_maintenance_mode(),
+			'maintenance_mode'   => function_exists('wp_maintenance_mode') ? wp_maintenance_mode() : false,
 			'tagline'            => get_bloginfo('description'),
 			'site_title'         => get_bloginfo('name'),
-			'posts_per_page'     => get_option( 'posts_per_page' )
+			'posts_per_page'     => intval(get_option( 'posts_per_page' )),
+			'paged'              => $paged ? $paged : 1
 		];
 
 		if( is_multisite() ){
@@ -175,8 +177,11 @@ Trait ContextTrait
 				'search_url'         => get_search_link(),
 				'privacy_policy_url' => get_privacy_policy_url(),
 				'is_front_page'      => is_front_page(),
+				'is_single'          => $queried_object->post_type??false,
+				'is_tax'             => $queried_object->taxonomy??false,
+				'is_archive'         => get_class($queried_object) == 'WP_Post_Type' ? $queried_object->name : false,
 				'body_class'         => $blog_language . ' ' . $body_class,
-				'page_title'         => empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title,
+				'page_title'         => html_entity_decode(empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title),
 				'system' => [
 					'head'   => $this->getOutput('wp_head'),
 					'footer' => $this->getOutput('wp_footer')
@@ -201,10 +206,21 @@ Trait ContextTrait
 			$menu = new Menu($location);
 
 			if( $menu->ID )
-				$this->data['menu'][$location] = new Menu($location);
+				$this->data['menu'][$location] = $menu;
 		}
 
 		return $this->data['menu'];
+	}
+
+
+	/**
+	 * Get queried object
+	 * @return object|array
+	 */
+	public function getQueriedObject()
+	{
+		global $wp_query;
+		return $wp_query->get_queried_object();
 	}
 
 
@@ -335,10 +351,10 @@ Trait ContextTrait
 
 
 	/**
-	 * Add term entry to context from id
+	 * Add term entry to context from id or object with field, value and taxonomy to perform a get_term_by
 	 *
 	 * @see Post
-	 * @param null $id
+	 * @param int|object $id
 	 * @param string $key
 	 * @param callable|bool $callback
 	 * @return Term|bool
@@ -356,12 +372,18 @@ Trait ContextTrait
 
 		if( $id )
 		{
+			if( is_array($id) && isset($id['field'], $id['value'], $id['taxonomy']) ){
+				$term = get_term_by($id['field'], $id['value'], $id['taxonomy']);
+				if( $term )
+					$id = $term->term_id;
+			}
+
 			$term = TaxonomyFactory::create($id);
 
-			if( $callback && is_callable($callback) )
+			if( !is_wp_error($term) && $callback && is_callable($callback) )
 				call_user_func($callback, $term);
 
-			$this->data[$key] = $term;
+			$this->data[$key] = is_wp_error($term) ? false: $term;
 
 			return $this->data[$key];
 		}
@@ -374,7 +396,8 @@ Trait ContextTrait
 	 * Query posts
 	 *
 	 * @see Post
-	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters
+	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters,
+	 * added output=array|object, override=bool and found_posts=bool
 	 * @param bool|string $key the key name to store data
 	 * @param callable|bool $callback execute a function for each result via array_map
 	 * @return Post[]
@@ -388,7 +411,7 @@ Trait ContextTrait
 		if( isset($args['found_posts']) && $args['found_posts']) {
 
 			if( !isset($this->data['found_'.$key]) )
-				$this->data['found_'.$key] = 0;
+				$this->data['found_'.$key] = $wp_query->found_posts;
 			else
 				$this->data['found_'.$key] += $wp_query->found_posts;
 		}
@@ -399,12 +422,15 @@ Trait ContextTrait
 		foreach ($raw_posts as $post){
 
 			if( isset($post->ID) )
-			$posts[$post->ID] = $post;
+				$posts[$post->ID] = $post;
 			else
 				$posts[] = $post;
 		}
 
-		if( !isset($this->data[$key]) )
+		if( isset($args['output']) && $args['output'] == 'array' )
+			$posts = array_values( $posts );
+
+		if( !isset($this->data[$key]) || (isset($args['override']) && $args['override']) )
 			$this->data[$key] = $posts;
 		else
 			$this->data[$key] = array_merge($this->data[$key], $posts);
@@ -538,7 +564,8 @@ Trait ContextTrait
 
 	/**
 	 * Query terms
-	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
+	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/,
+	 * added output=array|object, group=bool and sort=bool
 	 * @param string $key
 	 * @param false|callable $callback
 	 * @return Term[]
@@ -551,7 +578,7 @@ Trait ContextTrait
 		if( isset($args['taxonomy'], $args['group']) && is_array($args['taxonomy']) && $args['group']) {
 
 			foreach ($raw_terms as $term)
-				$terms[$term->taxonomy][$term->term_id] = $term;
+				$terms[$term->taxonomy][$term->term_id] = is_wp_error($term) ? false : $term;
 
 			if( !isset($args['sort']) || $args['sort'] ){
 
@@ -575,11 +602,14 @@ Trait ContextTrait
 				$raw_terms = TermsPlugin::sortHierarchically( $raw_terms );
 
 			foreach ($raw_terms as $term)
-				$terms[$term->ID] = $term;
+				$terms[$term->ID] = is_wp_error($term) ? false : $term;
 		}
 
 		if( $callback && is_callable($callback) )
 			$terms = array_map($callback, $terms);
+
+		if( isset($args['output']) && $args['output'] == 'array' )
+			$terms = array_values( $terms );
 
 		if( !isset($this->data[$key]) )
 			$this->data[$key] = $terms;

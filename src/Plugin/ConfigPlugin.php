@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 use Dflydev\DotAccessData\Data;
+use Metabolism\WordpressBundle\Helper\Query;
 use Metabolism\WordpressBundle\Helper\Table;
 
 /**
@@ -77,6 +78,7 @@ class ConfigPlugin {
 					$args['capability_type'] = [$post_type, $this->plural($post_type)];
 
 				$slug = get_option( $post_type. '_rewrite_slug' );
+				$slug = str_replace('%', '}', str_replace('/%', '/{', $slug));
 
 				if( !is_null($slug) && !empty($slug) )
 					$args['rewrite'] = ['slug'=>$slug];
@@ -89,8 +91,30 @@ class ConfigPlugin {
 						$args['has_archive'] = $archive;
 				}
 
-				if( !WP_FRONT )
+				if( !WP_FRONT ){
+
 					$args['publicly_queryable'] = false;
+				}
+				else{
+
+					preg_match_all('/\/{.+?}/', $slug, $toks);
+
+					if( count($toks) && count($toks[0]) ){
+
+						$rule = '^'.$slug.'/([^/]+)/?$';
+						foreach ($toks[0] as $tok){
+							$rule = str_replace($tok, '/[^/]+', $rule);
+						}
+
+						add_rewrite_rule($rule, 'index.php?'.$post_type.'=$matches[1]', 'top');
+					}
+				}
+
+				if( isset($args['publicly_queryable']) && !$args['publicly_queryable'] ){
+					$args['query_var'] = false;
+					$args['exclude_from_search'] = false;
+					$args['rewrite'] = false;
+				}
 
 				register_post_type($post_type, $args);
 
@@ -141,17 +165,18 @@ class ConfigPlugin {
 
 					}
 
-					if( isset($args['has_options']) && function_exists('acf_add_options_page') )
+					if( isset($args['has_options']) && function_exists('acf_add_options_sub_page') )
 					{
 						if( is_bool($args['has_options']) )
 						{
 							$args = [
 								'page_title' 	=> ucfirst($name).' archive options',
-								'menu_title' 	=> 'Archive options'
+								'menu_title' 	=> 'Archive options',
+								'autoload'   	=> true
 							];
 						}
 
-						$args['menu_slug'] = 'options_'.$post_type;
+						$args['menu_slug']   = 'options_'.$post_type;
 						$args['parent_slug'] = 'edit.php?post_type='.$post_type;
 
 						acf_add_options_sub_page($args);
@@ -159,7 +184,7 @@ class ConfigPlugin {
 				}
 
 			}else{
-				wp_die($post_type. 'is not allowed, reserved keyword');
+				wp_die($post_type. ' is not allowed, reserved keyword');
 			}
 		}
 
@@ -218,7 +243,7 @@ class ConfigPlugin {
 
 		foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args )
 		{
-			if( $taxonomy != 'type' && $taxonomy != 'category' && $taxonomy != 'tag' && $taxonomy != 'product' ) {
+			if( $taxonomy != 'category' && $taxonomy != 'tag' && $taxonomy != 'product' ) {
 
 				$args = array_merge($default_args, $args);
 				$name = str_replace('_', ' ', isset($args['name']) ? $args['name'] : $taxonomy);
@@ -234,6 +259,7 @@ class ConfigPlugin {
 				];
 
 				$slug = get_option( $taxonomy. '_rewrite_slug' );
+				$slug = str_replace('%', '}', str_replace('/%', '/{', $slug));
 
 				if( !is_null($slug) && !empty($slug) )
 					$args['rewrite'] = ['slug'=>$slug];
@@ -267,13 +293,48 @@ class ConfigPlugin {
 					$object_type = 'post';
 				}
 
-				if( !WP_FRONT )
+				if( !WP_FRONT ){
+
 					$args['publicly_queryable'] = false;
+				}
+				else{
+
+					preg_match_all('/\/{.+?}/', $slug, $toks);
+
+					if( count($toks) && count($toks[0]) ){
+
+						$rule = '^'.$slug.'/([^/]+)/?$';
+						$has_parent = false;
+
+						foreach ($toks[0] as $tok){
+
+							$has_parent = $has_parent || $tok == '/{parent}';
+
+							if( $tok != '/{parent}' )
+								$rule = str_replace($tok, '/[^/]+', $rule);
+						}
+
+						if( $has_parent ){
+
+							add_rewrite_rule(str_replace('/{parent}', '/[^/]+', $rule), 'index.php?'.$taxonomy.'=$matches[1]', 'top');
+							add_rewrite_rule(str_replace('/{parent}', '', $rule), 'index.php?'.$taxonomy.'=$matches[1]', 'top');
+						}
+						else{
+
+							add_rewrite_rule($rule, 'index.php?'.$taxonomy.'=$matches[1]', 'top');
+						}
+					}
+				}
+
+				if( isset($args['publicly_queryable']) && !$args['publicly_queryable'] ){
+					$args['query_var'] = false;
+					$args['rewrite'] = false;
+				}
 
 				register_taxonomy($taxonomy, $object_type, $args);
 
 			} else{
-				wp_die($taxonomy. 'is not allowed, reserved keyword');
+				wp_die($taxonomy. ' is not allowed, reserved keyword');
 			}
 		}
 
@@ -320,13 +381,13 @@ class ConfigPlugin {
 			if( isset($args['force']) && $args['force'] )
 				remove_role($role);
 
-				add_role($role, $args['display_name'], $args['capabilities']);
+			add_role($role, $args['display_name'], $args['capabilities']);
 		}
 	}
 
 
 	/**
-	 * Set permalink stucture
+	 * Set permalink structure
 	 */
 	public function setPermalink()
 	{
@@ -335,8 +396,6 @@ class ConfigPlugin {
 		$wp_rewrite->set_permalink_structure($this->config->get('permalink_structure', '/%postname%'));
 
 		update_option( 'rewrite_rules', FALSE );
-
-		$wp_rewrite->flush_rules( true );
 	}
 
 
@@ -369,7 +428,7 @@ class ConfigPlugin {
 				{
 					if( isset( $_POST[$post_type. '_rewrite_'.$type] ) && !empty($_POST[$post_type. '_rewrite_'.$type]) )
 					{
-						update_option( $post_type. '_rewrite_'.$type, sanitize_title_with_dashes( $_POST[$post_type. '_rewrite_'.$type] ) );
+						update_option( $post_type. '_rewrite_'.$type, $_POST[$post_type. '_rewrite_'.$type] );
 						$updated = true;
 					}
 
@@ -380,6 +439,13 @@ class ConfigPlugin {
 							$value = $this->config->get('post_type.'.$post_type.($type=='slug'?'.rewrite.slug':'has_archive'), $post_type);
 
 						echo '<input type="text" value="' . esc_attr( $value ) . '" name="'.$post_type.'_rewrite_'.$type.'" placeholder="'.$post_type.'" id="'.$post_type.'_rewrite_'.$type.'" class="regular-text" />';
+
+						if( $type == 'slug' ){
+
+							$taxonomy_objects = get_object_taxonomies( $post_type );
+							if( !empty($taxonomy_objects) )
+								echo '<p class="description">You can use %'.implode('%, %', $taxonomy_objects).'% as custom structure</p>';
+						}
 
 					}, 'permalink', 'custom_post_type_rewrite' );
 				}
@@ -392,7 +458,7 @@ class ConfigPlugin {
 		{
 			if( isset( $_POST[$taxonomy. '_rewrite_slug'] ) && !empty($_POST[$taxonomy. '_rewrite_slug']) )
 			{
-				update_option( $taxonomy. '_rewrite_slug', sanitize_title_with_dashes( $_POST[$taxonomy. '_rewrite_slug'] ) );
+				update_option( $taxonomy. '_rewrite_slug', $_POST[$taxonomy. '_rewrite_slug'] );
 				$updated = true;
 			}
 
@@ -403,18 +469,14 @@ class ConfigPlugin {
 					$value = $this->config->get('taxonomy.'.$taxonomy.'.rewrite.slug', $taxonomy);
 
 				echo '<input type="text" value="' . esc_attr( $value ) . '" name="'.$taxonomy.'_rewrite_slug" placeholder="'.$taxonomy.'" id="'.$taxonomy.'_rewrite_slug" class="regular-text" />';
+				echo '<p class="description">You can use %parent% as custom structure</p>';
 
 			}, 'permalink', 'custom_taxonomy_rewrite' );
 		}
 
 
 		if( $updated )
-		{
-			global $wp_rewrite;
-			$wp_rewrite->flush_rules( true );
-
-			do_action('purge_cache');
-		}
+			do_action('reset_cache');
 	}
 
 
@@ -492,6 +554,12 @@ class ConfigPlugin {
 
 		if( !in_array('page', $this->support) )
 			register_post_type('page', []);
+
+		if( !in_array('category', $this->support) )
+			register_taxonomy( 'category', array() );
+
+		if( !in_array('tag', $this->support) )
+			register_taxonomy( 'post_tag', array() );
 	}
 
 
@@ -503,6 +571,70 @@ class ConfigPlugin {
 	{
 		if( $this->config->get('post_formats') )
 			add_theme_support('post-formats', $this->config->get('post_formats'));
+	}
+
+
+	/**
+	 * Update permalink if structure is custom
+	 */
+	public  function updatePostTypePermalink($post_link, $post){
+
+		if ( is_object( $post ) ){
+
+			preg_match_all('/\/{.+?}/', $post_link, $toks);
+
+			if( count($toks) && count($toks[0]) ){
+
+				foreach ($toks[0] as $tok){
+
+					$taxonomy = str_replace('}', '', str_replace('/{', '', $tok));
+
+					$terms = get_the_terms( $post, $taxonomy );
+
+					if( count($terms) && is_object($terms[0]) )
+						$post_link = str_replace( '{'.$taxonomy.'}', $terms[0]->slug, $post_link );
+					else
+						$post_link = str_replace( '{'.$taxonomy.'}', 'default', $post_link );
+				}
+			}
+		}
+
+		return $post_link;
+	}
+
+
+	/**
+	 * Update permalink if structure is custom
+	 */
+	public  function updateTermPermalink($term_link, $term){
+
+		if ( is_object( $term ) ){
+
+			preg_match_all('/\/{.+?}/', $term_link, $toks);
+
+			if( count($toks) ){
+
+				foreach ($toks[0] as $tok){
+
+					$match = str_replace('}', '', str_replace('/{', '', $tok));
+
+					if( $match == 'parent' ){
+
+						if( $term->parent ){
+							$parent_term = get_term($term->parent, $term->taxonomy);
+
+							if( $parent_term )
+								$term_link = str_replace( '{'.$match.'}', $parent_term->slug, $term_link );
+						}
+					}
+
+					$term_link = str_replace( '/{'.$match.'}', '', $term_link );
+				}
+			}
+		}
+
+		return $term_link;
+
 	}
 
 
@@ -529,9 +661,12 @@ class ConfigPlugin {
 			$this->addMenus();
 			$this->addRoles();
 
-			if( WP_FRONT )
+			if( WP_FRONT ){
 				$this->setPermalink();
-			
+				add_filter( 'post_type_link', [$this, 'updatePostTypePermalink'], 10, 2);
+				add_filter( 'term_link', [$this, 'updateTermPermalink'], 10, 2);
+			}
+
 			if( is_admin() )
 				$this->addTableViews();
 		});
@@ -546,7 +681,7 @@ class ConfigPlugin {
 			add_action('admin_head', [$this, 'loadStyle']);
 			add_action('admin_head', [$this, 'loadJS']);
 
-			if( in_array('post_thumbnails', $this->support) )
+			if( in_array('post_thumbnails', $this->support) || in_array('thumbnail', $this->support) )
 				add_theme_support( 'post-thumbnails' );
 
 			add_post_type_support( 'page', 'excerpt' );

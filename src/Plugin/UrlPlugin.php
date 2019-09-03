@@ -58,25 +58,6 @@ class UrlPlugin {
 	}
 
 	/**
-	 * Add search post type filtered
-	 */
-	public function addRewriteRules(){
-
-		global $wp_rewrite;
-
-		$search_slug = get_option( 'search_rewrite_slug' );
-		if( !empty($search_slug) )
-			$wp_rewrite->search_base = $search_slug;
-
-		$search_post_type_permastuct = str_replace('/%search%', '/%post_type%/%search%', $wp_rewrite->get_search_permastruct());
-		$regex = str_replace('%search%', '([^/]*)', str_replace('%post_type%', '([^/]*)', $search_post_type_permastuct));
-		add_rewrite_rule('^'.$regex.'/'.$wp_rewrite->pagination_base.'/([0-9]{1,})/?', 'index.php?s=$matches[2]&post_type=$matches[1]&paged=$matches[3]', 'top');
-		add_rewrite_rule('^'.$regex.'/?', 'index.php?s=$matches[2]&post_type=$matches[1]', 'top');
-
-		$wp_rewrite->search_post_type_structure = $search_post_type_permastuct;
-	}
-
-	/**
 	 * Save post name when requesting for preview link
 	 * @param $id
 	 * @return mixed
@@ -85,8 +66,10 @@ class UrlPlugin {
 
 		$post = get_post($id);
 
-		if( $post->post_name )
+		if( $post->post_name ){
+			$post->post_status = 'publish';
 			return get_permalink($post);
+		}
 
 		$filter = isset($post->filter) ? $post->filter : false;
 
@@ -105,6 +88,7 @@ class UrlPlugin {
 		return $preview_permalink;
 	}
 
+
 	/**
 	 * Make link relative
 	 * @param $link
@@ -114,6 +98,7 @@ class UrlPlugin {
 
 		return str_replace(WP_HOME, '', $link);
 	}
+
 
 	/**
 	 * Symfony require real url so redirect preview url to real url
@@ -132,6 +117,22 @@ class UrlPlugin {
 		wp_redirect($permalink);
 		exit;
 	}
+
+
+	/**
+	 * Symfony require real url so redirect preview url to real url
+	 * ex /?post_type=project&p=899&preview=true redirect to /project/post-title?preview=true
+	 */
+	public function previewPostLink($permalink, $post){
+
+		$permalink = $this->getPreviewPermalink($post);
+
+		$query_args['preview'] = 'true';
+		$permalink = add_query_arg( $query_args, $permalink );
+
+		return $permalink;
+	}
+
 
 	/**
 	 * Remove link when there is no template support
@@ -154,6 +155,7 @@ class UrlPlugin {
 		add_filter('page_link', [$this, 'relativeLink']);
 		add_filter('post_type_link', [$this, 'relativeLink']);
 		add_filter('post_type_archive_link', [$this, 'relativeLink']);
+		add_filter('preview_post_link', [$this, 'previewPostLink'], 10, 2);
 
 		add_filter('option_siteurl', [$this, 'optionSiteURL'] );
 		add_filter('network_site_url', [$this, 'networkSiteURL'] );

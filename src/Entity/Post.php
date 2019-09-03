@@ -14,11 +14,12 @@ use Metabolism\WordpressBundle\Helper\Query;
  */
 class Post extends Entity
 {
+	public $entity = 'post';
+
 	public $excerpt ='';
 
 	/** @var Image */
 	public $thumbnail = false;
-
 	public $link = '';
 	public $template = '';
 	public $comment_status;
@@ -42,19 +43,22 @@ class Post extends Entity
 	private $_prev = null;
 	private $_post = null;
 
+
 	/**
 	 * Post constructor.
 	 *
 	 * @param null $id
+	 * @param array $args
 	 */
-	public function __construct($id = null) {
+	public function __construct($id = null, $args = []) {
 
 		if( $post = $this->get($id) ) {
 
 			$this->import($post, false, 'post_');
 			$this->content = wpautop($this->content);
 
-			$this->addCustomFields($post->ID);
+			if( !isset($args['depth']) || $args['depth'] )
+				$this->addCustomFields($post->ID);
 		}
 	}
 
@@ -202,33 +206,35 @@ class Post extends Entity
 
 	/**
 	 * Get term
-	 * See: https://developer.wordpress.org/reference/functions/get_the_terms/
+	 * See: https://codex.wordpress.org/Function_Reference/wp_get_post_terms
 	 *
 	 * @param string $tax
+	 * @param array $args
 	 * @return Term|bool
 	 */
-	public function getTerm( $tax='' ) {
+	public function getTerm( $tax='', $args=[] ) {
 
-		$term = false;
+		$args['number'] = 1;
+		$terms = $this->getTerms($tax, $args);
 
-		$terms = get_the_terms($this->ID, $tax);
-		if( $terms && !is_wp_error($terms) && count($terms) )
-			$term = $terms[0];
-
-		if( $term )
-			return TaxonomyFactory::create( $term );
+		if( count($terms) )
+			return end($terms);
 		else
 			return false;
 	}
 
 	/**
 	 * Get term list
+	 * See : https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
 	 *
 	 * @param string $tax
+	 * @param array $args
 	 * @return Term[]|[]
 	 */
-	public function getTerms( $tax = '' ) {
-		
+	public function getTerms( $tax = '', $args=[] ) {
+
+		$args['fields'] = 'ids';
+
 		$taxonomies = array();
 
 		if ( is_array($tax) )
@@ -253,7 +259,7 @@ class Post extends Entity
 			if ( $taxonomy == 'categories' )
 				$taxonomy = 'category';
 
-			$terms = wp_get_post_terms($this->ID, $taxonomy, ['fields' => 'ids']);
+			$terms = wp_get_post_terms($this->ID, $taxonomy, $args);
 
 			if( is_wp_error($terms) ){
 
@@ -273,12 +279,18 @@ class Post extends Entity
 	}
 
 	/**
+	 * @param string $tax
+	 * @param bool $args
+	 * @return Term[]
 	 * @deprecated
 	 */
-	public function get_terms( $tax='' ) { return $this->getTerms($tax); }
+	public function get_terms( $tax='', $args=false ) { return $this->getTerms($tax, $args); }
 
 	/**
+	 * @param string $tax
+	 * @param bool $args
+	 * @return bool|Term
 	 * @deprecated
 	 */
-	public function get_term( $tax='' ) { return $this->getTerm($tax); }
+	public function get_term( $tax='', $args=false ) { return $this->getTerm($tax, $args); }
 }

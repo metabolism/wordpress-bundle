@@ -10,6 +10,8 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class MenuItem extends Entity
 {
+	public $entity = 'menu-item';
+
 	/** @var bool $menu_item_parent */
 	public $menu_item_parent;
 
@@ -30,8 +32,9 @@ class MenuItem extends Entity
 	/**
 	 * MenuItem constructor.
 	 * @param $data
+	 * @param array $args
 	 */
-	public function __construct($data ) {
+	public function __construct($data, $args = [] ) {
 		
 		if ( $data ){
 			$this->import($data, false, 'post_');
@@ -41,7 +44,8 @@ class MenuItem extends Entity
 
 			unset($this->date, $this->date_gmt, $this->modified, $this->modified_gmt, $this->name);
 
-			$this->addCustomFields($this->ID);
+			if( !isset($args['depth']) || $args['depth'] )
+				$this->addCustomFields($this->ID);
 		}
 	}
 }

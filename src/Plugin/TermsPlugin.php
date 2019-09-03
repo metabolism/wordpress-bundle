@@ -24,7 +24,6 @@ class TermsPlugin{
 			jQuery(function(){
 				jQuery('[id$="-all"] > ul.categorychecklist').each(function() {
 					var $list = jQuery(this);
-					console.log($list)
 					var $firstChecked = $list.find(':checkbox:checked').first();
 
 					if ( !$firstChecked.length )
@@ -67,7 +66,7 @@ class TermsPlugin{
 	{
 		foreach ($cats as $i => $cat)
 		{
-			if ($cat->parent == $parentId)
+			if (!is_wp_error($cat) && $cat->parent == $parentId)
 			{
 				$into[$cat->ID] = $cat;
 				unset($cats[$i]);

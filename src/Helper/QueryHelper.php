@@ -27,6 +27,9 @@ class Query
 	 */
 	public static function get_terms($args=[])
 	{
+		if( !isset($args['depth']) || !is_int($args['depth']))
+			$args['depth'] = 1;
+
 		$args['fields'] = 'ids';
 
 		$terms = get_terms( $args );
@@ -154,7 +157,11 @@ class Query
 			if( !isset($args['posts_per_page']) && !isset($args['numberposts']))
 				$args['posts_per_page'] = get_option( 'posts_per_page' );
 
+			if( !isset($args['depth']) || !is_int($args['depth']))
+				$args['depth'] = 1;
+
 			$args['fields'] = 'ids';
+
 			$query = new \WP_Query( $args );
 		}
 
@@ -162,7 +169,7 @@ class Query
 			return false;
 
 		foreach ($query->posts as &$post) {
-			$post = PostFactory::create( $post );
+			$post = PostFactory::create( $post, false, $args );
 		}
 
 		return $query;

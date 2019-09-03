@@ -252,6 +252,8 @@ Available functions :
 
 Image entity provide a nice on the fly resize function, add width and height to crop-resize, set width or height to 0 to resize
 
+To debug images, just add `?debug=image` to any url, it will replace images with placeholder.
+
 [wp-smartcrop](https://wordpress.org/plugins/wp-smartcrop/) plugin is supported
 
 ```twig

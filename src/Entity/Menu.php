@@ -10,22 +10,25 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class Menu extends Entity
 {
+	public $entity = 'menu';
+
 	/** @var MenuItem[] $items */
 	public $items;
-
 	public $title;
-
 	public $slug;
-
 	public $description;
 
 	private $menuItemClass;
+	private $args;
 
 	/**
 	 * Menu constructor.
 	 * @param int $slug
+	 * @param array $args
 	 */
-	public function __construct($slug = 0 ) {
+	public function __construct($slug = 0, $args = [] ) {
+
+		$this->args = $args;
 
 		$app_classname = 'App\Entity\MenuItem';
 
@@ -44,8 +47,11 @@ class Menu extends Entity
 		else if ( $slug === false )
 			$menu_id = false;
 
-		if ( $menu_id && $menu = $this->get($menu_id))
-			$this->addCustomFields($menu_id);
+		if ( $menu_id && $menu = $this->get($menu_id) ){
+
+			if( !isset($args['depth']) || $args['depth'] )
+				$this->addCustomFields($menu_id);
+		}
 	}
 
 
@@ -85,7 +91,7 @@ class Menu extends Entity
 
 		foreach ($menu_items as $item){
 
-			$ordered_menu[$item->ID] = new $this->menuItemClass($item);
+			$ordered_menu[$item->ID] = new $this->menuItemClass($item, $this->args);
 		}
 
 		foreach ($ordered_menu as $item)

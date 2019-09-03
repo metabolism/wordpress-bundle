@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle;
 
+use Dflydev\DotAccessData\Data;
 use Symfony\Component\Routing\Route,
 	Symfony\Component\Routing\RouteCollection;
 
@@ -10,6 +11,12 @@ class Permastruct{
 	public $collection;
 	private $controller_name, $wp_rewrite, $locale;
 
+	/**
+	 * Permastruct constructor.
+	 * @param $collection
+	 * @param $locale
+	 * @param $controller_name
+	 */
 	public function __construct($collection, $locale, $controller_name)
 	{
 		global $wp_rewrite;
@@ -19,9 +26,24 @@ class Permastruct{
 		$this->locale = $locale;
 		$this->wp_rewrite = $wp_rewrite;
 
-		$this->addRoutes();
+		if( wp_maintenance_mode() )
+			$this->addMaintenanceRoute();
+		else
+			$this->addRoutes();
 	}
 
+	/**
+	 * Catch all url to display maintenance
+	 */
+	public function addMaintenanceRoute(){
+
+		$maintenanceController = $this->getControllerName('maintenance');
+		$this->addRoute('maintenance', '{req}', ['req'=>".*"], false, $maintenanceController);
+	}
+
+	/**
+	 * Define all routes from post types and taxonomies
+	 */
 	public function addRoutes(){
 
 		$this->addRoute('front', '');
@@ -75,17 +97,22 @@ class Permastruct{
 					else
 						$struct = $base_struct;
 
+
 					$this->addRoute($taxonomy->name, $struct, [], $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
+
+					if( strpos($struct, '/%parent%') !== false )
+						$this->addRoute($taxonomy->name.'_parent', str_replace('/%parent%', '', $struct), [], $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
 
 					$registered[] = $taxonomy->name;
 				}
 			}
 		}
 
-		$this->addRoute('author', $this->wp_rewrite->author_structure);
+		if( isset($this->wp_rewrite->author_structure) )
+			$this->addRoute('author', $this->wp_rewrite->author_structure);
 
 		$translated_search_slug = get_option( 'search_rewrite_slug' );
-		$search_post_type_structure = false;
+		$search_post_type_structure = $search_structure = false;
 
 		if( !empty($translated_search_slug) ){
 
@@ -96,18 +123,21 @@ class Permastruct{
 		}
 		else{
 
-			$search_structure = $this->wp_rewrite->search_structure;
+			if( isset($this->wp_rewrite->search_structure) )
+				$search_structure = $this->wp_rewrite->search_structure;
 
 			if( isset($this->wp_rewrite->search_post_type_structure) )
 				$search_post_type_structure = $this->wp_rewrite->search_post_type_structure;
 		}
 
-		$this->addRoute('search', $search_structure, [], true);
+		if( $search_structure )
+			$this->addRoute('search', $search_structure, [], true);
 
 		if( $search_post_type_structure )
 			$this->addRoute('search_post_type', $search_post_type_structure, [], true);
 
-		$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
+		if( isset($this->wp_rewrite->page_structure) )
+			$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
 
 		$this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealth::check');
 
@@ -116,10 +146,22 @@ class Permastruct{
 	}
 
 
+	/**
+	 * @param $name
+	 * @return string
+	 */
 	private function getControllerName( $name ){
-		return 'App\Controller\\'.$this->controller_name.'::'.str_replace(' ', '',lcfirst(ucwords(str_replace('_', ' ', $name))).'Action');
+
+		$methodName = str_replace('_parent', '', $name);
+		$methodName = str_replace(' ', '',lcfirst(ucwords(str_replace('_', ' ', $methodName))));
+
+		return 'App\Controller\\'.$this->controller_name.'::'.$methodName.'Action';
 	}
 
+	/**
+	 * @param $struct
+	 * @return array
+	 */
 	private function getPaths( $struct ){
 
 		$path = str_replace('%/', '}/', str_replace('/%', '/{', $struct));
@@ -130,6 +172,13 @@ class Permastruct{
 		return ['singular'=>$path, 'archive'=>$path.'/'.$this->wp_rewrite->pagination_base.'/{page}'];
 	}
 
+	/**
+	 * @param $name
+	 * @param $struct
+	 * @param array $requirements
+	 * @param bool $paginate
+	 * @param bool $controllerName
+	 */
 	public function addRoute( $name, $struct, $requirements=[], $paginate=false, $controllerName=false )
 	{
 		$name = str_replace('_structure', '', $name);
@@ -138,11 +187,8 @@ class Permastruct{
 		$paths = $this->getPaths($struct);
 		$locale = $this->locale?'.'.$this->locale:'';
 
-		if( !empty($paths['singular']) || $name == 'front' ){
-
-			$route = new Route( $paths['singular'], ['_controller'=>$controller], $requirements);
-			$this->collection->add($name.$locale, $route);
-		}
+		$route = new Route( $paths['singular'], ['_controller'=>$controller], $requirements);
+		$this->collection->add($name.$locale, $route);
 
 		if( $paginate && !empty($paths['archive']) )
 		{
@@ -152,6 +198,7 @@ class Permastruct{
 	}
 }
 
+/** @var Data $_config */
 global $_config;
 $controller_name = $_config->get('extra_permastructs.controller', 'MainController');
 

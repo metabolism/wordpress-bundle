@@ -8,9 +8,10 @@ class PostFactory {
 	 * Create entity from post_type
 	 * @param null $id
 	 * @param bool $post_type
+	 * @param array $args
 	 * @return bool|mixed|\WP_Error
 	 */
-	public static function create($id=null, $post_type = false){
+	public static function create($id=null, $post_type = false, $args = []){
 
 		if( is_array($id) ) {
 
@@ -50,11 +51,29 @@ class PostFactory {
 
 		$post_status = get_post_status( $id );
 
-		if( $post_status && $post_status == 'private' && (!is_user_logged_in() || current_user_can( 'read_private_posts' )) )
-			return false;
-		elseif( $post_status && $post_status != 'publish' )
+		switch($post_status){
+
+			case '':
+			case false:
+			case 'trash':
+			case 'auto-draft':
 			return false;
 
-		return Factory::create($id, $post_type, 'post');
+			case 'private':
+
+				if( !is_user_logged_in() || !current_user_can( 'read_private_posts' ) )
+			return false;
+				break;
+
+			case 'draft':
+			case 'pending':
+			case 'inherit':
+			case 'future':
+				if( !is_user_logged_in() || !current_user_can( 'edit_posts' ) )
+					return false;
+				break;
+		}
+
+		return Factory::create($id, $post_type, 'post', $args);
 	}
 }

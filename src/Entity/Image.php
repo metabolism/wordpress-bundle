@@ -11,12 +11,9 @@ use Intervention\Image\ImageManagerStatic;
  */
 class Image extends Entity
 {
+	public $entity = 'image';
+
 	public static $wp_upload_dir = false;
-
-	private $compression = 90;
-
-	protected $src;
-
 	public $focus_point = false;
 	public $file;
 	public $meta;
@@ -29,8 +26,12 @@ class Image extends Entity
 	public $modified;
 	public $modified_gmt;
 	public $title;
-
 	public $sizes = [];
+
+	private $compression = 90;
+	private $show_meta = false;
+
+	protected $src;
 
 	/**
 	 * Post constructor.
@@ -40,10 +41,17 @@ class Image extends Entity
 	public function __construct($id = null) {
 
 		global $_config;
-		$this->compression = $_config->get('image.compression', 90);
 
-		if( $data = $this->get($id) )
+		$this->compression = $_config->get('image.compression', 90);
+		$this->show_meta = $_config->get('image.show_meta');
+
+		if( isset($_REQUEST['debug']) && $_REQUEST['debug'] == 'image' && WP_ENV == 'dev' ){
+			$this->ID = 0;
+		}
+		elseif( $data = $this->get($id) ){
+
 			$this->import($data, false, 'post_');
+		}
 	}
 
 
@@ -77,7 +85,6 @@ class Image extends Entity
 		$metadata['src']  = str_replace(WP_FOLDER.'/..', '', $metadata['src']);
 
 		$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
-		$metadata['meta'] = $metadata['image_meta'];
 		$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
 
 		foreach($post_meta as $key=>$value)
@@ -92,7 +99,7 @@ class Image extends Entity
 			else
 			{
 				$value = (is_array($value) && count($value)==1) ? $value[0] : $value;
-				$unserialized = @unserialize($value);
+				$unserialized = is_string($value)?@unserialize($value):false;
 
 				if( substr($key, 0, 1) == '_')
 					$key = substr($key, 1);
@@ -106,9 +113,10 @@ class Image extends Entity
 			$focus_point =  @unserialize($post_meta['_wpsmartcrop_image_focus'][0]);
 			$this->focus_point = ['x'=>$focus_point['left'], 'y'=>$focus_point['top']];
 		}
-
-		if( !empty($metadata) )
-			unset($metadata['sizes'], $metadata['image_meta']);
+		//imagefocus plugin support
+		elseif( isset($post_meta['focus_point']) ){
+			$this->focus_point = $post_meta['focus_point'];
+		}
 
 		if( file_exists($metadata['src']) )
 			$post['mime_type'] = mime_content_type($metadata['src']);
@@ -116,7 +124,14 @@ class Image extends Entity
 		unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
 
 		if( isset($post['mime_type']) && ($post['mime_type'] == 'image/svg+xml' || $this->mime_type == 'image/svg') )
-			unset($metadata['meta'],$metadata['width'],$metadata['height']);
+			unset($metadata['meta'], $metadata['width'], $metadata['height']);
+
+		if( $this->show_meta )
+			$metadata['meta'] = $metadata['image_meta'];
+		else
+			$metadata['meta'] = false;
+
+		unset($metadata['image_meta']);
 
 		if( is_array($metadata) )
 			return array_merge($post, $metadata);
@@ -189,8 +204,21 @@ class Image extends Entity
 	 */
 	public function toHTML($w, $h=0, $sources=false, $params=false){
 
-		if( empty($this->src) || !file_exists($this->src) )
-			return new \Twig\Markup('<img src="'.$this->placeholder($w, $h).'" alt="image not found or empty">', 'UTF-8');;
+		if( empty($this->src) || !file_exists($this->src) ){
+
+			$html = '<picture>';
+			if( $sources && is_array($sources) ){
+
+				foreach ($sources as $media=>$size)
+					$html .='	<source media="('.$media.')"  srcset="'.$this->placeholder($size[0], $size[1] ?? 0).'">';
+			}
+
+			$html .='	<source srcset="'.$this->placeholder($w, $h).'">';
+			$html .= '<img src="'.$this->placeholder($w, $h).'">';
+			$html .='</picture>';
+
+			return new \Twig\Markup($html, 'UTF-8');;
+		}
 
 		$ext = function_exists('imagewebp') ? 'webp' : null;
 		$mime = function_exists('imagewebp') ? 'image/webp' : $this->mime_type;

@@ -9,6 +9,8 @@ namespace Metabolism\WordpressBundle\Entity;
  */
 class User extends Entity
 {
+	public $entity = 'user';
+
 	public $login;
 	public $nicename;
 	public $email;
@@ -24,13 +26,16 @@ class User extends Entity
 	 * User constructor.
 	 *
 	 * @param $id
+	 * @param array $args
 	 */
-	public function __construct($id)
+	public function __construct($id, $args = [])
 	{
 		if( $user = $this->get($id) ) {
 
 			$this->import($user->data, false, 'user_');
-			$this->addCustomFields('user_'.$id);
+
+			if( !isset($args['depth']) || $args['depth'] )
+				$this->addCustomFields('user_'.$id);
 		}
 	}
 

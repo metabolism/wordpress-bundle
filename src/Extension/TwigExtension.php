@@ -19,8 +19,7 @@ class TwigExtension extends AbstractExtension{
 	public function getFilters()
 	{
 		return [
-			new TwigFilter( "more", [$this, 'more'] ),
-			new TwigFilter( "placeholder", [$this, 'placeholder'] )
+			new TwigFilter( 'placeholder', [$this, 'placeholder'] )
 		];
 	}
 
@@ -30,14 +29,31 @@ class TwigExtension extends AbstractExtension{
 	public function getFunctions()
 	{
 		return [
-			new TwigFunction( "fn", [$this,'execFunction'] ),
-			new TwigFunction( "function", [$this,'execFunction'] ),
-			new TwigFunction( "shortcode", "shortcode" ),
-			new TwigFunction( "archive_url", "get_post_type_archive_link" ),
-			new TwigFunction( "post_url", [$this, 'getPermalink'] ),
-			new TwigFunction( "term_url", "get_term_link" ),
-			new TwigFunction( "bloginfo", "bloginfo" )
+			new TwigFunction( '__', '__' ),
+			new TwigFunction( 'fn', [$this,'execFunction'] ),
+			new TwigFunction( 'function', [$this,'execFunction'] ),
+			new TwigFunction( 'shortcode', 'shortcode' ),
+			new TwigFunction( 'archive_url', 'get_post_type_archive_link' ),
+			new TwigFunction( 'post_url', [$this, 'getPermalink'] ),
+			new TwigFunction( 'term_url', [$this,'getTermLink'] ),
+			new TwigFunction( 'bloginfo', 'bloginfo' )
 		];
+	}
+
+
+	/**
+	 * @param object|int|string $term
+	 * @param string $taxonomy
+	 * @return mixed
+	 */
+	public function getTermLink( $term, $taxonomy = '' )
+	{
+		$link = get_term_link($term, $taxonomy);
+
+		if( !is_string($link) )
+			return false;
+
+		return $link;
 	}
 
 
@@ -83,21 +99,17 @@ class TwigExtension extends AbstractExtension{
 				break;
 		}
 
-		if( $page )
-			return get_permalink($page);
+		if( $page ){
+
+			$link = get_permalink($page);
+
+			if( !is_string($link) )
+				return false;
+
+			return $link;
+		}
 		else
 			return false;
-	}
-
-
-	/**
-	 * @param $text
-	 * @param string $cta
-	 * @return mixed
-	 */
-	public function more($text, $cta='Lire la suite')
-	{
-		return str_replace('<p><!--more--></p>', '<more cta="'.$cta.'">'.$text.'</more>', $text);
 	}
 
 

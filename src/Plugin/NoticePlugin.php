@@ -36,7 +36,13 @@ class NoticePlugin {
 		}
 
 		if( str_replace('/edition','', get_option( 'siteurl' )) !== get_home_url() )
-			$notices [] = 'Site url and Home url are different, please check your database configuration';
+			$notices [] = 'Site url host and Home url host are different, please check your database configuration';
+
+		global $wpdb, $table_prefix;
+		$siteurl = $wpdb->get_var("SELECT option_value FROM `".$table_prefix."options` WHERE `option_name` = 'siteurl'");
+
+		if( strpos($siteurl, '/edition' ) === false )
+			$notices [] = 'Site url must contain /edition, please check your database configuration';
 
 		if( !empty($notices) )
 			echo '<div class="error"><p>'.implode('<br/>', $notices ).'</p></div>';
