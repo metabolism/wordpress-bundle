@@ -19,10 +19,15 @@ class MSLSProvider {
 			global $current_blog, $wp_query;
 			$current_id = isset($_GET['post'])?$_GET['post']:get_the_ID();
 
-			if( $current_id )
-				return $path.'&clone=true&blog_id='.$current_blog->blog_id.'&post_id='.$current_id;
-			else
-				return $path;
+			if( $current_id ) {
+				$path = add_query_arg([
+					'clone' => 'true',
+					'blog_id' => $current_blog->blog_id,
+					'post_id' => $current_id
+				], $path);
+			}
+
+			return $path;
 		});
 
 
