@@ -1,7 +1,11 @@
 CHANGELOG
 ---------
 
-##1.3.0
+## 1.3.1
+#### Fix
+- msls clone link
+
+## 1.3.0
 **Category and tag taxonomy supports must now be explicitly declared in `wordpress.yml`**
 
 #### Feature
@@ -45,17 +49,17 @@ CHANGELOG
 #### Removed
 - Twig `more` function
 
-##1.2.6
+## 1.2.6
 #### Fix
 - Add more check before foreach in ACFHelper
 
-##1.2.5
+## 1.2.5
 #### Fix
 - Entity->addCustomFields bug on non object ( merge request from @undefinedfr )
 - Update function comments
 
 
-##1.2.4
+## 1.2.4
 #### Feature
 - add wpackagist-plugin/redirection plugin, role configuration
 #### Fix
@@ -64,22 +68,22 @@ CHANGELOG
 - Update composer required php extensions
 
 
-##1.2.3
+## 1.2.3
 #### Fix
 - Yoast SEO sitemap urls
 
 
-##1.2.2
+## 1.2.2
 #### Feature
 - new VARNISH_IP env variable for better cache purge
 
 
-##1.2.1
+## 1.2.1
 #### Fix
 - cache button
 
 
-##1.2.0
+## 1.2.0
 #### Feature
 - Site health is now available by typing `/_site-health` url [README.md](README.md)
 - Cache clear button is now available for administrators to remove filecache.
@@ -90,7 +94,7 @@ CHANGELOG
 - Purge cache button will now clear varnish cache efficiently
 
 
-##1.1.0
+## 1.1.0
 **Post and page supports must now be explicitly declared in `wordpress.yml`**
 ####Backoffice Feature
 - New interface for Wordpress backoffice
@@ -114,10 +118,10 @@ CHANGELOG
 
 
 
-##1.0.7
+## 1.0.7
 - Core upgrade with a provider and plugin design patterns for maintainability.
 
-##1.0.6
+## 1.0.6
 ###Features
 - WebP image generation
 - Auto-resize for images
@@ -133,23 +137,23 @@ CHANGELOG
 
 
 
-##1.0.5
+## 1.0.5
 - Bugfix: force `$_SERVER['HTTPS']="on"` when not set but `$_SERVER['HTTP_X_FORWARDED_PROTO']` is set to https
 - Bugfix: Context->addPosts now return posts ^^
 - Doc: Better documentation for ContextTrait functions
 - Feature: table prefix now handled by .env using `TABLE_PREFIX` variable
 
-##1.0.4
+## 1.0.4
 - Feature: add addSitemap context function
 
-##1.0.3
+## 1.0.3
 - Bugfix: Preview button in post now generate a real url
 
-##1.0.2
+## 1.0.2
 - Bugfix: Form Helper
 
-##1.0.1
+## 1.0.1
 - Support Wordpress 5 by adding classic editor plugin
 
-##1.0.0
+## 1.0.0
 - Public release
