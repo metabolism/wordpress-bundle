@@ -29,13 +29,12 @@ class TwigExtension extends AbstractExtension{
 	public function getFunctions()
 	{
 		return [
-			new TwigFunction( '__', '__' ),
-			new TwigFunction( 'fn', [$this,'execFunction'] ),
-			new TwigFunction( 'function', [$this,'execFunction'] ),
+			new TwigFunction( 'fn', [$this, 'execFunction'] ),
+			new TwigFunction( 'function', [$this, 'execFunction'] ),
 			new TwigFunction( 'shortcode', 'shortcode' ),
 			new TwigFunction( 'archive_url', 'get_post_type_archive_link' ),
 			new TwigFunction( 'post_url', [$this, 'getPermalink'] ),
-			new TwigFunction( 'term_url', [$this,'getTermLink'] ),
+			new TwigFunction( 'term_url', [$this, 'getTermLink'] ),
 			new TwigFunction( 'bloginfo', 'bloginfo' )
 		];
 	}

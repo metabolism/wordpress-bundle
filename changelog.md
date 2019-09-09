@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.3.2
+#### Fix
+- removed __ function from TwigExtension to allow declaration in App
+
 ## 1.3.1
 #### Fix
 - msls clone link
