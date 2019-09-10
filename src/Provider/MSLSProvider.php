@@ -168,63 +168,6 @@ class MSLSProvider {
 
 
 	/**
-	 * @param $link
-	 * @param $post_type
-	 * @return mixed
-	 */
-	public function postTypeArchiveLink($link, $post_type){
-
-		if( !empty($GLOBALS['_wp_switched_stack'] ) ){
-
-			global $wp_post_types;
-
-			$post_type = $wp_post_types[$post_type];
-
-			$base_struct = is_string($post_type->has_archive) ? $post_type->has_archive : $post_type->name;
-			$translated_slug = get_option( $post_type->name. '_rewrite_archive' );
-
-			$link = home_url( user_trailingslashit( $translated_slug, 'post_type_archive' ) );
-		}
-
-		return $link;
-	}
-
-
-	/**
-	 * @param $permalink
-	 * @param $post
-	 * @return mixed
-	 */
-	public function postTypeLink($permalink, $post){
-
-		if( !empty($GLOBALS['_wp_switched_stack'] ) ){
-
-			global $wp_rewrite;
-			global $wp_post_types;
-
-			$post_type = $wp_post_types[$post->post_type];
-
-			if( isset($wp_rewrite->extra_permastructs[$post_type->name]) ){
-
-				$base_struct = $wp_rewrite->extra_permastructs[$post_type->name]['struct'];
-				$translated_slug = get_option( $post_type->name. '_rewrite_slug' );
-
-				if( !empty($translated_slug) )
-					$struct = str_replace('/'.$post_type->rewrite['slug'].'/', '/'.$translated_slug.'/', $base_struct);
-				else
-					$struct = $base_struct;
-
-				$struct = str_replace( "%$post->post_type%", $post->post_name, $struct );
-
-				$permalink = home_url( user_trailingslashit( $struct ) );
-			}
-		}
-
-		return $permalink;
-	}
-
-
-	/**
 	 * MSLSProvider constructor.
 	 * @param $config
 	 */
@@ -232,21 +175,10 @@ class MSLSProvider {
 
 		$this->config = $config;
 
-		if( is_multisite() ) {
-
-			if( is_admin() ) {
+		if( is_multisite() && is_admin() ) {
 
 				if( $config->get('multisite.clone_post') )
 					$this->setupClone();
 			}
-			else {
-
-				add_action('init', function() {
-
-					add_filter('post_type_archive_link', [$this, 'postTypeArchiveLink'], 10, 2);
-					add_filter('post_type_link', [$this, 'postTypeLink'], 10, 2);
-				});
-			}
-		}
 	}
 }

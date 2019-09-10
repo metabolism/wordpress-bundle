@@ -2,6 +2,8 @@
 
 namespace Metabolism\WordpressBundle\Traits;
 
+use lloc\Msls\MslsOptions;
+
 use Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 use Metabolism\WordpressBundle\Helper\ACF,
@@ -70,6 +72,29 @@ Trait ContextTrait
 
 
 	/**
+	 * Return function echo
+	 * @param $function
+	 * @param array $args
+	 * @return string
+	 */
+	private function getAlternativeLink($mslsOptions, $site, $locale)
+	{
+		switch_to_blog($site->blog_id);
+
+		if ( MslsOptions::class != get_class( $mslsOptions ) && ( is_null( $mslsOptions ) || ! $mslsOptions->has_value( $locale ) ) ) {
+			restore_current_blog();
+			return false;
+		}
+
+		$alternate = $mslsOptions->get_permalink( $locale );
+
+		restore_current_blog();
+
+		return $alternate;
+	}
+
+
+	/**
 	 * Get multisite multilangue data
 	 * @param $queried_object
 	 * @return array
@@ -86,38 +111,18 @@ Trait ContextTrait
 		{
 			$sites = get_sites(['public'=>1]);
 			$current_blog_id = get_current_blog_id();
-			$alternates      = false;
 
 			if( !function_exists('format_code_lang') )
 				require_once(ABSPATH . 'wp-admin/includes/ms.php');
 
-			if( is_singular() )
-				$alternates = maybe_unserialize(get_option('msls_'.$queried_object->ID));
+			$mslsOptions = MslsOptions::create();
 
 			foreach($sites as $site)
 			{
 				$locale    = get_blog_option($site->blog_id, 'WPLANG');
 				$locale    = empty($locale)? 'en_US' : $locale;
 				$lang      = explode('_', $locale)[0];
-				$alternate = false;
-
-				if( $current_blog_id != $site->blog_id ){
-					if( is_singular() ){
-
-						if( $queried_object->ID && isset($alternates[$locale]) ){
-
-							switch_to_blog($site->blog_id);
-							$alternate = get_permalink($alternates[$locale]);
-							restore_current_blog();
-						}
-					}
-					elseif( is_archive() ){
-						$post_type = $queried_object->name;
-						switch_to_blog($site->blog_id);
-						$alternate = get_post_type_archive_link($post_type);
-						restore_current_blog();
-					}
-				}
+				$alternate = $current_blog_id != $site->blog_id ? $this->getAlternativeLink($mslsOptions, $site, $locale) : false;
 
 				$languages[] = [
 					'id' => $site->blog_id,
