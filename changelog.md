@@ -1,6 +1,14 @@
 CHANGELOG
 ---------
 
+## 1.3.4
+#### Fix
+- msls alternate url used in context
+
+## 1.3.3
+#### Feature
+- Added support for term templates, can be used as a display rule in acf using `metabolism/acf-extensions`
+
 ## 1.3.2
 #### Fix
 - removed __ function from TwigExtension to allow declaration in App

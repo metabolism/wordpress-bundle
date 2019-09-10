@@ -1,10 +1,15 @@
-domain_name: rocket
+###############################################
+##                                           ##
+##    Wordpress Bundle configuration file    ##
+##                                           ##
+###############################################
 
-## bind custom post type permalink structure to controller
-extra_permastructs:
-  controller: MainController
 
-key:
+####################
+##    Security    ##
+####################
+
+key: #https://api.wordpress.org/secret-key/1.1/salt/
   auth : 'O-} !h|JpOq^w,CXn+O5=o3MvkN_So+ O0-chs$+a>KJq*i~/!ykEd<]IsPdgI#6'
   secure_auth : 'r HvS?mdf^4xc.Iy^G*<ZliwL5r_w.]CUWIu|j0{sfq-M)k:Lhi-),qCDcN<Yy+w'
   logged_in : 'u`UAyT)Wp0bT&Z.^e3RWTWDs?Je9K0UBQDJqG$W*yb9YG1yl,|*:LQV^ZUt|Q~#.'
@@ -16,7 +21,11 @@ salt:
   logged_in : 'w/iowiks]_i5b#/SqYuD2`28o</-L|P4H3vq@!<OrH 7Q!gxB[Q4m`/*CiVdylGs'
   nonce : 'gelPRQb4NzO=4pOG_5YnuN(5G~YJCIutY*BL%!:ds(TqwDd;F[PsI,gT_1J-9;;D'
 
-## Image options
+
+#########################
+##    Image options    ##
+#########################
+
 image:
   compression: 90 #on the fly compression ration
   show_meta: false #add metadata to Image entity
@@ -24,10 +33,15 @@ image:
     max_width: 1920
     max_height: 2160
 
-## Enable maintenance mode
+
+###########################
+##    Admin interface    ##
+###########################
+
+## Enable maintenance mode support
 maintenance: true
 
-## Hide page from menu
+## Hide pages from menu
 remove_menu_page:
   - edit-comments.php #Comments
 #  - index.php #Dashboard
@@ -43,21 +57,7 @@ remove_menu_page:
 remove_submenu_page:
   themes.php: customize.php?return=%2Fedition%2Fwp-admin%2F
 
-## Allow multisite installation
-install-multisite: true
-
-## Multisite configuration ( after install )
-# multisite:
-#  subdomain_install: true
-#  shared_media: true
-#  multidomain: true
-#  clone_post: true
-
-## Declare constant
-#define:
-#  disallow_file_edit: false
-
-##WYSIWYG Editor TinyMCE Buttons
+## Customize WYSIWYG Editor TinyMCE Buttons
 ##https://www.tiny.cloud/docs/advanced/editor-control-identifiers/
 mce_buttons:
   - formatselect
@@ -83,15 +83,44 @@ mce_buttons:
   - wp_adv
   - dfw
 
-##ACF configurations
+##################
+##    System    ##
+##################
+
+## Add theme support
+support:
+  - template #uncomment for api only backoffice
+  - thumbnail #add thumbnails to page
+  - page #enable page
+#  - post #enable post
+#  - tag #enable tag taxonomy for post
+#  - category #enable category taxonomy for post
+
+## Allow multisite installation
+install-multisite: true
+
+## Multisite configuration ( after install )
+# multisite:
+#  subdomain_install: true
+#  shared_media: true
+#  multidomain: true
+#  clone_post: true
+
+## Declare constant
+#define:
+#  disallow_file_edit: false
+
+###############
+##    ACF    ##
+###############
+
 acf:
   settings:
-    autoload: true
-    #https://developers.google.com/maps/documentation/javascript/get-api-key
-    google_api_key: XXXYYYZZZ
-  options_page:
+    autoload: true #autoload options
+    google_api_key: XXXYYYZZZ #https://developers.google.com/maps/documentation/javascript/get-api-key
+  options_page: #add option pages https://www.advancedcustomfields.com/resources/options-page/
     - 'Personnalisation'
-  toolbars:
+  toolbars: #customize wysiwyg toolbar
     Full:
       1:
         - bold
@@ -146,25 +175,21 @@ acf:
         - link
         - fullscreen
 
-## Activate features
-support:
-  - template #uncomment for api only backoffice
-  - thumbnail #add thumbnails to page
-  - page #enable page
-#  - post #enable post
-#  - tag #enable tag taxonomy for post
-#  - category #enable category taxonomy for post
 
-## Declare menus
+################
+##    Menu    ##
+################
+
 menu:
   footer: Footer
   header: Header
 
-## Declare custom post types
-## https://codex.wordpress.org/Function_Reference/register_post_type
-## see vendor/metabolism/wordpress-bundle/doc/custom_taxonomy.yml for a full sample
-post_type:
 
+##########################
+##    New post types    ##
+##########################
+
+post_type: # https://codex.wordpress.org/Function_Reference/register_post_type
   guide:
     menu_icon: book #https://developer.wordpress.org/resource/dashicons/
     has_archive: true
@@ -172,9 +197,10 @@ post_type:
     #  - 1
     #disable_for_blogs:
     #  - 2#
-    #has_options: true
+    #has_options: true #add acf page option to post type menu
     capability_type: post
     #publicly_queryable: false
+    ## options for archive page
     #posts_per_page: 11
     #orderby: name #https://codex.wordpress.org/Class_Reference/WP_Query#Order_.26_Orderby_Parameters
     #order: ASC
@@ -182,7 +208,7 @@ post_type:
       - title
       - excerpt
       - thumbnail
-    #columns:
+    #columns: #add new column to post listing, thumbnail|meta
      # - thumbnail
     #taxonomies:
      # - category
@@ -199,16 +225,18 @@ post_type:
     #  popular_items:  'Guides populaires'
     #  not_found:      'Aucun guide trouvé'
 
-## Declare custom taxonomies
-## https://codex.wordpress.org/Function_Reference/register_taxonomy
-## see vendor/metabolism/wordpress-bundle/doc/custom_post_type.yml for a full sample
-taxonomy:
 
+##########################
+##    New taxonomies    ##
+##########################
+
+taxonomy: # https://codex.wordpress.org/Function_Reference/register_taxonomy
   item:
+    ## options for archive page
     #posts_per_page: 11
     #orderby: name #https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
     #order: ASC
-    #radio: true
+    #radio: true #display terms selection as radio instead of checkbox
     #publicly_queryable: false
     object_type:
       - guide
@@ -225,38 +253,39 @@ taxonomy:
     #  popular_items:  'Catégories populaires'
     #  not_found:      'Aucune catégorie trouvée'
 
-## Add post type template
-template:
-  page:
-    coming_soon: 'Coming Soon'
-    not_found: '404'
-  post:
-    video: 'Video'
 
-## Add/remove rewrite rules
-rewrite_rules:
-  remove:
-    - attachment
-    - embed
-    - trackback
-    - feed
-    - comment
+####################################
+##    Templates/States/Formats    ##
+####################################
 
-## Add page states
+## Add post and taxonomy templates
+#template:
+#  page:
+#    coming_soon: 'Coming Soon'
+#    not_found: '404'
+#  post:
+#    video: 'Video'
+#  taxonomy:
+#    item:
+#      edito: 'Edito'
+#      podcast: 'Podcast'
+#      reportage: 'Reportage'
+#      video: 'Video'
+
+## Add page states, like "homepage"
 #page_states:
   #archive_guide: 'Archive des guides'
 
 ## Add post formats
-## https://wordpress.org/support/article/post-formats/#supported-formats
-#post_formats:
+#post_formats: # https://wordpress.org/support/article/post-formats/#supported-formats
 #  - video
 #  - gallery
 
-## Configure search
-#search:
- # posts_per_page: 12
 
-## Declare custom database tables
+#################################
+##    Database table viewer    ##
+#################################
+
 #table:
 #  newsletter:
 #    page_title: Newsletter
@@ -278,7 +307,9 @@ rewrite_rules:
 #      company: Company
 #      request: Request
 
-## Add new roles
+#####################
+##    Add Roles    ##
+#####################
 #role:
 #  translator:
 #    display_name: Traducteur
@@ -304,6 +335,35 @@ rewrite_rules:
 #      manage_items: true
 #      edit_items: true
 
+
+############################
+##    Plugins specific    ##
+############################
+
 #plugins:
 #  redirection:
 #    redirection_role: edit_others_posts
+
+#########################
+##    Optimisations    ##
+#########################
+rewrite_rules:
+  remove:
+    - attachment
+    - embed
+    - trackback
+    - feed
+    - comment
+
+#########################
+##    Misc    ##
+#########################
+
+domain_name: rocket # MO/PO traductions
+
+#search: # change search settings
+# posts_per_page: 12
+
+## controller name used when importing @WordpressBundle/Routing/permastructs.php
+extra_permastructs:
+  controller: MainController

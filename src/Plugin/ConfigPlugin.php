@@ -171,7 +171,7 @@ class ConfigPlugin {
 						{
 							$args = [
 								'page_title' 	=> ucfirst($name).' archive options',
-								'menu_title' 	=> 'Archive options',
+								'menu_title' 	=> __('Archive options'),
 								'autoload'   	=> true
 							];
 						}
