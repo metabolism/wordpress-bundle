@@ -56,9 +56,6 @@ class RewritePlugin {
 
 			if( in_array('comment', $remove) && strpos($rule, '/comment-page-') !== false )
 				unset( $wp_rewrite->rules [$rule] );
-
-			if( strpos($rule, 'wp-json/') !== false )
-				unset( $wp_rewrite->rules [$rule] );
 		}
 	}
 

@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.3.5
+#### Fix
+- wp-json rewrite rule was deleted by mistake
+
 ## 1.3.4
 #### Fix
 - msls alternate url used in context
