@@ -364,22 +364,26 @@ class Image extends Entity
 
 		$html = '<picture>';
 
-		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || !$sources ){
+		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' ){
 
-			$html .= '<img srccar="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'">';
+			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'">';
 		}
 		else{
 
 			if( $sources && is_array($sources) ){
 
 				foreach ($sources as $media=>$size){
-					$html .='	<source media="('.$media.')"  srcset="'.$this->edit(['resize'=>$size], $ext).'" type="'.$mime.'">';
+
 					if( $ext == 'webp' )
-						$html .='	<source media="('.$media.')"  srcset="'.$this->edit(['resize'=>$size]).'" type="'.$this->mime_type.'">';
+						$html .='	<source media="('.$media.')"  srcset="'.$this->edit(['resize'=>$size], $ext).'" type="'.$mime.'">';
+
+					$html .='	<source media="('.$media.')"  srcset="'.$this->edit(['resize'=>$size]).'" type="'.$this->mime_type.'">';
 				}
 			}
 
-			$html .='	<source srcset="'.$this->edit(['resize'=>[$w, $h]], $ext).'" type="'.$mime.'">';
+			if( $ext == 'webp' )
+				$html .='	<source srcset="'.$this->edit(['resize'=>[$w, $h]], $ext).'" type="'.$mime.'">';
+
 			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'">';
 		}
 
@@ -397,52 +401,52 @@ class Image extends Entity
 	 */
 	protected function crop(&$image, $w, $h=0){
 
-			if(!$w){
+		if(!$w){
 
-				$image->resize(null, $h, function ($constraint) {
-					$constraint->aspectRatio();
-				});
+			$image->resize(null, $h, function ($constraint) {
+				$constraint->aspectRatio();
+			});
+		}
+		elseif(!$h){
+
+			$image->resize($w, null, function ($constraint) {
+				$constraint->aspectRatio();
+			});
+		}
+		elseif($this->focus_point){
+
+			$src_width = $image->getWidth();
+			$src_height = $image->getHeight();
+			$src_ratio = $src_width/$src_height;
+			$dest_ratio = $w/$h;
+
+			$ratio_height = $src_height/$h;
+			$ratio_width = $src_width/$w;
+
+			if( $dest_ratio < 1)
+			{
+				$dest_width = $w*$ratio_height;
+				$dest_height = $src_height;
 			}
-			elseif(!$h){
-
-				$image->resize($w, null, function ($constraint) {
-					$constraint->aspectRatio();
-				});
+			else
+			{
+				$dest_width = $src_width;
+				$dest_height = $h*$ratio_width;
 			}
-			elseif($this->focus_point){
 
-				$src_width = $image->getWidth();
-				$src_height = $image->getHeight();
-				$src_ratio = $src_width/$src_height;
-				$dest_ratio = $w/$h;
+			if ($ratio_height < $ratio_width) {
 
-				$ratio_height = $src_height/$h;
-				$ratio_width = $src_width/$w;
+				list($cropX1, $cropX2) = $this->calculateCrop($src_width, $dest_width, $this->focus_point['x']/100);
+				$cropY1 = 0;
+				$cropY2 = $src_height;
+			} else {
 
-				if( $dest_ratio < 1)
-				{
-					$dest_width = $w*$ratio_height;
-					$dest_height = $src_height;
-				}
-				else
-				{
-					$dest_width = $src_width;
-					$dest_height = $h*$ratio_width;
-				}
+				list($cropY1, $cropY2) = $this->calculateCrop($src_height, $dest_height, $this->focus_point['y']/100);
+				$cropX1 = 0;
+				$cropX2 = $src_width;
+			}
 
-				if ($ratio_height < $ratio_width) {
-
-					list($cropX1, $cropX2) = $this->calculateCrop($src_width, $dest_width, $this->focus_point['x']/100);
-					$cropY1 = 0;
-					$cropY2 = $src_height;
-				} else {
-
-					list($cropY1, $cropY2) = $this->calculateCrop($src_height, $dest_height, $this->focus_point['y']/100);
-					$cropX1 = 0;
-					$cropX2 = $src_width;
-				}
-
-				$image->crop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
+			$image->crop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
 
 			$tmp = tempnam("/tmp", "II");
 
@@ -450,12 +454,12 @@ class Image extends Entity
 
 			$image = ImageManagerStatic::make($tmp);
 
-				$image->fit($w, $h);
-			}
-			else{
+			$image->fit($w, $h);
+		}
+		else{
 
-				$image->fit($w, $h);
-			}
+			$image->fit($w, $h);
+		}
 	}
 
 	/**
