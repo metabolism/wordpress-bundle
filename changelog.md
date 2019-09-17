@@ -1,6 +1,15 @@
 CHANGELOG
 ---------
 
+## 1.3.6
+#### Feature
+new image edit function `{{ data.image.edit({resize:[260,224], insert:['/newsletter/dots.png','bottom-right', 10, 10]})`
+
+supported actions: resize / insert / colorize / blur / brightness / gamma / pixelate / greyscale / limitColors
+See : http://image.intervention.io/
+
+images for insert action must be in `/web`
+
 ## 1.3.5
 #### Fix
 - wp-json rewrite rule was deleted by mistake
