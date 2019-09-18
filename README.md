@@ -270,7 +270,7 @@ data.image.toHTML(664, 443, {'max-width: 1023px':[438,246]})|raw
 
 Edit image : 
 
-resize / insert / colorize / blur / brightness / gamma / pixelate / greyscale / limitColors
+resize / insert / colorize / blur / brightness / gamma / pixelate / greyscale / limitColors / mask / text / rotate
 See : http://image.intervention.io/
 
 ```twig

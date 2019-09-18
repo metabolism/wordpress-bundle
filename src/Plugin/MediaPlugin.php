@@ -397,7 +397,7 @@ class MediaPlugin {
 		{
 			$dir = new \RecursiveDirectoryIterator($folder);
 			$ite = new \RecursiveIteratorIterator($dir);
-			$files = new \RegexIterator($ite, '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/', \RegexIterator::GET_MATCH);
+			$files = new \RegexIterator($ite, '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?(-[a-z0-9]*)?\.[a-z]{3,4}$/', \RegexIterator::GET_MATCH);
 			$file_list = [];
 
 			foreach($files as $file) {
