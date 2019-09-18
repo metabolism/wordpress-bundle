@@ -302,7 +302,7 @@ class Image extends Entity
 						break;
 
 					case 'mask':
-						$image->mask($param[0], $param[1]??true);
+						$image->mask(BASE_URI.$param[0], $param[1]??true);
 						break;
 
 					case 'gamma':
