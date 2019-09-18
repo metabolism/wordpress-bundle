@@ -337,7 +337,7 @@ class MediaPlugin {
 			</tr>';
 
 			if( $this->config->get('multisite.shared_media') )
-			echo '<tr>
+				echo '<tr>
 				<th scope="row">'.__('Multisite').'</th>
 				<td><a class="button button-primary" href="'.get_admin_url().'?syncronize_images">Synchronize images</a></td>
 			</tr>';
@@ -400,8 +400,10 @@ class MediaPlugin {
 			$files = new \RegexIterator($ite, '/(?!.*150x150).*-[0-9]+x[0-9]+(-c-default|-c-center)?\.[a-z]{3,4}$/', \RegexIterator::GET_MATCH);
 			$file_list = [];
 
-			foreach($files as $file)
-				$file_list[] = $file[0];
+			foreach($files as $file) {
+				if( file_exists($file[0]) )
+					$file_list[] = $file[0];
+			}
 		}
 
 		return $file_list;
@@ -418,8 +420,10 @@ class MediaPlugin {
 		{
 			$thumbnails = $this->getThumbnails($all);
 
-			foreach($thumbnails as $file)
-				unlink($file);
+			foreach($thumbnails as $file){
+				if( file_exists($file) )
+					unlink($file);
+			}
 		}
 
 		clearstatcache();
