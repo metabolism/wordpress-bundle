@@ -278,7 +278,7 @@ class Image extends Entity
 						break;
 
 					case 'insert':
-						$image->insert(BASE_URI.'/web'.$param[0], $param[1]??'top-left', $param[2]??0, $param[3]??0);
+						$image->insert(BASE_URI.$param[0], $param[1]??'top-left', $param[2]??0, $param[3]??0);
 						break;
 
 					case 'colorize':
@@ -289,12 +289,54 @@ class Image extends Entity
 						$image->blur($param[0]??1);
 						break;
 
+					case 'flip':
+						$image->flip($param[0]??'v');
+						break;
+
 					case 'brightness':
 						$image->brightness($param[0]);
 						break;
 
+					case 'invert':
+						$image->invert();
+						break;
+
+					case 'mask':
+						$image->mask($param[0], $param[1]??true);
+						break;
+
 					case 'gamma':
 						$image->gamma($param[0]);
+						break;
+
+					case 'rotate':
+						$image->rotate($param[0]);
+						break;
+
+					case 'text':
+						$image->text($param[0], $param[1]??0, $param[2]??0, function($font) use($param) {
+
+							$params = $param[3]??[];
+
+							if( isset($params['file']) )
+								$font->file(BASE_URI.$params['file']);
+
+							if( isset($params['size']) )
+								$font->size($params['size']);
+
+							if( isset($params['color']) )
+								$font->color($params['color']);
+
+							if( isset($params['align']) )
+								$font->align($params['align']);
+
+							if( isset($params['valign']) )
+								$font->valign($params['valign']);
+
+							if( isset($params['angle']) )
+								$font->angle($params['angle']);
+						});
+
 						break;
 
 					case 'pixelate':
