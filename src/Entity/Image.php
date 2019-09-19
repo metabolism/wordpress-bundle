@@ -176,7 +176,7 @@ class Image extends Entity
 				'post_modified_gmt' => date("Y-m-d H:i:s", filectime($filename))
 			];
 
-			if( $this->show_meta )
+			if( $this->show_meta && function_exists('exif_read_data') )
 				$metadata['meta'] = @exif_read_data($filename);
 		}
 

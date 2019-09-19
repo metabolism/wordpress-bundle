@@ -8,7 +8,6 @@
     "ext-zip" : "*",
     "ext-fileinfo" : "*",
     "ext-json" : "*",
-    "ext-exif": "*",
     "ext-mbstring" : "*",
     "metabolism/wordpress-core-installer": "1.0.*",
     "metabolism/package-actions": "1.0.*",
