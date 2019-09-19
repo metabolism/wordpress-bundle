@@ -3,12 +3,14 @@ CHANGELOG
 
 ## 1.3.6
 #### Feature
-new image edit function `{{ data.image.edit({resize:[260,224], insert:['/newsletter/dots.png','bottom-right', 10, 10]})`
+- new image edit function `{{ data.image.edit({resize:[260,224], insert:['/web/newsletter/dots.png','bottom-right', 10, 10]})`
 
-supported actions: resize / insert / colorize / blur / brightness / gamma / pixelate / greyscale / limitColors / mask / text / rotate
+  supported actions: resize / insert / colorize / blur / brightness / gamma / pixelate / greyscale / limitColors / mask / text / rotate / ...
+
 See : http://image.intervention.io/
 
-images for insert action must be in `/web`
+- new Twig fonctions : Image, Post, User, Term, attachment_url
+
 
 ## 1.3.5
 #### Fix

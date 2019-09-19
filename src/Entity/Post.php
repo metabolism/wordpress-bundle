@@ -42,6 +42,7 @@ class Post extends Entity
 	private $_next = null;
 	private $_prev = null;
 	private $_post = null;
+	private $args = [];
 
 
 	/**
@@ -51,6 +52,8 @@ class Post extends Entity
 	 * @param array $args
 	 */
 	public function __construct($id = null, $args = []) {
+
+		$this->args = $args;
 
 		if( $post = $this->get($id) ) {
 

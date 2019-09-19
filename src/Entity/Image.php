@@ -30,17 +30,21 @@ class Image extends Entity
 
 	private $compression = 90;
 	private $show_meta = false;
+	private $args = [];
 
 	protected $src;
 
 	/**
 	 * Post constructor.
 	 *
-	 * @param null $id
+	 * @param int|string $id
+	 * @param array $args
 	 */
-	public function __construct($id = null) {
+	public function __construct($id=null, $args=[]) {
 
 		global $_config;
+
+		$this->args = $args;
 
 		$this->compression = $_config->get('image.compression', 90);
 		$this->show_meta = $_config->get('image.show_meta');
@@ -65,73 +69,116 @@ class Image extends Entity
 
 
 	/**
+	 * Return true if file exists
+	 */
+	public function exist()
+	{
+		return $this->ID ===  0 || file_exists( $this->src );
+	}
+
+
+	/**
 	 * Remove useless data
 	 * @param $id
 	 * @return array|bool|\WP_Post|null
 	 */
 	protected function get($id)
 	{
-		$metadata = wp_get_attachment_metadata($id);
-		$post = get_post($id, ARRAY_A);
-		$post_meta = get_post_meta($id);
+		$post = $metadata = false;
 
-		if( !$post || is_wp_error($post) )
-			return false;
+		if( is_numeric($id) ){
 
-		if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
-			return false;
+			$metadata = wp_get_attachment_metadata($id);
+			$post = get_post($id, ARRAY_A);
+			$post_meta = get_post_meta($id);
 
-		$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
-		$metadata['src']  = str_replace(WP_FOLDER.'/..', '', $metadata['src']);
+			if( !$post || is_wp_error($post) )
+				return false;
 
-		$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
-		$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
+			if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
+				return false;
 
-		foreach($post_meta as $key=>$value)
-		{
-			if( in_array($key, ['_wp_attached_file', '_wp_attachment_metadata', '_wpsmartcrop_enabled', '_wpsmartcrop_image_focus']) )
-				continue;
+			$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
+			$metadata['src']  = str_replace(WP_FOLDER.'/..', '', $metadata['src']);
 
-			if($key == '_wp_attachment_image_alt')
+			if( !file_exists($metadata['src']) )
+				return false;
+
+			$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
+			$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
+
+			foreach($post_meta as $key=>$value)
 			{
-				$post['alt'] = trim($value[0]);
+				if( in_array($key, ['_wp_attached_file', '_wp_attachment_metadata', '_wpsmartcrop_enabled', '_wpsmartcrop_image_focus']) )
+					continue;
+
+				if($key == '_wp_attachment_image_alt')
+				{
+					$post['alt'] = trim($value[0]);
+				}
+				else
+				{
+					$value = (is_array($value) && count($value)==1) ? $value[0] : $value;
+					$unserialized = is_string($value)?@unserialize($value):false;
+
+					if( substr($key, 0, 1) == '_')
+						$key = substr($key, 1);
+
+					$post[$key] = $unserialized?$unserialized:$value;
+				}
 			}
-			else
-			{
-				$value = (is_array($value) && count($value)==1) ? $value[0] : $value;
-				$unserialized = is_string($value)?@unserialize($value):false;
 
-				if( substr($key, 0, 1) == '_')
-					$key = substr($key, 1);
-
-				$post[$key] = $unserialized?$unserialized:$value;
+			//wpsmartcrop plugin support
+			if( isset($post_meta['_wpsmartcrop_enabled'], $post_meta['_wpsmartcrop_image_focus']) && $post_meta['_wpsmartcrop_enabled'][0] ){
+				$focus_point =  @unserialize($post_meta['_wpsmartcrop_image_focus'][0]);
+				$this->focus_point = ['x'=>$focus_point['left'], 'y'=>$focus_point['top']];
 			}
-		}
+			//imagefocus plugin support
+			elseif( isset($post_meta['focus_point']) ){
+				$this->focus_point = $post_meta['focus_point'];
+			}
 
-		//wpsmartcrop plugin support
-		if( isset($post_meta['_wpsmartcrop_enabled'], $post_meta['_wpsmartcrop_image_focus']) && $post_meta['_wpsmartcrop_enabled'][0] ){
-			$focus_point =  @unserialize($post_meta['_wpsmartcrop_image_focus'][0]);
-			$this->focus_point = ['x'=>$focus_point['left'], 'y'=>$focus_point['top']];
-		}
-		//imagefocus plugin support
-		elseif( isset($post_meta['focus_point']) ){
-			$this->focus_point = $post_meta['focus_point'];
-		}
-
-		if( file_exists($metadata['src']) )
 			$post['mime_type'] = mime_content_type($metadata['src']);
 
-		unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
+			unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
 
-		if( isset($post['mime_type']) && ($post['mime_type'] == 'image/svg+xml' || $this->mime_type == 'image/svg') )
-			unset($metadata['meta'], $metadata['width'], $metadata['height']);
+			if( isset($post['mime_type']) && ($post['mime_type'] == 'image/svg+xml' || $this->mime_type == 'image/svg') )
+				unset($metadata['meta'], $metadata['width'], $metadata['height']);
 
-		if( $this->show_meta )
-			$metadata['meta'] = $metadata['image_meta'];
-		else
-			$metadata['meta'] = false;
+			if( $this->show_meta )
+				$metadata['meta'] = $metadata['image_meta'];
+			else
+				$metadata['meta'] = false;
 
-		unset($metadata['image_meta']);
+			unset($metadata['image_meta']);
+		}
+		elseif( is_string($id) ){
+
+			$filename = BASE_URI.$id;
+
+			if( !file_exists( $filename) )
+				return false;
+
+			$post = $post_meta = [];
+
+			$image_size = getimagesize($filename);
+
+			$metadata = [
+				'src' => $filename,
+				'file' => str_replace('/web', '', $id),
+				'width' => $image_size[0],
+				'height' => $image_size[1],
+				'mime_type' => $image_size['mime'],
+				'post_title' => str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME)),
+				'post_date' => filemtime($filename),
+				'post_date_gmt' => date("Y-m-d H:i:s", filemtime($filename)),
+				'post_modified' => filectime($filename),
+				'post_modified_gmt' => date("Y-m-d H:i:s", filectime($filename))
+			];
+
+			if( $this->show_meta )
+				$metadata['meta'] = @exif_read_data($filename);
+		}
 
 		if( is_array($metadata) )
 			return array_merge($post, $metadata);
@@ -187,6 +234,7 @@ class Image extends Entity
 		$file = $this->process($params, $ext);
 
 		$url = str_replace($abspath, $this->uploadDir('relative'), $file);
+		$url = str_replace(BASE_URI.'/web', '', $url);
 
 		if( is_array($params) && isset($params['name']) )
 			$this->sizes[$params['name']] = $url;
@@ -256,6 +304,16 @@ class Image extends Entity
 
 		//append suffix to filename
 		$dest = str_replace('.'.$src_ext, $suffix.'.'.$ext, $this->src);
+
+		if( isset($this->args['path']) ){
+
+			$path = BASE_URI.$this->args['path'];
+
+			if( !is_dir($path) )
+				mkdir($path, 0755, true);
+
+			$dest = $path.'/'.pathinfo($dest, PATHINFO_BASENAME);
+		}
 
 		if( file_exists($dest) ){
 
@@ -345,6 +403,28 @@ class Image extends Entity
 
 					case 'greyscale':
 						$image->greyscale();
+						break;
+
+					case 'rectangle':
+						$image->rectangle($param[0], $param[1], $param[2], $param[3], function ($draw) use($param) {
+
+							if( count($param) > 4 )
+								$draw->background($param[4]);
+
+							if( count($param) > 6 )
+								$draw->border($param[5], $param[6]);
+						});
+						break;
+
+					case 'circle':
+						$image->circle($param[0], $param[1], $param[2], function ($draw) use($param) {
+
+							if( count($param) > 3 )
+								$draw->background($param[3]);
+
+							if( count($param) > 5 )
+								$draw->border($param[4], $param[5]);
+						});
 						break;
 
 					case 'limitColors':

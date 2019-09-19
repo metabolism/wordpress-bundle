@@ -10,6 +10,10 @@
 namespace Metabolism\WordpressBundle\Extension;
 
 use Metabolism\WordpressBundle\Entity\Image;
+use Metabolism\WordpressBundle\Factory\Factory;
+use Metabolism\WordpressBundle\Factory\PostFactory;
+use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
+
 use Twig\Extension\AbstractExtension,
 	Twig\TwigFilter,
 	Twig\TwigFunction;
@@ -33,9 +37,15 @@ class TwigExtension extends AbstractExtension{
 			new TwigFunction( 'function', [$this, 'execFunction'] ),
 			new TwigFunction( 'shortcode', 'shortcode' ),
 			new TwigFunction( 'archive_url', 'get_post_type_archive_link' ),
+			new TwigFunction( 'attachment_url', 'wp_get_attachment_ur' ),
 			new TwigFunction( 'post_url', [$this, 'getPermalink'] ),
 			new TwigFunction( 'term_url', [$this, 'getTermLink'] ),
-			new TwigFunction( 'bloginfo', 'bloginfo' )
+			new TwigFunction( 'bloginfo', 'bloginfo' ),
+			new TwigFunction( 'Image', function($id){ return Factory::create($id, 'image'); } ),
+			new TwigFunction( 'Post', function($id){ return PostFactory::create($id); } ),
+			new TwigFunction( 'User', function($id){ return Factory::create($id, 'user'); } ),
+			new TwigFunction( 'Term', function($id){ return TaxonomyFactory::create($id); } ),
+			new TwigFunction( 'Image', function($id, $path=false){ return Factory::create($id, 'image', false, ['path'=>$path]); } )
 		];
 	}
 
