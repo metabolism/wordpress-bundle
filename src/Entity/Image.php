@@ -166,8 +166,8 @@ class Image extends Entity
 			$metadata = [
 				'src' => $filename,
 				'file' => str_replace('/web', '', $id),
-				'width' => $image_size[0],
-				'height' => $image_size[1],
+				'width' => $image_size[0]??false,
+				'height' => $image_size[1]??false,
 				'mime_type' => $image_size['mime'],
 				'post_title' => str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME)),
 				'post_date' => filemtime($filename),
@@ -264,8 +264,14 @@ class Image extends Entity
 		}
 		else{
 
-			$w = 800;
-			$h = 600;
+			if( file_exists($this->src) && $image_size = getimagesize($this->src) ){
+				$w = $image_size[0];
+				$h = $image_size[1];
+			}
+			else{
+				$w = 800;
+				$h = 600;
+			}
 		}
 
 		//return placeholder if image is empty

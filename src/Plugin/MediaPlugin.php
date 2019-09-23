@@ -158,6 +158,7 @@ class MediaPlugin {
 	/**
 	 * add attachment to other blog by reference
 	 * @param $attachment_ID
+	 * @return void
 	 */
 	public function addAttachment( $attachment_ID )
 	{
