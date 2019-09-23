@@ -1,6 +1,17 @@
 CHANGELOG
 ---------
 
+## 1.3.6
+#### Feature
+- new image edit function `{{ data.image.edit({resize:[260,224], insert:['/web/newsletter/dots.png','bottom-right', 10, 10]})`
+
+  supported actions: resize / insert / colorize / blur / brightness / gamma / pixelate / greyscale / limitColors / mask / text / rotate / ...
+
+See : http://image.intervention.io/
+
+- new Twig fonctions : Image, Post, User, Term, attachment_url
+
+
 ## 1.3.5
 #### Fix
 - wp-json rewrite rule was deleted by mistake

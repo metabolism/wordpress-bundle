@@ -260,13 +260,21 @@ To debug images, just add `?debug=image` to any url, it will replace images with
 <h1>{{ post.title }}</h1>
 <img src="{{ post.thumbnail.resize(800, 600) }}" alt="{{ post.thumbnail.alt }}">
 <img src="{{ post.thumbnail.resize(0, 600) }}" alt="{{ post.thumbnail.alt }}">
-<img src="{{ post.thumbnail.resize(800, 0) }}" alt="{{ post.thumbnail.alt }}">
+<img src="{{ post.thumbnail.resize(800, 0, 'webp') }}" alt="{{ post.thumbnail.alt }}">
 ```
 
 Generate picture element ( width, height, media queries ), it use wepb if enabled in PHP
 ```twig
 data.image.toHTML(664, 443, {'max-width: 1023px':[438,246]})|raw 
-(data.image|default|placeholder).toHTML(664, 443, {'max-width: 1023px':[438,246]})|raw 
+```
+
+Edit image : 
+
+resize / insert / colorize / blur / brightness / gamma / pixelate / greyscale / limitColors / mask / text / rotate
+See : http://image.intervention.io/
+
+```twig
+data.image.edit({resize:[260,224], insert:['/newsletter/dots.png','bottom-right', 10, 10]})
 ```
 
 Use a placeholder if the image doesn't exists

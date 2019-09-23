@@ -30,17 +30,21 @@ class Image extends Entity
 
 	private $compression = 90;
 	private $show_meta = false;
+	private $args = [];
 
 	protected $src;
 
 	/**
 	 * Post constructor.
 	 *
-	 * @param null $id
+	 * @param int|string $id
+	 * @param array $args
 	 */
-	public function __construct($id = null) {
+	public function __construct($id=null, $args=[]) {
 
 		global $_config;
+
+		$this->args = $args;
 
 		$this->compression = $_config->get('image.compression', 90);
 		$this->show_meta = $_config->get('image.show_meta');
@@ -65,73 +69,116 @@ class Image extends Entity
 
 
 	/**
+	 * Return true if file exists
+	 */
+	public function exist()
+	{
+		return $this->ID ===  0 || file_exists( $this->src );
+	}
+
+
+	/**
 	 * Remove useless data
 	 * @param $id
 	 * @return array|bool|\WP_Post|null
 	 */
 	protected function get($id)
 	{
-		$metadata = wp_get_attachment_metadata($id);
-		$post = get_post($id, ARRAY_A);
-		$post_meta = get_post_meta($id);
+		$post = $metadata = false;
 
-		if( !$post || is_wp_error($post) )
-			return false;
+		if( is_numeric($id) ){
 
-		if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
-			return false;
+			$metadata = wp_get_attachment_metadata($id);
+			$post = get_post($id, ARRAY_A);
+			$post_meta = get_post_meta($id);
 
-		$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
-		$metadata['src']  = str_replace(WP_FOLDER.'/..', '', $metadata['src']);
+			if( !$post || is_wp_error($post) )
+				return false;
 
-		$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
-		$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
+			if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
+				return false;
 
-		foreach($post_meta as $key=>$value)
-		{
-			if( in_array($key, ['_wp_attached_file', '_wp_attachment_metadata', '_wpsmartcrop_enabled', '_wpsmartcrop_image_focus']) )
-				continue;
+			$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
+			$metadata['src']  = str_replace(WP_FOLDER.'/..', '', $metadata['src']);
 
-			if($key == '_wp_attachment_image_alt')
+			if( !file_exists($metadata['src']) )
+				return false;
+
+			$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
+			$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
+
+			foreach($post_meta as $key=>$value)
 			{
-				$post['alt'] = trim($value[0]);
+				if( in_array($key, ['_wp_attached_file', '_wp_attachment_metadata', '_wpsmartcrop_enabled', '_wpsmartcrop_image_focus']) )
+					continue;
+
+				if($key == '_wp_attachment_image_alt')
+				{
+					$post['alt'] = trim($value[0]);
+				}
+				else
+				{
+					$value = (is_array($value) && count($value)==1) ? $value[0] : $value;
+					$unserialized = is_string($value)?@unserialize($value):false;
+
+					if( substr($key, 0, 1) == '_')
+						$key = substr($key, 1);
+
+					$post[$key] = $unserialized?$unserialized:$value;
+				}
 			}
-			else
-			{
-				$value = (is_array($value) && count($value)==1) ? $value[0] : $value;
-				$unserialized = is_string($value)?@unserialize($value):false;
 
-				if( substr($key, 0, 1) == '_')
-					$key = substr($key, 1);
-
-				$post[$key] = $unserialized?$unserialized:$value;
+			//wpsmartcrop plugin support
+			if( isset($post_meta['_wpsmartcrop_enabled'], $post_meta['_wpsmartcrop_image_focus']) && $post_meta['_wpsmartcrop_enabled'][0] ){
+				$focus_point =  @unserialize($post_meta['_wpsmartcrop_image_focus'][0]);
+				$this->focus_point = ['x'=>$focus_point['left'], 'y'=>$focus_point['top']];
 			}
-		}
+			//imagefocus plugin support
+			elseif( isset($post_meta['focus_point']) ){
+				$this->focus_point = $post_meta['focus_point'];
+			}
 
-		//wpsmartcrop plugin support
-		if( isset($post_meta['_wpsmartcrop_enabled'], $post_meta['_wpsmartcrop_image_focus']) && $post_meta['_wpsmartcrop_enabled'][0] ){
-			$focus_point =  @unserialize($post_meta['_wpsmartcrop_image_focus'][0]);
-			$this->focus_point = ['x'=>$focus_point['left'], 'y'=>$focus_point['top']];
-		}
-		//imagefocus plugin support
-		elseif( isset($post_meta['focus_point']) ){
-			$this->focus_point = $post_meta['focus_point'];
-		}
-
-		if( file_exists($metadata['src']) )
 			$post['mime_type'] = mime_content_type($metadata['src']);
 
-		unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
+			unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
 
-		if( isset($post['mime_type']) && ($post['mime_type'] == 'image/svg+xml' || $this->mime_type == 'image/svg') )
-			unset($metadata['meta'], $metadata['width'], $metadata['height']);
+			if( isset($post['mime_type']) && ($post['mime_type'] == 'image/svg+xml' || $this->mime_type == 'image/svg') )
+				unset($metadata['meta'], $metadata['width'], $metadata['height']);
 
-		if( $this->show_meta )
-			$metadata['meta'] = $metadata['image_meta'];
-		else
-			$metadata['meta'] = false;
+			if( $this->show_meta )
+				$metadata['meta'] = $metadata['image_meta'];
+			else
+				$metadata['meta'] = false;
 
-		unset($metadata['image_meta']);
+			unset($metadata['image_meta']);
+		}
+		elseif( is_string($id) ){
+
+			$filename = BASE_URI.$id;
+
+			if( !file_exists( $filename) )
+				return false;
+
+			$post = $post_meta = [];
+
+			$image_size = getimagesize($filename);
+
+			$metadata = [
+				'src' => $filename,
+				'file' => str_replace('/web', '', $id),
+				'width' => $image_size[0]??false,
+				'height' => $image_size[1]??false,
+				'mime_type' => $image_size['mime'],
+				'post_title' => str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME)),
+				'post_date' => filemtime($filename),
+				'post_date_gmt' => date("Y-m-d H:i:s", filemtime($filename)),
+				'post_modified' => filectime($filename),
+				'post_modified_gmt' => date("Y-m-d H:i:s", filectime($filename))
+			];
+
+			if( $this->show_meta && function_exists('exif_read_data') )
+				$metadata['meta'] = @exif_read_data($filename);
+		}
 
 		if( is_array($metadata) )
 			return array_merge($post, $metadata);
@@ -166,19 +213,240 @@ class Image extends Entity
 	 */
 	public function resize($w, $h = 0, $ext=null, $params=false){
 
-		if( $ext === 'webp' && !function_exists('imagewebp'))
-			$ext = null;
-
-		$abspath = $this->uploadDir('basedir');
-		$abspath = str_replace(WP_FOLDER.'/..', '', $abspath);
-
-		$image_file = $this->crop($w, $h, $ext, $params);
-		$image = str_replace($abspath, $this->uploadDir('relative'), $image_file);
+		$image = $this->edit(['resize'=>[$w, $h]], $ext);
 
 		if( is_array($params) && isset($params['name']) )
 			$this->sizes[$params['name']] = $image;
 
 		return $image;
+	}
+
+
+	/**
+	 * @param array $params
+	 * @param null $ext
+	 * @return mixed
+	 */
+	public function edit($params, $ext=null){
+
+		$abspath = str_replace(WP_FOLDER.'/..', '', $this->uploadDir('basedir'));
+
+		$file = $this->process($params, $ext);
+
+		$url = str_replace($abspath, $this->uploadDir('relative'), $file);
+		$url = str_replace(BASE_URI.'/web', '', $url);
+
+		if( is_array($params) && isset($params['name']) )
+			$this->sizes[$params['name']] = $url;
+
+		return $url;
+	}
+
+
+	/**
+	 * Edit image using Intervention library
+	 * @param array $params
+	 * @param null $ext
+	 * @return string
+	 */
+	private function process($params, $ext=null){
+
+		//redefine ext if webp is not supported
+		if( $ext === 'webp' && !function_exists('imagewebp'))
+			$ext = null;
+
+		//get size from params
+		if( isset($params['resize']) ){
+
+			$params['resize'] = (array)$params['resize'];
+			$w = $params['resize'][0];
+			$h = $params['resize'][1]??0;
+		}
+		else{
+
+			if( file_exists($this->src) && $image_size = getimagesize($this->src) ){
+				$w = $image_size[0];
+				$h = $image_size[1];
+			}
+			else{
+				$w = 800;
+				$h = 600;
+			}
+		}
+
+		//return placeholder if image is empty
+		if( empty($this->src) || !file_exists($this->src) )
+			return $this->placeholder($w, $h);
+
+		//remove focus point if invalid
+		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
+			$this->focus_point = false;
+
+		//return if image is svg
+		if( $this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' )
+			return $this->src;
+
+		// get src ext
+		$src_ext = pathinfo($this->src, PATHINFO_EXTENSION);
+
+		// define $dest_ext if not defined
+		if( $ext == null )
+			$ext = $src_ext;
+
+		// get suffix
+		// add width height
+		$suffix = '-'.round($w).'x'.round($h);
+
+		// add focus point
+		if( $this->focus_point )
+			$suffix .= '-c-'.round($this->focus_point['x']).'x'.round($this->focus_point['y']);
+
+		// add params
+		$filtered_params = $params;
+		unset($filtered_params['resize']);
+
+		if( count($filtered_params) )
+			$suffix .= '-'.substr(md5(json_encode($filtered_params)), 0, 6);
+
+		//append suffix to filename
+		$dest = str_replace('.'.$src_ext, $suffix.'.'.$ext, $this->src);
+
+		if( isset($this->args['path']) ){
+
+			$path = BASE_URI.$this->args['path'];
+
+			if( !is_dir($path) )
+				mkdir($path, 0755, true);
+
+			$dest = $path.'/'.pathinfo($dest, PATHINFO_BASENAME);
+		}
+
+		if( file_exists($dest) ){
+
+			if( filemtime($dest) > filemtime($this->src) )
+				return $dest;
+			else
+				unlink($dest);
+		}
+
+		try
+		{
+			$image = ImageManagerStatic::make($this->src);
+
+			foreach ($params as $type=>$param){
+
+				switch ($type){
+
+					case 'resize':
+						$this->crop($image, $w, $h);
+						break;
+
+					case 'insert':
+						$image->insert(BASE_URI.$param[0], $param[1]??'top-left', $param[2]??0, $param[3]??0);
+						break;
+
+					case 'colorize':
+						$image->colorize($param[0], $param[1], $param[2]);
+						break;
+
+					case 'blur':
+						$image->blur($param[0]??1);
+						break;
+
+					case 'flip':
+						$image->flip($param[0]??'v');
+						break;
+
+					case 'brightness':
+						$image->brightness($param[0]);
+						break;
+
+					case 'invert':
+						$image->invert();
+						break;
+
+					case 'mask':
+						$image->mask(BASE_URI.$param[0], $param[1]??false);
+						break;
+
+					case 'gamma':
+						$image->gamma($param[0]);
+						break;
+
+					case 'rotate':
+						$image->rotate($param[0]);
+						break;
+
+					case 'text':
+						$image->text($param[0], $param[1]??0, $param[2]??0, function($font) use($param) {
+
+							$params = $param[3]??[];
+
+							if( isset($params['file']) )
+								$font->file(BASE_URI.$params['file']);
+
+							if( isset($params['size']) )
+								$font->size($params['size']);
+
+							if( isset($params['color']) )
+								$font->color($params['color']);
+
+							if( isset($params['align']) )
+								$font->align($params['align']);
+
+							if( isset($params['valign']) )
+								$font->valign($params['valign']);
+
+							if( isset($params['angle']) )
+								$font->angle($params['angle']);
+						});
+
+						break;
+
+					case 'pixelate':
+						$image->pixelate($param[0]);
+						break;
+
+					case 'greyscale':
+						$image->greyscale();
+						break;
+
+					case 'rectangle':
+						$image->rectangle($param[0], $param[1], $param[2], $param[3], function ($draw) use($param) {
+
+							if( count($param) > 4 )
+								$draw->background($param[4]);
+
+							if( count($param) > 6 )
+								$draw->border($param[5], $param[6]);
+						});
+						break;
+
+					case 'circle':
+						$image->circle($param[0], $param[1], $param[2], function ($draw) use($param) {
+
+							if( count($param) > 3 )
+								$draw->background($param[3]);
+
+							if( count($param) > 5 )
+								$draw->border($param[4], $param[5]);
+						});
+						break;
+
+					case 'limitColors':
+						$image->limitColors($param[0], $param[1]??null);
+						break;
+				}
+			}
+
+			$image->save($dest, $this->compression);
+
+			return $dest;
+		}
+		catch(\Exception $e)
+		{
+			return $e->getMessage();
+		}
 	}
 
 
@@ -199,10 +467,9 @@ class Image extends Entity
 	 * @param $w
 	 * @param int $h
 	 * @param bool $sources
-	 * @param bool $params
 	 * @return \Twig\Markup
 	 */
-	public function toHTML($w, $h=0, $sources=false, $params=false){
+	public function toHTML($w, $h=0, $sources=false){
 
 		if( empty($this->src) || !file_exists($this->src) ){
 
@@ -217,7 +484,7 @@ class Image extends Entity
 			$html .= '<img src="'.$this->placeholder($w, $h).'">';
 			$html .='</picture>';
 
-			return new \Twig\Markup($html, 'UTF-8');;
+			return new \Twig\Markup($html, 'UTF-8');
 		}
 
 		$ext = function_exists('imagewebp') ? 'webp' : null;
@@ -225,23 +492,27 @@ class Image extends Entity
 
 		$html = '<picture>';
 
-		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || !$sources ){
+		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' ){
 
-			$html .= '<img src="'.$this->resize($w, $h, null, $params).'" alt="'.$this->alt.'">';
+			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'">';
 		}
 		else{
 
 			if( $sources && is_array($sources) ){
 
 				foreach ($sources as $media=>$size){
-					$html .='	<source media="('.$media.')"  srcset="'.$this->resize($size[0], $size[1] ?? 0, $ext, $params).'" type="'.$mime.'">';
+
 					if( $ext == 'webp' )
-						$html .='	<source media="('.$media.')"  srcset="'.$this->resize($size[0], $size[1] ?? 0, null, $params).'" type="'.$this->mime_type.'">';
+						$html .='	<source media="('.$media.')"  srcset="'.$this->edit(['resize'=>$size], $ext).'" type="'.$mime.'">';
+
+					$html .='	<source media="('.$media.')"  srcset="'.$this->edit(['resize'=>$size]).'" type="'.$this->mime_type.'">';
 				}
 			}
 
-			$html .='	<source srcset="'.$this->resize($w, $h, $ext, $params).'" type="'.$mime.'">';
-			$html .= '<img src="'.$this->resize($w, $h, null, $params).'" alt="'.$this->alt.'">';
+			if( $ext == 'webp' )
+				$html .='	<source srcset="'.$this->edit(['resize'=>[$w, $h]], $ext).'" type="'.$mime.'">';
+
+			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'">';
 		}
 
 		$html .='</picture>';
@@ -254,132 +525,68 @@ class Image extends Entity
 	 * @param $w
 	 * @param int $h
 	 * @param null $ext
-	 * @param bool $params
-	 * @return mixed|string
+	 * @return void
 	 */
-	protected function crop($w, $h=0, $ext=null, $params=false){
+	protected function crop(&$image, $w, $h=0){
 
-		if( empty($this->src) || !file_exists($this->src) )
-			return $this->placeholder($w, $h);
+		if(!$w){
 
-		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
-			$this->focus_point = false;
+			$image->resize(null, $h, function ($constraint) {
+				$constraint->aspectRatio();
+			});
+		}
+		elseif(!$h){
 
-		$src_ext = pathinfo($this->src, PATHINFO_EXTENSION);
+			$image->resize($w, null, function ($constraint) {
+				$constraint->aspectRatio();
+			});
+		}
+		elseif($this->focus_point){
 
-		if( $this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' )
-			return $this->src;
+			$src_width = $image->getWidth();
+			$src_height = $image->getHeight();
+			$src_ratio = $src_width/$src_height;
+			$dest_ratio = $w/$h;
 
-		if( $ext == null )
-			$ext = $src_ext;
+			$ratio_height = $src_height/$h;
+			$ratio_width = $src_width/$w;
 
-		$extrafilename = $params ? '-'.substr(md5(json_encode($params)), 0, 6) : '';
-
-		if( $this->focus_point )
-			$dest = str_replace('.'.$src_ext, '-'.round($w).'x'.round($h).'-c-'.round($this->focus_point['x']).'x'.round($this->focus_point['y']).$extrafilename.'.' . $ext, $this->src);
-		else
-			$dest = str_replace('.'.$src_ext, '-'.round($w).'x'.round($h).$extrafilename.'.' . $ext, $this->src);
-
-		if( file_exists($dest) ){
-
-			if( filemtime($dest) > filemtime($this->src) )
-				return  $dest;
+			if( $dest_ratio < 1)
+			{
+				$dest_width = $w*$ratio_height;
+				$dest_height = $src_height;
+			}
 			else
-				unlink($dest);
+			{
+				$dest_width = $src_width;
+				$dest_height = $h*$ratio_width;
+			}
+
+			if ($ratio_height < $ratio_width) {
+
+				list($cropX1, $cropX2) = $this->calculateCrop($src_width, $dest_width, $this->focus_point['x']/100);
+				$cropY1 = 0;
+				$cropY2 = $src_height;
+			} else {
+
+				list($cropY1, $cropY2) = $this->calculateCrop($src_height, $dest_height, $this->focus_point['y']/100);
+				$cropX1 = 0;
+				$cropX2 = $src_width;
+			}
+
+			$image->crop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
+
+			$tmp = tempnam("/tmp", "II");
+
+			$image->save($tmp, 100);
+
+			$image = ImageManagerStatic::make($tmp);
+
+			$image->fit($w, $h);
 		}
+		else{
 
-		try
-		{
-			$image = ImageManagerStatic::make($this->src);
-
-			if(!$w){
-
-				$image->resize(null, $h, function ($constraint) {
-					$constraint->aspectRatio();
-				});
-			}
-			elseif(!$h){
-
-				$image->resize($w, null, function ($constraint) {
-					$constraint->aspectRatio();
-				});
-			}
-			elseif($this->focus_point){
-
-				$src_width = $image->getWidth();
-				$src_height = $image->getHeight();
-				$src_ratio = $src_width/$src_height;
-				$dest_ratio = $w/$h;
-
-				$ratio_height = $src_height/$h;
-				$ratio_width = $src_width/$w;
-
-				if( $dest_ratio < 1)
-				{
-					$dest_width = $w*$ratio_height;
-					$dest_height = $src_height;
-				}
-				else
-				{
-					$dest_width = $src_width;
-					$dest_height = $h*$ratio_width;
-				}
-
-				if ($ratio_height < $ratio_width) {
-
-					list($cropX1, $cropX2) = $this->calculateCrop($src_width, $dest_width, $this->focus_point['x']/100);
-					$cropY1 = 0;
-					$cropY2 = $src_height;
-				} else {
-
-					list($cropY1, $cropY2) = $this->calculateCrop($src_height, $dest_height, $this->focus_point['y']/100);
-					$cropX1 = 0;
-					$cropX2 = $src_width;
-				}
-
-				$image->crop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
-				$image->save($dest, 100);
-
-				$image = ImageManagerStatic::make($dest);
-
-				$image->fit($w, $h);
-			}
-			else{
-
-				$image->fit($w, $h);
-			}
-
-			if($params && is_array($params) ){
-
-				if( isset($params['colorize']) && count($params['colorize']) === 3 )
-					$image->colorize($params['colorize'][0], $params['colorize'][1], $params['colorize'][2]);
-
-				if( isset($params['blur']) )
-					$image->blur($params['blur']);
-
-				if( isset($params['brightness']) )
-					$image->brightness($params['brightness']);
-
-				if( isset($params['gamma']) )
-					$image->gamma($params['gamma']);
-
-				if( isset($params['pixelate']) )
-					$image->pixelate($params['pixelate']);
-
-				if( isset($params['greyscale']) )
-					$image->greyscale();
-
-				if( isset($params['limitColors']) && count($params['limitColors']) === 2 )
-					$image->limitColors($params['limitColors'][0], $params['limitColors'][1]);
-			}
-
-			$image->save($dest, $this->compression);
-
-			return $dest;
-		}
-		catch(Exception $e)
-		{
-			return $e->getMessage();
+			$image->fit($w, $h);
 		}
 	}
 

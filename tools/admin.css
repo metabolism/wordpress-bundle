@@ -64,13 +64,13 @@ th#mslscol{ width: 25px }
 #comment-link-box, #edit-slug-box{ padding-left: 0 }
 .mce-top-part::before{ display: none }
 .misc-pub-section a{ float: right }
-.misc-pub-section a.edit-timestamp{ float: none }
 #save-post, #save-action .spinner{ float: right }
 #save-action:after, #poststuff .inside:after{ content: ''; display: table; clear: both }
 #save-action+#preview-action{ margin-top: 10px }
 .postbox-container .inside{ margin: 10px 0 }
 .form-wrap p, p.description, p.help, span.description { line-height: 110%; opacity: 0.8 }
 #wp-content-editor-tools{ background: none }
+#timestampdiv select{ width: auto }
 
 /* MSLS */
 #msls_noncename ~ .button-secondary{ display: none }
