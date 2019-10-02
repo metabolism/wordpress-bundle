@@ -66,9 +66,20 @@ Because of Wordpress design, functions are available in the global namespace, it
 
 Some plugins may not work directly, Woocommerce provider needs some rework
 
-No support for Gutemberg, activate the Classic Editor until further notice. 
+No support for Gutenberg, activate the Classic Editor until further notice. 
  
-Installation
+ 
+Using the boilerplate
+-----------
+
+See : https://github.com/wearemetabolism/boilerplate-symfony
+```
+git clone git@github.com:wearemetabolism/boilerplate-symfony.git myproject
+cd myproject
+composer install
+```
+
+Manual installation
 -----------
 
 ```

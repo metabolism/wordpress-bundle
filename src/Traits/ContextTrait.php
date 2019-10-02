@@ -313,7 +313,7 @@ Trait ContextTrait
 		{
 			return $this->addPost();
 		}
-		elseif( is_archive() )
+		elseif( is_archive() || is_home() )
 		{
 			return ['term'=>$this->addTerm(), 'posts'=>$this->addPosts()];
 		}
