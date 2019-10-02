@@ -64,8 +64,10 @@ class WPSEOProvider
 	 */
 	public function makeAbsolute($entry){
 
-		if( isset($entry['loc']) && strpos( WP_HOME, $entry['loc']) === false )
+		if( isset($entry['loc']) && strpos( $entry['loc'], WP_HOME) === false )
 			$entry['loc'] = WP_HOME.$entry['loc'];
+		elseif( is_string($entry) && strpos( $entry, WP_HOME ) === false  )
+			$entry = WP_HOME.$entry;
 
 		return $entry;
 	}
@@ -148,6 +150,26 @@ class WPSEOProvider
 
 
 	/**
+	 * add sitemap_index.xml to robots.txt
+	 * @param $output
+	 * @return string
+	 */
+	public static function sitemapToRobots( $output ) {
+
+		$options = get_option( 'wpseo_xml' );
+
+		if ( class_exists( 'WPSEO_Sitemaps' ) && $options['enablexmlsitemap'] == true ) {
+
+			$homeURL = get_home_url();
+			$output .= "Sitemap: $homeURL/sitemap_index.xml\n";
+		}
+
+		return $output;
+	}
+
+
+
+	/**
 	 * Construct
 	 */
 	public function __construct()
@@ -165,7 +187,12 @@ class WPSEOProvider
 					remove_action( 'wpseo_head', [\WPSEO_Frontend::get_instance(), 'debug_mark'], 2);
 
 				add_filter('wpseo_canonical', [$this, 'filterCanonical']);
+
 				add_filter('wpseo_sitemap_entry', [$this, 'makeAbsolute'], 10, 3);
+				add_filter('wpseo_xml_sitemap_post_url', [$this, 'makeAbsolute'], 10, 3);
+				add_filter('wpseo_sitemap_post_type_archive_link', [$this, 'makeAbsolute'], 10, 3);
+
+				add_filter('robots_txt', [$this, 'sitemapToRobots'], 9999, 1 );
 			});
 		}
 	}

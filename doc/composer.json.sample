@@ -1,0 +1,65 @@
+{
+  "name": "mycompany/wordpress-project",
+  "version": "1.0.0",
+  "license": "AGPL-3.0",
+  "description": "Symfony with Wordpress project",
+  "config": {
+    "optimize-autoloader": true,
+    "apcu-autoloader": true,
+    "process-timeout":0
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "elliotcondon/advanced-custom-fields-pro",
+        "version": "5.8.4",
+        "type": "wordpress-plugin",
+        "dist": {"type": "zip", "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download&k={%ACF_PRO_KEY}&t={%version}"},
+        "require": {
+          "ffraenz/private-composer-installer": "^2.0",
+          "composer/installers": "^1.0"
+        }
+      }
+    },
+    {
+      "type":"composer", "url":"https://wpackagist.org"
+    }
+  ],
+  "require": {
+    "php": ">=7.1.0",
+    "ext-fileinfo": "*",
+    "ext-json": "*",
+    "psr/simple-cache": "1.*",
+    "symfony/framework-bundle": "4.3.*",
+    "symfony/templating": "4.3.*",
+    "symfony/twig-bundle": "4.3.*",
+    "symfony/yaml": "4.3.*",
+    "symfony/asset": "4.3.*",
+    "symfony/dotenv": "4.3.*",
+    "twig/extensions": "1.5.*",
+    "metabolism/wordpress-bundle": "1.3.*",
+    "metabolism/acf-extensions": "1.1.*",
+    "elliotcondon/advanced-custom-fields-pro": "5.8.*"
+  },
+  "require-dev":{
+    "symfony/debug-bundle": "4.3.*",
+    "symfony/console": "4.3.*",
+    "symfony/web-profiler-bundle": "4.3.*",
+    "symfony/stopwatch": "4.3.*"
+  },
+  "extra": {
+    "installer-paths": {
+      "web/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+      "web/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
+      "web/edition/": ["type:wordpress-core"]
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  }
+}
