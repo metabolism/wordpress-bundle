@@ -10,7 +10,7 @@
     "ext-json" : "*",
     "ext-mbstring" : "*",
     "metabolism/wordpress-core-installer": "1.0.*",
-    "metabolism/package-actions": "1.0.*",
+    "metabolism/package-actions": "dev-develop",
     "johnpbloch/wordpress-core": "5.*",
     "ifsnop/mysqldump-php":"2.*",
     "dflydev/dot-access-data":"2.*",
