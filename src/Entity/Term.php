@@ -25,6 +25,7 @@ class Term extends Entity
 	public $order;
 	public $title;
 	public $thumbnail;
+	public $template;
 
 	/** @var bool|Term[] $children */
 	public $children;
@@ -90,6 +91,7 @@ class Term extends Entity
 				return false;
 			
 			$term->excerpt = strip_tags(term_description($pid),'<b><i><strong><em><br>');
+			$term->template = get_term_meta($term->term_id, 'template', true);
 
 			if( WP_FRONT )
 				$term->link = get_term_link($pid);
