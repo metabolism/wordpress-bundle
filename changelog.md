@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.3.8
+#### Added
+- Template in Term entity
+
 ## 1.3.7
 #### Added
 - Composer.json sample
