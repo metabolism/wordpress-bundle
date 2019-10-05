@@ -168,7 +168,7 @@ class ConfigLoader {
 		 * Custom Content Directory
 		 */
 		if (!defined('WP_CONTENT_DIR'))
-			define( 'WP_CONTENT_DIR', BASE_URI . '/web/wp-bundle');
+			define( 'WP_CONTENT_DIR', BASE_URI . '/public/wp-bundle');
 
 		if (!defined('UPLOADS'))
 			define( 'UPLOADS', '../uploads');
@@ -205,6 +205,6 @@ class ConfigLoader {
 			define( 'WP_USE_THEMES', false);
 
 		if (!defined('ABSPATH'))
-			define( 'ABSPATH', BASE_URI.'/web'.WP_FOLDER .'/');
+			define( 'ABSPATH', BASE_URI.'/public'.WP_FOLDER .'/');
 	}
 }

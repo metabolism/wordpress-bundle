@@ -342,9 +342,9 @@ Then define install paths, for mu-plugin, plugin and core
     },
     "extra": {
       "installer-paths": {
-        "web/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
-        "web/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
-        "web/edition/": ["type:wordpress-core"]
+        "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+        "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
+        "public/edition/": ["type:wordpress-core"]
       }
     },
     "autoload": {
