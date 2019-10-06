@@ -40,13 +40,13 @@
       "copy": {
         "metabolism/wordpress-bundle": {
           "tools/wp-config.php": "public/wp-config.php",
-          "doc/config/wordpress.yml": "config/wordpress.yml",
-          "doc/service/Context.php": "src/Service/Context.php",
-          "doc/controller/BlogController.php": "src/Controller/BlogController.php",
-          "doc/controller/AdminController.php": "src/Controller/AdminController.php",
-          "doc/controller/FrontController.php": "src/Controller/FrontController.php",
-          "doc/template/frontpage.html.twig": "templates/frontpage.html.twig",
-          "doc/twig/AppExtension.php": "src/Twig/AppExtension.php"
+          "samples/config/wordpress.yml": "config/wordpress.yml",
+          "samples/service/Context.php": "src/Service/Context.php",
+          "samples/controller/BlogController.php": "src/Controller/BlogController.php",
+          "samples/controller/AdminController.php": "src/Controller/AdminController.php",
+          "samples/controller/FrontController.php": "src/Controller/FrontController.php",
+          "samples/template/frontpage.html.twig": "templates/frontpage.html.twig",
+          "samples/twig/AppExtension.php": "src/Twig/AppExtension.php"
         }
       },
       "symlink": {
