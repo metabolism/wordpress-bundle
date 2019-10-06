@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.4.0
+#### Symfony 4 compatibility
+Breaking changes : `/web` folder must be renammed `/public`
+
 ## 1.3.8
 #### Added
 - Template in Term entity
@@ -12,7 +16,7 @@ CHANGELOG
 - Symfony now handle robots.txt virtual route if no robots.txt file is present
 - Some Urls in Yoast Sitemap were relative
 
-## 1.3.6
+## 1.3.6 
 #### Feature
 - new image edit function `{{ data.image.edit({resize:[260,224], insert:['/web/newsletter/dots.png','bottom-right', 10, 10]})`
 
