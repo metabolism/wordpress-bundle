@@ -74,6 +74,10 @@ No support for Gutenberg, activate the Classic Editor until further notice.
 ```
 symfony new --full my_project
 ```
+or
+```
+composer create-project symfony/website-skeleton my_project
+```
 
 #### 2 - Prepare composer to work with Wordpress
 
@@ -114,11 +118,6 @@ Use optimized autoloader
 }
 ```
 
-#### 3 - Require Wordpress Bundle
-```
-composer require metabolism/wordpress-bundle
-```
-
 #### 4 - Configure database
 
 edit `.env`
@@ -129,6 +128,11 @@ TABLE_PREFIX=wp_
 ```
 
 Only mysql is supported
+
+#### 3 - Require Wordpress Bundle
+```
+composer require metabolism/wordpress-bundle
+```
     
 #### 5 - Add Wordpress routing
 
