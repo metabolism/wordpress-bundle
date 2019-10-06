@@ -56,7 +56,7 @@ class ConfigLoader {
 		$_config = new Data($config);
 
 		/**
-		 * Set debug default
+		 * Set env default
 		 */
 		$env = $_SERVER['APP_ENV'] ?? 'dev';
 

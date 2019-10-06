@@ -151,6 +151,19 @@ Configure a vhost mounted to `/public`, or start the built-in Symfony server
 ./bin/console server:start
 ```
 
+#### 7 - Update gitignore
+
+edit `.gitignore`
+
+```
+/public/uploads/*
+!/public/uploads/acf-thumbnails
+/public/edition
+/public/cache
+/public/wp-bundle
+```
+
+
 ## Wordpress configuration
 
 When the bundle is installed, a default `wordpress.yml` is copied to `/config/`

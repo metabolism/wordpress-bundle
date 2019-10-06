@@ -202,9 +202,12 @@ class Permastruct{
 
 /** @var Data $_config */
 global $_config;
-$controller_name = $_config->get('extra_permastructs.controller', 'MainController');
-
 $collection = new RouteCollection();
+
+if( !isset($_SERVER['SERVER_NAME'] ) && !$_SERVER['WP_INSTALLED'] ?? false )
+    return $collection;
+
+$controller_name = $_config->get('extra_permastructs.controller', 'MainController');
 
 if( $_config->get('multisite') && !$_config->get('multisite.subdomain_install') )
 {

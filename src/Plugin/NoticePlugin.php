@@ -20,9 +20,10 @@ class NoticePlugin {
 			return;
 
 		$notices = [];
+		$errors = [];
 
 		//check folder right
-		$folders = ['public/wp-bundle/languages', 'public/uploads', 'public/wp-bundle/upgrade', 'config/acf-json', 'var/cache', 'var/log'];
+		$folders = ['public/wp-bundle/languages', 'public/uploads', 'public/wp-bundle/upgrade', 'config/acf-json', 'var/cache'];
 		$folders = apply_filters('notice/folders', $folders);
 
 		foreach ($folders as $folder ){
@@ -30,22 +31,28 @@ class NoticePlugin {
 			$path = BASE_URI.'/'.$folder;
 
 			if( !file_exists($path) )
-				$notices [] = $folder.' folder doesn\'t exist';
+                $errors [] = $folder.' folder doesn\'t exist';
 			elseif( !is_writable($path) )
-				$notices [] = $folder.' folder is not writable';
+                $errors [] = $folder.' folder is not writable';
 		}
 
 		if( str_replace('/edition','', get_option( 'siteurl' )) !== get_home_url() )
-			$notices [] = 'Site url host and Home url host are different, please check your database configuration';
+            $errors [] = 'Site url host and Home url host are different, please check your database configuration';
 
 		global $wpdb, $table_prefix;
 		$siteurl = $wpdb->get_var("SELECT option_value FROM `".$table_prefix."options` WHERE `option_name` = 'siteurl'");
 
 		if( strpos($siteurl, '/edition' ) === false )
-			$notices [] = 'Site url must contain /edition, please check your database configuration';
+            $errors [] = 'Site url must contain /edition, please check your database configuration';
+
+        if( is_blog_installed() && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
+            $notices [] = 'Wordpress is now installed, you should add WP_INSTALLED=1 to the <i>.env</i> file';
+
+		if( !empty($errors) )
+			echo '<div class="error"><p>'.implode('<br/>', $errors ).'</p></div>';
 
 		if( !empty($notices) )
-			echo '<div class="error"><p>'.implode('<br/>', $notices ).'</p></div>';
+			echo '<div class="updated"><p>'.implode('<br/>', $notices ).'</p></div>';
 	}
 
 
