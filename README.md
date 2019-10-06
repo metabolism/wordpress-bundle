@@ -82,11 +82,69 @@ composer install
 Manual installation
 -----------
 
+#### 1 - Edit your composer.json, add wpackagist repository
+
+See `doc/composer.json`
+
+```
+ "repositories": [
+        {
+            "type":"composer", "url":"https://wpackagist.org"
+        }
+    ],
+```
+
+Define installation path for wordpress related packages
+
+```
+"extra": {
+        ...
+        "installer-paths": {
+            "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+            "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
+            "public/edition/": ["type:wordpress-core"]
+        }
+        ...
+    }
+```
+
+Use optimized autoloader
+
+```
+    "config": {
+        ...
+        "optimize-autoloader": true,
+        "apcu-autoloader": true,
+        ...
+    }
+```
+
+#### 2 - Add Wordpress Bundle using composer
 ```
 composer require metabolism/wordpress-bundle
 ```
-    
-register the bundle in the Kernel
+
+#### 3 - Edit your `.env` file 
+
+Specify the database url, should be mysql
+
+See `doc/.env`
+
+```
+DATABASE_URL=mysql://user:pwd@host:3306/dbname
+```
+
+#### 4 - Start Wordpress installation
+
+Configure a vhost mounted to `/public`, or start the built-in Symfony server
+
+```
+./bin/console server:run
+```
+
+You should now be able to access `http://127.0.0.1:8000/edition` to start Wordpress installation
+
+#### 5 - Register the bundle in the Kernel
   
 ```php
 public function registerBundles()
@@ -102,15 +160,23 @@ public function registerBundles()
   return $bundles;
 }
 ```
+
+or in `config/bundles.php`
+
+```php
+    ...
+    Metabolism\WordpressBundle\WordpressBundle::class => ['all' => true]
+    ...
+```
     
-add wordpress permastruct in the routing
+#### 6 - Add Wordpress permastruct in the routing
   
 ```
 _wordpress:
     resource: "@WordpressBundle/Routing/permastructs.php"
 ```
   
-add a context service and use context trait from the Wordpress bundle
+#### 7 - Add a context service and use context trait from the Wordpress bundle
   
 ```php
 <?php
@@ -135,8 +201,12 @@ class Context
 	}
 }
 ```
+
+or use the one from `doc/Service/Context.php`
     
-inject the context in the controller
+#### 8 - Inject the context in the controller
+
+see `doc/config/BlogController.php`
 
 ```php
 public function frontAction(Context $context)

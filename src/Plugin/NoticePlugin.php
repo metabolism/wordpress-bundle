@@ -22,7 +22,7 @@ class NoticePlugin {
 		$notices = [];
 
 		//check folder right
-		$folders = ['public/wp-bundle/languages', 'public/uploads', 'public/uploads/acf-thumbnails', 'public/wp-bundle/upgrade', 'config/acf-json', 'var/cache', 'var/log'];
+		$folders = ['public/wp-bundle/languages', 'public/uploads', 'public/wp-bundle/upgrade', 'config/acf-json', 'var/cache', 'var/log'];
 		$folders = apply_filters('notice/folders', $folders);
 
 		foreach ($folders as $folder ){

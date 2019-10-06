@@ -28,8 +28,11 @@ class WordpressBundle extends Bundle
 
 		do_action('template-redirect');
 
-		$twigExtension = new TwigExtension();
-		$this->container->get('twig')->addExtension($twigExtension);
+		if( $twig = $this->container->get('twig') ){
+
+            $twigExtension = new TwigExtension();
+            $twig->addExtension($twigExtension);
+        }
 	}
 
 	/**
@@ -48,6 +51,7 @@ class WordpressBundle extends Bundle
 		$GLOBALS['post'] = isset( $wp_query->post ) ? $wp_query->post : null;
 
 		if( !$wp_query->get_queried_object() ){
+
 			$wp_query->is_single = false;
 			$wp_query->is_singular = false;
 		}

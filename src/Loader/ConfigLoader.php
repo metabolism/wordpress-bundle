@@ -67,6 +67,7 @@ class ConfigLoader {
 		foreach ($_config->get('define', []) as $constant=>$value)
 			define( strtoupper($constant), $value);
 
+        define('COOKIE_DOMAIN', $_SERVER['HTTP_HOST'] );
 
 		/**
 		 * Define basic environment

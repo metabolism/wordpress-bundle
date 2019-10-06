@@ -36,7 +36,7 @@
       "copy": {
         "metabolism/wordpress-bundle": {
           "tools/wp-config.php": "public/wp-config.php",
-          "doc/wordpress.sample.yml": "config/wordpress.yml"
+          "doc/wordpress.yml": "config/wordpress.yml"
         }
       },
       "symlink": {
