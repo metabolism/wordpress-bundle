@@ -12,9 +12,9 @@ class WordpressBundle extends Bundle
 	 */
 	public function boot()
 	{
-		$rootDir = $this->container->get('kernel')->getRootDir();
+		$rootDir = $this->container->get('kernel')->getProjectDir();
 
-		include $rootDir.'/../public/edition/wp-load.php';
+		include $rootDir.'/public/edition/wp-load.php';
 
 		global $wp;
 

@@ -92,9 +92,9 @@ support:
   - template #uncomment for api only backoffice
   - thumbnail #add thumbnails to page
   - page #enable page
-#  - post #enable post
-#  - tag #enable tag taxonomy for post
-#  - category #enable category taxonomy for post
+  - post #enable post
+  - tag #enable tag taxonomy for post
+  - category #enable category taxonomy for post
 
 ## Allow multisite installation
 install-multisite: true
@@ -366,4 +366,4 @@ domain_name: rocket # MO/PO traductions
 
 ## controller name used when importing @WordpressBundle/Routing/permastructs.php
 extra_permastructs:
-  controller: MainController
+  controller: BlogController

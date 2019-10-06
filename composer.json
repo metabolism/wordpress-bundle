@@ -36,18 +36,18 @@
       "copy": {
         "metabolism/wordpress-bundle": {
           "tools/wp-config.php": "public/wp-config.php",
-          "doc/wordpress.yml": "config/wordpress.yml",
-          "doc/Service/Context.php": "src/Service/Context.php",
-          "doc/Controller/BlogController.php": "src/Controller/BlogController.php",
-          "doc/Controller/AdminController.php": "src/Controller/AdminController.php",
-          "doc/Controller/FrontController.php": "src/Controller/FrontController.php",
-          "doc/frontpage.html.twig": "templates/frontpage.html.twig"
+          "doc/config/wordpress.yml": "config/wordpress.yml",
+          "doc/service/Context.php": "src/Service/Context.php",
+          "doc/controller/BlogController.php": "src/Controller/BlogController.php",
+          "doc/controller/AdminController.php": "src/Controller/AdminController.php",
+          "doc/controller/FrontController.php": "src/Controller/FrontController.php",
+          "doc/template/frontpage.html.twig": "templates/frontpage.html.twig"
         }
       },
       "symlink": {
         "metabolism/wordpress-bundle": {
           "README.md": "doc/wordpress-bundle.md",
-          "tools/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php"
+          "tools/mu-plugin.php": "public/wp-bundle/mu-plugins/wp-bundle.php"
         }
       }
     }

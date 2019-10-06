@@ -67,8 +67,6 @@ class ConfigLoader {
 		foreach ($_config->get('define', []) as $constant=>$value)
 			define( strtoupper($constant), $value);
 
-        define('COOKIE_DOMAIN', $_SERVER['HTTP_HOST'] );
-
 		/**
 		 * Define basic environment
 		 */
@@ -117,8 +115,10 @@ class ConfigLoader {
 
 		define( 'WP_SITEURL', WP_HOME.WP_FOLDER);
 
-		define( 'COOKIE_DOMAIN', $_SERVER[ 'HTTP_HOST' ] );
-
+        if(filter_var($_SERVER['SERVER_NAME'], FILTER_VALIDATE_IP) !== false)
+            define('COOKIE_DOMAIN', '' );
+        else
+            define( 'COOKIE_DOMAIN', $_SERVER[ 'HTTP_HOST' ] );
 
 		/**
 		 * Define DB settings

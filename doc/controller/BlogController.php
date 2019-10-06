@@ -10,6 +10,6 @@ class BlogController extends AbstractController
 {
     public function frontAction(Context $context)
     {
-        return $this->render('page/front.twig', $context->toArray());
+        return $this->render('frontpage.html.twig', $context->toArray());
     }
 }

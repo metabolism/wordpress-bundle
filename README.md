@@ -1,25 +1,23 @@
 # Wordpress & Symfony, with ♥
 
-Introduction
-------------
+## Introduction
 
 Use Wordpress 5 as a backend for a Symfony 4 application
 
 The main idea is to use the power of Symfony for the front / webservices with the ease of Wordpress for the backend.
 
 
-How does it work ?
---------
+## How does it work ?
 
-When the Wordpress bundle is loaded, it loads a small amount of Wordpress Core files to allow usage of Wordpress functions inside Symfony Controllers.
+When the Wordpress bundle is loaded, it loads a small amount of Wordpress Core files to allow usage of Wordpress functions 
+inside Symfony Controllers.
 
 Wordpress is then linked to the bundle via a plugin located in the mu folder.
 
 Because it's a Symfony bundle, there is no theme management in Wordpress and the entire routing is powered by Symfony.
 
 
-Features
---------
+## Features
 
 From Composer :
 * Install/update Wordpress via composer
@@ -59,64 +57,61 @@ From the bundle itself :
 * Site health checker
  
  
-Drawbacks
------------
+## Drawbacks
 
-Because of Wordpress design, functions are available in the global namespace, it's not perfect but Wordpress will surely change this soon.
+Because of Wordpress design, functions are available in the global namespace, 
+it's not perfect but Wordpress will surely change this soon.
 
 Some plugins may not work directly, Woocommerce provider needs some rework
 
 No support for Gutenberg, activate the Classic Editor until further notice. 
  
  
-Using the boilerplate
------------
+## Installation
 
-See : https://github.com/wearemetabolism/boilerplate-symfony
-```
-git clone git@github.com:wearemetabolism/boilerplate-symfony.git myproject
-cd myproject
-composer install
-```
-
-Manual installation
------------
-
-#### 1 - Edit your composer.json, add wpackagist repository
-
-See `doc/composer.json`
+#### 0 - Start a fresh project
 
 ```
- "repositories": [
-        {
-            "type":"composer", "url":"https://wpackagist.org"
-        }
-    ],
+symfony new --full my_project
 ```
 
-Define installation path for wordpress related packages
+#### 1 - Prepare composer to work with Wordpress
+
+Edit `composer.json`
+
+Add https://wpackagist.org repository
+
+```
+"repositories": [
+    {
+        "type":"composer", "url":"https://wpackagist.org"
+    }
+],
+```
+
+Define installation path for Wordpress related packages
 
 ```
 "extra": {
-        ...
-        "installer-paths": {
-            "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
-            "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
-            "public/edition/": ["type:wordpress-core"]
-        }
-        ...
+    ...
+    "installer-paths": {
+        "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+        "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
+        "public/edition/": ["type:wordpress-core"]
     }
+    ...
+}
 ```
 
 Use optimized autoloader
 
 ```
-    "config": {
-        ...
-        "optimize-autoloader": true,
-        "apcu-autoloader": true,
-        ...
-    }
+"config": {
+    ...
+    "optimize-autoloader": true,
+    "apcu-autoloader": true,
+    ...
+}
 ```
 
 #### 2 - Add Wordpress Bundle using composer
@@ -124,53 +119,77 @@ Use optimized autoloader
 composer require metabolism/wordpress-bundle
 ```
 
-#### 3 - Edit your `.env` file 
+#### 3 - Configure your database
 
-Specify the database url, should be mysql
-
-See `doc/.env`
+edit `.env`
 
 ```
 DATABASE_URL=mysql://user:pwd@host:3306/dbname
+TABLE_PREFIX=wp_
 ```
 
-#### 4 - Start Wordpress installation
+Only mysql is supported
 
-Configure a vhost mounted to `/public`, or start the built-in Symfony server
-
-```
-./bin/console server:run
-```
-
-You should now be able to access `http://127.0.0.1:8000/edition` to start Wordpress installation
-
-#### 5 - Register the bundle
+#### 4 - Register the bundle
 
 edit `config/bundles.php`
 
 ```php
-    ...
-    Metabolism\WordpressBundle\WordpressBundle::class => ['all' => true]
-    ...
+...
+Metabolism\WordpressBundle\WordpressBundle::class => ['all' => true]
+...
 ```
     
-#### 6 - Add Wordpress routing
+#### 5 - Add Wordpress routing
 
-edit `services.yaml`
+edit `routes.yaml`
 
 ```
 _wordpress:
     resource: "@WordpressBundle/Routing/permastructs.php"
 ```
 
+#### 6 - Start the server
 
-Context trait
------------
+Configure a vhost mounted to `/public`, or start the built-in Symfony server
+
+```
+./bin/console server:start
+```
+
+## Wordpress configuration
+
+When the bundle is installed, a default `wordpress.yml` is copied to `/config/`
+This file allow you to manage :
+ * Keys and Salts
+ * Image options
+ * Maintenance support
+ * Admin pages removal
+ * WYSIWYG MCE Editor
+ * Feature Support
+ * Multi-site configuration
+ * Constants
+ * ACF configuration
+ * Menu
+ * Custom Post type
+ * Custom Taxonomy
+ * Page, post, taxonomy templates
+ * Page states
+ * Post format
+ * External table viewer
+ * Roles
+ * Optimisations
+ * Domain name
+ * Controller name
+
+## Context service
     
-Wordpress data wrapper, allow to query post, term, pagination, breadcrumb, comments and sitemap.
+The Context service is a Wordpress data wrapper, it allows to query post, term, pagination, breadcrumb, comments and sitemap.
 
 Critical data are added automatically, such as current post or posts for archive, locale, home url, search url, ...
- 
+
+### Usage
+
 ```php
 public function articleAction(Context $context)
 {
@@ -179,6 +198,7 @@ public function articleAction(Context $context)
     return $this->render( 'page/article.twig', $context->toArray() );
 }
 ```
+
 ### Preview
 
 To preview/debug context, just add `?debug=context` to any url, it will output a json representation of itself.
@@ -235,8 +255,7 @@ To preview/debug context, just add `?debug=context` to any url, it will output a
 }
 ```   
 
-Entities
------------
+## Entities
 
 ### Post
 
@@ -319,7 +338,7 @@ namespace App\Entity;
 use Metabolism\WordpressBundle\Entity\Post;
 use Metabolism\WordpressBundle\Entity\Image;
 
-class Keyfact extends Post
+class Guide extends Post
 {
 	public function __construct($id = null)
 	{
@@ -334,46 +353,12 @@ class Keyfact extends Post
 ### Other entities
 
 Menu, Comment, MenuItem, Product, Term and User can be extended by creating the same file in the `/src/Entity` folder. 
-
-Wordpress core and plugin installation
------------
-
-Plugin have to be declared to your composer.json, but first you must declare wpackagist.org as a replacement repository to your composer.json
-
-Then define install paths, for mu-plugin, plugin and core
- 
-```json
-{
-    "name": "acme/brilliant-wordpress-site",
-    "description": "My brilliant WordPress site",
-    "repositories":[
-        {
-            "type":"composer",
-            "url":"https://wpackagist.org"
-        }
-    ],
-    "require": {
-        "wpackagist-plugin/wordpress-seo":">=7.0.2"
-    },
-    "extra": {
-      "installer-paths": {
-        "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
-        "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
-        "public/edition/": ["type:wordpress-core"]
-      }
-    },
-    "autoload": {
-        "psr-0": {
-            "Acme": "src/"
-        }
-    }
-}
-```
     
-Wordpress ACF PRO installation
------------
+# Wordpress ACF PRO installation
 
-You must declare a new repository like bellow
+Edit `composer.json`
+
+Declare a new repository
 
 ```
 "repositories": [
@@ -396,7 +381,7 @@ You must declare a new repository like bellow
   ]
 ```
 
-Still in composer.json, add ACF to the require section
+Add ACF
 
 ```
 "require": {
@@ -404,41 +389,15 @@ Still in composer.json, add ACF to the require section
 }
 ```
       
-Set the environment variable ACF_PRO_KEY to your ACF PRO key. Add an entry to your .env file:
+Edit `.env` to set ACF_PRO_KEY
 
 ```
 ACF_PRO_KEY=Your-Key-Here      
 ```
 
-Environment
------------
+## Additional routes
 
-The environment configuration ( debug, database, cookie ) is managed via the `.env` file like any other SF4 project, there is a sample file in `doc/sample.env`
-
-We've added an option to handle cookie prefix named `COOKIE_PREFIX` and table prefix named `TABLE_PREFIX`
-
-
-Wordpress configuration
------------
-
-When the bundle is installed, a default `wordpress.yml` is copied to `/config/`
-This file allow you to manage :
- * Domain name for translation
- * Controller name
- * Keys and Salts
- * Admin pages removal
- * Multi-site configuration
- * Constants
- * Support
- * Menu
- * Post types
- * Taxonomies
- * Options page
- * Post type templates
-
-        
-Site health
------------
+### Site health
 
 You can check site health using `/_site-health`, url
 options are:
@@ -446,51 +405,44 @@ options are:
 - full : 0 | 1
 
         
-Cache
------------
+### Cache
 
 You can purge cache using `/_cache/purge`, url or using purge cache button in backoffice
 
 You can completely remove and purge cache using `/_cache/clear`, url
 
         
-Roadmap
---------
+## Roadmap
 
 * Woo-commerce Provider rework + samples
 * Global maintenance mode for multi-site
 * Unit tests
        
        
-Why not using Bedrock
---------
+## Why not using Bedrock
 
 Because Bedrock "only" provides a folder organisation with composer dependencies management.
 Btw this Bundle comes from years of Bedrock usage + Timber plugin...
        
-Why not using Ekino Wordpress Bundle
---------
+## Why not using Ekino Wordpress Bundle
 
 The philosophy is not the same, Ekino use Symfony to manipulate Wordpress database.
 Plus the last release was in 2015...
 
 
-Is Wordpress classic theme bad ?
---------
+## Is Wordpress classic theme bad ?
 
 We don't want to judge anyone, it's more like a code philosophy, once you go Symfony you can't go back.
 
 Plus the security is a requirement for us and Wordpress failed to provide something good because of it's huge usage.
 
 
-Licence
-----------
+## Licence
 
 GNU AFFERO GPL
     
     
-Maintainers
------------
+## Maintainers
 
 This project is made by Metabolism ( http://metabolism.fr )
 
