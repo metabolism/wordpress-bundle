@@ -69,13 +69,13 @@ No support for Gutenberg, activate the Classic Editor until further notice.
  
 ## Installation
 
-#### 0 - Start a fresh project
+#### 1 - Start a fresh project
 
 ```
 symfony new --full my_project
 ```
 
-#### 1 - Prepare composer to work with Wordpress
+#### 2 - Prepare composer to work with Wordpress
 
 Edit `composer.json`
 
@@ -114,12 +114,12 @@ Use optimized autoloader
 }
 ```
 
-#### 2 - Add Wordpress Bundle using composer
+#### 3 - Require Wordpress Bundle
 ```
 composer require metabolism/wordpress-bundle
 ```
 
-#### 3 - Configure your database
+#### 4 - Configure database
 
 edit `.env`
 
@@ -129,16 +129,6 @@ TABLE_PREFIX=wp_
 ```
 
 Only mysql is supported
-
-#### 4 - Register the bundle
-
-edit `config/bundles.php`
-
-```php
-...
-Metabolism\WordpressBundle\WordpressBundle::class => ['all' => true]
-...
-```
     
 #### 5 - Add Wordpress routing
 

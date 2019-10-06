@@ -1,5 +1,6 @@
 {
   "name":"metabolism/wordpress-bundle",
+  "type": "symfony-bundle",
   "version": "1.4.0",
   "description": "Use Wordpress 5 as a backend for a Symfony 4 application",
   "license": "GPL-3.0-or-later",
@@ -17,6 +18,9 @@
     "enshrined/svg-sanitize": "0.*",
     "intervention/image": "2.*",
     "wpackagist-plugin/classic-editor":"1.*"
+  },
+  "scripts": {
+    "post-install-cmd": "Metabolism\\WordpressBundle\\WordpressBundle::postInstall"
   },
   "extra": {
     "installer-paths": {
@@ -41,7 +45,8 @@
           "doc/controller/BlogController.php": "src/Controller/BlogController.php",
           "doc/controller/AdminController.php": "src/Controller/AdminController.php",
           "doc/controller/FrontController.php": "src/Controller/FrontController.php",
-          "doc/template/frontpage.html.twig": "templates/frontpage.html.twig"
+          "doc/template/frontpage.html.twig": "templates/frontpage.html.twig",
+          "doc/twig/AppExtension.php": "src/Twig/AppExtension.php"
         }
       },
       "symlink": {
