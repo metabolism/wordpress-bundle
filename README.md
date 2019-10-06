@@ -144,24 +144,9 @@ Configure a vhost mounted to `/public`, or start the built-in Symfony server
 
 You should now be able to access `http://127.0.0.1:8000/edition` to start Wordpress installation
 
-#### 5 - Register the bundle in the Kernel
-  
-```php
-public function registerBundles()
-{
-   $bundles = [
-      new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-      new \Symfony\Bundle\TwigBundle\TwigBundle(),
-      ...
-  ];
-  	
-  $bundles[] = new \Metabolism\WordpressBundle\WordpressBundle();
-  	
-  return $bundles;
-}
-```
+#### 5 - Register the bundle
 
-or in `config/bundles.php`
+edit `config/bundles.php`
 
 ```php
     ...
@@ -169,55 +154,15 @@ or in `config/bundles.php`
     ...
 ```
     
-#### 6 - Add Wordpress permastruct in the routing
-  
+#### 6 - Add Wordpress routing
+
+edit `services.yaml`
+
 ```
 _wordpress:
     resource: "@WordpressBundle/Routing/permastructs.php"
 ```
-  
-#### 7 - Add a context service and use context trait from the Wordpress bundle
-  
-```php
-<?php
 
-namespace App\Service;
-
-use Metabolism\WordpressBundle\Traits\ContextTrait as WordpressContext;
-
-class Context
-{
-	use WordpressContext;
-
-	protected $data;
-
-	/**
-	 * Return Context as Array
-	 * @return array
-	 */
-	public function toArray()
-	{    	    
-	    return is_array($this->data) ? $this->data : [];
-	}
-}
-```
-
-or use the one from `doc/Service/Context.php`
-    
-#### 8 - Inject the context in the controller
-
-see `doc/config/BlogController.php`
-
-```php
-public function frontAction(Context $context)
-{
-    //use wordpress function directly ex:is_user_logged_in()
-    if( is_user_logged_in() )
-       return $this->render( 'page/article-unlocked.twig', $context->toArray() );
-    else   
-       return $this->render( 'page/article.twig', $context->toArray() );
-}
-``` 
 
 Context trait
 -----------

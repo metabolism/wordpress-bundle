@@ -36,7 +36,12 @@
       "copy": {
         "metabolism/wordpress-bundle": {
           "tools/wp-config.php": "public/wp-config.php",
-          "doc/wordpress.yml": "config/wordpress.yml"
+          "doc/wordpress.yml": "config/wordpress.yml",
+          "doc/Service/Context.php": "src/Service/Context.php",
+          "doc/Controller/BlogController.php": "src/Controller/BlogController.php",
+          "doc/Controller/AdminController.php": "src/Controller/AdminController.php",
+          "doc/Controller/FrontController.php": "src/Controller/FrontController.php",
+          "doc/frontpage.html.twig": "templates/frontpage.html.twig"
         }
       },
       "symlink": {
