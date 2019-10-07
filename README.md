@@ -214,6 +214,77 @@ This file allow you to manage :
  * Domain name
  * Controller name
 
+## Plugin installation
+
+Please use https://wpackagist.org to find your plugin.
+
+edit `composer.json`
+
+```
+"require": {
+    ...
+    "wpackagist-plugin/classic-editor":"1.*"
+    ...
+}
+```
+
+## Recommended plugins
+
+- "wpackagist-plugin/classic-editor":"1.*"
+- "elliotcondon/advanced-custom-fields-pro":"5.8.*"
+- "metabolism/acf-extensions":"1.1.*"
+- "wpackagist-plugin/wp-smartcrop":"2.0.*"
+- "wpackagist-plugin/wordpress-seo":"11.*"
+- "wpackagist-plugin/redirection": "4.3.*"
+- "wpackagist-plugin/cookie-notice": "1.*"
+    
+For multilangue using multisite
+
+- "wpackagist-plugin/multisite-clone-duplicator": "1.*",
+- "wpackagist-plugin/multisite-language-switcher": "2.3.*",
+
+## ACF Pro installation
+
+Edit `composer.json`
+
+Declare a new repository
+
+```
+"repositories": [
+  {
+    "type": "package",
+    "package": {
+      "name": "elliotcondon/advanced-custom-fields-pro",
+      "version": "5.7.10",
+      "type": "wordpress-plugin",
+      "dist": {"type": "zip", "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download&k={%ACF_PRO_KEY}&t={%version}"},
+      "require": {
+        "ffraenz/private-composer-installer": "^2.0",
+        "composer/installers": "^1.0"
+      }
+    }
+  },
+  {
+    "type":"composer", "url":"https://wpackagist.org"
+  }
+]
+```
+
+Add ACF
+
+```
+"require": {
+   "elliotcondon/advanced-custom-fields-pro": "5.*",
+   ...
+}
+```
+      
+Edit `.env` to set ACF_PRO_KEY
+
+```
+ACF_PRO_KEY=Your-Key-Here      
+```
+
 ## Context service
     
 The Context service is a Wordpress data wrapper, it allows to query post, term, pagination, breadcrumb, comments and sitemap.
@@ -385,47 +456,6 @@ class Guide extends Post
 ### Other entities
 
 Menu, Comment, MenuItem, Product, Term and User can be extended by creating the same file in the `/src/Entity` folder. 
-    
-# Wordpress ACF PRO installation
-
-Edit `composer.json`
-
-Declare a new repository
-
-```
-"repositories": [
-    {
-      "type": "package",
-      "package": {
-        "name": "elliotcondon/advanced-custom-fields-pro",
-        "version": "5.7.10",
-        "type": "wordpress-plugin",
-        "dist": {"type": "zip", "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download&k={%ACF_PRO_KEY}&t={%version}"},
-        "require": {
-          "ffraenz/private-composer-installer": "^2.0",
-          "composer/installers": "^1.0"
-        }
-      }
-    },
-    {
-      "type":"composer", "url":"https://wpackagist.org"
-    }
-  ]
-```
-
-Add ACF
-
-```
-"require": {
-     "elliotcondon/advanced-custom-fields-pro": "5.*",
-}
-```
-      
-Edit `.env` to set ACF_PRO_KEY
-
-```
-ACF_PRO_KEY=Your-Key-Here      
-```
 
 ## Additional routes
 

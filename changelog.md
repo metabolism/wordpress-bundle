@@ -3,7 +3,9 @@ CHANGELOG
 
 ## 1.4.0
 #### Symfony 4 compatibility
-Breaking changes : `/web` folder must be renammed `/public`
+Breaking changes : 
+- `/web` folder must be renammed `/public`
+- classic editor plugin is no longer required, so add it to your composer.json
 
 ## 1.3.8
 #### Added
