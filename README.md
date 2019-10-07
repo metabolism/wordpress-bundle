@@ -143,15 +143,13 @@ _wordpress:
     resource: "@WordpressBundle/Routing/permastructs.php"
 ```
 
-#### 6 - Start the server
-
-Configure a vhost mounted to `/public`, or start the built-in Symfony server
+Clear cache
 
 ```
-./bin/console server:start
+./bin/console cache:clear
 ```
 
-#### 7 - Update gitignore
+#### 6 - Update gitignore
 
 edit `.gitignore`
 
@@ -163,10 +161,24 @@ edit `.gitignore`
 /public/wp-bundle
 ```
 
+#### 7 - Start the server
+
+Configure a vhost mounted to `/public`, or start the built-in Symfony server
+
+```
+./bin/console server:start
+```
+
+Accessing the server url will now start the Wordpress Installation, 
+
+#### 8 - Develop your website !
+
+Take a look at `src/Controller/BlogController.php`, `templates/generic.html.twig` and `config/wordpress.yml` and continue to read the doc bellow.
 
 ## Wordpress configuration
 
 When the bundle is installed, a default `wordpress.yml` is copied to `/config/`
+
 This file allow you to manage :
  * Keys and Salts
  * Image options
