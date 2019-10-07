@@ -252,6 +252,16 @@ Trait ContextTrait
 
 
 	/**
+	 * Get current post
+	 * @return Term|bool
+	 */
+	public function getTerm()
+	{
+		return $this->get('term');
+	}
+
+
+	/**
 	 * Get current posts
 	 * @return Post[]|bool
 	 */
