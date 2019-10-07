@@ -16,11 +16,7 @@
     "ifsnop/mysqldump-php":"2.*",
     "dflydev/dot-access-data":"2.*",
     "enshrined/svg-sanitize": "0.*",
-    "intervention/image": "2.*",
-    "wpackagist-plugin/classic-editor":"1.*"
-  },
-  "scripts": {
-    "post-install-cmd": "Metabolism\\WordpressBundle\\WordpressBundle::postInstall"
+    "intervention/image": "2.*"
   },
   "extra": {
     "installer-paths": {
