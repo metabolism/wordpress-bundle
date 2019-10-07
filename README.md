@@ -255,7 +255,7 @@ Declare a new repository
     "type": "package",
     "package": {
       "name": "elliotcondon/advanced-custom-fields-pro",
-      "version": "5.7.10",
+      "version": "5.8.4",
       "type": "wordpress-plugin",
       "dist": {"type": "zip", "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download&k={%ACF_PRO_KEY}&t={%version}"},
       "require": {
