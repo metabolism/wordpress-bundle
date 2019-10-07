@@ -118,7 +118,7 @@ Use optimized autoloader
 }
 ```
 
-#### 4 - Configure database
+#### 3 - Configure database
 
 edit `.env`
 
@@ -129,11 +129,27 @@ TABLE_PREFIX=wp_
 
 Only mysql is supported
 
-#### 3 - Require Wordpress Bundle
+#### 4 - Require Wordpress Bundle
+
 ```
 composer require metabolism/wordpress-bundle
 ```
-    
+
+if you want to use the development version (not recommended), edit `composer.json` before
+```
+"license": "GPL-3.0-or-later",
+...
+"prefer-stable": true,
+"minimum-stability": "dev",
+...
+```
+
+then 
+
+```
+composer require metabolism/wordpress-bundle:dev-develop
+```
+
 #### 5 - Add Wordpress routing
 
 edit `routes.yaml`
