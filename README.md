@@ -421,7 +421,9 @@ You can completely remove and purge cache using `/_cache/clear`, url
         
 ## Roadmap
 
-* Woo-commerce Provider rework + samples
+* Create Symfony recipe
+* Provide more samples
+* Woo-commerce Provider rework
 * Global maintenance mode for multi-site
 * Unit tests
        
