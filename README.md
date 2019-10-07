@@ -62,10 +62,7 @@ From the bundle itself :
 Because of Wordpress design, functions are available in the global namespace, 
 it's not perfect but Wordpress will surely change this soon.
 
-Some plugins may not work directly, Woocommerce provider needs some rework
-
-No support for Gutenberg, activate the Classic Editor until further notice. 
- 
+Some plugins may not work directly, Woocommerce provider needs some rework 
  
 ## Installation
 
