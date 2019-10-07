@@ -204,7 +204,7 @@ class Permastruct{
 global $_config;
 $collection = new RouteCollection();
 
-if( !isset($_SERVER['SERVER_NAME'] ) && !$_SERVER['WP_INSTALLED'] ?? false )
+if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
     return $collection;
 
 $controller_name = $_config->get('extra_permastructs.controller', 'MainController');

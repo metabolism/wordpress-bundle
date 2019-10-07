@@ -12,7 +12,7 @@ class WordpressBundle extends Bundle
 	 */
 	public function boot()
 	{
-	    if( !isset($_SERVER['SERVER_NAME'] ) && !$_SERVER['WP_INSTALLED'] ?? false )
+	    if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
 	        return;
 
 		$rootDir = $this->container->get('kernel')->getProjectDir();
