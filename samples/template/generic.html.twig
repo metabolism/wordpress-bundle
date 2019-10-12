@@ -2,9 +2,9 @@
 <html lang="{{ locale|default('en') }}">
 <head>
     <meta charset="UTF-8">
-    <title>{{ page_title|raw }}</title>
+    <title>{{ wp_title|raw }}</title>
     {% block stylesheets %}{% endblock %}
-    {% block head %}{{ system.head|raw }}{% endblock head %}
+    {% block head %}{{ wp_head() }}{% endblock head %}
 </head>
 <body class="{{ body_class }}">
 
@@ -61,6 +61,6 @@
     {% block javascripts %}{% endblock %}
 {% endif %}
 
-{% block footer %}{{ system.footer|raw }}{% endblock footer %}
+{% block footer %}{{ wp_footer() }}{% endblock footer %}
 </body>
 </html>

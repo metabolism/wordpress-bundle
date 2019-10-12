@@ -4,6 +4,7 @@ namespace Metabolism\WordpressBundle\Traits;
 
 use lloc\Msls\MslsOptions;
 
+use Metabolism\WordpressBundle\Entity\User;
 use Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 use Metabolism\WordpressBundle\Helper\ACF,
@@ -40,7 +41,8 @@ Trait ContextTrait
 		$this->addSite();
 		$this->addMenus();
 		$this->addOptions();
-		$this->addCurrent();
+		$this->addContent();
+		$this->addCurrentUser();
 	}
 
 
@@ -51,23 +53,6 @@ Trait ContextTrait
 	protected function addOptions()
 	{
 		$this->data['options'] = $this->getFields('options');
-	}
-
-
-	/**
-	 * Return function echo
-	 * @param $function
-	 * @param array $args
-	 * @return string
-	 */
-	protected function getOutput($function, $args=[])
-	{
-		ob_start();
-		call_user_func_array($function, $args);
-		$data = ob_get_contents();
-		ob_end_clean();
-
-		return $data;
 	}
 
 
@@ -155,12 +140,15 @@ Trait ContextTrait
 			'debug'              => WP_DEBUG,
 			'environment'        => WP_ENV,
 			'locale'             => count($language) ? $language[0] : 'en',
-			'language'           => $blog_language,
 			'is_admin'           => current_user_can('manage_options'),
 			'home_url'           => home_url('/'),
 			'maintenance_mode'   => function_exists('wp_maintenance_mode') ? wp_maintenance_mode() : false,
-			'tagline'            => get_bloginfo('description'),
-			'site_title'         => get_bloginfo('name'),
+            'bloginfo'           => [
+                'description'   => get_bloginfo('description'),
+                'name'          => get_bloginfo('name'),
+                'charset'       => get_bloginfo('charset'),
+                'language'      => $blog_language,
+            ],
 			'posts_per_page'     => intval(get_option( 'posts_per_page' )),
 			'paged'              => $paged ? $paged : 1
 		];
@@ -176,21 +164,26 @@ Trait ContextTrait
 		if( WP_FRONT )
 		{
 			$wp_title = trim(wp_title(' ', false));
-			$body_class = $queried_object ? implode(' ', get_body_class()) : '';
+
+			if( ( is_singular() || is_archive() ) && !$queried_object )
+                $body_class = '';
+			else
+                $body_class = implode(' ', get_body_class());
+
+            $policy_page_id       = (int) get_option( 'wp_page_for_privacy_policy' );
+            $privacy_policy_title = ( $policy_page_id ) ? get_the_title( $policy_page_id ) : '';
 
 			$this->data = array_merge($this->data, [
-				'search_url'         => get_search_link(),
-				'privacy_policy_url' => get_privacy_policy_url(),
-				'is_front_page'      => is_front_page(),
-				'is_single'          => $queried_object->post_type??false,
-				'is_tax'             => $queried_object->taxonomy??false,
-				'is_archive'         => is_object($queried_object) && get_class($queried_object) == 'WP_Post_Type' ? $queried_object->name : false,
-				'body_class'         => $blog_language . ' ' . $body_class,
-				'page_title'         => html_entity_decode(empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title),
-				'system' => [
-					'head'   => $this->getOutput('wp_head'),
-					'footer' => $this->getOutput('wp_footer')
-				]
+				'search_url'           => get_search_link(),
+				'privacy_policy_url'   => get_privacy_policy_url(),
+				'privacy_policy_title' => $privacy_policy_title,
+				'is_customize_preview' => is_customize_preview(),
+				'is_front_page'        => is_front_page(),
+				'is_single'            => $queried_object->post_type??false,
+				'is_tax'               => $queried_object->taxonomy??false,
+				'is_archive'           => is_object($queried_object) && get_class($queried_object) == 'WP_Post_Type' ? $queried_object->name : false,
+				'body_class'           => $blog_language . ' ' . $body_class,
+				'wp_title'             => html_entity_decode(empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title)
 			]);
 		}
 	}
@@ -317,22 +310,36 @@ Trait ContextTrait
 	 * Get default wordpress data
 	 * @return Post|array|bool
 	 */
-	protected function addCurrent()
+	protected function addContent()
 	{
 		if( (is_single() || is_page()) && !is_attachment() )
 		{
 			return $this->addPost();
 		}
-		elseif( is_archive() || is_home() )
+		elseif( is_archive() )
 		{
 			return ['term'=>$this->addTerm(), 'posts'=>$this->addPosts()];
 		}
-		elseif( is_search() )
+		elseif( is_search() || is_home() )
 		{
 			return $this->addPosts();
 		}
 
 		return false;
+	}
+
+
+
+	/**
+	 * Add connected user
+	 * @return User|bool
+	 */
+	protected function addCurrentUser()
+	{
+		$current_user_id = get_current_user_id();
+        $this->data['current_user'] = $current_user_id ? new User($current_user_id) : false;
+
+        return $this->data['current_user'];
 	}
 
 
@@ -511,8 +518,10 @@ Trait ContextTrait
 
 		$total = (int) $args['total'];
 
-		if ( $total < 2 )
-			return false;
+		if ( $total < 2 ){
+            $this->data['pagination'] = false;
+            return false;
+        }
 
 		$current  = (int) $args['current'];
 		$end_size = (int) $args['end_size'];
@@ -535,7 +544,7 @@ Trait ContextTrait
 				$link = add_query_arg($add_args, $link);
 			$link .= $args['add_fragment'];
 
-			$pagination['previous'] = ['link' => esc_url(apply_filters('paginate_links', $link)), 'text' => $args['prev_text']];
+			$pagination['prev'] = ['link' => esc_url(apply_filters('paginate_links', $link)), 'text' => $args['prev_text']];
 		endif;
 
 		$pagination['pages'] = [];
@@ -552,10 +561,10 @@ Trait ContextTrait
 						$link = add_query_arg( $add_args, $link );
 					$link .= $args['add_fragment'];
 
-					$pagination['pages'][] = ['link'=> esc_url( apply_filters( 'paginate_links', $link ) ), 'text'=> $args['before_page_number'] . number_format_i18n( $n ) . $args['after_page_number']];
+					$pagination['pages'][] = ['current'=>false, 'link'=> esc_url( apply_filters( 'paginate_links', $link ) ), 'text'=> $args['before_page_number'] . number_format_i18n( $n ) . $args['after_page_number']];
 					$dots = true;
 				elseif ( $dots && ! $args['show_all'] ) :
-					$pagination['pages'][] = ['text'=> __( '&hellip;' ) ];
+					$pagination['pages'][] = ['current'=>false, 'link'=>false, 'text'=> __( '&hellip;' ) ];
 					$dots = false;
 				endif;
 			endif;
@@ -673,63 +682,5 @@ Trait ContextTrait
 		$this->data['breadcrumb'] = $breadcrumb;
 		
 		return $this->data['breadcrumb'];
-	}
-
-
-	/**
-	 * Add comments entries
-	 * @param array $args see https://codex.wordpress.org/get_comments
-	 * @param string $key
-	 * @return Comment[]
-	 *
-	 */
-	public function addComments($args=[], $key='comments')
-	{
-		$args['fields'] = 'ids';
-
-		if( !isset($args['status']))
-			$args['status'] = 'approve';
-
-		if( !isset($args['number']))
-			$args['number'] = 5;
-
-		$comments_id = get_comments($args);
-		$comments = [];
-
-		foreach ($comments_id as $comment_id)
-		{
-			$comments[$comment_id] = new Comment($comment_id);
-		}
-
-		// todo: check recursivity
-		foreach ($comments as $comment)
-		{
-			if( $comment->parent )
-			{
-				$comments[$comment->parent]->replies[] = $comment;
-				unset($comments[$comment->ID]);
-			}
-		}
-
-		$comments_count = wp_count_comments(isset($args['post_id'])?$args['post_id']:0 );
-
-		if( isset($this->data['post']))
-		{
-			if( is_array($this->data['post']) ){
-				$this->data['post'][$key] = $comments;
-				$this->data['post']['comments_count'] = $comments_count;
-			}
-			else{
-				$this->data['post']->$key = $comments;
-				$this->data['post']->comments_count = $comments_count;
-			}
-		}
-		else{
-
-			$this->data[$key] = $comments;
-			$this->data['comments_count'] = $comments_count;
-		}
-
-		return $comments;
 	}
 }

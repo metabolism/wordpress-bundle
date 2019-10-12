@@ -46,7 +46,7 @@ class Permastruct{
 	 */
 	public function addRoutes(){
 
-		$this->addRoute('front', '');
+		$this->addRoute('front', '', [], true);
 
 		global $wp_post_types, $wp_taxonomies;
 

@@ -9,13 +9,6 @@ class AdminController {
 
 	private $config;
 
-	/**
-	 * @var string plugin domain name for translations
-	 */
-	public static $acf_folder, $languages_folder;
-
-	public static $bo_domain_name = 'bo_default';
-
 
 	/**
 	 * Init placeholder
@@ -40,11 +33,7 @@ class AdminController {
 	private function loadConfig()
 	{
 		global $_config;
-
 		$this->config = $_config;
-
-		self::$bo_domain_name   = 'bo_'.$this->config->get('domain_name', 'customer');
-		self::$languages_folder = BASE_URI . '/config/languages';
 	}
 
 

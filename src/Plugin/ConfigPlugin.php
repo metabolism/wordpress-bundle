@@ -218,7 +218,7 @@ class ConfigPlugin {
 
 
 	/**
-	 * Create Menu instances from configs
+	 * Register menus
 	 * @see Menu
 	 */
 	public function addMenus()
@@ -226,6 +226,20 @@ class ConfigPlugin {
 		foreach ($this->config->get('menu', []) as $location => $description)
 		{
 			register_nav_menu($location, __($description, 'wordpress-bundle'));
+		}
+	}
+
+
+	/**
+	 * Register sidebars
+	 * @see Menu
+	 */
+	public function addSidebars()
+	{
+		foreach ($this->config->get('sidebar', []) as $id => $params)
+		{
+            $params['id'] = $id;
+            register_sidebar($params);
 		}
 	}
 
@@ -564,17 +578,6 @@ class ConfigPlugin {
 
 
 	/**
-	 * Enable post formats
-	 * See https://wordpress.org/support/article/post-formats/#supported-formats
-	 */
-	public function addPostFormats()
-	{
-		if( $this->config->get('post_formats') )
-			add_theme_support('post-formats', $this->config->get('post_formats'));
-	}
-
-
-	/**
 	 * Update permalink if structure is custom
 	 */
 	public  function updatePostTypePermalink($post_link, $post){
@@ -639,6 +642,35 @@ class ConfigPlugin {
 
 
 	/**
+	 * Add theme support
+	 */
+	public function addThemeSupport()
+	{
+        $excluded = ['template', 'page', 'post', 'tag', 'category'];
+
+	    foreach ($this->support as $feature){
+
+            if( $feature == 'post_thumbnails' || $feature == 'thumbnail')
+                $feature = 'post-thumbnails';
+
+	        if( is_array($feature) ){
+
+                $key = array_key_first($feature);
+                $params = $feature[$key];
+
+                if( !in_array($key, $excluded) )
+                    add_theme_support( $key, $params);
+            }
+            elseif( !in_array($feature, $excluded) ){
+
+                add_theme_support( $feature );
+            }
+        }
+    }
+
+
+
+	/**
 	 * ConfigPlugin constructor.
 	 * @param Data $config
 	 */
@@ -656,19 +688,29 @@ class ConfigPlugin {
 		{
 			$this->disableFeatures();
 			$this->addPostTypes();
-			$this->addPostFormats();
 			$this->addTaxonomies();
 			$this->addMenus();
+			$this->addSidebars();
 			$this->addRoles();
+			$this->addThemeSupport();
 
-			if( WP_FRONT ){
+            load_theme_textdomain( $this->config->get('domain_name'), BASE_URI. '/translations' );
+
+            if( WP_FRONT ){
+
 				$this->setPermalink();
+
 				add_filter( 'post_type_link', [$this, 'updatePostTypePermalink'], 10, 2);
 				add_filter( 'term_link', [$this, 'updateTermPermalink'], 10, 2);
 			}
 
-			if( is_admin() )
-				$this->addTableViews();
+			if( is_admin() ){
+
+                $this->addTableViews();
+
+                if( $editor_style = $this->config->get('editor_style') )
+                    add_editor_style( $editor_style );
+            }
 		});
 
 
@@ -679,12 +721,7 @@ class ConfigPlugin {
 				add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
 			
 			add_action('admin_head', [$this, 'loadStyle']);
-			add_action('admin_head', [$this, 'loadJS']);
-
-			if( in_array('post_thumbnails', $this->support) || in_array('thumbnail', $this->support) )
-				add_theme_support( 'post-thumbnails' );
-
-			add_post_type_support( 'page', 'excerpt' );
+            add_action('admin_head', [$this, 'loadJS']);
 		}
 	}
 }

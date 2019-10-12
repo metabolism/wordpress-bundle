@@ -101,6 +101,20 @@ class UrlPlugin {
 
 
 	/**
+	 * Get search url
+	 * @param $s
+	 * @return mixed
+	 */
+	public function getSearchLink($s){
+
+	    global $wp_rewrite;
+
+	    $s = sanitize_title($s);
+        return $wp_rewrite->search_base.'/'.$s;
+	}
+
+
+	/**
 	 * Symfony require real url so redirect preview url to real url
 	 * ex /?post_type=project&p=899&preview=true redirect to /project/post-title?preview=true
 	 */
@@ -108,11 +122,18 @@ class UrlPlugin {
 
 		require_once(ABSPATH . 'wp-admin/includes/post.php');
 
-		$id = isset($_GET['p'])?$_GET['p']:$_GET['page_id'];
-		$permalink = $this->getPreviewPermalink($id);
+		if( isset($_GET['s']) ){
 
-		$query_args['preview'] = 'true';
-		$permalink = add_query_arg( $query_args, $permalink );
+            $permalink = $this->getSearchLink($_GET['s']);
+        }
+		else{
+
+            $id = isset($_GET['p'])?$_GET['p']:$_GET['page_id'];
+            $permalink = $this->getPreviewPermalink($id);
+
+            $query_args['preview'] = 'true';
+            $permalink = add_query_arg( $query_args, $permalink );
+        }
 
 		wp_redirect($permalink);
 		exit;
@@ -173,7 +194,7 @@ class UrlPlugin {
 			if ( is_feed() || get_query_var( 'sitemap' ) )
 				return;
 
-			if( isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id']) )
+			if( isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id']) || isset($_GET['s']) )
 				$this->redirect();
 
 			$filters = array(

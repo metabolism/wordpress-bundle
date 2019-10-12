@@ -107,11 +107,7 @@ class FrontController {
 	private function loadConfig()
 	{
 		global $_config;
-
 		$this->config = $_config;
-
-		self::$domain_name      = $this->config->get('domain_name', 'app');
-		self::$languages_folder = WP_CONTENT_DIR . '/languages';
 	}
 
 

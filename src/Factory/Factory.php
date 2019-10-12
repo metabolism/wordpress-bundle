@@ -73,7 +73,6 @@ class Factory {
 			return $item;
 
 		$classname = self::getClassname($class);
-
 		$app_classname = 'App\Entity\\'.$classname;
 
 		if( class_exists($app_classname) ){
@@ -87,7 +86,7 @@ class Factory {
 			if( class_exists($bundle_classname) ){
 
 				$item = new $bundle_classname($id, $args);
-			}
+            }
 			elseif( $default_class ){
 
 				$item = self::create($id, $default_class, false, $args);

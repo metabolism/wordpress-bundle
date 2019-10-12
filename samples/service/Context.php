@@ -82,9 +82,6 @@ class Context
 	{
 		header('Content-Type: application/json');
 
-		if( isset($this->data['system']))
-			$this->data['system'] = '-- Removed from debug --';
-
 		echo json_encode($this->data);
 
 		exit(0);
