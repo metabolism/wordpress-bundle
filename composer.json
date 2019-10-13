@@ -18,6 +18,13 @@
     "enshrined/svg-sanitize": "0.*",
     "intervention/image": "2.*"
   },
+  "suggest": {
+    "elliotcondon/advanced-custom-fields-pro": "Customise WordPress with powerful, professional and intuitive fields.",
+    "metabolism/acf-extensions": "Component extension for ACF",
+    "wpackagist-plugin/wp-smartcrop": "Set the 'focal point' of any image, right from the media library",
+    "wpackagist-plugin/multisite-language-switcher": "Add multilingual support using a WordPress multisite",
+    "wpackagist-plugin/wordpress-seo": "The favorite WordPress SEO plugin of millions of users worldwide!"
+  },
   "extra": {
     "installer-paths": {
       "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
