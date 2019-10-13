@@ -64,6 +64,12 @@ it's not perfect but Wordpress will surely change this soon.
 
 Some plugins may not work directly, Woocommerce provider needs some rework 
  
+## Demo
+
+A demo is available at https://github.com/wearemetabolism/wordpress-bundle-demo, 
+
+it's an implementation of the Twenty Nineteen theme for Wordpress 5.
+
 ## Installation
 
 #### 1 - Start a fresh project
@@ -120,8 +126,10 @@ Use optimized autoloader
 edit `.env`
 
 ```
+###> metabolism/wordpress-bundle ###
 DATABASE_URL=mysql://user:pwd@host:3306/dbname
 TABLE_PREFIX=wp_
+###< metabolism/wordpress-bundle ###
 ```
 
 Only mysql is supported

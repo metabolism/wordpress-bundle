@@ -27,15 +27,16 @@
     "post-package-install": {
       "create": {
         "metabolism/wordpress-bundle": {
-          "public/uploads": 755,
-          "public/wp-bundle/upgrade": 755,
-          "public/wp-bundle/languages": 755,
-          "config/acf-json": 755
+          "public/uploads": 666,
+          "public/wp-bundle/upgrade": 666,
+          "public/wp-bundle/languages": 666,
+          "config/acf-json": 666
         }
       },
       "copy": {
         "metabolism/wordpress-bundle": {
           "tools/wp-config.php": "public/wp-config.php",
+          "samples/.htaccess": "public/.htaccess",
           "samples/config/wordpress.yml": "config/wordpress.yml",
           "samples/service/Context.php": "src/Service/Context.php",
           "samples/controller/BlogController.php": "src/Controller/BlogController.php",
