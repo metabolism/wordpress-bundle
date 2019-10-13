@@ -236,21 +236,6 @@ edit `composer.json`
 }
 ```
 
-## Recommended plugins
-
-- "wpackagist-plugin/classic-editor":"1.*"
-- "elliotcondon/advanced-custom-fields-pro":"5.8.*"
-- "metabolism/acf-extensions":"1.1.*"
-- "wpackagist-plugin/wp-smartcrop":"2.0.*"
-- "wpackagist-plugin/wordpress-seo":"11.*"
-- "wpackagist-plugin/redirection": "4.3.*"
-- "wpackagist-plugin/cookie-notice": "1.*"
-    
-For multilangue using multisite
-
-- "wpackagist-plugin/multisite-clone-duplicator": "1.*",
-- "wpackagist-plugin/multisite-language-switcher": "2.3.*",
-
 ## ACF Pro installation
 
 Edit `composer.json`

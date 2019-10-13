@@ -21,6 +21,7 @@
   "suggest": {
     "elliotcondon/advanced-custom-fields-pro": "Customise WordPress with powerful, professional and intuitive fields.",
     "metabolism/acf-extensions": "Component extension for ACF",
+    "wpackagist-plugin/classic-editor": "Restores the previous (« classic ») WordPress editor and the « Edit Post » screen.",
     "wpackagist-plugin/wp-smartcrop": "Set the 'focal point' of any image, right from the media library",
     "wpackagist-plugin/multisite-language-switcher": "Add multilingual support using a WordPress multisite",
     "wpackagist-plugin/wordpress-seo": "The favorite WordPress SEO plugin of millions of users worldwide!"
