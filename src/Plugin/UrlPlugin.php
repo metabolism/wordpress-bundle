@@ -117,7 +117,7 @@ class UrlPlugin {
 		wp_redirect($permalink);
 		exit;
 	}
-
+	
 
 	/**
 	 * Symfony require real url so redirect preview url to real url
@@ -125,10 +125,13 @@ class UrlPlugin {
 	 */
 	public function previewPostLink($permalink, $post){
 
-		$permalink = $this->getPreviewPermalink($post);
+		if( $post->post_name == '' ){
 
-		$query_args['preview'] = 'true';
-		$permalink = add_query_arg( $query_args, $permalink );
+			$permalink = $this->getPreviewPermalink($post);
+
+			$query_args['preview'] = 'true';
+			$permalink = add_query_arg( $query_args, $permalink );
+		}
 
 		return $permalink;
 	}

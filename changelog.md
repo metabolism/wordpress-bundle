@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.3.9
+#### Fixed
+- Preview link not working
+
 ## 1.3.8
 #### Added
 - Template in Term entity
