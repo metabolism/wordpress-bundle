@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.3.10
+#### Added
+- Template selector for ACF Relationship
+
 ## 1.3.9
 #### Fixed
 - Preview link not working
