@@ -35,10 +35,10 @@
     "post-package-install": {
       "create": {
         "metabolism/wordpress-bundle": {
-          "public/uploads": 666,
-          "public/wp-bundle/upgrade": 666,
-          "public/wp-bundle/languages": 666,
-          "config/acf-json": 666
+          "public/uploads": 775,
+          "public/wp-bundle/upgrade": 775,
+          "public/wp-bundle/languages": 775,
+          "config/acf-json": 775
         }
       },
       "copy": {
