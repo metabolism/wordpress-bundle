@@ -2,8 +2,10 @@ CHANGELOG
 ---------
 
 ## 1.3.10
+#### Fixed
+- Debug routes and robots route when maintenance mode is enabled
 #### Added
-- Template selector for ACF Relationship
+- Template selector for ACF Relationship on Taxonomy
 
 ## 1.3.9
 #### Fixed
