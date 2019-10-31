@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Robots {
 
-	public function do(){
+	public function doAction(){
 
 		ob_start();
 		do_action( 'do_robots' );

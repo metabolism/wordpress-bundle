@@ -26,6 +26,12 @@ class Permastruct{
 		$this->locale = $locale;
 		$this->wp_rewrite = $wp_rewrite;
 
+		$this->addRoute('robots', 'robots.txt', [], false, 'Metabolism\WordpressBundle\Helper\Robots::doAction');
+		$this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealth::check');
+
+		$this->addRoute('cache-purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\Cache::purge');
+		$this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\Cache::clear');
+
 		if( wp_maintenance_mode() )
 			$this->addMaintenanceRoute();
 		else
@@ -136,15 +142,8 @@ class Permastruct{
 		if( $search_post_type_structure )
 			$this->addRoute('search_post_type', $search_post_type_structure, [], true);
 
-		$this->addRoute('robots', 'robots.txt', [], false, 'Metabolism\WordpressBundle\Helper\Robots::do');
-
 		if( isset($this->wp_rewrite->page_structure) )
 			$this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
-
-		$this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealth::check');
-
-		$this->addRoute('cache-purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\Cache::purge');
-		$this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\Cache::clear');
 	}
 
 

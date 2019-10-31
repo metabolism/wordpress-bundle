@@ -73,6 +73,29 @@ class ACFProvider {
 
 
 	/**
+	 * Add theme to field selection
+	 * @param $field
+	 * @return
+	 */
+	public function addTaxonomyTemplates($field){
+
+		if( $field['type'] == 'select' && $field['_name'] == 'taxonomy'){
+
+			$types = $this->config->get('template.taxonomy', []);
+			$all_templates = [];
+
+			foreach ($types as $type=>$templates){
+				foreach ($templates as $key=>$name){
+					$all_templates['template_'.$type.':'.$key] = ucfirst(str_replace('_', ' ', $type)).' : '.$name;
+				}
+			}
+			$field['choices'][__('Template').' (template)'] = $all_templates;
+		}
+
+		return $field;
+	}
+
+	/**
 	 * Disable database query for non editable field
 	 * @param $unused
 	 * @param $post_id
@@ -89,6 +112,46 @@ class ACFProvider {
 
 
 	/**
+	 * Change query to replace template by term slug
+	 * @param $args
+	 * @param $field
+	 * @param $post_id
+	 * @return
+	 */
+	public function filterPostsByTermTemplateMeta($args, $field, $post_id ){
+
+		if( $field['type'] == 'relationship' && isset($field['taxonomy'])){
+
+			foreach ($args['tax_query'] as $id=>&$taxonomy){
+
+				if( is_array($taxonomy) && strpos($taxonomy['taxonomy'], 'template_') === 0){
+
+					$taxonomy['taxonomy'] = str_replace('template_','', $taxonomy['taxonomy']);
+
+					$terms = get_terms($taxonomy['taxonomy']);
+					$terms_by_template = [];
+					foreach ($terms as $term){
+						$template = get_term_meta($term->term_id, 'template');
+						if(!empty($template) )
+							$terms_by_template[$template[0]][] = $term->slug;
+					}
+
+					$terms = [];
+					foreach ($taxonomy['terms'] as $template){
+						if( isset($terms_by_template[$template]) )
+							$terms = array_merge($terms, $terms_by_template[$template]);
+					}
+
+					$taxonomy['terms'] = $terms;
+				}
+			}
+		}
+
+		return $args;
+	}
+
+
+	/**
 	 * ACFPlugin constructor.
 	 * @param Data $config
 	 */
@@ -99,6 +162,8 @@ class ACFProvider {
 		add_filter('acf/settings/save_json', function(){ return $this::$folder; });
 		add_filter('acf/settings/load_json', function(){ return [$this::$folder]; });
 		add_filter('acf/pre_load_value', [$this, 'preLoadValue'], 10, 3);
+		add_filter('acf/prepare_field', [$this, 'addTaxonomyTemplates']);
+		add_filter('acf/fields/relationship/query/name=items', [$this, 'filterPostsByTermTemplateMeta'], 10, 3);
 
 		// When viewing admin
 		if( is_admin() )
@@ -107,6 +172,9 @@ class ACFProvider {
 			add_action( 'acf/init', [$this, 'addSettings'] );
 			add_filter( 'acf/fields/wysiwyg/toolbars' , [$this, 'editToolbars']  );
 			add_action( 'init', [$this, 'addOptionPages'] );
+			add_filter('acf/settings/show_admin', function( $show ) {
+				return current_user_can('administrator');
+			});
 		}
 	}
 }
