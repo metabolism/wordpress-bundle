@@ -172,6 +172,9 @@ class ACFProvider {
 			add_action( 'acf/init', [$this, 'addSettings'] );
 			add_filter( 'acf/fields/wysiwyg/toolbars' , [$this, 'editToolbars']  );
 			add_action( 'init', [$this, 'addOptionPages'] );
+			add_filter('acf/settings/show_admin', function( $show ) {
+				return current_user_can('administrator');
+			});
 		}
 	}
 }
