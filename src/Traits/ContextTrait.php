@@ -184,7 +184,7 @@ Trait ContextTrait
 				'is_front_page'      => is_front_page(),
 				'is_single'          => $queried_object->post_type??false,
 				'is_tax'             => $queried_object->taxonomy??false,
-				'is_archive'         => get_class($queried_object) == 'WP_Post_Type' ? $queried_object->name : false,
+				'is_archive'         => is_object($queried_object) && get_class($queried_object) == 'WP_Post_Type' ? $queried_object->name : false,
 				'body_class'         => $blog_language . ' ' . $body_class,
 				'page_title'         => html_entity_decode(empty($wp_title) ? get_the_title( get_option('page_on_front') ) : $wp_title),
 				'system' => [
