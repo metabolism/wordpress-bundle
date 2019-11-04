@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.3.11
+#### Fixed
+- Warning in context
+
 ## 1.3.10
 #### Fixed
 - Debug routes and robots route when maintenance mode is enabled
