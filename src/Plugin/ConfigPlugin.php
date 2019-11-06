@@ -591,7 +591,7 @@ class ConfigPlugin {
 
 					$terms = get_the_terms( $post, $taxonomy );
 
-					if( count($terms) && is_object($terms[0]) )
+					if( is_array($terms) && count($terms) && is_object($terms[0]) )
 						$post_link = str_replace( '{'.$taxonomy.'}', $terms[0]->slug, $post_link );
 					else
 						$post_link = str_replace( '{'.$taxonomy.'}', 'default', $post_link );

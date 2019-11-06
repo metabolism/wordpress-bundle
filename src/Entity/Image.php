@@ -151,6 +151,12 @@ class Image extends Entity
 				$metadata['meta'] = false;
 
 			unset($metadata['image_meta']);
+
+			if( isset($metadata['sizes'], $metadata['sizes']['thumbnail']) ){
+
+			    $path = pathinfo($metadata['file'], PATHINFO_DIRNAME );
+                $metadata['sizes']['thumbnail'] = $path.'/'.$metadata['sizes']['thumbnail']['file'];
+            }
 		}
 		elseif( is_string($id) ){
 

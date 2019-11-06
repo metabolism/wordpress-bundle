@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.3.12
+#### Fixed
+- Handle sizes on images
+
 ## 1.3.11
 #### Fixed
 - Warning in context

@@ -196,14 +196,32 @@ class ACF
 	 * @param $id
 	 * @return array|bool|Entity|mixed|\WP_Error
 	 */
-	public function load($type, $id)
+	public function load($type, $id, $object=false)
 	{
 		$value = false;
 
 		switch ($type)
 		{
 			case 'image':
-				$value = Factory::create($id, 'image');
+
+                $value = Factory::create($id, 'image');
+
+                if( isset($object['sizes']) && !empty($object['sizes']) ){
+
+                    $sizes = explode(',', trim(str_replace(' ', '', $object['sizes'])));
+
+                    foreach ($sizes as $size)
+                    {
+                        $size = explode(':', $size);
+                        if( count($size) <= 1 ) continue;
+
+                        $name = $size[0];
+                        $width_height = explode('x', $size[1]);
+                        $extension = $size[2]??null;
+
+                        $value->resize($width_height[0], $width_height[1]??0, $extension, ['name'=>$name]);
+                    }
+                }
 				break;
 
 			case 'file':
@@ -293,9 +311,9 @@ class ACF
 						break;
 
 					if ($object['return_format'] == 'id' || is_int($object['value']) )
-						$objects[$object['name']] = $this->load('image', $object['value']);
+						$objects[$object['name']] = $this->load('image', $object['value'], $object);
 					elseif ($object['return_format'] == 'array')
-						$objects[$object['name']] = $this->load('image', $object['value']['id']);
+						$objects[$object['name']] = $this->load('image', $object['value']['id'], $object);
 					else
 						$objects[$object['name']] = $object['value'];
 
@@ -313,7 +331,7 @@ class ACF
 						if( isset($object['value']) && is_iterable($object['value']) ){
 
 						foreach ($object['value'] as $value)
-							$objects[$object['name']][] = $this->load('image', $value['id']);
+							$objects[$object['name']][] = $this->load('image', $value['id'], $object);
 					}
 					}
 
