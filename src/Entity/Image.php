@@ -26,6 +26,8 @@ class Image extends Entity
 	public $modified;
 	public $modified_gmt;
 	public $title;
+	public $caption;
+	public $description;
 	public $sizes = [];
 
 	private $compression = 90;
@@ -139,6 +141,8 @@ class Image extends Entity
 			}
 
 			$post['mime_type'] = mime_content_type($metadata['src']);
+			$post['caption'] = $post['post_excerpt'];
+			$post['description'] = $post['post_content'];
 
 			unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
 

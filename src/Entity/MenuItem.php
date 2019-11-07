@@ -15,8 +15,6 @@ class MenuItem extends Entity
 	/** @var bool $menu_item_parent */
 	public $menu_item_parent;
 
-	/** @var [] $classes */
-	public $classes;
 	public $class;
 	public $description;
 	public $target;

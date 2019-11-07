@@ -13,7 +13,7 @@ class Entity
 {
 	public static $remove = [
 		'xfn', 'db_id', 'post_mime_type', 'ping_status', 'to_ping', 'pinged', '_edit_lock',
-		'guid', 'filter', 'post_content_filtered', 'url', 'name', 'author_IP', 'agent'
+		'guid', 'filter', 'post_content_filtered', 'url', 'author_IP', 'agent'
 	];
 
 	public $ID;
