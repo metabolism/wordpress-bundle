@@ -220,7 +220,7 @@ class Post extends Entity
 		$args['number'] = 1;
 		$terms = $this->getTerms($tax, $args);
 
-		if( count($terms) )
+		if( is_array($terms) && count($terms) )
 			return end($terms);
 		else
 			return false;
@@ -275,7 +275,7 @@ class Post extends Entity
 			}
 		}
 
-		if( count($taxonomies) == 1 )
+		if( is_array($taxonomies) && count($taxonomies) == 1 )
 			return end($term_array);
 		else
 			return $term_array;

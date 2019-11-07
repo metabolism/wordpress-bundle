@@ -1,22 +1,13 @@
 <?php
 
-/*
- * Route middleware to easily implement multi-langue
- * todo: check to find a better way...
- */
+
 namespace Metabolism\WordpressBundle\Helper;
 
 use Metabolism\WordpressBundle\Entity\Entity;
-use Metabolism\WordpressBundle\Entity\Post,
-	Metabolism\WordpressBundle\Entity\Term,
-	Metabolism\WordpressBundle\Entity\User,
-	Metabolism\WordpressBundle\Entity\Image,
-	Metabolism\WordpressBundle\Entity\Product;
 
-use Metabolism\WordpressBundle\Factory\Factory;
-use Metabolism\WordpressBundle\Factory\PostFactory,
+use Metabolism\WordpressBundle\Factory\Factory,
+	Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
-use Metabolism\WordpressBundle\Provider\ACFProvider;
 
 class ACF
 {
@@ -416,9 +407,6 @@ class ACF
 							$type = $value['acf_fc_layout'];
 							$value = $this->bindLayoutsFields($value, $layouts);
 							$data = $this->clean($value);
-
-							if( is_array($value) && count($value) == 1 && is_string(key($value)) )
-								$data = reset($data);
 
 							$objects[$object['name']][] = ['type'=>$type, 'data'=>$data];
 						}
