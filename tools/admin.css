@@ -33,7 +33,10 @@
 
 /* Bugfix */
 .js .tmce-active .wp-editor-area { color: inherit!important }
-
+.compat-item .label { min-width: 20%; margin-right: 3% }
+.compat-item .field { width: 77%; margin: 0; padding-top: 5px }
+.compat-item .field > input { margin-left: 0!important; margin-top: 0!important }
+.media-modal .compat-item label { font-size: 12px }
 
 /* Quick redesign */
 .post-php, body[class*="toplevel_page_acf-options"], .post-new-php { background: linear-gradient(-90deg, rgba(238,238,238,1) 0%, rgba(238,238,238,1) 290px, rgba(230,230,230,1) 300px, rgba(255,255,255,1) 300px, rgba(255,255,255,1) 100%); }
