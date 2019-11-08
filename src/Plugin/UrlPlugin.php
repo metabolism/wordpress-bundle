@@ -90,17 +90,6 @@ class UrlPlugin {
 
 
 	/**
-	 * Make link relative
-	 * @param $link
-	 * @return mixed
-	 */
-	public function relativeLink($link){
-
-		return str_replace(WP_HOME, '', $link);
-	}
-
-
-	/**
 	 * Symfony require real url so redirect preview url to real url
 	 * ex /?post_type=project&p=899&preview=true redirect to /project/post-title?preview=true
 	 */
@@ -149,17 +138,22 @@ class UrlPlugin {
 
 
 	/**
+	 * Remove link when there is no template support
+	 */
+	public function makeRelative($url){
+
+		$make_relative = apply_filters('wp-bundle/make_link_relative', true);
+		return $make_relative ? wp_make_link_relative($url) : $url;
+	}
+
+
+	/**
 	 * UrlPlugin constructor.
 	 * @param Data $config
 	 */
 	public function __construct($config){
 
-		add_filter('post_link', [$this, 'relativeLink']);
-		add_filter('page_link', [$this, 'relativeLink']);
-		add_filter('post_type_link', [$this, 'relativeLink']);
-		add_filter('post_type_archive_link', [$this, 'relativeLink']);
 		add_filter('preview_post_link', [$this, 'previewPostLink'], 10, 2);
-
 		add_filter('option_siteurl', [$this, 'optionSiteURL'] );
 		add_filter('network_site_url', [$this, 'networkSiteURL'] );
 		add_filter('home_url', [$this, 'homeURL'] );
@@ -167,16 +161,13 @@ class UrlPlugin {
 		if( !WP_FRONT )
 			add_action( 'wp_before_admin_bar_render', [$this, 'removeAdminBarLinks'] );
 
-		if( is_admin() )
-			return;
-
 		add_action('init', function()
 		{
 			// Handle subfolder in url
-			if ( is_feed() || get_query_var( 'sitemap' ) )
+			if ( is_feed() )
 				return;
 
-			if( isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id']) )
+			if( !is_admin() && (isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id'])) )
 				$this->redirect();
 
 			$filters = array(
@@ -197,7 +188,7 @@ class UrlPlugin {
 			);
 
 			foreach ( $filters as $filter )
-				add_filter( $filter, 'wp_make_link_relative' );
+				add_filter( $filter, [$this, 'makeRelative'] );
 		});
 	}
 }

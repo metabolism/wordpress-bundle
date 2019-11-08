@@ -685,6 +685,9 @@ class ConfigPlugin {
 				add_theme_support( 'post-thumbnails' );
 
 			add_post_type_support( 'page', 'excerpt' );
+
+			$editor = get_role('editor');
+			$editor->remove_cap('manage_options');
 		}
 	}
 }

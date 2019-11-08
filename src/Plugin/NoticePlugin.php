@@ -23,7 +23,7 @@ class NoticePlugin {
 
 		//check folder right
 		$folders = ['web/wp-bundle/languages', 'web/uploads', 'web/uploads/acf-thumbnails', 'web/wp-bundle/upgrade', 'config/acf-json', 'var/cache', 'var/log'];
-		$folders = apply_filters('notice/folders', $folders);
+		$folders = apply_filters('wp-bundle/admin_notices', $folders);
 
 		foreach ($folders as $folder ){
 

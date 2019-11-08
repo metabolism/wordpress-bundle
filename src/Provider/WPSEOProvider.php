@@ -58,22 +58,6 @@ class WPSEOProvider
 
 
 	/**
-	 * make url absolute
-	 * @param $entry
-	 * @return mixed
-	 */
-	public function makeAbsolute($entry){
-
-		if( isset($entry['loc']) && strpos( $entry['loc'], WP_HOME) === false )
-			$entry['loc'] = WP_HOME.$entry['loc'];
-		elseif( is_string($entry) && strpos( $entry, WP_HOME ) === false  )
-			$entry = WP_HOME.$entry;
-
-		return $entry;
-	}
-
-
-	/**
 	 * Remove trailing slash & query parameters
 	 * @param $canonical
 	 * @return mixed
@@ -188,9 +172,11 @@ class WPSEOProvider
 
 				add_filter('wpseo_canonical', [$this, 'filterCanonical']);
 
-				add_filter('wpseo_sitemap_entry', [$this, 'makeAbsolute'], 10, 3);
-				add_filter('wpseo_xml_sitemap_post_url', [$this, 'makeAbsolute'], 10, 3);
-				add_filter('wpseo_sitemap_post_type_archive_link', [$this, 'makeAbsolute'], 10, 3);
+				add_filter('wp-bundle/make_link_relative', function($make){
+
+					global $wp_query;
+					return $make && empty($wp_query->query_vars["sitemap"]) && empty($wp_query->query_vars["yoast-sitemap-xsl"]);
+				});
 
 				add_filter('robots_txt', [$this, 'sitemapToRobots'], 9999, 1 );
 			});
