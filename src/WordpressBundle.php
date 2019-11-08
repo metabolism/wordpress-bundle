@@ -26,7 +26,7 @@ class WordpressBundle extends Bundle
 
 		do_action_ref_array( 'wp', array( &$wp ) );
 
-		do_action('template-redirect');
+		do_action( 'template_redirect' );
 
 		$twigExtension = new TwigExtension();
 		$this->container->get('twig')->addExtension($twigExtension);
