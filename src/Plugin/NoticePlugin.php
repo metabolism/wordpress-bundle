@@ -36,14 +36,21 @@ class NoticePlugin {
                 $errors [] = $folder.' folder is not writable';
 		}
 
-		if( str_replace('/edition','', get_option( 'siteurl' )) !== get_home_url() )
-            $errors [] = 'Site url host and Home url host are different, please check your database configuration';
-
 		global $wpdb, $table_prefix;
 		$siteurl = $wpdb->get_var("SELECT option_value FROM `".$table_prefix."options` WHERE `option_name` = 'siteurl'");
+		$homeurl = $wpdb->get_var("SELECT option_value FROM `".$table_prefix."options` WHERE `option_name` = 'home'");
 
-		if( strpos($siteurl, '/edition' ) === false )
-            $errors [] = 'Site url must contain /edition, please check your database configuration';
+		if( str_replace('/edition','', $siteurl) !== str_replace('/edition','', $homeurl) )
+			$notices [] = 'Site url host and Home url host are different, please check your database configuration';
+
+		if( strpos($homeurl, '/edition' ) !== false )
+			$notices [] = 'Home url must not contain /edition, please check your database configuration';
+
+		if( strpos($homeurl, $_SERVER['HTTP_HOST'] ) === false )
+			$notices [] = 'Home url host is different from current host, please check your database configuration';
+
+		if( strpos($siteurl, $_SERVER['HTTP_HOST'] ) === false )
+			$notices [] = 'Site url host is different from current host, please check your database configuration';
 
         if( is_blog_installed() && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
             $notices [] = 'Wordpress is now installed, you should add WP_INSTALLED=1 to the <i>.env</i> file';
