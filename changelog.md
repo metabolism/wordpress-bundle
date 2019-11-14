@@ -4,6 +4,7 @@ CHANGELOG
 ## 1.4.0
 #### Added
 - more samples
+- use RFC 4122 compliant UUID version 5 to generate post guid
 - bloginfo in context
 - search url redirect when using ?s=
 - sidebar management
