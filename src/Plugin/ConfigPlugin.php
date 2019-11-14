@@ -722,9 +722,6 @@ class ConfigPlugin {
 			
 			add_action('admin_head', [$this, 'loadStyle']);
 			add_action('admin_head', [$this, 'loadJS']);
-
-			$editor = get_role('editor');
-			$editor->remove_cap('manage_options');
 		}
 	}
 }

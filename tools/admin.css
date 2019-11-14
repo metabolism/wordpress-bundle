@@ -61,6 +61,7 @@ input[type=checkbox]{ border-color:#b4b9be; border-radius: 0 }
 .wp-core-ui .button-primary { color:#fff; background: #007cba; border-color: #007cba }
 .postbox .hndle, .stuffbox .hndle { border-bottom: 0 }
 .meta-box-sortables select { padding: 4px 8px; }
+.notice, div.error, div.updated{ border-bottom: 0; border-right: 0; border-top: 0 }
 
 #side-sortables .postbox{ background: none; border: 0; border-bottom: 1px solid #ddd; margin-bottom: 0; padding: 10px 0 }
 #side-sortables .postbox:last-of-type{ border-bottom: 0 }

@@ -139,7 +139,7 @@ class EditorPlugin {
 	}
 
 	/**
-	 * Allow editor to edit theme
+	 * Update editor role
 	 */
 	public function adminInit()
 	{
@@ -147,6 +147,8 @@ class EditorPlugin {
 
 		if( !$role_object->has_cap('edit_theme_options') )
 			$role_object->add_cap( 'edit_theme_options' );
+
+		$role_object->remove_cap('manage_options');
 	}
 
 
