@@ -1,6 +1,34 @@
 CHANGELOG
 ---------
 
+## 1.4.0
+#### Added
+- more samples
+- bloginfo in context
+- search url redirect when using ?s=
+- sidebar management
+- translations management
+- editor style
+- caption and description in image entity
+- sticky and class in post entity
+- link and getAvatar in user entity
+- `login_url`, `search_form`, `dynamic_sidebar`, `comment_form`, `is_active_sidebar`, `_e`, `_x`, `_n`, `__`, `wp_head`, `wp_footer` twig functions
+#### Fixed
+- project is now a symfony-bundle declared as is in composer.json
+- menu depth
+- compat-item css
+- template_redirect action management
+- frontpage pagination in router
+- bundle support when loaded from php server
+#### Removed
+- `classes` in entity
+#### Breaking changes
+- page_title renammed as wp_title
+- wp_footer and wp_head is no longer available in context as system.head/footer but now as a twig function `{{ wp_head }}`
+- wordpress.yml : post-formats is now integrated in support
+- Flexible content no longer skip parent when only one child
+- moved addComments from context -> getComments in post entity
+
 ## 1.3.12
 #### Fixed
 - Handle sizes on images

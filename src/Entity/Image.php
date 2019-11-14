@@ -175,7 +175,7 @@ class Image extends Entity
 
 			$metadata = [
 				'src' => $filename,
-				'file' => str_replace('/web', '', $id),
+				'file' => str_replace(PUBLIC_DIR, '', $id),
 				'width' => $image_size[0]??false,
 				'height' => $image_size[1]??false,
 				'mime_type' => $image_size['mime'],
@@ -244,7 +244,7 @@ class Image extends Entity
 		$file = $this->process($params, $ext);
 
 		$url = str_replace($abspath, $this->uploadDir('relative'), $file);
-		$url = str_replace(BASE_URI.'/web', '', $url);
+		$url = str_replace(BASE_URI.PUBLIC_DIR, '', $url);
 
 		if( is_array($params) && isset($params['name']) )
 			$this->sizes[$params['name']] = $url;

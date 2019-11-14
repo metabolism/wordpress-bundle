@@ -56,7 +56,7 @@ class ConfigLoader {
 		$_config = new Data($config);
 
 		/**
-		 * Set debug default
+		 * Set env default
 		 */
 		$env = $_SERVER['APP_ENV'] ?? 'dev';
 
@@ -66,7 +66,6 @@ class ConfigLoader {
 		 */
 		foreach ($_config->get('define', []) as $constant=>$value)
 			define( strtoupper($constant), $value);
-
 
 		/**
 		 * Define basic environment
@@ -116,8 +115,10 @@ class ConfigLoader {
 
 		define( 'WP_SITEURL', WP_HOME.WP_FOLDER);
 
-		define( 'COOKIE_DOMAIN', $_SERVER[ 'HTTP_HOST' ] );
-
+        if(filter_var($_SERVER['SERVER_NAME'], FILTER_VALIDATE_IP) !== false)
+            define('COOKIE_DOMAIN', '' );
+        else
+            define( 'COOKIE_DOMAIN', $_SERVER[ 'HTTP_HOST' ] );
 
 		/**
 		 * Define DB settings
@@ -167,8 +168,12 @@ class ConfigLoader {
 		/**
 		 * Custom Content Directory
 		 */
+
+		if (!defined('PUBLIC_DIR'))
+			define( 'PUBLIC_DIR', '/web');
+
 		if (!defined('WP_CONTENT_DIR'))
-			define( 'WP_CONTENT_DIR', BASE_URI . '/web/wp-bundle');
+			define( 'WP_CONTENT_DIR', BASE_URI . PUBLIC_DIR . '/wp-bundle');
 
 		if (!defined('UPLOADS'))
 			define( 'UPLOADS', '../uploads');
@@ -205,6 +210,6 @@ class ConfigLoader {
 			define( 'WP_USE_THEMES', false);
 
 		if (!defined('ABSPATH'))
-			define( 'ABSPATH', BASE_URI.'/web'.WP_FOLDER .'/');
+			define( 'ABSPATH', BASE_URI . PUBLIC_DIR . WP_FOLDER .'/');
 	}
 }

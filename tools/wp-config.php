@@ -24,7 +24,6 @@ if( !class_exists('App') && !defined('ABSPATH') ){
 	exit;
 }
 
-
 use Symfony\Component\Dotenv\Dotenv;
 use Metabolism\WordpressBundle\Loader\ConfigLoader;
 

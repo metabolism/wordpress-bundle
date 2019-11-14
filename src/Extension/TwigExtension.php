@@ -23,7 +23,8 @@ class TwigExtension extends AbstractExtension{
 	public function getFilters()
 	{
 		return [
-			new TwigFilter( 'placeholder', [$this, 'placeholder'] )
+			new TwigFilter( 'placeholder', [$this, 'placeholder'] ),
+			new TwigFilter( 'more', [$this, 'more'] )
 		];
 	}
 
@@ -36,18 +37,45 @@ class TwigExtension extends AbstractExtension{
 			new TwigFunction( 'fn', [$this, 'execFunction'] ),
 			new TwigFunction( 'function', [$this, 'execFunction'] ),
 			new TwigFunction( 'shortcode', 'shortcode' ),
+			new TwigFunction( 'login_url', 'wp_login_url' ),
+			new TwigFunction( 'search_form', 'get_search_form' ),
 			new TwigFunction( 'archive_url', 'get_post_type_archive_link' ),
 			new TwigFunction( 'attachment_url', 'wp_get_attachment_ur' ),
 			new TwigFunction( 'post_url', [$this, 'getPermalink'] ),
 			new TwigFunction( 'term_url', [$this, 'getTermLink'] ),
 			new TwigFunction( 'bloginfo', 'bloginfo' ),
-			new TwigFunction( 'Image', function($id){ return Factory::create($id, 'image'); } ),
+			new TwigFunction( 'dynamic_sidebar', function($id){ return $this->getOutput('dynamic_sidebar', [$id]); }, ['is_safe' => array('html')]  ),
+			new TwigFunction( 'comment_form', function($post_id, $args=[]){ return $this->getOutput('comment_form', [$args, $post_id]); }, ['is_safe' => array('html')]  ),
+			new TwigFunction( 'is_active_sidebar', 'is_active_sidebar' ),
+			new TwigFunction( '_e', 'translate' ),
+			new TwigFunction( '_x', '_x' ),
+			new TwigFunction( '_n', '_n' ),
+			new TwigFunction( '__', 'translate' ),
+			new TwigFunction( 'wp_head', function(){ return $this->getOutput('wp_head'); }, ['is_safe' => array('html')]  ),
+			new TwigFunction( 'wp_footer', function(){ return $this->getOutput('wp_footer'); }, ['is_safe' => array('html')]  ),
 			new TwigFunction( 'Post', function($id){ return PostFactory::create($id); } ),
 			new TwigFunction( 'User', function($id){ return Factory::create($id, 'user'); } ),
 			new TwigFunction( 'Term', function($id){ return TaxonomyFactory::create($id); } ),
 			new TwigFunction( 'Image', function($id, $path=false){ return Factory::create($id, 'image', false, ['path'=>$path]); } )
 		];
 	}
+
+
+    /**
+     * Return function echo
+     * @param $function
+     * @param array $args
+     * @return string
+     */
+    private function getOutput($function, $args=[])
+    {
+        ob_start();
+        call_user_func_array($function, $args);
+        $data = ob_get_contents();
+        ob_end_clean();
+
+        return $data;
+    }
 
 
 	/**
@@ -63,6 +91,31 @@ class TwigExtension extends AbstractExtension{
 			return false;
 
 		return $link;
+	}
+
+
+	/**
+	 * @param object|int|string $term
+	 * @param string $taxonomy
+	 * @return mixed
+	 */
+	public function more( $content )
+	{
+        if ( preg_match( '/<!--more(.*?)?-->/', $content, $matches ) ) {
+            if ( has_block( 'more', $content ) ) {
+                // Remove the core/more block delimiters. They will be left over after $content is split up.
+                $content = preg_replace( '/<!-- \/?wp:more(.*?) -->/', '', $content );
+            }
+
+            $content = explode( $matches[0], $content, 2 );
+        } else {
+            $content = array( $content );
+        }
+
+        foreach ($content as &$paragraph)
+            $paragraph = force_balance_tags($paragraph);
+
+        return $content;
 	}
 
 

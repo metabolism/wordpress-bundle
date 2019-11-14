@@ -1,25 +1,23 @@
 # Wordpress & Symfony, with ♥
 
-Introduction
-------------
+## Introduction
 
 Use Wordpress 5 as a backend for a Symfony 4 application
 
 The main idea is to use the power of Symfony for the front / webservices with the ease of Wordpress for the backend.
 
 
-How does it work ?
---------
+## How does it work ?
 
-When the Wordpress bundle is loaded, it loads a small amount of Wordpress Core files to allow usage of Wordpress functions inside Symfony Controllers.
+When the Wordpress bundle is loaded, it loads a small amount of Wordpress Core files to allow usage of Wordpress functions 
+inside Symfony Controllers.
 
 Wordpress is then linked to the bundle via a plugin located in the mu folder.
 
 Because it's a Symfony bundle, there is no theme management in Wordpress and the entire routing is powered by Symfony.
 
 
-Features
---------
+## Features
 
 From Composer :
 * Install/update Wordpress via composer
@@ -59,103 +57,235 @@ From the bundle itself :
 * Site health checker
  
  
-Drawbacks
------------
+## Drawbacks
 
-Because of Wordpress design, functions are available in the global namespace, it's not perfect but Wordpress will surely change this soon.
+Because of Wordpress design, functions are available in the global namespace, 
+it's not perfect but Wordpress will surely change this soon.
 
-Some plugins may not work directly, Woocommerce provider needs some rework
-
-No support for Gutenberg, activate the Classic Editor until further notice. 
+Some plugins may not work directly, Woocommerce provider needs some rework 
  
- 
-Using the boilerplate
------------
+## Demo
 
-See : https://github.com/wearemetabolism/boilerplate-symfony
+A demo is available at https://github.com/wearemetabolism/wordpress-bundle-demo, 
+
+it's an implementation of the Twenty Nineteen theme for Wordpress 5.
+
+## Installation
+
+#### 1 - Start a fresh project
+
 ```
-git clone git@github.com:wearemetabolism/boilerplate-symfony.git myproject
-cd myproject
-composer install
+symfony new --full my_project
+```
+or
+```
+composer create-project symfony/website-skeleton my_project
 ```
 
-Manual installation
------------
+#### 2 - Prepare composer to work with Wordpress
+
+Edit `composer.json`
+
+Add https://wpackagist.org repository
+
+```
+"repositories": [
+    {
+        "type":"composer", "url":"https://wpackagist.org"
+    }
+],
+```
+
+Define installation path for Wordpress related packages
+
+```
+"extra": {
+    ...
+    "installer-paths": {
+        "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+        "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
+        "public/edition/": ["type:wordpress-core"]
+    }
+    ...
+}
+```
+
+Use optimized autoloader
+
+```
+"config": {
+    ...
+    "optimize-autoloader": true,
+    "apcu-autoloader": true,
+    ...
+}
+```
+
+#### 3 - Configure database
+
+edit `.env`
+
+```
+###> metabolism/wordpress-bundle ###
+DATABASE_URL=mysql://user:pwd@host:3306/dbname
+TABLE_PREFIX=wp_
+###< metabolism/wordpress-bundle ###
+```
+
+Only mysql is supported
+
+#### 4 - Require Wordpress Bundle
 
 ```
 composer require metabolism/wordpress-bundle
 ```
-    
-register the bundle in the Kernel
-  
-```php
-public function registerBundles()
-{
-   $bundles = [
-      new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-      new \Symfony\Bundle\TwigBundle\TwigBundle(),
-      ...
-  ];
-  	
-  $bundles[] = new \Metabolism\WordpressBundle\WordpressBundle();
-  	
-  return $bundles;
-}
+
+if you want to use the development version (not recommended), edit `composer.json` before
 ```
-    
-add wordpress permastruct in the routing
-  
+"license": "GPL-3.0-or-later",
+...
+"prefer-stable": true,
+"minimum-stability": "dev",
+...
+```
+
+then 
+
+```
+composer require metabolism/wordpress-bundle:dev-develop
+```
+
+#### 5 - Add Wordpress routing
+
+edit `routes.yaml`
+
 ```
 _wordpress:
     resource: "@WordpressBundle/Routing/permastructs.php"
 ```
-  
-add a context service and use context trait from the Wordpress bundle
-  
-```php
-<?php
 
-namespace App\Service;
+Clear cache
 
-use Metabolism\WordpressBundle\Traits\ContextTrait as WordpressContext;
+```
+./bin/console cache:clear
+```
 
-class Context
-{
-	use WordpressContext;
+#### 6 - Update gitignore
 
-	protected $data;
+edit `.gitignore`
 
-	/**
-	 * Return Context as Array
-	 * @return array
-	 */
-	public function toArray()
-	{    	    
-	    return is_array($this->data) ? $this->data : [];
-	}
+```
+/public/uploads/*
+!/public/uploads/acf-thumbnails
+/public/edition
+/public/cache
+/public/wp-bundle
+```
+
+#### 7 - Start the server
+
+Configure a vhost mounted to `/public`, or start the built-in Symfony server
+
+```
+./bin/console server:start
+```
+
+Accessing the server url will now start the Wordpress Installation, 
+
+#### 8 - Develop your website !
+
+Take a look at `src/Controller/BlogController.php`, `templates/generic.html.twig` and `config/wordpress.yml` and continue to read the doc bellow.
+
+## Wordpress configuration
+
+When the bundle is installed, a default `wordpress.yml` is copied to `/config/`
+
+This file allow you to manage :
+ * Keys and Salts
+ * Image options
+ * Maintenance support
+ * Admin pages removal
+ * WYSIWYG MCE Editor
+ * Feature Support
+ * Multi-site configuration
+ * Constants
+ * ACF configuration
+ * Menu
+ * Custom Post type
+ * Custom Taxonomy
+ * Page, post, taxonomy templates
+ * Page states
+ * Post format
+ * External table viewer
+ * Roles
+ * Optimisations
+ * Domain name
+ * Controller name
+
+## Plugin installation
+
+Please use https://wpackagist.org to find your plugin.
+
+edit `composer.json`
+
+```
+"require": {
+    ...
+    "wpackagist-plugin/classic-editor":"1.*"
+    ...
 }
 ```
-    
-inject the context in the controller
 
-```php
-public function frontAction(Context $context)
-{
-    //use wordpress function directly ex:is_user_logged_in()
-    if( is_user_logged_in() )
-       return $this->render( 'page/article-unlocked.twig', $context->toArray() );
-    else   
-       return $this->render( 'page/article.twig', $context->toArray() );
+## ACF Pro installation
+
+Edit `composer.json`
+
+Declare a new repository
+
+```
+"repositories": [
+  {
+    "type": "package",
+    "package": {
+      "name": "elliotcondon/advanced-custom-fields-pro",
+      "version": "5.8.4",
+      "type": "wordpress-plugin",
+      "dist": {"type": "zip", "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download&k={%ACF_PRO_KEY}&t={%version}"},
+      "require": {
+        "ffraenz/private-composer-installer": "^2.0",
+        "composer/installers": "^1.0"
+      }
+    }
+  },
+  {
+    "type":"composer", "url":"https://wpackagist.org"
+  }
+]
+```
+
+Add ACF
+
+```
+"require": {
+   "elliotcondon/advanced-custom-fields-pro": "5.*",
+   ...
 }
-``` 
+```
+      
+Edit `.env` to set ACF_PRO_KEY
 
-Context trait
------------
+```
+ACF_PRO_KEY=Your-Key-Here      
+```
+
+## Context service
     
-Wordpress data wrapper, allow to query post, term, pagination, breadcrumb, comments and sitemap.
+The Context service is a Wordpress data wrapper, it allows to query post, term, pagination, breadcrumb, comments and sitemap.
 
 Critical data are added automatically, such as current post or posts for archive, locale, home url, search url, ...
- 
+
+### Usage
+
 ```php
 public function articleAction(Context $context)
 {
@@ -164,6 +294,7 @@ public function articleAction(Context $context)
     return $this->render( 'page/article.twig', $context->toArray() );
 }
 ```
+
 ### Preview
 
 To preview/debug context, just add `?debug=context` to any url, it will output a json representation of itself.
@@ -220,8 +351,7 @@ To preview/debug context, just add `?debug=context` to any url, it will output a
 }
 ```   
 
-Entities
------------
+## Entities
 
 ### Post
 
@@ -304,7 +434,7 @@ namespace App\Entity;
 use Metabolism\WordpressBundle\Entity\Post;
 use Metabolism\WordpressBundle\Entity\Image;
 
-class Keyfact extends Post
+class Guide extends Post
 {
 	public function __construct($id = null)
 	{
@@ -320,110 +450,9 @@ class Keyfact extends Post
 
 Menu, Comment, MenuItem, Product, Term and User can be extended by creating the same file in the `/src/Entity` folder. 
 
-Wordpress core and plugin installation
------------
+## Additional routes
 
-Plugin have to be declared to your composer.json, but first you must declare wpackagist.org as a replacement repository to your composer.json
-
-Then define install paths, for mu-plugin, plugin and core
- 
-```json
-{
-    "name": "acme/brilliant-wordpress-site",
-    "description": "My brilliant WordPress site",
-    "repositories":[
-        {
-            "type":"composer",
-            "url":"https://wpackagist.org"
-        }
-    ],
-    "require": {
-        "wpackagist-plugin/wordpress-seo":">=7.0.2"
-    },
-    "extra": {
-      "installer-paths": {
-        "web/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
-        "web/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
-        "web/edition/": ["type:wordpress-core"]
-      }
-    },
-    "autoload": {
-        "psr-0": {
-            "Acme": "src/"
-        }
-    }
-}
-```
-    
-Wordpress ACF PRO installation
------------
-
-You must declare a new repository like bellow
-
-```
-"repositories": [
-    {
-      "type": "package",
-      "package": {
-        "name": "elliotcondon/advanced-custom-fields-pro",
-        "version": "5.7.10",
-        "type": "wordpress-plugin",
-        "dist": {"type": "zip", "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download&k={%ACF_PRO_KEY}&t={%version}"},
-        "require": {
-          "ffraenz/private-composer-installer": "^2.0",
-          "composer/installers": "^1.0"
-        }
-      }
-    },
-    {
-      "type":"composer", "url":"https://wpackagist.org"
-    }
-  ]
-```
-
-Still in composer.json, add ACF to the require section
-
-```
-"require": {
-     "elliotcondon/advanced-custom-fields-pro": "5.*",
-}
-```
-      
-Set the environment variable ACF_PRO_KEY to your ACF PRO key. Add an entry to your .env file:
-
-```
-ACF_PRO_KEY=Your-Key-Here      
-```
-
-Environment
------------
-
-The environment configuration ( debug, database, cookie ) is managed via the `.env` file like any other SF4 project, there is a sample file in `doc/sample.env`
-
-We've added an option to handle cookie prefix named `COOKIE_PREFIX` and table prefix named `TABLE_PREFIX`
-
-
-Wordpress configuration
------------
-
-When the bundle is installed, a default `wordpress.yml` is copied to `/config/`
-This file allow you to manage :
- * Domain name for translation
- * Controller name
- * Keys and Salts
- * Admin pages removal
- * Multi-site configuration
- * Constants
- * Support
- * Menu
- * Post types
- * Taxonomies
- * Options page
- * Post type templates
-
-        
-Site health
------------
+### Site health
 
 You can check site health using `/_site-health`, url
 options are:
@@ -431,51 +460,46 @@ options are:
 - full : 0 | 1
 
         
-Cache
------------
+### Cache
 
 You can purge cache using `/_cache/purge`, url or using purge cache button in backoffice
 
 You can completely remove and purge cache using `/_cache/clear`, url
 
         
-Roadmap
---------
+## Roadmap
 
-* Woo-commerce Provider rework + samples
+* Create Symfony recipe
+* Provide more samples
+* Woo-commerce Provider rework
 * Global maintenance mode for multi-site
 * Unit tests
        
        
-Why not using Bedrock
---------
+## Why not using Bedrock
 
 Because Bedrock "only" provides a folder organisation with composer dependencies management.
 Btw this Bundle comes from years of Bedrock usage + Timber plugin...
        
-Why not using Ekino Wordpress Bundle
---------
+## Why not using Ekino Wordpress Bundle
 
 The philosophy is not the same, Ekino use Symfony to manipulate Wordpress database.
 Plus the last release was in 2015...
 
 
-Is Wordpress classic theme bad ?
---------
+## Is Wordpress classic theme bad ?
 
 We don't want to judge anyone, it's more like a code philosophy, once you go Symfony you can't go back.
 
 Plus the security is a requirement for us and Wordpress failed to provide something good because of it's huge usage.
 
 
-Licence
-----------
+## Licence
 
 GNU AFFERO GPL
     
     
-Maintainers
------------
+## Maintainers
 
 This project is made by Metabolism ( http://metabolism.fr )
 

@@ -16,8 +16,6 @@ class Post extends Entity
 {
 	public $entity = 'post';
 
-	public $excerpt ='';
-
 	/** @var Image */
 	public $thumbnail = false;
 	public $link = '';
@@ -28,6 +26,7 @@ class Post extends Entity
 	public $author;
 	public $date;
 	public $date_gmt;
+	public $class;
 	public $modified;
 	public $modified_gmt;
 	public $title;
@@ -38,6 +37,8 @@ class Post extends Entity
 	public $slug;
 	public $name;
 	public $content;
+	public $sticky;
+    public $excerpt ='';
 
 	private $_next = null;
 	private $_prev = null;
@@ -58,7 +59,6 @@ class Post extends Entity
 		if( $post = $this->get($id) ) {
 
 			$this->import($post, false, 'post_');
-			$this->content = wpautop($this->content);
 
 			if( !isset($args['depth']) || $args['depth'] )
 				$this->addCustomFields($post->ID);
@@ -98,11 +98,14 @@ class Post extends Entity
 
 			$post->template = get_page_template_slug( $post );
 			$post->thumbnail = get_post_thumbnail_id( $post );
+			$post->class = implode(' ', get_post_class());
+			$post->sticky = is_sticky($pid);
 
 			if( $post->thumbnail )
 				$post->thumbnail = Factory::create($post->thumbnail, 'image');
 
 			$post->slug = $post->post_name;
+			$post->post_excerpt = get_the_excerpt($post);
 		}
 
 		return $post;
@@ -188,6 +191,44 @@ class Post extends Entity
 
 
 	/**
+	 * Get post comments
+	 *
+	 * @return Comment[]|[]
+	 */
+	public function getComments($args=[]) {
+
+		$default_args = [
+            'post_id'=> $this->ID,
+            'status'=> 'approve',
+            'type'=> 'comment',
+            'fields'=> 'ids'
+        ];
+
+
+		$args = array_merge($default_args, $args);
+
+        $comments_id = get_comments($args);
+        $comments = [];
+
+        foreach ($comments_id as $comment_id)
+        {
+            $comments[$comment_id] = Factory::create($comment_id, 'comment');
+        }
+
+        foreach ($comments as $comment)
+        {
+            if( $comment && $comment->parent )
+            {
+                $comments[$comment->parent]->replies[] = $comment;
+                unset($comments[$comment->ID]);
+            }
+        }
+
+        return $comments;
+	}
+
+
+	/**
 	 * Get previous post
 	 * See: https://developer.wordpress.org/reference/functions/get_previous_post/
 	 *
@@ -202,7 +243,6 @@ class Post extends Entity
 			return $this->_prev;
 
 		$this->_prev = $this->getSibling('prev', $in_same_term , $excluded_terms, $taxonomy);
-
 		return $this->_prev;
 	}
 
@@ -215,7 +255,7 @@ class Post extends Entity
 	 * @param array $args
 	 * @return Term|bool
 	 */
-	public function getTerm( $tax='', $args=[] ) {
+	public function getTerm( $tax='category', $args=[] ) {
 
 		$args['number'] = 1;
 		$terms = $this->getTerms($tax, $args);
@@ -234,7 +274,7 @@ class Post extends Entity
 	 * @param array $args
 	 * @return Term[]|[]
 	 */
-	public function getTerms( $tax = '', $args=[] ) {
+	public function getTerms( $tax = 'category', $args=[] ) {
 
 		$args['fields'] = 'ids';
 

@@ -52,7 +52,7 @@ class Permastruct{
 	 */
 	public function addRoutes(){
 
-		$this->addRoute('front', '');
+		$this->addRoute('front', '', [], true);
 
 		global $wp_post_types, $wp_taxonomies;
 
@@ -201,9 +201,12 @@ class Permastruct{
 
 /** @var Data $_config */
 global $_config;
-$controller_name = $_config->get('extra_permastructs.controller', 'MainController');
-
 $collection = new RouteCollection();
+
+if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
+    return $collection;
+
+$controller_name = $_config->get('extra_permastructs.controller', 'MainController');
 
 if( $_config->get('multisite') && !$_config->get('multisite.subdomain_install') )
 {
