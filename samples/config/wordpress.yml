@@ -326,6 +326,7 @@ taxonomy: # https://codex.wordpress.org/Function_Reference/register_taxonomy
 #  translator:
 #    display_name: Traducteur
 #    force: true
+#    #inherit: editor
 #    capabilities:
 #      read: true
 #      publish: false
@@ -367,9 +368,9 @@ rewrite_rules:
     - feed
     - comment
 
-#########################
+################
 ##    Misc    ##
-#########################
+################
 
 domain_name: rocket # MO/PO traductions
 

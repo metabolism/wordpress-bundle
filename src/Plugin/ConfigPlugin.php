@@ -238,8 +238,8 @@ class ConfigPlugin {
 	{
 		foreach ($this->config->get('sidebar', []) as $id => $params)
 		{
-            $params['id'] = $id;
-            register_sidebar($params);
+			$params['id'] = $id;
+			register_sidebar($params);
 		}
 	}
 
@@ -388,15 +388,27 @@ class ConfigPlugin {
 	 */
 	public function addRoles()
 	{
-		global $wp_roles;
-
 		foreach ( $this->config->get('role', []) as $role => $args )
 		{
 			if( isset($args['force']) && $args['force'] )
 				remove_role($role);
 
+			if( isset($args['inherit']) && !empty($args['inherit']) ){
+
+				$inherited_role = get_role( $args['inherit'] );
+				$args['capabilities'] = array_merge($inherited_role->capabilities, $args['capabilities']);
+			}
+
 			add_role($role, $args['display_name'], $args['capabilities']);
 		}
+
+		add_filter( 'editable_roles', function($all_roles){
+
+			if( !current_user_can('administrator') )
+				unset($all_roles['administrator']);
+
+			return $all_roles;
+		});
 	}
 
 
@@ -646,27 +658,27 @@ class ConfigPlugin {
 	 */
 	public function addThemeSupport()
 	{
-        $excluded = ['template', 'page', 'post', 'tag', 'category'];
+		$excluded = ['template', 'page', 'post', 'tag', 'category'];
 
-	    foreach ($this->support as $feature){
+		foreach ($this->support as $feature){
 
-            if( $feature == 'post_thumbnails' || $feature == 'thumbnail')
-                $feature = 'post-thumbnails';
+			if( $feature == 'post_thumbnails' || $feature == 'thumbnail')
+				$feature = 'post-thumbnails';
 
-	        if( is_array($feature) ){
+			if( is_array($feature) ){
 
-                $key = array_key_first($feature);
-                $params = $feature[$key];
+				$key = array_key_first($feature);
+				$params = $feature[$key];
 
-                if( !in_array($key, $excluded) )
-                    add_theme_support( $key, $params);
-            }
-            elseif( !in_array($feature, $excluded) ){
+				if( !in_array($key, $excluded) )
+					add_theme_support( $key, $params);
+			}
+			elseif( !in_array($feature, $excluded) ){
 
-                add_theme_support( $feature );
-            }
-        }
-    }
+				add_theme_support( $feature );
+			}
+		}
+	}
 
 
 
@@ -694,9 +706,9 @@ class ConfigPlugin {
 			$this->addRoles();
 			$this->addThemeSupport();
 
-            load_theme_textdomain( $this->config->get('domain_name'), BASE_URI. '/translations' );
+			load_theme_textdomain( $this->config->get('domain_name'), BASE_URI. '/translations' );
 
-            if( WP_FRONT ){
+			if( WP_FRONT ){
 
 				$this->setPermalink();
 
@@ -706,11 +718,11 @@ class ConfigPlugin {
 
 			if( is_admin() ){
 
-                $this->addTableViews();
+				$this->addTableViews();
 
-                if( $editor_style = $this->config->get('editor_style') )
-                    add_editor_style( $editor_style );
-            }
+				if( $editor_style = $this->config->get('editor_style') )
+					add_editor_style( $editor_style );
+			}
 		});
 
 
@@ -719,7 +731,7 @@ class ConfigPlugin {
 		{
 			if( WP_FRONT )
 				add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
-			
+
 			add_action('admin_head', [$this, 'loadStyle']);
 			add_action('admin_head', [$this, 'loadJS']);
 		}

@@ -10,6 +10,7 @@ CHANGELOG
 - sidebar management
 - translations management
 - editor style
+- inherit option for role management
 - caption and description in image entity
 - sticky and class in post entity
 - link and getAvatar in user entity
@@ -25,7 +26,7 @@ CHANGELOG
 - `classes` in entity
 #### Breaking changes
 - page_title renammed as wp_title
-- wp_footer and wp_head is no longer available in context as system.head/footer but now as a twig function `{{ wp_head }}`
+- wp_footer and wp_head is no longer available in context as system.head/footer but now as a twig function `{{ wp_head() }}`
 - wordpress.yml : post-formats is now integrated in support
 - Flexible content no longer skip parent when only one child
 - moved addComments from context -> getComments in post entity

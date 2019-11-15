@@ -55,7 +55,7 @@ class FrontController {
 
 		$object = $wp_query->get_queried_object();
 
-		if ( $query->is_archive )
+		if ( $query->is_archive && is_object($object) )
 		{
 			if( get_class($object) == 'WP_Post_Type' ){
 
