@@ -81,10 +81,33 @@ class TwigExtension extends AbstractExtension{
 	/**
 	 * @param object|int|string $term
 	 * @param string $taxonomy
+	 * @param bool|string $meta
 	 * @return mixed
 	 */
-	public function getTermLink( $term, $taxonomy = '' )
+	public function getTermLink( $term, $taxonomy = 'category', $meta=false )
 	{
+
+		if( $meta ){
+
+			$args = array(
+				'meta_query' => array(
+					array(
+						'key'       => $meta,
+						'value'     => $term,
+						'compare'   => 'LIKE'
+					)
+				),
+				'number'  => 1,
+				'taxonomy'  => $taxonomy,
+			);
+
+			$terms = get_terms( $args );
+
+			if( count($terms) )
+				$term = $terms[0];
+		}
+
+
 		$link = get_term_link($term, $taxonomy);
 
 		if( !is_string($link) )
