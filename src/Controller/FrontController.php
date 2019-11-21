@@ -24,12 +24,9 @@ class FrontController {
 	{
 		$path = rtrim($_SERVER['REQUEST_URI'], '/');
 
-		if( !empty($path) && ($path == WP_FOLDER || $path == PUBLIC_DIR.WP_FOLDER) ){
+		if( !empty($path) && strpos($path, WP_FOLDER) !== false ){
 
 			wp_redirect(is_user_logged_in() ? admin_url() : wp_login_url());
-
-			echo "redirect...";
-
 			exit;
 		}
 	}

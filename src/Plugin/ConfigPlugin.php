@@ -43,7 +43,7 @@ class ConfigPlugin {
 
 		foreach ( $this->config->get('post_type', []) as $post_type => $args )
 		{
-			if( !in_array($post_type, ['post', 'page']) )
+			if( !in_array($post_type, ['post', 'page', 'edition']) )
 			{
 				if( (isset($args['enable_for_blogs']) && !in_array($current_blog_id, (array)$args['enable_for_blogs'])) || (isset($args['disable_for_blogs']) && in_array($current_blog_id, (array)$args['disable_for_blogs'])))
 					continue;
@@ -257,7 +257,7 @@ class ConfigPlugin {
 
 		foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args )
 		{
-			if( !in_array($taxonomy, ['category', 'tag']) ) {
+			if( !in_array($taxonomy, ['category', 'tag', 'edition']) ) {
 
 				$args = array_merge($default_args, $args);
 				$name = str_replace('_', ' ', isset($args['name']) ? $args['name'] : $taxonomy);
