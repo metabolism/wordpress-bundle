@@ -103,12 +103,16 @@ class Term extends Entity
 			$term->ID = $term->term_id;
 			$term->term_order = intval($term->term_order);
 			$term->current = get_queried_object_id() == $pid;
+			$term->thumbnail = false;
 
 			// load thumbnail if set to optimize loading by preventing full acf load
-			if( class_exists('ACF') && $thumbnail_id = get_field('thumbnail', $term->taxonomy.'_'.$term->ID) )
-				$term->thumbnail = Factory::create($thumbnail_id, 'image');
-			else
-				$term->thumbnail = false;
+			if( function_exists('get_field_object') )
+			{
+				$object = get_field_object('thumbnail', $term->taxonomy.'_'.$term->ID);
+
+				if( $object['value'] )
+					$term->thumbnail = Factory::create( $object['value'], 'image', false, ['sizes'=>$object['sizes']??false]);
+			}
 		}
 
 		return $term;

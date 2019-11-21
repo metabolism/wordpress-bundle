@@ -19,6 +19,7 @@ class Image extends Entity
 	public $meta;
 	public $alt;
 	public $mime_type;
+	public $extension;
 	public $width;
 	public $height;
 	public $date;
@@ -57,7 +58,41 @@ class Image extends Entity
 		elseif( $data = $this->get($id) ){
 
 			$this->import($data, false, 'post_');
+
+			if( isset($this->args['sizes']) && !empty($this->args['sizes']) )
+				$this->generateSizes($this->args['sizes']);
 		}
+	}
+
+
+	/**
+	 * Generate image sizes from args
+	 * ex for sizes: large:1920x1080.webp, small:150x150.jpg, medium:800x600
+	 *
+	 * @param string $sizes
+	 * @param array $args
+	 */
+	private function generateSizes($sizes)
+	{
+		$sizes = explode(',', trim(str_replace(' ', '', $sizes)));
+
+		foreach ($sizes as $size)
+		{
+			$size = explode(':', $size);
+			if( count($size) <= 1 ) continue;
+
+			$name = $size[0];
+			$spec = explode('.', $size[1]);
+
+			$width_height = explode('x', $spec[0]);
+			$extension = $spec[1]??null;
+
+			$this->resize($width_height[0], $width_height[1]??0, $extension, ['name'=>$name]);
+
+			if( $extension != 'webp')
+				$this->resize($width_height[0], $width_height[1]??0, 'webp', ['name'=>$name]);
+		}
+
 	}
 
 
@@ -141,6 +176,7 @@ class Image extends Entity
 			}
 
 			$post['mime_type'] = mime_content_type($metadata['src']);
+			$post['extension'] = pathinfo($metadata['src'], PATHINFO_EXTENSION);
 			$post['caption'] = $post['post_excerpt'];
 			$post['description'] = $post['post_content'];
 
@@ -154,13 +190,7 @@ class Image extends Entity
 			else
 				$metadata['meta'] = false;
 
-			unset($metadata['image_meta']);
-
-			if( isset($metadata['sizes'], $metadata['sizes']['thumbnail']) ){
-
-			    $path = pathinfo($metadata['file'], PATHINFO_DIRNAME );
-                $metadata['sizes']['thumbnail'] = $path.'/'.$metadata['sizes']['thumbnail']['file'];
-            }
+			unset($metadata['image_meta'], $metadata['sizes']);
 		}
 		elseif( is_string($id) ){
 
@@ -225,8 +255,21 @@ class Image extends Entity
 
 		$image = $this->edit(['resize'=>[$w, $h]], $ext);
 
-		if( is_array($params) && isset($params['name']) )
-			$this->sizes[$params['name']] = $image;
+		if( is_null($ext) )
+			$ext = pathinfo($image, PATHINFO_EXTENSION);
+
+		if( is_array($params) && isset($params['name']) ){
+
+			$src = BASE_URI.PUBLIC_DIR.$image;
+			$image_info = getimagesize($src);
+
+			$this->sizes[$params['name']][$ext] = [
+				'file'=>$image,
+				'mime-type'=>$image_info['mime'],
+				'width'=>$image_info[0],
+				'height'=>$image_info[1]
+			];
+		}
 
 		return $image;
 	}

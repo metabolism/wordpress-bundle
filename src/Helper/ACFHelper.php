@@ -20,7 +20,7 @@ class ACF
 	 * ACF constructor.
 	 * @param $id
 	 */
-	public function __construct( $id )
+	public function __construct( $id, $type='objects' )
 	{
 		$this->id = $id;
 
@@ -36,7 +36,7 @@ class ACF
 			}
 			else {
 				$this->loaded = true;
-				$this->objects = $this->load('objects', $id);
+				$this->objects = $this->load($type, $id);
 
 				wp_cache_set( $id.'::'.self::$DEPTH, $this->objects, 'acf_helper' );
 			}
@@ -194,25 +194,7 @@ class ACF
 		switch ($type)
 		{
 			case 'image':
-
-                $value = Factory::create($id, 'image');
-
-                if( isset($object['sizes']) && !empty($object['sizes']) ){
-
-                    $sizes = explode(',', trim(str_replace(' ', '', $object['sizes'])));
-
-                    foreach ($sizes as $size)
-                    {
-                        $size = explode(':', $size);
-                        if( count($size) <= 1 ) continue;
-
-                        $name = $size[0];
-                        $width_height = explode('x', $size[1]);
-                        $extension = $size[2]??null;
-
-                        $value->resize($width_height[0], $width_height[1]??0, $extension, ['name'=>$name]);
-                    }
-                }
+                $value = Factory::create($id, 'image', false, ['sizes'=>$object['sizes']??false]);
 				break;
 
 			case 'file':
