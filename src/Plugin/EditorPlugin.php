@@ -71,7 +71,7 @@ class EditorPlugin {
 			remove_submenu_page($menu, $submenu);
 		}
 
-		if( !WP_FRONT ){
+		if( HEADLESS && !URL_MAPPING ){
 
 			remove_submenu_page('options-general.php', 'options-reading.php');
 			remove_submenu_page('options-general.php', 'options-permalink.php');
@@ -179,7 +179,7 @@ class EditorPlugin {
 				foreach($data->allcaps as $cap=>$value)
 					$caps[] = $value ? $cap : 'no-'.$cap;
 
-				return implode(' ', $caps).$classes;
+				return implode(' ', $caps).$classes.(HEADLESS?' headless':'').(URL_MAPPING?' url-mapping':'');
 			});
 		}
 

@@ -91,7 +91,6 @@ mce_buttons:
 
 ## Add theme support
 support:
-  - template #uncomment for api only backoffice
   - post-thumbnail #add thumbnails to page
   - page #enable page
   - post #enable post
@@ -100,6 +99,10 @@ support:
  #- post-formats: # https://wordpress.org/support/article/post-formats/#supported-formats
   #  - video
   #  - gallery
+
+## Use Wordpress as a headless cms
+#headless:
+#  mapping: true
 
 ## Allow multisite installation
 install-multisite: true

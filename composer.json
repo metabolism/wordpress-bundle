@@ -43,8 +43,6 @@
           "samples/config/wordpress.yml": "config/wordpress.yml",
           "samples/service/Context.php": "src/Service/Context.php",
           "samples/controller/BlogController.php": "src/Controller/BlogController.php",
-          "samples/controller/AdminController.php": "src/Controller/AdminController.php",
-          "samples/controller/FrontController.php": "src/Controller/FrontController.php",
           "samples/template/generic.html.twig": "templates/generic.html.twig"
         }
       },

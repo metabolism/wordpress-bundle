@@ -169,6 +169,17 @@ class UrlPlugin {
 
 
 	/**
+	 * Remove link when there is no template support
+	 */
+	public function applyUrlMapping($html){
+
+		$html = preg_replace('/<span id="sample-permalink"><a href="(.*)">(.*)<span/', '<span id="sample-permalink"><a href="'.URL_MAPPING.'$1">'.URL_MAPPING.'$2<span', $html);
+		$html = preg_replace('/<a id="sample-permalink" href="(.*)">(.*)<\/a>/', '<a id="sample-permalink" href="'.URL_MAPPING.'$1">'.URL_MAPPING.'$2</a>', $html);
+		return $html;
+	}
+
+
+	/**
 	 * UrlPlugin constructor.
 	 * @param Data $config
 	 */
@@ -179,8 +190,14 @@ class UrlPlugin {
 		add_filter('network_site_url', [$this, 'networkSiteURL'] );
 		add_filter('home_url', [$this, 'homeURL'] );
 
-		if( !WP_FRONT )
+		if( HEADLESS ){
+
 			add_action( 'wp_before_admin_bar_render', [$this, 'removeAdminBarLinks'] );
+
+			if( URL_MAPPING ){
+				add_filter('get_sample_permalink_html', [$this, 'applyUrlMapping'] );
+			}
+		}
 
 		add_action('init', function()
 		{

@@ -91,7 +91,7 @@ class ConfigPlugin {
 						$args['has_archive'] = $archive;
 				}
 
-				if( !WP_FRONT ){
+				if( HEADLESS && !URL_MAPPING ){
 
 					$args['publicly_queryable'] = false;
 				}
@@ -307,7 +307,7 @@ class ConfigPlugin {
 					$object_type = 'post';
 				}
 
-				if( !WP_FRONT ){
+				if( HEADLESS && !URL_MAPPING ){
 
 					$args['publicly_queryable'] = false;
 				}
@@ -541,19 +541,6 @@ class ConfigPlugin {
 	}
 
 
-	public function loadStyle(){
-
-		echo '<style>
-               #the-list .attachment-thumbnail-container{ position: relative; display: inline-block }
-               #the-list .attachment-thumbnail-container:hover .attachment-thumbnail{ display: block; z-index: 999 }
-               #the-list .attachment-thumbnail{ width: 60px; height: auto; border-radius: 2px; display: block }
-               #the-list .attachment-thumbnail+.attachment-thumbnail{ width: auto; position: absolute; left: 50%; top: 50%; display: none; transform: translate(-50%, -50%); box-shadow: 0 0 4px rgba(0,0,0,0.2) }
-               #the-list .attachment-thumbnail-container+a{ display: none!important } 
-               .manage-column.num{ text-align: left } 
-              </style>';
-	}
-
-
 	public function loadJS(){
 
 		echo '<script>jQuery(document).ready(function(jQuery){';
@@ -708,7 +695,7 @@ class ConfigPlugin {
 
 			load_theme_textdomain( $this->config->get('domain_name'), BASE_URI. '/translations' );
 
-			if( WP_FRONT ){
+			if( !HEADLESS || URL_MAPPING ){
 
 				$this->setPermalink();
 
@@ -729,10 +716,9 @@ class ConfigPlugin {
 		// When viewing admin
 		if( is_admin() )
 		{
-			if( WP_FRONT )
+			if( !HEADLESS || URL_MAPPING )
 				add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
 
-			add_action('admin_head', [$this, 'loadStyle']);
 			add_action('admin_head', [$this, 'loadJS']);
 		}
 	}

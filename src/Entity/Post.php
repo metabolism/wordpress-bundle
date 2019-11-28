@@ -93,7 +93,7 @@ class Post extends Entity
 
 			$this->_post = clone $post;
 
-			if( WP_FRONT )
+			if( !HEADLESS || URL_MAPPING )
 				$post->link = get_permalink( $post );
 
 			$post->template = get_page_template_slug( $post );

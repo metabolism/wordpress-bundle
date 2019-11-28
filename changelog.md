@@ -15,6 +15,8 @@ CHANGELOG
 - sticky and class in post entity
 - link and getAvatar in user entity
 - `ADMIN_IP_WHITELIST` environment variable to prevent backend access
+- headless options in wordpress.yml
+- `MAPPED_URL` environment variable to support headless
 - `login_url`, `search_form`, `dynamic_sidebar`, `comment_form`, `is_active_sidebar`, `_e`, `_x`, `_n`, `__`, `wp_head`, `wp_footer` twig functions
 #### Fixed
 - project is now a symfony-bundle declared as is in composer.json

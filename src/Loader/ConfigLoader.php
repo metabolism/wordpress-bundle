@@ -78,8 +78,8 @@ class ConfigLoader {
 		define( 'WP_DEBUG', $env === 'dev');
 		define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
 
-		$support = $_config->get('support', []);
-		define( 'WP_FRONT', in_array('templates', $support)||in_array('template', $support) );
+		define( 'HEADLESS', $_config->get('headless') );
+		define( 'URL_MAPPING', $_config->get('headless.mapping')?getenv('MAPPED_URL')??false:false );
 
 		/**
 		 * Enable multisite

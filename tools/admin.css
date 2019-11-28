@@ -30,6 +30,14 @@
 .options-media-php .wrap .form-table tr:nth-child(2),
 .options-media-php .wrap .form-table tr:nth-child(3){ display: none }
 
+#the-list .attachment-thumbnail-container{ position: relative; display: inline-block }
+#the-list .attachment-thumbnail-container:hover .attachment-thumbnail{ display: block; z-index: 999 }
+#the-list .attachment-thumbnail{ width: 60px; height: auto; border-radius: 2px; display: block }
+#the-list .attachment-thumbnail+.attachment-thumbnail{ width: auto; position: absolute; left: 50%; top: 50%; display: none; transform: translate(-50%, -50%); box-shadow: 0 0 4px rgba(0,0,0,0.2) }
+#the-list .attachment-thumbnail-container+a{ display: none!important }
+.manage-column.num{ text-align: left }
+
+.headless #post-preview, .headless #wp-admin-bar-view{ display: none }
 
 /* Bugfix */
 .js .tmce-active .wp-editor-area { color: inherit!important }
