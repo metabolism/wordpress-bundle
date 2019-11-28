@@ -247,6 +247,9 @@ class ACF
 			if(!isset($object['type'], $object['name']) || empty($object['name']))
 				continue;
 
+			if(isset($object['public']) && !$object['public'])
+				continue;
+
 			switch ($object['type']) {
 
 				case 'clone';

@@ -29,6 +29,7 @@ class WordpressBundle extends Bundle
 
 		do_action_ref_array( 'wp', array( &$wp ) );
 
+		remove_action( 'template_redirect', 'redirect_canonical' );
 		do_action( 'template_redirect' );
 
 		if( $twig = $this->container->get('twig') ){
