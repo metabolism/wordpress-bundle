@@ -56,7 +56,7 @@ class AdminController {
 				$ip = $_SERVER['REMOTE_ADDR'];
 
 			if( !in_array($ip, $whitelist) )
-				wp_die('Sorry, you are not allowed to access this page');
+				wp_die('Sorry, you are not allowed to access this page. Your IP: '.$ip);
 		}
 	}
 
