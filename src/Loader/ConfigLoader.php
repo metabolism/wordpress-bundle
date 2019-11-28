@@ -27,14 +27,18 @@ class ConfigLoader {
 
 		if (!defined('BASE_URI'))
 		{
-			// unix
 			$base_uri = dirname( __DIR__ );
-			$base_uri = preg_replace( "/\/web$/", '', $base_uri );
-			$base_uri = preg_replace( "/\/vendor\/metabolism\/wordpress-bundle\/src$/", '', $base_uri );
 
+			if( '\\' === \DIRECTORY_SEPARATOR ){
 			// windows
 			$base_uri = preg_replace( "/\\web$/", '', $base_uri );
 			$base_uri = preg_replace( "/\\\\vendor\\\\metabolism\\\\wordpress-bundle\\\\src$/", '', $base_uri );
+			}
+			else{
+				// unix
+				$base_uri = preg_replace( "/\/web$/", '', $base_uri );
+				$base_uri = preg_replace( "/\/vendor\/metabolism\/wordpress-bundle\/src$/", '', $base_uri );
+			}
 
 			define( 'BASE_URI', $base_uri);
 		}

@@ -14,9 +14,11 @@ CHANGELOG
 - caption and description in image entity
 - sticky and class in post entity
 - link and getAvatar in user entity
+- `ADMIN_IP_WHITELIST` environment variable to prevent backend access
 - `login_url`, `search_form`, `dynamic_sidebar`, `comment_form`, `is_active_sidebar`, `_e`, `_x`, `_n`, `__`, `wp_head`, `wp_footer` twig functions
 #### Fixed
 - project is now a symfony-bundle declared as is in composer.json
+- double `/web` replacement on windows os
 - menu depth
 - compat-item css
 - template_redirect action management
@@ -28,7 +30,7 @@ CHANGELOG
 - page_title renammed as wp_title
 - wp_footer and wp_head is no longer available in context as system.head/footer but now as a twig function `{{ wp_head() }}`
 - wordpress.yml : post-formats is now integrated in support
-- Flexible content no longer skip parent when only one child
+- Flexible content no longer skip parent when there is only one child
 - moved addComments from context -> getComments in post entity
 
 ## 1.3.12

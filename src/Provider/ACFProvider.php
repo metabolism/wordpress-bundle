@@ -112,6 +112,17 @@ class ACFProvider {
 
 
 	/**
+	 * Filter preview sizes
+	 * @param $sizes
+	 * @return array
+	 */
+	public function getImageSizes($sizes){
+
+		return ['thumbnail'=>$sizes['thumbnail'], 'full'=>$sizes['full']];
+	}
+
+
+	/**
 	 * Change query to replace template by term slug
 	 * @param $args
 	 * @param $field
@@ -164,6 +175,7 @@ class ACFProvider {
 		add_filter('acf/pre_load_value', [$this, 'preLoadValue'], 10, 3);
 		add_filter('acf/prepare_field', [$this, 'addTaxonomyTemplates']);
 		add_filter('acf/fields/relationship/query/name=items', [$this, 'filterPostsByTermTemplateMeta'], 10, 3);
+		add_filter( 'acf/get_image_sizes', [$this, 'getImageSizes'] );
 
 		// When viewing admin
 		if( is_admin() )
