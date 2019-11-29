@@ -178,7 +178,7 @@ Trait ContextTrait
 			$this->data['languages'] = $languages;
 		}
 
-		if( HEADLESS && !URL_MAPPING )
+		if( !HEADLESS || URL_MAPPING )
 		{
 			$wp_title = trim(wp_title(' ', false));
 			$body_class = $queried_object ? implode(' ', get_body_class()) : '';
