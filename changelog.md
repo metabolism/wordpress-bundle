@@ -3,6 +3,7 @@ CHANGELOG
 
 ## 1.4.0
 #### Added
+- new mail plugin to send emails from custom SMTP set in .env
 - more samples
 - use RFC 4122 compliant UUID version 5 to generate post guid
 - bloginfo in context
