@@ -87,7 +87,7 @@ class Image extends Entity
 			$width_height = explode('x', $spec[0]);
 			$extension = $spec[1]??null;
 
-			if( $extension != 'webp')
+			if( $extension != 'webp' && function_exists('imagewebp') )
 				$this->resize($width_height[0], $width_height[1]??0, 'webp', ['name'=>$name]);
 
 			if( $scaled_down )
