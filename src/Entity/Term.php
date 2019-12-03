@@ -111,7 +111,7 @@ class Term extends Entity
 				$object = get_field_object('thumbnail', $term->taxonomy.'_'.$term->ID);
 
 				if( $object['value'] )
-					$term->thumbnail = Factory::create( $object['value'], 'image', false, ['sizes'=>$object['sizes']??false]);
+					$term->thumbnail = Factory::create( $object['value'], 'image', false, $object);
 			}
 		}
 

@@ -194,7 +194,7 @@ class ACF
 		switch ($type)
 		{
 			case 'image':
-                $value = Factory::create($id, 'image', false, ['sizes'=>$object['sizes']??false]);
+                $value = Factory::create($id, 'image', false, $object);
 				break;
 
 			case 'file':
