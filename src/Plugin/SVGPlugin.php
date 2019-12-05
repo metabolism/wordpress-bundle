@@ -3,11 +3,14 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 use enshrined\svgSanitize\Sanitizer;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class SVGPlugin {
+
+	use SingletonTrait;
 
 	/**
 	 * @param $data

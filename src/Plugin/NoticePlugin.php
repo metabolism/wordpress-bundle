@@ -3,10 +3,14 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
+
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class NoticePlugin {
+
+	use SingletonTrait;
 
 	protected $config;
 

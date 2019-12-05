@@ -6,12 +6,15 @@ namespace Metabolism\WordpressBundle\Plugin{
 	use Ifsnop\Mysqldump as IMysqldump;
 	use Metabolism\WordpressBundle\Helper\DirFilterHelper;
 	use Metabolism\WordpressBundle\Helper\Stream;
-	
+	use Metabolism\WordpressBundle\Traits\SingletonTrait;
+
 	/**
 	 * Class Metabolism\WordpressBundle Framework
 	 */
 	class BackupPlugin {
-		
+
+		use SingletonTrait;
+
 		protected $config;
 		private $zip;
 		

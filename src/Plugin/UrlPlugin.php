@@ -4,12 +4,14 @@ namespace Metabolism\WordpressBundle\Plugin;
 
 
 use Dflydev\DotAccessData\Data;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class UrlPlugin {
 
+	use SingletonTrait;
 
 	/**
 	 * Add edition folder to option url

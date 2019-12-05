@@ -9,6 +9,7 @@ use Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 use Metabolism\WordpressBundle\Helper\ACF,
 	Metabolism\WordpressBundle\Helper\Query;
+use Metabolism\WordpressBundle\Plugin\ConfigPlugin;
 use Metabolism\WordpressBundle\Plugin\TermsPlugin;
 
 use Metabolism\WordpressBundle\Entity\Post,
@@ -75,8 +76,9 @@ Trait ContextTrait
 
 	/**
 	 * Return function echo
-	 * @param $function
-	 * @param array $args
+	 * @param MslsOptions $mslsOptions
+	 * @param WP_Site $site
+	 * @param string $locale
 	 * @return string
 	 */
 	private function getAlternativeLink($mslsOptions, $site, $locale)
@@ -98,7 +100,7 @@ Trait ContextTrait
 
 	/**
 	 * Get multisite multilangue data
-	 * @param $queried_object
+	 * @param object $queried_object
 	 * @return array
 	 */
 	protected function getLanguagesData($queried_object){
@@ -109,7 +111,7 @@ Trait ContextTrait
 		{
 			$languages = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc' );
 		}
-		elseif(  defined('MSLS_PLUGIN_VERSION') && is_multisite() )
+		elseif( defined('MSLS_PLUGIN_VERSION') && is_multisite() )
 		{
 			$sites = get_sites(['public'=>1]);
 			$current_blog_id = get_current_blog_id();
@@ -124,6 +126,7 @@ Trait ContextTrait
 				$locale    = get_blog_option($site->blog_id, 'WPLANG');
 				$locale    = empty($locale)? 'en_US' : $locale;
 				$lang      = explode('_', $locale)[0];
+				
 				$alternate = $current_blog_id != $site->blog_id ? $this->getAlternativeLink($mslsOptions, $site, $locale) : false;
 
 				$languages[] = [

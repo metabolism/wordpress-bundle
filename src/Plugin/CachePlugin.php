@@ -4,6 +4,7 @@ namespace Metabolism\WordpressBundle\Plugin;
 
 use Dflydev\DotAccessData\Data;
 use Metabolism\WordpressBundle\Helper\Cache;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 
 /**
@@ -11,6 +12,7 @@ use Metabolism\WordpressBundle\Helper\Cache;
  */
 class CachePlugin
 {
+	use SingletonTrait;
 
 	private $noticeMessage,  $errorMessage, $cacheHelper;
 

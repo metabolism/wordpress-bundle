@@ -2,12 +2,16 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
+
 /**
  * Class MailPlugin
  * @description Send Emails from custom SMTP set in .env
  * @package Metabolism\WordpressBundle\Plugin
  */
 class MailPlugin {
+
+	use SingletonTrait;
 
 	protected $_smtp_config;
 

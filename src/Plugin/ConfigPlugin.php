@@ -5,11 +5,14 @@ namespace Metabolism\WordpressBundle\Plugin;
 use Dflydev\DotAccessData\Data;
 use Metabolism\WordpressBundle\Helper\Query;
 use Metabolism\WordpressBundle\Helper\Table;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class ConfigPlugin {
+
+	use SingletonTrait;
 
 	protected $config;
 	protected $support;
@@ -22,6 +25,15 @@ class ConfigPlugin {
 		return substr($name, -1) == 's' ? $name : (substr($name, -1) == 'y' && !in_array(substr($name, -2, 1), ['a','e','i','o','u']) ? substr($name, 0, -1).'ies' : $name.'s');
 	}
 
+
+	/**
+	 * Reload configuration
+	 */
+	public function reload()
+	{
+		$this->addPostTypes();
+		$this->addTaxonomies();
+	}
 
 	/**
 	 * Adds specific post types here
@@ -668,14 +680,12 @@ class ConfigPlugin {
 	}
 
 
-
 	/**
 	 * ConfigPlugin constructor.
 	 * @param Data $config
 	 */
 	public function __construct($config)
 	{
-
 		$this->config = $config;
 		$this->support = $config->get('support');
 
@@ -712,6 +722,7 @@ class ConfigPlugin {
 			}
 		});
 
+		add_action('switch_blog', [$this, 'reload']);
 
 		// When viewing admin
 		if( is_admin() )

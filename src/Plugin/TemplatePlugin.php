@@ -2,7 +2,11 @@
 
 namespace Metabolism\WordpressBundle\Plugin{
 
+	use Metabolism\WordpressBundle\Traits\SingletonTrait;
+
 	class TemplatePlugin {
+
+		use SingletonTrait;
 
 		/**
 		 * The array of templates that this plugin tracks.

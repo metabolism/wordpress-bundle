@@ -5,11 +5,14 @@ namespace Metabolism\WordpressBundle\Plugin;
 
 use Dflydev\DotAccessData\Data;
 use Intervention\Image\ImageManagerStatic;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class MediaPlugin {
+
+	use SingletonTrait;
 
 	protected $config, $prevent_recursion;
 
