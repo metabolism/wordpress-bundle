@@ -62,7 +62,7 @@ body[class*="_page_"] div.updated{
 .imgedit-group, .manage-menus, .menu-item-handle, .popular-tags, .stuffbox, .widget-inside, .widget-top,
 .widgets-holder-wrap, .wp-editor-container, p.popular-tags, table.widefat, .widefat thead td, .widefat thead th,
 input[type=color], input[type=date], input[type=datetime-local], input[type=datetime], input[type=email], input[type=month],
-input[type=number], input[type=password], input[type=search], input[type=tel], input[type=text], input[type=time],input[type=checkbox]
+input[type=number], input[type=password], input[type=search], input[type=tel], input[type=text], input[type=time],input[type=checkbox],
 input[type=url], input[type=week], select, textarea, .widefat tfoot td, .widefat tfoot th, .postbox{ border-color: #e0e0e0; border-radius: 0 }
 input[type=checkbox]{ border-color:#b4b9be; border-radius: 0 }
 .wp-core-ui .button, .wp-core-ui .button-secondary { color: #555; border-color: #ccc; background: #f7f7f7; box-shadow: 0 1px 0 #ccc }

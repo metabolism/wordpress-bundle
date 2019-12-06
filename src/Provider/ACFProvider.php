@@ -163,6 +163,84 @@ class ACFProvider {
 
 
 	/**
+	 * Add attachment protocol when needed
+	 * @param array $options
+	 */
+	public function filterOptions($options_arr){
+
+		if( !function_exists('acf_get_field') )
+			return $options_arr;
+
+		$options = [];
+
+		foreach($options_arr as $option)
+			$options[$option['name']] = $option['value'];
+
+		$options_arr = [];
+
+		foreach($options as $name=>$value){
+
+			if( substr($name, 0, 1) !== '_' && isset($options['_'.$name]) && substr($options['_'.$name], 0, 6) == 'field_' ){
+
+				$field = acf_get_field($options['_'.$name]);
+
+				if( $field && ($field['type'] == 'image' || $field['type'] == 'file') && $value){
+
+					$path = wp_get_attachment_url($value);
+
+					if( $path )
+						$value = 'attachment://'.ltrim($path, '/');
+				}
+			}
+
+			$options_arr[] = ['name'=>$name, 'value'=>$value];
+		}
+
+		return $options_arr;
+	}
+
+
+	/**
+	 * Add attachment protocol when needed
+	 * @param array $options
+	 */
+	public function filterPostMeta($postmeta_arr){
+
+		if( !function_exists('acf_get_field') )
+			return $postmeta_arr;
+
+		$postmeta = [];
+
+		foreach($postmeta_arr as $meta)
+			$postmeta[$meta->meta_key] = $meta->meta_value;
+
+		$postmeta_arr = [];
+
+		foreach($postmeta as $key=>$value){
+
+			if( substr($key, 0, 1) !== '_' && isset($postmeta['_'.$key]) && substr($postmeta['_'.$key], 0, 6) == 'field_' ){
+
+				$field = acf_get_field($postmeta['_'.$key]);
+				if($field['type'] == 'image')
+					print_r($value);
+
+				if( $field && ($field['type'] == 'image' || $field['type'] == 'file')  && $value ){
+
+					$path = wp_get_attachment_url($value);
+
+					if( $path )
+						$value = 'attachment://'.ltrim($path, '/');
+				}
+			}
+
+			$postmeta_arr[] = (object)['meta_key'=>$key, 'meta_value'=>$value];
+		}
+
+		return $postmeta_arr;
+	}
+
+
+	/**
 	 * ACFPlugin constructor.
 	 * @param Data $config
 	 */
@@ -176,6 +254,8 @@ class ACFProvider {
 		add_filter('acf/prepare_field', [$this, 'addTaxonomyTemplates']);
 		add_filter('acf/fields/relationship/query/name=items', [$this, 'filterPostsByTermTemplateMeta'], 10, 3);
 		add_filter( 'acf/get_image_sizes', [$this, 'getImageSizes'] );
+		add_filter( 'export_wp_options', [$this, 'filterOptions'] );
+		add_filter( 'postmeta_export',  [$this, 'filterPostMeta']);
 
 		// When viewing admin
 		if( is_admin() )

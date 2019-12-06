@@ -598,20 +598,25 @@ class MediaPlugin {
 		if(in_array($image_data['type'], $valid_types) && $this->config->get('image.resize') ){
 
 			$src = $image_data['file'];
-			$image = ImageManagerStatic::make($src);
 
-			if( $image->getWidth() > $this->config->get('image.resize.max_width', 1920) ){
-				$image->resize($this->config->get('image.resize.max_width', 1920), null, function ($constraint) {
-					$constraint->aspectRatio();
-				});
-			}
-			elseif( $image->getHeight() > $this->config->get('image.resize.max_height', 2160) ){
-				$image->resize(null, $this->config->get('image.resize.max_height', 2160), function ($constraint) {
-					$constraint->aspectRatio();
-				});
-			}
+			try {
 
-			$image->save($src, 99);
+				$image = ImageManagerStatic::make($src);
+
+				if( $image->getWidth() > $this->config->get('image.resize.max_width', 1920) ){
+					$image->resize($this->config->get('image.resize.max_width', 1920), null, function ($constraint) {
+						$constraint->aspectRatio();
+					});
+				}
+				elseif( $image->getHeight() > $this->config->get('image.resize.max_height', 2160) ){
+					$image->resize(null, $this->config->get('image.resize.max_height', 2160), function ($constraint) {
+						$constraint->aspectRatio();
+					});
+				}
+
+				$image->save($src, 99);
+			}
+			catch (\Exception $e){}
 		}
 
 		return $image_data;
