@@ -312,9 +312,9 @@ class ACF
 
 						if( isset($object['value']) && is_iterable($object['value']) ){
 
-						foreach ($object['value'] as $value)
-							$objects[$object['name']][] = $this->load('image', $value['id']);
-					}
+                            foreach ($object['value'] as $value)
+                                $objects[$object['name']][] = $this->load('image', (is_array($value) ? $value['id'] : $value), $object);
+                        }
 					}
 
 					break;
