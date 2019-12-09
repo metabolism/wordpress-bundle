@@ -3,7 +3,7 @@ CHANGELOG
 
 ## 1.4.0
 #### Added
-- new mail plugin to send emails from custom SMTP set in .env
+- new mail plugin to send emails from custom SMTP set in .env ( merge request from @undefinedfr )
 - more samples
 - use RFC 4122 compliant UUID version 5 to generate post guid
 - bloginfo in context
@@ -28,6 +28,7 @@ CHANGELOG
 - frontpage pagination in router
 - bundle support when loaded from php server
 - invalid url when using switch_to_blog
+- incorrect processing of gallery in ACFHelper ( merge request from @undefinedfr )
 #### Removed
 - `classes` in entity
 #### Breaking changes

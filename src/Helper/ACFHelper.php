@@ -194,7 +194,7 @@ class ACF
 		switch ($type)
 		{
 			case 'image':
-                $value = Factory::create($id, 'image', false, $object);
+				$value = Factory::create($id, 'image', false, $object);
 				break;
 
 			case 'file':
@@ -275,8 +275,8 @@ class ACF
 					$objects[$object['name']] = [];
 
 					if( isset($object['value']) && is_iterable($object['value']) ){
-					foreach($object['value'] as $post)
-						$objects[$object['name']][] = $this->load('post', $post->ID);
+						foreach($object['value'] as $post)
+							$objects[$object['name']][] = $this->load('post', $post->ID);
 					}
 
 					break;
@@ -306,9 +306,16 @@ class ACF
 
 						if( isset($object['value']) && is_iterable($object['value']) ){
 
-						foreach ($object['value'] as $value)
-							$objects[$object['name']][] = $this->load('image', $value['id'], $object);
-					}
+							foreach ($object['value'] as $value){
+
+								if ($object['return_format'] == 'id' || is_int($value) )
+									$objects[$object['name']][] = $this->load('image', $value, $object);
+								elseif ($object['return_format'] == 'array')
+									$objects[$object['name']][] = $this->load('image', $value['id'], $object);
+								else
+									$objects[$object['name']][] = $value;
+							}
+						}
 					}
 
 					break;
