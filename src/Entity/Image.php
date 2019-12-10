@@ -60,7 +60,7 @@ class Image extends Entity
 			$this->import($data, false, 'post_');
 
 			if( isset($this->args['sizes']) && !empty($this->args['sizes']) && $this->mime_type != 'image/svg+xml' && $this->mime_type != 'image/svg' )
-				$this->generateSizes($this->args['sizes'], $this->args['scaled_down']??false);
+				$this->generateSizes($this->args['sizes'], isset($this->args['scaled_down'])?$this->args['scaled_down']:false);
 		}
 	}
 
@@ -85,15 +85,15 @@ class Image extends Entity
 			$spec = explode('.', $size[1]);
 
 			$width_height = explode('x', $spec[0]);
-			$extension = $spec[1]??null;
+			$extension = count($spec)>1?$spec[1]:null;
 
 			if( $extension != 'webp' && function_exists('imagewebp') )
-				$this->resize($width_height[0], $width_height[1]??0, 'webp', ['name'=>$name]);
+				$this->resize($width_height[0], count($width_height)>1?$width_height[1]:0, 'webp', ['name'=>$name]);
 
 			if( $scaled_down )
-				$this->resize($width_height[0], $width_height[1]??0, $extension, ['name'=>$name, 'blur'=>5, 'gcd'=>1]);
+				$this->resize($width_height[0], count($width_height)>1?$width_height[1]:0, $extension, ['name'=>$name, 'blur'=>5, 'gcd'=>1]);
 
-			$this->resize($width_height[0], $width_height[1]??0, $extension, ['name'=>$name]);
+			$this->resize($width_height[0], count($width_height)>1?$width_height[1]:0, $extension, ['name'=>$name]);
 		}
 
 	}
@@ -209,8 +209,8 @@ class Image extends Entity
 			$metadata = [
 				'src' => $filename,
 				'file' => str_replace(PUBLIC_DIR, '', $id),
-				'width' => $image_size[0]??false,
-				'height' => $image_size[1]??false,
+				'width' => count($image_size)?$image_size[0]:false,
+				'height' => count($image_size)>1?$image_size[1]:false,
 				'mime_type' => $image_size['mime'],
 				'post_title' => str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME)),
 				'post_date' => filemtime($filename),
@@ -322,7 +322,7 @@ class Image extends Entity
 
 			$params['resize'] = (array)$params['resize'];
 			$w = $params['resize'][0];
-			$h = $params['resize'][1]??0;
+			$h = count($params['resize'])>1?$params['resize'][1]:0;
 		}
 		else{
 
@@ -424,7 +424,7 @@ class Image extends Entity
 						break;
 
 					case 'insert':
-						$image->insert(BASE_URI.$param[0], $param[1]??'top-left', $param[2]??0, $param[3]??0);
+						$image->insert(BASE_URI.$param[0], count($param)>1?$param[1]:'top-left', count($param)>2?$param[2]:0, count($param)>3?$param[3]:0);
 						break;
 
 					case 'colorize':
@@ -432,11 +432,11 @@ class Image extends Entity
 						break;
 
 					case 'blur':
-						$image->blur($param[0]??1);
+						$image->blur(count($param)?$param[0]:1);
 						break;
 
 					case 'flip':
-						$image->flip($param[0]??'v');
+						$image->flip(count($param)?$param[0]:'v');
 						break;
 
 					case 'brightness':
@@ -448,7 +448,7 @@ class Image extends Entity
 						break;
 
 					case 'mask':
-						$image->mask(BASE_URI.$param[0], $param[1]??false);
+						$image->mask(BASE_URI.$param[0], count($param)>1?$param[1]:false);
 						break;
 
 					case 'gamma':
@@ -460,9 +460,9 @@ class Image extends Entity
 						break;
 
 					case 'text':
-						$image->text($param[0], $param[1]??0, $param[2]??0, function($font) use($param) {
+						$image->text($param[0], count($param)>1?$param[1]:0, count($param)>2?$param[2]:0, function($font) use($param) {
 
-							$params = $param[3]??[];
+							$params = count($param)>3?$param[3]:[];
 
 							if( isset($params['file']) )
 								$font->file(BASE_URI.$params['file']);
@@ -516,7 +516,7 @@ class Image extends Entity
 						break;
 
 					case 'limitColors':
-						$image->limitColors($param[0], $param[1]??null);
+						$image->limitColors($param[0], count($param)>1?$param[1]:null);
 						break;
 				}
 			}
@@ -559,7 +559,7 @@ class Image extends Entity
 			if( $sources && is_array($sources) ){
 
 				foreach ($sources as $media=>$size)
-					$html .='	<source media="('.$media.')"  srcset="'.$this->placeholder($size[0], $size[1] ?? 0).'">';
+					$html .='	<source media="('.$media.')"  srcset="'.$this->placeholder($size[0], count($size)>1?$size[1]:0).'">';
 			}
 
 			$html .='	<source srcset="'.$this->placeholder($w, $h).'">';

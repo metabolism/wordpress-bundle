@@ -25,7 +25,7 @@ class NoticePlugin {
 
 		global $wpdb, $table_prefix;
 
-		if( $_GET['fix']??false == 'database' ){
+		if( isset($_GET['fix'])?$_GET['fix']:false == 'database' ){
 			$wpdb->update($table_prefix."options", ['option_value' => WP_SITEURL], ['option_name' => 'siteurl']);
 			$wpdb->update($table_prefix."options", ['option_value' => WP_HOME], ['option_name' => 'home']);
 		}

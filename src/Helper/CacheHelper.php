@@ -91,7 +91,7 @@ class Cache {
 		if( !$url )
 			$url = get_home_url(null, '*');
 
-		$varnish = $_SERVER['VARNISH_IP'] ?? false;
+		$varnish = isset($_SERVER['VARNISH_IP'])?$_SERVER['VARNISH_IP']:false;
 
 		$args = [
 			'method' => 'PURGE',

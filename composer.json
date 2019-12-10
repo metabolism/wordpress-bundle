@@ -2,7 +2,7 @@
   "name":"metabolism/wordpress-bundle",
   "type": "symfony-bundle",
   "version": "1.4.0",
-  "description": "Use Wordpress 5 as a backend for a Symfony 4 application",
+  "description": "Use Wordpress 5 as a backend for a Symfony application",
   "license": "GPL-3.0-or-later",
   "require": {
     "php" : ">=5.6.1",
@@ -14,7 +14,7 @@
     "metabolism/package-actions": "1.1.*",
     "johnpbloch/wordpress-core": "5.*",
     "ifsnop/mysqldump-php":"2.*",
-    "dflydev/dot-access-data":"1.*",
+    "dflydev/dot-access-data":"~1.0",
     "enshrined/svg-sanitize": "0.*",
     "intervention/image": "2.*"
   },

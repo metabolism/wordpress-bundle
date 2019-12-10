@@ -31,8 +31,11 @@ CHANGELOG
 - incorrect processing of gallery in ACFHelper ( merge request from @undefinedfr )
 #### Removed
 - `classes` in entity
+#### Changed
+- downgraded PHP version requirement to 5.6.1 to make it comptible with SF3
 #### Breaking changes
 - page_title renammed as wp_title
+- return format in ACF is now used, id will return id, array/object will return entity
 - wp_footer and wp_head is no longer available in context as system.head/footer but now as a twig function `{{ wp_head() }}`
 - wordpress.yml : post-formats is now integrated in support
 - Flexible content no longer skip parent when there is only one child

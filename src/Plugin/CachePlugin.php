@@ -128,8 +128,8 @@ class CachePlugin
 	 */
 	public function __construct($config)
 	{
-		$env = $_SERVER['APP_ENV'] ?? 'dev';
-		$debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env));
+		$env = isset($_SERVER['APP_ENV'])?$_SERVER['APP_ENV']:'dev';
+		$debug = (bool) ( isset($_SERVER['APP_DEBUG'])?$_SERVER['APP_DEBUG']:('prod' !== $env));
 
 		$this->cacheHelper = new Cache();
 

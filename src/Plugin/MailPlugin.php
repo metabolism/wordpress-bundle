@@ -93,11 +93,11 @@ class MailPlugin {
 		$phpmailer->SMTPAuth = $SMTPAuth;
 
 		if((bool) $SMTPAuth){
-			$phpmailer->Port = $this->_smtp_config['port'] ?? 25;
+			$phpmailer->Port = isset($this->_smtp_config['port'])?$this->_smtp_config['port']:25;
 			$phpmailer->Username = $this->_smtp_config['user'];
 			$phpmailer->Password = urldecode($this->_smtp_config['pass']);
 		}
 
-		$phpmailer->SMTPSecure = $this->_smtp_config['encryption'] ?? null;
+		$phpmailer->SMTPSecure = isset($this->_smtp_config['encryption'])?$this->_smtp_config['encryption']:null;
 	}
 }

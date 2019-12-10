@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Use Wordpress 5 as a backend for a Symfony 4 application
+Use Wordpress 5 as a backend for a Symfony application
 
 The main idea is to use the power of Symfony for the front / webservices with the ease of Wordpress for the backend.
 

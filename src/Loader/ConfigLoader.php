@@ -62,7 +62,7 @@ class ConfigLoader {
 		/**
 		 * Set env default
 		 */
-		$env = $_SERVER['APP_ENV'] ?? 'dev';
+		$env = isset($_SERVER['APP_ENV'])?$_SERVER['APP_ENV']:'dev';
 
 
 		/**
@@ -79,7 +79,7 @@ class ConfigLoader {
 		define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
 
 		define( 'HEADLESS', $_config->get('headless') );
-		define( 'URL_MAPPING', $_config->get('headless.mapping')?getenv('MAPPED_URL')??false:false );
+		define( 'URL_MAPPING', $_config->get('headless.mapping')?getenv('MAPPED_URL'):false );
 
 		/**
 		 * Enable multisite

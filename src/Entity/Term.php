@@ -85,8 +85,6 @@ class Term extends Entity
 	 */
 	protected function get($pid ) {
 
-		$term = false;
-
 		if( $term = get_term($pid) )
 		{
 			if( !$term || is_wp_error($term) )
@@ -106,12 +104,18 @@ class Term extends Entity
 			$term->thumbnail = false;
 
 			// load thumbnail if set to optimize loading by preventing full acf load
+			//todo: move to ACF Provider using action
 			if( function_exists('get_field_object') )
 			{
 				$object = get_field_object('thumbnail', $term->taxonomy.'_'.$term->ID);
 
-				if( $object['value'] )
-					$term->thumbnail = Factory::create( $object['value'], 'image', false, $object);
+				if( $object['value'] ){
+
+					if( $object['return_format'] == 'array')
+						$term->thumbnail = Factory::create( is_array($object['value'])?$object['value']['id']:$object['value'], 'image', false, $object);
+					else
+						$term->thumbnail = $object['value'];
+				}
 			}
 		}
 

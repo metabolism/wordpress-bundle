@@ -42,7 +42,7 @@ class AdminController {
 	 */
 	private function lock()
 	{
-		$whitelist = getenv('ADMIN_IP_WHITELIST')??false;
+		$whitelist = getenv('ADMIN_IP_WHITELIST');
 
 		if( $whitelist ){
 
