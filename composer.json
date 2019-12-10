@@ -14,7 +14,7 @@
     "metabolism/package-actions": "1.1.*",
     "johnpbloch/wordpress-core": "5.*",
     "ifsnop/mysqldump-php":"2.*",
-    "dflydev/dot-access-data":"2.*",
+    "dflydev/dot-access-data":"1.*",
     "enshrined/svg-sanitize": "0.*",
     "intervention/image": "2.*"
   },
