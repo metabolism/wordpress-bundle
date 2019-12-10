@@ -70,7 +70,7 @@ class Image extends Entity
 	 * ex for sizes: large:1920x1080.webp, small:150x150.jpg, medium:800x600
 	 *
 	 * @param string $sizes
-	 * @param array $args
+	 * @param bool $scaled_down
 	 */
 	private function generateSizes($sizes, $scaled_down=false)
 	{
@@ -251,8 +251,7 @@ class Image extends Entity
 	 * @param $w
 	 * @param int $h
 	 * @param null $ext
-	 * @param bool $params
-	 * @param bool $params
+	 * @param array $params
 	 * @return mixed
 	 */
 	public function resize($w, $h = 0, $ext=null, $params=[]){
@@ -604,9 +603,9 @@ class Image extends Entity
 
 
 	/**
+	 * @param $image
 	 * @param $w
 	 * @param int $h
-	 * @param null $ext
 	 * @return void
 	 */
 	protected function crop(&$image, $w, $h=0){

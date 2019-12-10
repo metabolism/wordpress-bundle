@@ -134,6 +134,9 @@ class UrlPlugin {
 	/**
 	 * Symfony require real url so redirect preview url to real url
 	 * ex /?post_type=project&p=899&preview=true redirect to /project/post-title?preview=true
+	 * @param $permalink
+	 * @param $post
+	 * @return mixed
 	 */
 	public function previewPostLink($permalink, $post){
 
@@ -162,6 +165,8 @@ class UrlPlugin {
 
 	/**
 	 * Remove link when there is no template support
+	 * @param $url
+	 * @return
 	 */
 	public function makeRelative($url){
 
@@ -172,6 +177,8 @@ class UrlPlugin {
 
 	/**
 	 * Remove link when there is no template support
+	 * @param $html
+	 * @return string|string[]|null
 	 */
 	public function applyUrlMapping($html){
 

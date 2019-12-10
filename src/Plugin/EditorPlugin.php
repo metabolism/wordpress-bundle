@@ -18,7 +18,7 @@ class EditorPlugin {
 	/**
 	 * Configure Tiny MCE first line buttons
 	 * @param $mce_buttons
-	 * @return
+	 * @return array
 	 */
 	public function TinyMceButtons( $mce_buttons )
 	{

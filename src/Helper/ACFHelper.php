@@ -19,6 +19,7 @@ class ACF
 	/**
 	 * ACF constructor.
 	 * @param $id
+	 * @param string $type
 	 */
 	public function __construct( $id, $type='objects' )
 	{
@@ -185,6 +186,7 @@ class ACF
 	/**
 	 * @param $type
 	 * @param $id
+	 * @param bool $object
 	 * @return array|bool|Entity|mixed|\WP_Error
 	 */
 	public function load($type, $id, $object=false)

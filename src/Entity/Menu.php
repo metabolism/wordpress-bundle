@@ -85,7 +85,7 @@ class Menu extends Entity
 
 
 	/**
-	 * @param $menu_items
+	 * @param int $parent_id
 	 * @return array
 	 */
 	protected function addDepth($parent_id=0)

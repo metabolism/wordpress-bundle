@@ -283,9 +283,8 @@ Trait ContextTrait
 	/**
 	 * Add list of all wordpress post, page and custom post
 	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters
-	 * @param string $title_meta
+	 * @param bool $title_meta
 	 * @return array
-	 *
 	 */
 	public function addSitemap($args=[], $title_meta=false)
 	{

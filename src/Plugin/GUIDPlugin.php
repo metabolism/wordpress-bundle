@@ -60,6 +60,9 @@ class GUIDPlugin {
 
 	/**
 	 * Update UUID
+	 * @param $post_ID
+	 * @param null $post
+	 * @param bool $update
 	 */
 	public function update($post_ID, $post = null, $update = false){
 

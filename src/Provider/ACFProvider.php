@@ -62,7 +62,7 @@ class ACFProvider {
 	/**
 	 * Customize basic toolbar
 	 * @param $toolbars
-	 * @return
+	 * @return array
 	 */
 	public function editToolbars($toolbars){
 

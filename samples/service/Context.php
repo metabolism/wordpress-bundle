@@ -37,10 +37,9 @@ class Context
 	/**
 	 * Remove generic entry
 	 *
-	 * @see Post
-	 * @internal param null $id
 	 * @param $key
-	 * @param $value
+	 * @internal param null $id
+	 * @see Post
 	 */
 	public function remove($key)
 	{
@@ -52,10 +51,12 @@ class Context
 	/**
 	 * Get entry using dot notation
 	 *
+	 * @param $key
+	 * @param bool $fallback
+	 * @param bool $strict
+	 * @return array|bool
 	 * @see Post
 	 * @internal param null $id
-	 * @param $key
-	 * @return array|bool
 	 */
 	public function get($key, $fallback=false, $strict=false)
 	{

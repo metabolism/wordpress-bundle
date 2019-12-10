@@ -10,6 +10,8 @@
     "ext-fileinfo" : "*",
     "ext-json" : "*",
     "ext-mbstring" : "*",
+    "ext-posix": "*",
+    "ext-zlib": "*",
     "metabolism/wordpress-core-installer": "1.0.*",
     "metabolism/package-actions": "1.1.*",
     "johnpbloch/wordpress-core": "5.*",

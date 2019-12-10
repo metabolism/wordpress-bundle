@@ -50,7 +50,7 @@ class Comment extends Entity
 
 
 	/**
-	 * @param array $comment_data {
+	 * @param array $data {
 	 *     Comment data.
 	 *
 	 *     @type string|int $comment_post_ID             The ID of the post that relates to the comment.

@@ -10,6 +10,11 @@ class Cache {
 
 	/**
 	 * Set cache, redundant with WP_Object_Cache::add
+	 * @param $key
+	 * @param $data
+	 * @param string $group
+	 * @param float|int $expire
+	 * @return bool
 	 */
 	public static function set($key, $data, $group='app', $expire=60*60*12){
 
@@ -22,6 +27,9 @@ class Cache {
 
 	/**
 	 * Get cache, redundant with WP_Object_Cache::add
+	 * @param $key
+	 * @param string $group
+	 * @return bool
 	 */
 	public static function get($key, $group='app'){
 
@@ -34,6 +42,9 @@ class Cache {
 
 	/**
 	 * Delete cache, redundant with WP_Object_Cache::add
+	 * @param $key
+	 * @param string $group
+	 * @return bool
 	 */
 	public static function delete($key, $group='app'){
 

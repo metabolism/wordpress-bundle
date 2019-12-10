@@ -71,9 +71,8 @@ class WPSEOProvider
 		}
 
 		$canonical = explode('?', $canonical);
-		$canonicalFormat = (substr($canonical[0], -1) == '/') ? substr($canonical[0], 0, -1) : $canonical[0];
 
-		return $canonicalFormat;
+		return (substr($canonical[0], -1) == '/') ? substr($canonical[0], 0, -1) : $canonical[0];
 	}
 
 

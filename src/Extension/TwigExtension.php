@@ -118,8 +118,7 @@ class TwigExtension extends AbstractExtension{
 
 
 	/**
-	 * @param object|int|string $term
-	 * @param string $taxonomy
+	 * @param $content
 	 * @return mixed
 	 */
 	public function more( $content )

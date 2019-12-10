@@ -193,6 +193,7 @@ class Post extends Entity
 	/**
 	 * Get post comments
 	 *
+	 * @param array $args
 	 * @return Comment[]|[]
 	 */
 	public function getComments($args=[]) {

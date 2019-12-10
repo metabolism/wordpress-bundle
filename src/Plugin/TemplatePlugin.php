@@ -22,11 +22,11 @@ namespace Metabolism\WordpressBundle\Plugin{
 			$templates = $this->config->get('template', []);
 
 			// Add a filter to the wp 4.7 version attributes metabox
-			foreach ($templates as $post_type=>$templates)
+			foreach ($templates as $post_type=>$template)
 			{
-				add_filter( 'theme_'.$post_type.'_templates', function($post_templates) use($templates){
+				add_filter( 'theme_'.$post_type.'_templates', function($post_templates) use($template){
 
-					return array_merge($post_templates, $templates);
+					return array_merge($post_templates, $template);
 				});
 			}
 		}

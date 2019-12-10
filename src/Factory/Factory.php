@@ -28,12 +28,12 @@ class Factory {
 	 * Retrieves the cache contents from the cache by key and group.
 	 * @param $id
 	 * @param string $type
-	 * @param bool $full
+	 * @param array $args
 	 * @return bool|mixed
 	 */
 	protected static function loadFromCache($id, $type='object', $args=[]){
 
-		if( $id == null )
+		if( $id == null || is_array($id) )
 			return false;
 
 		return wp_cache_get( $id.'_'.crc32(json_encode($args)), $type.'_factory' );
@@ -45,12 +45,12 @@ class Factory {
 	 * @param $id
 	 * @param $object
 	 * @param $type
-	 * @param bool $full
+	 * @param array $args
 	 * @return bool
 	 */
 	protected static function saveToCache($id, $object, $type, $args=[]){
 
-		if( $id == null )
+		if( $id == null || is_array($id) )
 			return false;
 
 		return wp_cache_set( $id.'_'.crc32(json_encode($args)), $object, $type.'_factory' );

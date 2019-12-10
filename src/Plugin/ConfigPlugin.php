@@ -19,6 +19,8 @@ class ConfigPlugin {
 
 	/**
 	 * Get plural from name
+	 * @param $name
+	 * @return string
 	 */
 	public function plural($name)
 	{
@@ -590,6 +592,9 @@ class ConfigPlugin {
 
 	/**
 	 * Update permalink if structure is custom
+	 * @param $post_link
+	 * @param $post
+	 * @return string|string[]
 	 */
 	public  function updatePostTypePermalink($post_link, $post){
 
@@ -619,6 +624,9 @@ class ConfigPlugin {
 
 	/**
 	 * Update permalink if structure is custom
+	 * @param $term_link
+	 * @param $term
+	 * @return string|string[]
 	 */
 	public  function updateTermPermalink($term_link, $term){
 
