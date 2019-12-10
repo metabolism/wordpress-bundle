@@ -5,7 +5,7 @@
   "description": "Use Wordpress 5 as a backend for a Symfony 4 application",
   "license": "GPL-3.0-or-later",
   "require": {
-    "php" : ">=7.1.0",
+    "php" : ">=5.6.1",
     "ext-zip" : "*",
     "ext-fileinfo" : "*",
     "ext-json" : "*",

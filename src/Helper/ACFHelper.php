@@ -286,9 +286,7 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id' || is_int($object['value']) )
-						$objects[$object['name']] = $this->load('image', $object['value'], $object);
-					elseif ($object['return_format'] == 'array')
+					if ($object['return_format'] == 'array')
 						$objects[$object['name']] = $this->load('image', $object['value']['id'], $object);
 					else
 						$objects[$object['name']] = $object['value'];
@@ -308,9 +306,7 @@ class ACF
 
 							foreach ($object['value'] as $value){
 
-								if ($object['return_format'] == 'id' || is_int($value) )
-									$objects[$object['name']][] = $this->load('image', $value, $object);
-								elseif ($object['return_format'] == 'array')
+								if ($object['return_format'] == 'array')
 									$objects[$object['name']][] = $this->load('image', $value['id'], $object);
 								else
 									$objects[$object['name']][] = $value;
@@ -325,11 +321,7 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id'){
-
-						$objects[$object['name']] = $this->load('file', $object['value']);
-					}
-					else {
+					if ($object['return_format'] == 'array'){
 
 						$object_value = $object['value'];
 						$remove = ['id', 'link', 'name', 'status', 'uploaded_to', 'menu_order', 'icon', 'author'];
@@ -340,6 +332,10 @@ class ACF
 						}
 
 						$objects[$object['name']] = $object_value;
+					}
+					else{
+
+						$objects[$object['name']] = $object['value'];
 					}
 
 					break;
