@@ -123,6 +123,22 @@ class ACFProvider {
 
 
 	/**
+	 * Add entity return format
+	 * @param $sizes
+	 * @return array
+	 */
+	public function validateField($field){
+
+        if( $field['name'] == 'return_format'){
+            $field['choices']['entity'] = __('Entity');
+            $field['default_value'] = 'entity';
+        }
+
+		return $field;
+	}
+
+
+	/**
 	 * Change query to replace template by term slug
 	 * @param $args
 	 * @param $field
@@ -176,6 +192,9 @@ class ACFProvider {
 		add_filter('acf/prepare_field', [$this, 'addTaxonomyTemplates']);
 		add_filter('acf/fields/relationship/query/name=items', [$this, 'filterPostsByTermTemplateMeta'], 10, 3);
 		add_filter('acf/get_image_sizes', [$this, 'getImageSizes'] );
+
+		if( $this->config->get('acf.settings.use_entity') )
+            add_filter('acf/validate_field', [$this, 'validateField']);
 
 		// When viewing admin
 		if( is_admin() )

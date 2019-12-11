@@ -3,6 +3,7 @@ CHANGELOG
 
 ## 1.4.0
 #### Added
+- new entity acf return format to reduce query
 - new mail plugin to send emails from custom SMTP set in .env ( merge request from @undefinedfr )
 - more samples
 - use RFC 4122 compliant UUID version 5 to generate post guid
