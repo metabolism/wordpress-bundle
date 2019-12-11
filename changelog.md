@@ -21,6 +21,7 @@ CHANGELOG
 - `login_url`, `search_form`, `dynamic_sidebar`, `comment_form`, `is_active_sidebar`, `_e`, `_x`, `_n`, `__`, `wp_head`, `wp_footer` twig functions
 #### Fixed
 - project is now a symfony-bundle declared as is in composer.json
+- Thumbnail usage in post column
 - double `/web` replacement on windows os
 - menu depth
 - compat-item css

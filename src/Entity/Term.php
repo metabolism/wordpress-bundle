@@ -110,9 +110,8 @@ class Term extends Entity
 				$object = get_field_object('thumbnail', $term->taxonomy.'_'.$term->ID);
 
 				if( $object['value'] ){
-
 					if( $object['return_format'] == 'array')
-						$term->thumbnail = Factory::create( is_array($object['value'])?$object['value']['id']:$object['value'], 'image', false, $object);
+						$term->thumbnail = Factory::create( $object['value']['id'], 'image', false, $object);
 					else
 						$term->thumbnail = $object['value'];
 				}

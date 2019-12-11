@@ -136,12 +136,19 @@ class ConfigPlugin {
 				{
 					if( isset($args['columns']) )
 					{
+                        $columns_arr = [];
+                        foreach ( $args['columns'] as $id=>$column ){
+
+                            if( is_int($id) )
+                                $columns_arr[$column] = ucfirst(str_replace('_', ' ', $column));
+                            else
+                                $columns_arr[$id] = $column;
+                        }
+                        $args['columns'] = $columns_arr;
+
 						add_filter ( 'manage_'.$post_type.'_posts_columns', function ( $columns ) use ( $args )
 						{
-							foreach ( $args['columns'] as &$column )
-								$column = ucfirst(str_replace('_', ' ', $column));
-
-							$columns = array_merge ( $columns, $args['columns'] );
+							$columns = array_merge ( $columns, $args['columns']);
 
 							if( isset($columns['date']) ){
 								$date = $columns['date'];
@@ -156,10 +163,11 @@ class ConfigPlugin {
 						{
 							if( isset($args['columns'][$column]) )
 							{
-								if( $args['columns'][$column] == 'thumbnail'){
+								if( $column == 'thumbnail'){
 
 									if( in_array('thumbnail', $args['supports']) ){
-										echo '<a class="attachment-thumbnail-container">'.get_the_post_thumbnail($post_id, 'thumbnail').get_the_post_thumbnail($post_id, 'thumbnail').'</a>';
+									    $thumbnail = get_the_post_thumbnail($post_id, 'thumbnail');
+										echo '<a class="attachment-thumbnail-container">'.$thumbnail.$thumbnail.'</a>';
 									}
 									else{
 
