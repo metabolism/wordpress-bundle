@@ -105,6 +105,7 @@ class Post extends Entity
 				$post->thumbnail = Factory::create($post->thumbnail, 'image');
 
 			$post->slug = $post->post_name;
+			$post->post_content = wpautop($post->post_content);
 			$post->post_excerpt = get_the_excerpt($post);
 		}
 

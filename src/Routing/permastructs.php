@@ -206,7 +206,7 @@ $collection = new RouteCollection();
 if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
     return $collection;
 
-$controller_name = $_config->get('extra_permastructs.controller', 'MainController');
+$controller_name = $_config->get('extra_permastructs.controller', 'BlogController');
 
 if( $_config->get('multisite') && !$_config->get('multisite.subdomain_install') )
 {

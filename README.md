@@ -356,7 +356,7 @@ To preview/debug context, just add `?debug=context` to any url, it will output a
 ### Post
 
 ```php
-//MainController.php
+//BlogController.php
 
 public function articleAction(Context $context)
 {
