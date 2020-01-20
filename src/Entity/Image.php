@@ -95,6 +95,12 @@ class Image extends Entity
 			if( !$post || is_wp_error($post) )
 				return false;
 
+            $mime_type = get_post_mime_type($id);
+            if(($mime_type == 'image/svg' || $mime_type == 'image/svg+xml') && empty($metadata))
+            {
+                $metadata = ['file' => get_post_meta($id, '_wp_attached_file', true), 'image_meta' =>  []];
+            }
+
 			if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
 				return false;
 
