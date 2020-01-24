@@ -44,8 +44,7 @@
           "samples/.htaccess": "web/.htaccess",
           "samples/config/wordpress.yml": "config/wordpress.yml",
           "samples/service/Context.php": "src/Service/Context.php",
-          "samples/controller/BlogController.php": "src/Controller/BlogController.php",
-          "samples/template/generic.html.twig": "templates/generic.html.twig"
+          "samples/controller/BlogController.php": "src/Controller/BlogController.php"
         }
       },
       "symlink": {

@@ -135,6 +135,14 @@ class Image extends Entity
 			if( !$post || is_wp_error($post) )
 				return false;
 
+			if( empty($metadata) ){
+
+				$mime_type = get_post_mime_type($id);
+
+				if($mime_type == 'image/svg' || $mime_type == 'image/svg+xml' )
+					$metadata = ['file' => get_post_meta($id, '_wp_attached_file', true), 'image_meta' =>  []];
+			}
+
 			if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
 				return false;
 
@@ -361,8 +369,8 @@ class Image extends Entity
 		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
 			$this->focus_point = false;
 
-		//return if image is svg
-		if( $this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' )
+		//return if image is svg or gif
+		if( $this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' )
 			return $this->src;
 
 		// get src ext
@@ -573,7 +581,7 @@ class Image extends Entity
 
 		$html = '<picture>';
 
-		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' ){
+		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' ){
 
 			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'">';
 		}

@@ -25,6 +25,8 @@ CHANGELOG
 - Thumbnail usage in post column
 - double `/web` replacement on windows os
 - menu depth
+- svg support in image entity ( merge request from @undefinedfr )
+- GIF issue
 - compat-item css
 - template_redirect action management
 - frontpage pagination in router

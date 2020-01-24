@@ -593,7 +593,7 @@ class MediaPlugin {
 	 */
 	public function uploadResize( $image_data )
 	{
-		$valid_types = array('image/gif','image/png','image/jpeg','image/jpg');
+		$valid_types = array('image/png','image/jpeg','image/jpg');
 
 		if(in_array($image_data['type'], $valid_types) && $this->config->get('image.resize') ){
 
