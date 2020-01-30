@@ -13,12 +13,16 @@ class TaxonomyFactory {
 	 */
 	public static function create($id=null, $taxonomy_name = false, $args = []){
 
-		if( is_array($id) ) {
+		if( is_null($id) || empty($id) ){
+
+			return false;
+		}
+		elseif( is_array($id) ) {
 
 			if( isset($id['term_id']) )
 				$id = $id['term_id'];
 			else
-				return new \WP_Error('taxonomy_factory_invalid_term_array', 'The array must contain a term_id');
+				return false;
 
 			if(  isset($id['taxonomy']))
 				$taxonomy_name = $id['taxonomy'];
@@ -32,7 +36,8 @@ class TaxonomyFactory {
 				$taxonomy_name = $term->taxonomy;
 			}
 			else{
-				return new \WP_Error('taxonomy_factory_invalid_term_object', 'The object is not an instance of WP_Term');
+
+				return false;
 			}
 		}
 		elseif( is_string($id) ) {
@@ -40,7 +45,7 @@ class TaxonomyFactory {
 			$id = intval($id);
 
 			if( !$id )
-				return new \WP_Error('taxonomy_factory_invalid_term_id', 'The id is not valid');
+				return false;
 		}
 
 		if( !$taxonomy_name )
@@ -51,7 +56,7 @@ class TaxonomyFactory {
 		}
 
 		if( !$taxonomy_name )
-			return new \WP_Error('taxonomy_factory_invalid_taxonomy_name', 'Unable to get taxonomy name');
+			return false;
 
 		return Factory::create($id, $taxonomy_name, 'term', $args);
 	}

@@ -13,12 +13,16 @@ class PostFactory {
 	 */
 	public static function create($id=null, $post_type = false, $args = []){
 
-		if( is_array($id) ) {
+		if( is_null($id) || empty($id) ){
+
+			return false;
+		}
+		elseif( is_array($id) ) {
 
 			if( isset($id['ID']) )
 				$id = $id['ID'];
 			else
-				return new \WP_Error('post_factory_invalid_post_array', 'The array must contain an ID');
+				return false;
 
 			if(  isset($id['post_type']))
 				$post_type = $id['post_type'];
@@ -32,7 +36,8 @@ class PostFactory {
 				$post_type = $post->post_type;
 			}
 			else{
-				return new \WP_Error('post_factory_invalid_post_object', 'The object is not an instance of WP_Post');
+
+				return false;
 			}
 		}
 		elseif( is_string($id) ) {
@@ -40,14 +45,14 @@ class PostFactory {
 			$id = intval($id);
 
 			if( !$id )
-				return new \WP_Error('post_factory_invalid_post_id', 'The id is not valid');
+				return false;
 		}
 
 		if( !$post_type )
 			$post_type = get_post_type($id);
 
 		if( !$post_type )
-			return new \WP_Error('post_factory_invalid_post_type', 'Unable to get post type');
+			return false;
 
 		$post_status = get_post_status( $id );
 

@@ -67,6 +67,9 @@ class Factory {
 	 */
 	public static function create($id, $class, $default_class=false, $args = []){
 
+		if( is_null($id) || empty($id) )
+			return false;
+
 		$item = self::loadFromCache($id, $class, $args);
 
 		if( $item )
@@ -93,7 +96,7 @@ class Factory {
 			}
 		}
 
-		if( !$item->exist() )
+		if( is_wp_error($item) || !$item->exist() )
 			$item = false;
 
 		if( !$item || $item->loaded() )
