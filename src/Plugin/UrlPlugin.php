@@ -109,7 +109,7 @@ class UrlPlugin {
 
 	    global $wp_rewrite;
 
-	    $s = sanitize_title($s);
+	    $s = urlencode($s);
         return $wp_rewrite->search_base.'/'.$s;
 	}
 
