@@ -3,11 +3,14 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 use Dflydev\DotAccessData\Data;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class EditorPlugin {
+
+	use SingletonTrait;
 
 	private $config;
 
@@ -15,7 +18,7 @@ class EditorPlugin {
 	/**
 	 * Configure Tiny MCE first line buttons
 	 * @param $mce_buttons
-	 * @return
+	 * @return array
 	 */
 	public function TinyMceButtons( $mce_buttons )
 	{
@@ -48,9 +51,11 @@ class EditorPlugin {
 
 		$wp_admin_bar->remove_node('themes');
 		$wp_admin_bar->remove_node('updates');
-		$wp_admin_bar->remove_node('comments');
-		$wp_admin_bar->remove_node('wp-logo');
-	}
+        $wp_admin_bar->remove_node('wp-logo');
+
+        if( in_array('edit-comments.php', $this->config->get('remove_menu_page', [])) )
+            $wp_admin_bar->remove_node('comments');
+    }
 
 	/**
 	 * Filter admin menu entries
@@ -69,7 +74,7 @@ class EditorPlugin {
 			remove_submenu_page($menu, $submenu);
 		}
 
-		if( !WP_FRONT ){
+		if( HEADLESS && !URL_MAPPING ){
 
 			remove_submenu_page('options-general.php', 'options-reading.php');
 			remove_submenu_page('options-general.php', 'options-permalink.php');
@@ -137,7 +142,7 @@ class EditorPlugin {
 	}
 
 	/**
-	 * Allow editor to edit theme
+	 * Update editor role
 	 */
 	public function adminInit()
 	{
@@ -145,6 +150,8 @@ class EditorPlugin {
 
 		if( !$role_object->has_cap('edit_theme_options') )
 			$role_object->add_cap( 'edit_theme_options' );
+
+		$role_object->remove_cap('manage_options');
 	}
 
 
@@ -175,7 +182,7 @@ class EditorPlugin {
 				foreach($data->allcaps as $cap=>$value)
 					$caps[] = $value ? $cap : 'no-'.$cap;
 
-				return implode(' ', $caps).$classes;
+				return implode(' ', $caps).$classes.(HEADLESS?' headless':'').(URL_MAPPING?' url-mapping':'');
 			});
 		}
 

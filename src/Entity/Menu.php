@@ -68,7 +68,10 @@ class Menu extends Entity
 
 		_wp_menu_item_classes_by_context($menu_items);
 
-		$this->items = $this->orderItems($menu_items);
+		foreach ($menu_items as $item)
+			$this->items[] = new $this->menuItemClass($item, $this->args);
+
+		$this->items = $this->addDepth();
 
 		$menu_info = wp_get_nav_menu_object($menu_id);
 
@@ -82,28 +85,25 @@ class Menu extends Entity
 
 
 	/**
-	 * @param $menu_items
+	 * @param int $parent_id
 	 * @return array
 	 */
-	protected function orderItems($menu_items)
+	protected function addDepth($parent_id=0)
 	{
-		$ordered_menu = [];
+		$branch = [];
 
-		foreach ($menu_items as $item){
-
-			$ordered_menu[$item->ID] = new $this->menuItemClass($item, $this->args);
-		}
-
-		foreach ($ordered_menu as $item)
+		foreach ($this->items as $item)
 		{
-			if( $item->menu_item_parent != 0 )
+			if( $item->menu_item_parent == $parent_id )
 			{
-				$ordered_menu[$item->menu_item_parent]->children[] = $item;
-				unset($ordered_menu[$item->ID]);
+				if( $children = $this->addDepth($item->ID))
+					$item->children = $children;
+
+				$branch[] = $item;
 			}
 		}
 
-		return array_values($ordered_menu);
+		return $branch;
 	}
 
 

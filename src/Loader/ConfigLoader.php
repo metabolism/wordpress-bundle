@@ -27,14 +27,18 @@ class ConfigLoader {
 
 		if (!defined('BASE_URI'))
 		{
-			// unix
 			$base_uri = dirname( __DIR__ );
-			$base_uri = preg_replace( "/\/web$/", '', $base_uri );
-			$base_uri = preg_replace( "/\/vendor\/metabolism\/wordpress-bundle\/src$/", '', $base_uri );
 
+			if( '\\' === \DIRECTORY_SEPARATOR ){
 			// windows
 			$base_uri = preg_replace( "/\\web$/", '', $base_uri );
 			$base_uri = preg_replace( "/\\\\vendor\\\\metabolism\\\\wordpress-bundle\\\\src$/", '', $base_uri );
+			}
+			else{
+				// unix
+				$base_uri = preg_replace( "/\/web$/", '', $base_uri );
+				$base_uri = preg_replace( "/\/vendor\/metabolism\/wordpress-bundle\/src$/", '', $base_uri );
+			}
 
 			define( 'BASE_URI', $base_uri);
 		}
@@ -56,9 +60,9 @@ class ConfigLoader {
 		$_config = new Data($config);
 
 		/**
-		 * Set debug default
+		 * Set env default
 		 */
-		$env = $_SERVER['APP_ENV'] ?? 'dev';
+		$env = isset($_SERVER['APP_ENV'])?$_SERVER['APP_ENV']:'dev';
 
 
 		/**
@@ -67,7 +71,6 @@ class ConfigLoader {
 		foreach ($_config->get('define', []) as $constant=>$value)
 			define( strtoupper($constant), $value);
 
-
 		/**
 		 * Define basic environment
 		 */
@@ -75,8 +78,8 @@ class ConfigLoader {
 		define( 'WP_DEBUG', $env === 'dev');
 		define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
 
-		$support = $_config->get('support', []);
-		define( 'WP_FRONT', in_array('templates', $support)||in_array('template', $support) );
+		define( 'HEADLESS', $_config->get('headless') );
+		define( 'URL_MAPPING', $_config->get('headless.mapping')?getenv('MAPPED_URL'):false );
 
 		/**
 		 * Enable multisite
@@ -116,8 +119,10 @@ class ConfigLoader {
 
 		define( 'WP_SITEURL', WP_HOME.WP_FOLDER);
 
-		define( 'COOKIE_DOMAIN', $_SERVER[ 'HTTP_HOST' ] );
-
+        if(filter_var($_SERVER['SERVER_NAME'], FILTER_VALIDATE_IP) !== false)
+            define('COOKIE_DOMAIN', '' );
+        else
+            define( 'COOKIE_DOMAIN', $_SERVER[ 'HTTP_HOST' ] );
 
 		/**
 		 * Define DB settings
@@ -167,8 +172,12 @@ class ConfigLoader {
 		/**
 		 * Custom Content Directory
 		 */
+
+		if (!defined('PUBLIC_DIR'))
+			define( 'PUBLIC_DIR', '/web');
+
 		if (!defined('WP_CONTENT_DIR'))
-			define( 'WP_CONTENT_DIR', BASE_URI . '/web/wp-bundle');
+			define( 'WP_CONTENT_DIR', BASE_URI . PUBLIC_DIR . '/wp-bundle');
 
 		if (!defined('UPLOADS'))
 			define( 'UPLOADS', '../uploads');
@@ -183,7 +192,7 @@ class ConfigLoader {
 		if (!defined('WP_CONTENT_URL'))
 			define( 'WP_CONTENT_URL', WP_HOME.'/wp-bundle' );
 
-		define('WP_UPLOADS_DIR', WP_CONTENT_DIR.'/'.UPLOADS);
+		define('WP_UPLOADS_DIR', realpath(WP_CONTENT_DIR.'/'.UPLOADS));
 
 		/**
 		 * Custom Settings
@@ -205,6 +214,6 @@ class ConfigLoader {
 			define( 'WP_USE_THEMES', false);
 
 		if (!defined('ABSPATH'))
-			define( 'ABSPATH', BASE_URI.'/web'.WP_FOLDER .'/');
+			define( 'ABSPATH', BASE_URI . PUBLIC_DIR . WP_FOLDER .'/');
 	}
 }

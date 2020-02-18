@@ -24,12 +24,9 @@ class FrontController {
 	{
 		$path = rtrim($_SERVER['REQUEST_URI'], '/');
 
-		if( !empty($path) && ($path == WP_FOLDER || $path == '/web'.WP_FOLDER) ){
+		if( !empty($path) && strpos($path, WP_FOLDER) !== false ){
 
 			wp_redirect(is_user_logged_in() ? admin_url() : wp_login_url());
-
-			echo "redirect...";
-
 			exit;
 		}
 	}
@@ -55,7 +52,7 @@ class FrontController {
 
 		$object = $wp_query->get_queried_object();
 
-		if ( $query->is_archive )
+		if ( $query->is_archive && is_object($object) )
 		{
 			if( get_class($object) == 'WP_Post_Type' ){
 
@@ -107,11 +104,7 @@ class FrontController {
 	private function loadConfig()
 	{
 		global $_config;
-
 		$this->config = $_config;
-
-		self::$domain_name      = $this->config->get('domain_name', 'app');
-		self::$languages_folder = WP_CONTENT_DIR . '/languages';
 	}
 
 

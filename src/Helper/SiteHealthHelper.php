@@ -25,9 +25,9 @@ class SiteHealth {
 	public function __construct(){
 
 		$this->base_url = get_home_url();
-		$this->output   = $_REQUEST['output']??false;
-		$this->full     = $_REQUEST['full']??false;
-		$this->password = $_SERVER['APP_PASSWORD']??false;
+		$this->output   = isset($_REQUEST['output'])?$_REQUEST['output']:false;
+		$this->full     = isset($_REQUEST['full'])?$_REQUEST['full']:false;
+		$this->password = isset($_SERVER['APP_PASSWORD'])?$_SERVER['APP_PASSWORD']:false;
 
 		$this->status['title']    = get_bloginfo('name');
 		$this->status['language'] = get_bloginfo('language');

@@ -19,7 +19,6 @@ class User extends Entity
 	public $status;
 	public $display_name;
 
-	private $pass;
 	private $_user = null;
 
 	/**
@@ -34,10 +33,14 @@ class User extends Entity
 
 			$this->import($user->data, false, 'user_');
 
+			$this->ID = $id;
+			$this->link = get_author_posts_url($id);
+
 			if( !isset($args['depth']) || $args['depth'] )
 				$this->addCustomFields('user_'.$id);
 		}
 	}
+
 
 	/**
 	 * Get user
@@ -58,4 +61,16 @@ class User extends Entity
 		return $user;
 	}
 
+
+    /**
+     * Get avatar url
+     *
+     * @param array $args
+     * @return string
+     */
+	public function getAvatar($args = []){
+
+        $args = get_avatar_data( $this->ID, $args );
+        return $args['url'];
+    }
 }

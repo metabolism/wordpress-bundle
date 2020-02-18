@@ -1,6 +1,51 @@
 CHANGELOG
 ---------
 
+## 1.4.0
+#### Added
+- new entity acf return format to reduce query
+- new mail plugin to send emails from custom SMTP set in .env ( merge request from @undefinedfr )
+- more samples
+- use RFC 4122 compliant UUID version 5 to generate post guid
+- bloginfo in context
+- search url redirect when using ?s=
+- sidebar management
+- translations management
+- editor style
+- inherit option for role management
+- caption and description in image entity
+- sticky and class in post entity
+- link and getAvatar in user entity
+- `ADMIN_IP_WHITELIST` environment variable to prevent backend access
+- headless options in wordpress.yml
+- `MAPPED_URL` environment variable to support headless
+- `login_url`, `search_form`, `dynamic_sidebar`, `comment_form`, `is_active_sidebar`, `_e`, `_x`, `_n`, `__`, `wp_head`, `wp_footer` twig functions
+#### Fixed
+- project is now a symfony-bundle declared as is in composer.json
+- Thumbnail usage in post column
+- double `/web` replacement on windows os
+- menu depth
+- svg support in image entity ( merge request from @undefinedfr )
+- GIF issue
+- compat-item css
+- template_redirect action management
+- frontpage pagination in router
+- bundle support when loaded from php server
+- less agressive search term sanitize
+- invalid url when using switch_to_blog
+- incorrect processing of gallery in ACFHelper ( merge request from @undefinedfr )
+#### Removed
+- `classes` in entity
+#### Changed
+- downgraded PHP version requirement to 5.6.1 to make it comptible with SF3
+#### Breaking changes
+- page_title renammed as wp_title
+- return format in ACF is now used, id will return id, array/object will return entity
+- wp_footer and wp_head is no longer available in context as system.head/footer but now as a twig function `{{ wp_head() }}`
+- wordpress.yml : post-formats is now integrated in support
+- Flexible content no longer skip parent when there is only one child
+- moved addComments from context -> getComments in post entity
+
 ## 1.3.12
 #### Fixed
 - Handle sizes on images

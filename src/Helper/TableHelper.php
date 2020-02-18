@@ -14,7 +14,7 @@ class Table extends \WP_List_Table {
 	 * @param $table
 	 * @param $args
 	 */
-	function __construct($table, $args)
+	function __construct($table, $args=[])
 	{
 		if( isset($args['columns'], $args['columns']['email']) )
 		{

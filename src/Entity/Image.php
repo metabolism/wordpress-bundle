@@ -19,6 +19,7 @@ class Image extends Entity
 	public $meta;
 	public $alt;
 	public $mime_type;
+	public $extension;
 	public $width;
 	public $height;
 	public $date;
@@ -26,6 +27,8 @@ class Image extends Entity
 	public $modified;
 	public $modified_gmt;
 	public $title;
+	public $caption;
+	public $description;
 	public $sizes = [];
 
 	private $compression = 90;
@@ -55,7 +58,44 @@ class Image extends Entity
 		elseif( $data = $this->get($id) ){
 
 			$this->import($data, false, 'post_');
+
+			if( isset($this->args['sizes']) && !empty($this->args['sizes']) && $this->mime_type != 'image/svg+xml' && $this->mime_type != 'image/svg' )
+				$this->generateSizes($this->args['sizes'], isset($this->args['scaled_down'])?$this->args['scaled_down']:false);
 		}
+	}
+
+
+	/**
+	 * Generate image sizes from args
+	 * ex for sizes: large:1920x1080.webp, small:150x150.jpg, medium:800x600
+	 *
+	 * @param string $sizes
+	 * @param bool $scaled_down
+	 */
+	private function generateSizes($sizes, $scaled_down=false)
+	{
+		$sizes = explode(',', trim(str_replace(' ', '', $sizes)));
+
+		foreach ($sizes as $size)
+		{
+			$size = explode(':', $size);
+			if( count($size) <= 1 ) continue;
+
+			$name = $size[0];
+			$spec = explode('.', $size[1]);
+
+			$width_height = explode('x', $spec[0]);
+			$extension = count($spec)>1?$spec[1]:null;
+
+			if( $extension != 'webp' && function_exists('imagewebp') )
+				$this->resize($width_height[0], count($width_height)>1?$width_height[1]:0, 'webp', ['name'=>$name]);
+
+			if( $scaled_down )
+				$this->resize($width_height[0], count($width_height)>1?$width_height[1]:0, $extension, ['name'=>$name, 'blur'=>5, 'gcd'=>1]);
+
+			$this->resize($width_height[0], count($width_height)>1?$width_height[1]:0, $extension, ['name'=>$name]);
+		}
+
 	}
 
 
@@ -94,6 +134,14 @@ class Image extends Entity
 
 			if( !$post || is_wp_error($post) )
 				return false;
+
+			if( empty($metadata) ){
+
+				$mime_type = get_post_mime_type($id);
+
+				if($mime_type == 'image/svg' || $mime_type == 'image/svg+xml' )
+					$metadata = ['file' => get_post_meta($id, '_wp_attached_file', true), 'image_meta' =>  []];
+			}
 
 			if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
 				return false;
@@ -139,6 +187,9 @@ class Image extends Entity
 			}
 
 			$post['mime_type'] = mime_content_type($metadata['src']);
+			$post['extension'] = pathinfo($metadata['src'], PATHINFO_EXTENSION);
+			$post['caption'] = $post['post_excerpt'];
+			$post['description'] = $post['post_content'];
 
 			unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
 
@@ -150,13 +201,7 @@ class Image extends Entity
 			else
 				$metadata['meta'] = false;
 
-			unset($metadata['image_meta']);
-
-			if( isset($metadata['sizes'], $metadata['sizes']['thumbnail']) ){
-
-			    $path = pathinfo($metadata['file'], PATHINFO_DIRNAME );
-                $metadata['sizes']['thumbnail'] = $path.'/'.$metadata['sizes']['thumbnail']['file'];
-            }
+			unset($metadata['image_meta'], $metadata['sizes']);
 		}
 		elseif( is_string($id) ){
 
@@ -171,9 +216,9 @@ class Image extends Entity
 
 			$metadata = [
 				'src' => $filename,
-				'file' => str_replace('/web', '', $id),
-				'width' => $image_size[0]??false,
-				'height' => $image_size[1]??false,
+				'file' => str_replace(PUBLIC_DIR, '', $id),
+				'width' => count($image_size)?$image_size[0]:false,
+				'height' => count($image_size)>1?$image_size[1]:false,
 				'mime_type' => $image_size['mime'],
 				'post_title' => str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME)),
 				'post_date' => filemtime($filename),
@@ -214,15 +259,36 @@ class Image extends Entity
 	 * @param $w
 	 * @param int $h
 	 * @param null $ext
-	 * @param bool $params
+	 * @param array $params
 	 * @return mixed
 	 */
-	public function resize($w, $h = 0, $ext=null, $params=false){
+	public function resize($w, $h = 0, $ext=null, $params=[]){
 
-		$image = $this->edit(['resize'=>[$w, $h]], $ext);
+		$name = is_array($params) && isset($params['name']) ? $params['name'] : false;
 
-		if( is_array($params) && isset($params['name']) )
-			$this->sizes[$params['name']] = $image;
+		$params = array_merge(['resize'=>[$w, $h]], $params);
+		unset($params['name']);
+
+		$image = $this->edit($params, $ext);
+
+		if( is_null($ext) )
+			$ext = pathinfo($image, PATHINFO_EXTENSION);
+
+		if( $name ){
+
+			unset($params['resize']);
+
+			$src = BASE_URI.PUBLIC_DIR.$image;
+			$image_info = file_exists($src)?getimagesize($src):[0,0, 'mime'=>''];
+
+			$this->sizes[$name][] = array_merge([
+				'file'=>$image,
+				'extension'=>$ext,
+				'mime-type'=>$image_info['mime'],
+				'width'=>$image_info[0],
+				'height'=>$image_info[1]
+			], $params);
+		}
 
 		return $image;
 	}
@@ -240,10 +306,7 @@ class Image extends Entity
 		$file = $this->process($params, $ext);
 
 		$url = str_replace($abspath, $this->uploadDir('relative'), $file);
-		$url = str_replace(BASE_URI.'/web', '', $url);
-
-		if( is_array($params) && isset($params['name']) )
-			$this->sizes[$params['name']] = $url;
+		$url = str_replace(BASE_URI.PUBLIC_DIR, '', $url);
 
 		return $url;
 	}
@@ -266,7 +329,7 @@ class Image extends Entity
 
 			$params['resize'] = (array)$params['resize'];
 			$w = $params['resize'][0];
-			$h = $params['resize'][1]??0;
+			$h = count($params['resize'])>1?$params['resize'][1]:0;
 		}
 		else{
 
@@ -280,6 +343,24 @@ class Image extends Entity
 			}
 		}
 
+
+		if( isset($params['gcd']) ){
+
+			if( ($w == 0 || $h == 0) && file_exists($this->src) && $image_size = getimagesize($this->src) ){
+
+				$ratio = $image_size[0]/$image_size[1];
+
+				if( $w == 0 )
+					$w = round($h*$ratio);
+				else
+					$h = round($w/$ratio);
+			}
+
+			$w = round($w/10);
+			$h = round($h/10);
+		}
+
+
 		//return placeholder if image is empty
 		if( empty($this->src) || !file_exists($this->src) )
 			return $this->placeholder($w, $h);
@@ -288,8 +369,8 @@ class Image extends Entity
 		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
 			$this->focus_point = false;
 
-		//return if image is svg
-		if( $this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' )
+		//return if image is svg or gif
+		if( $this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' )
 			return $this->src;
 
 		// get src ext
@@ -341,6 +422,8 @@ class Image extends Entity
 
 			foreach ($params as $type=>$param){
 
+				$param = (array)$param;
+
 				switch ($type){
 
 					case 'resize':
@@ -348,7 +431,7 @@ class Image extends Entity
 						break;
 
 					case 'insert':
-						$image->insert(BASE_URI.$param[0], $param[1]??'top-left', $param[2]??0, $param[3]??0);
+						$image->insert(BASE_URI.$param[0], count($param)>1?$param[1]:'top-left', count($param)>2?$param[2]:0, count($param)>3?$param[3]:0);
 						break;
 
 					case 'colorize':
@@ -356,11 +439,11 @@ class Image extends Entity
 						break;
 
 					case 'blur':
-						$image->blur($param[0]??1);
+						$image->blur(count($param)?$param[0]:1);
 						break;
 
 					case 'flip':
-						$image->flip($param[0]??'v');
+						$image->flip(count($param)?$param[0]:'v');
 						break;
 
 					case 'brightness':
@@ -372,7 +455,7 @@ class Image extends Entity
 						break;
 
 					case 'mask':
-						$image->mask(BASE_URI.$param[0], $param[1]??false);
+						$image->mask(BASE_URI.$param[0], count($param)>1?$param[1]:false);
 						break;
 
 					case 'gamma':
@@ -384,9 +467,9 @@ class Image extends Entity
 						break;
 
 					case 'text':
-						$image->text($param[0], $param[1]??0, $param[2]??0, function($font) use($param) {
+						$image->text($param[0], count($param)>1?$param[1]:0, count($param)>2?$param[2]:0, function($font) use($param) {
 
-							$params = $param[3]??[];
+							$params = count($param)>3?$param[3]:[];
 
 							if( isset($params['file']) )
 								$font->file(BASE_URI.$params['file']);
@@ -440,7 +523,7 @@ class Image extends Entity
 						break;
 
 					case 'limitColors':
-						$image->limitColors($param[0], $param[1]??null);
+						$image->limitColors($param[0], count($param)>1?$param[1]:null);
 						break;
 				}
 			}
@@ -483,7 +566,7 @@ class Image extends Entity
 			if( $sources && is_array($sources) ){
 
 				foreach ($sources as $media=>$size)
-					$html .='	<source media="('.$media.')"  srcset="'.$this->placeholder($size[0], $size[1] ?? 0).'">';
+					$html .='	<source media="('.$media.')"  srcset="'.$this->placeholder($size[0], count($size)>1?$size[1]:0).'">';
 			}
 
 			$html .='	<source srcset="'.$this->placeholder($w, $h).'">';
@@ -498,7 +581,7 @@ class Image extends Entity
 
 		$html = '<picture>';
 
-		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' ){
+		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' ){
 
 			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'">';
 		}
@@ -528,9 +611,9 @@ class Image extends Entity
 
 
 	/**
+	 * @param $image
 	 * @param $w
 	 * @param int $h
-	 * @param null $ext
 	 * @return void
 	 */
 	protected function crop(&$image, $w, $h=0){

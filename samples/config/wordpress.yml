@@ -83,18 +83,26 @@ mce_buttons:
   - wp_adv
   - dfw
 
+#editor_style: backoffice.css
+
 ##################
 ##    System    ##
 ##################
 
 ## Add theme support
 support:
-  - template #uncomment for api only backoffice
   - thumbnail #add thumbnails to page
   - page #enable page
-#  - post #enable post
-#  - tag #enable tag taxonomy for post
-#  - category #enable category taxonomy for post
+  - post #enable post
+  - tag #enable tag taxonomy for post
+  - category #enable category taxonomy for post
+ #- post-formats: # https://wordpress.org/support/article/post-formats/#supported-formats
+  #  - video
+  #  - gallery
+
+## Use Wordpress as a headless cms
+#headless:
+#  mapping: true
 
 ## Allow multisite installation
 install-multisite: true
@@ -116,6 +124,7 @@ install-multisite: true
 
 acf:
   settings:
+    use_entity: true #add new optimised return format
     autoload: true #autoload options
     google_api_key: XXXYYYZZZ #https://developers.google.com/maps/documentation/javascript/get-api-key
   options_page: #add option pages https://www.advancedcustomfields.com/resources/options-page/
@@ -184,6 +193,19 @@ menu:
   footer: Footer
   header: Header
 
+
+###################
+##    Sidebar    ##
+###################
+
+sidebar: # https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
+  footer:
+    name : Footer
+    description : 'Add widgets here to appear in your footer.'
+    before_widget : '<section id="%1$s" class="widget %2$s">'
+    after_widget : '</section>'
+    before_title : '<h2 class="widget-title">'
+    after_title : '</h2>'
 
 ##########################
 ##    New post types    ##
@@ -276,12 +298,6 @@ taxonomy: # https://codex.wordpress.org/Function_Reference/register_taxonomy
 #page_states:
   #archive_guide: 'Archive des guides'
 
-## Add post formats
-#post_formats: # https://wordpress.org/support/article/post-formats/#supported-formats
-#  - video
-#  - gallery
-
-
 #################################
 ##    Database table viewer    ##
 #################################
@@ -314,6 +330,7 @@ taxonomy: # https://codex.wordpress.org/Function_Reference/register_taxonomy
 #  translator:
 #    display_name: Traducteur
 #    force: true
+#    #inherit: editor
 #    capabilities:
 #      read: true
 #      publish: false
@@ -355,9 +372,9 @@ rewrite_rules:
     - feed
     - comment
 
-#########################
+################
 ##    Misc    ##
-#########################
+################
 
 domain_name: rocket # MO/PO traductions
 
@@ -366,4 +383,4 @@ domain_name: rocket # MO/PO traductions
 
 ## controller name used when importing @WordpressBundle/Routing/permastructs.php
 extra_permastructs:
-  controller: MainController
+  controller: BlogController

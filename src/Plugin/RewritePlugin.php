@@ -4,11 +4,14 @@ namespace Metabolism\WordpressBundle\Plugin;
 
 
 use Dflydev\DotAccessData\Data;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class RewritePlugin {
+
+	use SingletonTrait;
 
 	private $config;
 

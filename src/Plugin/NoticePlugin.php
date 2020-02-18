@@ -3,10 +3,14 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
+
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class NoticePlugin {
+
+	use SingletonTrait;
 
 	protected $config;
 
@@ -19,33 +23,57 @@ class NoticePlugin {
 		if( !WP_DEBUG )
 			return;
 
+		global $wpdb, $table_prefix;
+
+		if( isset($_GET['fix'])?$_GET['fix']:false == 'database' ){
+			$wpdb->update($table_prefix."options", ['option_value' => WP_SITEURL], ['option_name' => 'siteurl']);
+			$wpdb->update($table_prefix."options", ['option_value' => WP_HOME], ['option_name' => 'home']);
+		}
+
 		$notices = [];
+		$errors = [];
 
 		//check folder right
-		$folders = ['web/wp-bundle/languages', 'web/uploads', 'web/uploads/acf-thumbnails', 'web/wp-bundle/upgrade', 'config/acf-json', 'var/cache', 'var/log'];
-		$folders = apply_filters('notice/folders', $folders);
+		$folders = [PUBLIC_DIR.'/wp-bundle/languages', PUBLIC_DIR.'/uploads', PUBLIC_DIR.'/wp-bundle/upgrade', '/var/cache', '/var/log'];
+		$folders = apply_filters('wp-bundle/admin_notices', $folders);
 
 		foreach ($folders as $folder ){
 
-			$path = BASE_URI.'/'.$folder;
+			$path = BASE_URI.$folder;
 
-			if( !file_exists($path) )
-				$notices [] = $folder.' folder doesn\'t exist';
-			elseif( !is_writable($path) )
-				$notices [] = $folder.' folder is not writable';
+			if( !file_exists($path) && !@mkdir($path, 0755, true) )
+				$errors [] = 'Can\' create folder : '.$folder;
+
+			if( file_exists($path) && !is_writable($path) )
+				$errors [] = $folder.' folder is not writable';
 		}
 
-		if( str_replace('/edition','', get_option( 'siteurl' )) !== get_home_url() )
-			$notices [] = 'Site url host and Home url host are different, please check your database configuration';
-
-		global $wpdb, $table_prefix;
 		$siteurl = $wpdb->get_var("SELECT option_value FROM `".$table_prefix."options` WHERE `option_name` = 'siteurl'");
+		$homeurl = $wpdb->get_var("SELECT option_value FROM `".$table_prefix."options` WHERE `option_name` = 'home'");
 
-		if( strpos($siteurl, '/edition' ) === false )
-			$notices [] = 'Site url must contain /edition, please check your database configuration';
+		if( str_replace('/edition','', $siteurl) !== str_replace('/edition','', $homeurl) )
+			$notices[] = 'Site url host and Home url host are different, please check your database configuration';
+
+		if( strpos($homeurl, '/edition' ) !== false )
+			$notices[] = 'Home url must not contain /edition, please check your database configuration';
+
+		if( strpos($homeurl, WP_HOME ) === false )
+			$notices[] = 'Home url host is different from current host, please check your database configuration';
+
+		if( strpos($siteurl, WP_HOME ) === false )
+			$notices[] = 'Site url host is different from current host, please check your database configuration';
+
+		if( !empty($notices))
+			$notices[] = '<a href="?fix=database">Fix database now</a>';
+
+		if( is_blog_installed() && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
+			$notices[] = 'Wordpress is now installed, you should add WP_INSTALLED=1 to the <i>.env</i> file';
+
+		if( !empty($errors) )
+			echo '<div class="error"><p>'.implode('<br/>', $errors ).'</p></div>';
 
 		if( !empty($notices) )
-			echo '<div class="error"><p>'.implode('<br/>', $notices ).'</p></div>';
+			echo '<div class="updated"><p>'.implode('<br/>', $notices ).'</p></div>';
 	}
 
 
@@ -84,6 +112,7 @@ class NoticePlugin {
 	public function __construct($config)
 	{
 		$this->config = $config;
+
 		if( is_admin() )
 		{
 			add_action( 'admin_notices', [$this, 'adminNotices']);
@@ -93,7 +122,7 @@ class NoticePlugin {
 		}
 		else{
 
-			if( !WP_FRONT)
+			if( HEADLESS )
 				add_action( 'init', [$this, 'suppressError']);
 		}
 	}

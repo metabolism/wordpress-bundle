@@ -24,7 +24,6 @@ if( !class_exists('App') && !defined('ABSPATH') ){
 	exit;
 }
 
-
 use Symfony\Component\Dotenv\Dotenv;
 use Metabolism\WordpressBundle\Loader\ConfigLoader;
 
@@ -46,6 +45,6 @@ $loader->import( dirname(__DIR__).'/config/wordpress.yml' );
 
 global $table_prefix;
 
-$table_prefix  = $_SERVER['TABLE_PREFIX'] ?? 'wp_';
+$table_prefix  = isset($_SERVER['TABLE_PREFIX'])?$_SERVER['TABLE_PREFIX']:'wp_';
 
 require_once(ABSPATH . 'wp-settings.php');

@@ -5,23 +5,37 @@ namespace Metabolism\WordpressBundle\Plugin;
 use Dflydev\DotAccessData\Data;
 use Metabolism\WordpressBundle\Helper\Query;
 use Metabolism\WordpressBundle\Helper\Table;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class ConfigPlugin {
 
+	use SingletonTrait;
+
 	protected $config;
 	protected $support;
 
 	/**
 	 * Get plural from name
+	 * @param $name
+	 * @return string
 	 */
 	public function plural($name)
 	{
 		return substr($name, -1) == 's' ? $name : (substr($name, -1) == 'y' && !in_array(substr($name, -2, 1), ['a','e','i','o','u']) ? substr($name, 0, -1).'ies' : $name.'s');
 	}
 
+
+	/**
+	 * Reload configuration
+	 */
+	public function reload()
+	{
+		$this->addPostTypes();
+		$this->addTaxonomies();
+	}
 
 	/**
 	 * Adds specific post types here
@@ -43,7 +57,7 @@ class ConfigPlugin {
 
 		foreach ( $this->config->get('post_type', []) as $post_type => $args )
 		{
-			if( !in_array($post_type, ['post', 'page']) )
+			if( !in_array($post_type, ['post', 'page', 'edition']) )
 			{
 				if( (isset($args['enable_for_blogs']) && !in_array($current_blog_id, (array)$args['enable_for_blogs'])) || (isset($args['disable_for_blogs']) && in_array($current_blog_id, (array)$args['disable_for_blogs'])))
 					continue;
@@ -91,7 +105,7 @@ class ConfigPlugin {
 						$args['has_archive'] = $archive;
 				}
 
-				if( !WP_FRONT ){
+				if( HEADLESS && !URL_MAPPING ){
 
 					$args['publicly_queryable'] = false;
 				}
@@ -122,12 +136,19 @@ class ConfigPlugin {
 				{
 					if( isset($args['columns']) )
 					{
+                        $columns_arr = [];
+                        foreach ( $args['columns'] as $id=>$column ){
+
+                            if( is_int($id) )
+                                $columns_arr[$column] = ucfirst(str_replace('_', ' ', $column));
+                            else
+                                $columns_arr[$id] = $column;
+                        }
+                        $args['columns'] = $columns_arr;
+
 						add_filter ( 'manage_'.$post_type.'_posts_columns', function ( $columns ) use ( $args )
 						{
-							foreach ( $args['columns'] as &$column )
-								$column = ucfirst(str_replace('_', ' ', $column));
-
-							$columns = array_merge ( $columns, $args['columns'] );
+							$columns = array_merge ( $columns, $args['columns']);
 
 							if( isset($columns['date']) ){
 								$date = $columns['date'];
@@ -142,10 +163,11 @@ class ConfigPlugin {
 						{
 							if( isset($args['columns'][$column]) )
 							{
-								if( $args['columns'][$column] == 'thumbnail'){
+								if( $column == 'thumbnail'){
 
 									if( in_array('thumbnail', $args['supports']) ){
-										echo '<a class="attachment-thumbnail-container">'.get_the_post_thumbnail($post_id, 'thumbnail').get_the_post_thumbnail($post_id, 'thumbnail').'</a>';
+									    $thumbnail = get_the_post_thumbnail($post_id, 'thumbnail');
+										echo '<a class="attachment-thumbnail-container">'.$thumbnail.$thumbnail.'</a>';
 									}
 									else{
 
@@ -218,7 +240,7 @@ class ConfigPlugin {
 
 
 	/**
-	 * Create Menu instances from configs
+	 * Register menus
 	 * @see Menu
 	 */
 	public function addMenus()
@@ -226,6 +248,20 @@ class ConfigPlugin {
 		foreach ($this->config->get('menu', []) as $location => $description)
 		{
 			register_nav_menu($location, __($description, 'wordpress-bundle'));
+		}
+	}
+
+
+	/**
+	 * Register sidebars
+	 * @see Menu
+	 */
+	public function addSidebars()
+	{
+		foreach ($this->config->get('sidebar', []) as $id => $params)
+		{
+			$params['id'] = $id;
+			register_sidebar($params);
 		}
 	}
 
@@ -243,7 +279,7 @@ class ConfigPlugin {
 
 		foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args )
 		{
-			if( !in_array($taxonomy, ['category', 'tag']) ) {
+			if( !in_array($taxonomy, ['category', 'tag', 'edition']) ) {
 
 				$args = array_merge($default_args, $args);
 				$name = str_replace('_', ' ', isset($args['name']) ? $args['name'] : $taxonomy);
@@ -293,7 +329,7 @@ class ConfigPlugin {
 					$object_type = 'post';
 				}
 
-				if( !WP_FRONT ){
+				if( HEADLESS && !URL_MAPPING ){
 
 					$args['publicly_queryable'] = false;
 				}
@@ -374,15 +410,27 @@ class ConfigPlugin {
 	 */
 	public function addRoles()
 	{
-		global $wp_roles;
-
 		foreach ( $this->config->get('role', []) as $role => $args )
 		{
 			if( isset($args['force']) && $args['force'] )
 				remove_role($role);
 
+			if( isset($args['inherit']) && !empty($args['inherit']) ){
+
+				$inherited_role = get_role( $args['inherit'] );
+				$args['capabilities'] = array_merge($inherited_role->capabilities, $args['capabilities']);
+			}
+
 			add_role($role, $args['display_name'], $args['capabilities']);
 		}
+
+		add_filter( 'editable_roles', function($all_roles){
+
+			if( !current_user_can('administrator') )
+				unset($all_roles['administrator']);
+
+			return $all_roles;
+		});
 	}
 
 
@@ -515,19 +563,6 @@ class ConfigPlugin {
 	}
 
 
-	public function loadStyle(){
-
-		echo '<style>
-               #the-list .attachment-thumbnail-container{ position: relative; display: inline-block }
-               #the-list .attachment-thumbnail-container:hover .attachment-thumbnail{ display: block; z-index: 999 }
-               #the-list .attachment-thumbnail{ width: 60px; height: auto; border-radius: 2px; display: block }
-               #the-list .attachment-thumbnail+.attachment-thumbnail{ width: auto; position: absolute; left: 50%; top: 50%; display: none; transform: translate(-50%, -50%); box-shadow: 0 0 4px rgba(0,0,0,0.2) }
-               #the-list .attachment-thumbnail-container+a{ display: none!important } 
-               .manage-column.num{ text-align: left } 
-              </style>';
-	}
-
-
 	public function loadJS(){
 
 		echo '<script>jQuery(document).ready(function(jQuery){';
@@ -564,18 +599,10 @@ class ConfigPlugin {
 
 
 	/**
-	 * Enable post formats
-	 * See https://wordpress.org/support/article/post-formats/#supported-formats
-	 */
-	public function addPostFormats()
-	{
-		if( $this->config->get('post_formats') )
-			add_theme_support('post-formats', $this->config->get('post_formats'));
-	}
-
-
-	/**
 	 * Update permalink if structure is custom
+	 * @param $post_link
+	 * @param $post
+	 * @return string|string[]
 	 */
 	public  function updatePostTypePermalink($post_link, $post){
 
@@ -605,6 +632,9 @@ class ConfigPlugin {
 
 	/**
 	 * Update permalink if structure is custom
+	 * @param $term_link
+	 * @param $term
+	 * @return string|string[]
 	 */
 	public  function updateTermPermalink($term_link, $term){
 
@@ -639,12 +669,39 @@ class ConfigPlugin {
 
 
 	/**
+	 * Add theme support
+	 */
+	public function addThemeSupport()
+	{
+		$excluded = ['template', 'page', 'post', 'tag', 'category'];
+
+		foreach ($this->support as $feature){
+
+			if( $feature == 'post_thumbnails' || $feature == 'post_thumbnail' || $feature == 'thumbnail')
+				$feature = 'post-thumbnails';
+
+			if( is_array($feature) ){
+
+				$key = array_key_first($feature);
+				$params = $feature[$key];
+
+				if( !in_array($key, $excluded) )
+					add_theme_support( $key, $params);
+			}
+			elseif( !in_array($feature, $excluded) ){
+
+				add_theme_support( $feature );
+			}
+		}
+	}
+
+
+	/**
 	 * ConfigPlugin constructor.
 	 * @param Data $config
 	 */
 	public function __construct($config)
 	{
-
 		$this->config = $config;
 		$this->support = $config->get('support');
 
@@ -656,35 +713,40 @@ class ConfigPlugin {
 		{
 			$this->disableFeatures();
 			$this->addPostTypes();
-			$this->addPostFormats();
 			$this->addTaxonomies();
 			$this->addMenus();
+			$this->addSidebars();
 			$this->addRoles();
+			$this->addThemeSupport();
 
-			if( WP_FRONT ){
+			load_theme_textdomain( $this->config->get('domain_name'), BASE_URI. '/translations' );
+
+			if( !HEADLESS || URL_MAPPING ){
+
 				$this->setPermalink();
+
 				add_filter( 'post_type_link', [$this, 'updatePostTypePermalink'], 10, 2);
 				add_filter( 'term_link', [$this, 'updateTermPermalink'], 10, 2);
 			}
 
-			if( is_admin() )
+			if( is_admin() ){
+
 				$this->addTableViews();
+
+				if( $editor_style = $this->config->get('editor_style') )
+					add_editor_style( $editor_style );
+			}
 		});
 
+		add_action('switch_blog', [$this, 'reload']);
 
 		// When viewing admin
 		if( is_admin() )
 		{
-			if( WP_FRONT )
+			if( !HEADLESS || URL_MAPPING )
 				add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
-			
-			add_action('admin_head', [$this, 'loadStyle']);
+
 			add_action('admin_head', [$this, 'loadJS']);
-
-			if( in_array('post_thumbnails', $this->support) || in_array('thumbnail', $this->support) )
-				add_theme_support( 'post-thumbnails' );
-
-			add_post_type_support( 'page', 'excerpt' );
 		}
 	}
 }

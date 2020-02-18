@@ -33,6 +33,6 @@ class Loader{
 		else
 			$classname = '\Metabolism\WordpressBundle\Plugin\\'.$classname;
 
-		new $classname($_config);
+		$classname::getInstance($_config);
 	}
 }

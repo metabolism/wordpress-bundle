@@ -2,6 +2,8 @@
 
 namespace Metabolism\WordpressBundle\Provider;
 
+use lloc\Msls\MslsOptions;
+
 /**
  * Class MSLSProvider
  *
@@ -175,10 +177,13 @@ class MSLSProvider {
 
 		$this->config = $config;
 
-		if( is_multisite() && is_admin() ) {
+		if( is_multisite() ){
+
+			if( is_admin() ) {
 
 				if( $config->get('multisite.clone_post') )
 					$this->setupClone();
 			}
+		}
 	}
 }

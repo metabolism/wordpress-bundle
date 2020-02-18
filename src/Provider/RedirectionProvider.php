@@ -2,6 +2,8 @@
 
 namespace Metabolism\WordpressBundle\Provider;
 
+use Dflydev\DotAccessData\Data;
+
 /**
  * Class WPSmartCropProvider
  *
@@ -11,6 +13,7 @@ class RedirectionProvider
 {
 	/**
 	 * Construct
+	 * @param Data $config
 	 */
 	public function __construct($config)
 	{

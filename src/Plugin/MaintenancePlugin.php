@@ -3,13 +3,16 @@
 // bad design but required by to make wp style function
 namespace Metabolism\WordpressBundle\Plugin {
 
-use Dflydev\DotAccessData\Data;
+	use Dflydev\DotAccessData\Data;
+	use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 
-/**
- * Class Metabolism\WordpressBundle Framework
- */
+	/**
+	 * Class Metabolism\WordpressBundle Framework
+	 */
 	class MaintenancePlugin {
+
+		use SingletonTrait;
 
 		private $config;
 

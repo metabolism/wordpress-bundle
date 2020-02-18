@@ -28,12 +28,12 @@ class Factory {
 	 * Retrieves the cache contents from the cache by key and group.
 	 * @param $id
 	 * @param string $type
-	 * @param bool $full
+	 * @param array $args
 	 * @return bool|mixed
 	 */
 	protected static function loadFromCache($id, $type='object', $args=[]){
 
-		if( $id == null )
+		if( $id == null || is_array($id) )
 			return false;
 
 		return wp_cache_get( $id.'_'.crc32(json_encode($args)), $type.'_factory' );
@@ -45,12 +45,12 @@ class Factory {
 	 * @param $id
 	 * @param $object
 	 * @param $type
-	 * @param bool $full
+	 * @param array $args
 	 * @return bool
 	 */
 	protected static function saveToCache($id, $object, $type, $args=[]){
 
-		if( $id == null )
+		if( $id == null || is_array($id) )
 			return false;
 
 		return wp_cache_set( $id.'_'.crc32(json_encode($args)), $object, $type.'_factory' );
@@ -67,13 +67,15 @@ class Factory {
 	 */
 	public static function create($id, $class, $default_class=false, $args = []){
 
+		if( is_null($id) || empty($id) )
+			return false;
+
 		$item = self::loadFromCache($id, $class, $args);
 
 		if( $item )
 			return $item;
 
 		$classname = self::getClassname($class);
-
 		$app_classname = 'App\Entity\\'.$classname;
 
 		if( class_exists($app_classname) ){
@@ -87,14 +89,14 @@ class Factory {
 			if( class_exists($bundle_classname) ){
 
 				$item = new $bundle_classname($id, $args);
-			}
+            }
 			elseif( $default_class ){
 
 				$item = self::create($id, $default_class, false, $args);
 			}
 		}
 
-		if( !$item->exist() )
+		if( is_wp_error($item) || !$item->exist() )
 			$item = false;
 
 		if( !$item || $item->loaded() )

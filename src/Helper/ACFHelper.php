@@ -1,26 +1,21 @@
 <?php
 
-/*
- * Route middleware to easily implement multi-langue
- * todo: check to find a better way...
- */
+
 namespace Metabolism\WordpressBundle\Helper;
 
 use Metabolism\WordpressBundle\Entity\Entity;
-use Metabolism\WordpressBundle\Entity\Post,
-	Metabolism\WordpressBundle\Entity\Term,
-	Metabolism\WordpressBundle\Entity\User,
-	Metabolism\WordpressBundle\Entity\Image,
-	Metabolism\WordpressBundle\Entity\Product;
 
-use Metabolism\WordpressBundle\Factory\Factory;
-use Metabolism\WordpressBundle\Factory\PostFactory,
+use Metabolism\WordpressBundle\Factory\Factory,
+	Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
-use Metabolism\WordpressBundle\Provider\ACFProvider;
 
 class ACF
 {
-	private $raw_objects, $objects, $id, $loaded=false;
+	private $raw_objects;
+	private $objects;
+	private $id;
+	private $loaded=false;
+	private $use_entity=false;
 
 	protected static $MAX_DEPTH = 1;
 	protected static $DEPTH = 0;
@@ -28,9 +23,13 @@ class ACF
 	/**
 	 * ACF constructor.
 	 * @param $id
+	 * @param string $type
 	 */
-	public function __construct( $id )
+	public function __construct( $id, $type='objects' )
 	{
+        global $_config;
+        $this->use_entity = $_config->get('acf.settings.use_entity');
+
 		$this->id = $id;
 
 		self::$DEPTH++;
@@ -45,7 +44,7 @@ class ACF
 			}
 			else {
 				$this->loaded = true;
-				$this->objects = $this->load('objects', $id);
+				$this->objects = $this->load($type, $id);
 
 				wp_cache_set( $id.'::'.self::$DEPTH, $this->objects, 'acf_helper' );
 			}
@@ -194,34 +193,22 @@ class ACF
 	/**
 	 * @param $type
 	 * @param $id
+	 * @param bool $object
 	 * @return array|bool|Entity|mixed|\WP_Error
 	 */
 	public function load($type, $id, $object=false)
 	{
 		$value = false;
 
+		if( is_array($id) && (isset($id['id'])||isset($id['ID'])) )
+            $id = isset($id['id'])?$id['id']:$id['ID'];
+		elseif( is_object($id) && (isset($id->id)||isset($id->ID)) )
+            $id = isset($id->id)?$id->id:$id->ID;
+
 		switch ($type)
 		{
 			case 'image':
-
-                $value = Factory::create($id, 'image');
-
-                if( isset($object['sizes']) && !empty($object['sizes']) ){
-
-                    $sizes = explode(',', trim(str_replace(' ', '', $object['sizes'])));
-
-                    foreach ($sizes as $size)
-                    {
-                        $size = explode(':', $size);
-                        if( count($size) <= 1 ) continue;
-
-                        $name = $size[0];
-                        $width_height = explode('x', $size[1]);
-                        $extension = $size[2]??null;
-
-                        $value->resize($width_height[0], $width_height[1]??0, $extension, ['name'=>$name]);
-                    }
-                }
+				$value = Factory::create($id, 'image', false, $object);
 				break;
 
 			case 'file':
@@ -274,6 +261,9 @@ class ACF
 			if(!isset($object['type'], $object['name']) || empty($object['name']))
 				continue;
 
+			if(isset($object['public']) && !$object['public'])
+				continue;
+
 			switch ($object['type']) {
 
 				case 'clone';
@@ -299,8 +289,8 @@ class ACF
 					$objects[$object['name']] = [];
 
 					if( isset($object['value']) && is_iterable($object['value']) ){
-					foreach($object['value'] as $post)
-						$objects[$object['name']][] = $this->load('post', $post->ID);
+						foreach($object['value'] as $post)
+							$objects[$object['name']][] = $this->load('post', $post->ID);
 					}
 
 					break;
@@ -310,10 +300,8 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id' || is_int($object['value']) )
+					if ($object['return_format'] == $this->use_entity?'entity':'array')
 						$objects[$object['name']] = $this->load('image', $object['value'], $object);
-					elseif ($object['return_format'] == 'array')
-						$objects[$object['name']] = $this->load('image', $object['value']['id'], $object);
 					else
 						$objects[$object['name']] = $object['value'];
 
@@ -330,9 +318,14 @@ class ACF
 
 						if( isset($object['value']) && is_iterable($object['value']) ){
 
-						foreach ($object['value'] as $value)
-							$objects[$object['name']][] = $this->load('image', $value['id'], $object);
-					}
+							foreach ($object['value'] as $value){
+
+								if ($object['return_format'] == $this->use_entity?'entity':'array')
+									$objects[$object['name']][] = $this->load('image', $value, $object);
+								else
+									$objects[$object['name']][] = $value;
+							}
+						}
 					}
 
 					break;
@@ -342,11 +335,7 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id'){
-
-						$objects[$object['name']] = $this->load('file', $object['value']);
-					}
-					else {
+					if ($object['return_format'] == 'array' || $object['return_format'] == 'entity'){
 
 						$object_value = $object['value'];
 						$remove = ['id', 'link', 'name', 'status', 'uploaded_to', 'menu_order', 'icon', 'author'];
@@ -357,6 +346,10 @@ class ACF
 						}
 
 						$objects[$object['name']] = $object_value;
+					}
+					else{
+
+						$objects[$object['name']] = $object['value'];
 					}
 
 					break;
@@ -371,8 +364,8 @@ class ACF
 
 							if ($object['return_format'] == 'id' || is_int($value) )
 								$element = $value;
-							elseif ($object['return_format'] == 'object')
-								$element = $this->load('post', $value->ID);
+							elseif ($object['return_format'] == $this->use_entity?'entity':'object')
+								$element = $this->load('post', $value);
 							else
 								$element = $object['value'];
 
@@ -389,8 +382,8 @@ class ACF
 
 					if ($object['return_format'] == 'id' || is_int($object['value']) )
 						$objects[$object['name']] = $object['value'];
-					elseif ($object['return_format'] == 'object')
-						$objects[$object['name']] = $this->load('post', $object['value']->ID);
+					elseif ($object['return_format'] == $this->use_entity?'entity':'object')
+						$objects[$object['name']] = $this->load('post', $object['value']);
 					else
 						$objects[$object['name']] = $object['value'];
 
@@ -401,7 +394,7 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					$objects[$object['name']] = $this->load('user', $object['value']['ID']);
+					$objects[$object['name']] = $this->load('user', $object['value']);
 					break;
 
 				case 'flexible_content';
@@ -416,9 +409,6 @@ class ACF
 							$type = $value['acf_fc_layout'];
 							$value = $this->bindLayoutsFields($value, $layouts);
 							$data = $this->clean($value);
-
-							if( is_array($value) && count($value) == 1 && is_string(key($value)) )
-								$data = reset($data);
 
 							$objects[$object['name']][] = ['type'=>$type, 'data'=>$data];
 						}
@@ -455,9 +445,11 @@ class ACF
 								if( $value )
 									$objects[$object['name']][] = $value;
 							}
-							elseif (is_object($value) && $object['return_format'] == 'object'){
-								if( $value->term_id )
+							elseif (is_object($value) && $object['return_format'] == $this->use_entity?'entity':'object'){
+								if( isset($value->term_id) )
 									$objects[$object['name']][] = $this->load('term', $value->term_id);
+								else
+									$objects[$object['name']][] = $this->load('term', $value);
 							}
 						}
 					}
@@ -467,10 +459,12 @@ class ACF
 							if( $object['value'] )
 								$objects[$object['name']] = $object['value'];
 						}
-						elseif (is_object($object['value']) && $object['return_format'] == 'object'){
+						elseif (is_object($object['value']) && $object['return_format'] == $this->use_entity?'entity':'object'){
 
-							if( $object['value']->term_id )
+							if( isset($object['value']->term_id) )
 								$objects[$object['name']] = $this->load('term', $object['value']->term_id);
+							else
+								$objects[$object['name']] = $this->load('term', $object['value']);
 						}
 					}
 

@@ -3,10 +3,15 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
+use Dflydev\DotAccessData\Data;
+
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class SecurityPlugin {
+
+	use SingletonTrait;
 
 	/**
 	 * hide dashboard update notices
@@ -19,6 +24,10 @@ class SecurityPlugin {
 
 	/**
 	 * Allow iframe for editor in WYSIWYG
+	 * @param $caps
+	 * @param $cap
+	 * @param $user_id
+	 * @return array
 	 */
 	public function addUnfilteredHtmlCapabilityToEditors( $caps, $cap, $user_id )
 	{
@@ -150,7 +159,7 @@ class SecurityPlugin {
 
 	/**
 	 * SecurityPlugin constructor.
-	 * @param $config
+	 * @param Data $config
 	 */
 	public function __construct($config)
 	{

@@ -12,9 +12,12 @@ class WordpressBundle extends Bundle
 	 */
 	public function boot()
 	{
-		$rootDir = $this->container->get('kernel')->getRootDir();
+	    if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
+	        return;
 
-		include $rootDir.'/../web/edition/wp-load.php';
+		$rootDir = $this->container->get('kernel')->getProjectDir();
+
+		include $rootDir.'/web/edition/wp-load.php';
 
 		global $wp;
 
@@ -26,10 +29,14 @@ class WordpressBundle extends Bundle
 
 		do_action_ref_array( 'wp', array( &$wp ) );
 
-		do_action('template-redirect');
+		remove_action( 'template_redirect', 'redirect_canonical' );
+		do_action( 'template_redirect' );
 
-		$twigExtension = new TwigExtension();
-		$this->container->get('twig')->addExtension($twigExtension);
+		if( $twig = $this->container->get('twig') ){
+
+			$twigExtension = new TwigExtension();
+			$twig->addExtension($twigExtension);
+		}
 	}
 
 	/**
@@ -48,6 +55,7 @@ class WordpressBundle extends Bundle
 		$GLOBALS['post'] = isset( $wp_query->post ) ? $wp_query->post : null;
 
 		if( !$wp_query->get_queried_object() ){
+
 			$wp_query->is_single = false;
 			$wp_query->is_singular = false;
 		}

@@ -4,12 +4,14 @@ namespace Metabolism\WordpressBundle\Plugin;
 
 
 use Dflydev\DotAccessData\Data;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class UrlPlugin {
 
+	use SingletonTrait;
 
 	/**
 	 * Add edition folder to option url
@@ -90,13 +92,16 @@ class UrlPlugin {
 
 
 	/**
-	 * Make link relative
-	 * @param $link
+	 * Get search url
+	 * @param $s
 	 * @return mixed
 	 */
-	public function relativeLink($link){
+	public function getSearchLink($s){
 
-		return str_replace(WP_HOME, '', $link);
+	    global $wp_rewrite;
+
+	    $s = remove_accents(sanitize_text_field($s));
+        return $wp_rewrite->search_base.'/'.urlencode($s);
 	}
 
 
@@ -108,20 +113,30 @@ class UrlPlugin {
 
 		require_once(ABSPATH . 'wp-admin/includes/post.php');
 
-		$id = isset($_GET['p'])?$_GET['p']:$_GET['page_id'];
-		$permalink = $this->getPreviewPermalink($id);
+		if( isset($_GET['s']) ){
 
-		$query_args['preview'] = 'true';
-		$permalink = add_query_arg( $query_args, $permalink );
+            $permalink = $this->getSearchLink($_GET['s']);
+        }
+		else{
+
+            $id = isset($_GET['p'])?$_GET['p']:$_GET['page_id'];
+            $permalink = $this->getPreviewPermalink($id);
+
+            $query_args['preview'] = 'true';
+            $permalink = add_query_arg( $query_args, $permalink );
+        }
 
 		wp_redirect($permalink);
 		exit;
 	}
-	
+
 
 	/**
 	 * Symfony require real url so redirect preview url to real url
 	 * ex /?post_type=project&p=899&preview=true redirect to /project/post-title?preview=true
+	 * @param $permalink
+	 * @param $post
+	 * @return mixed
 	 */
 	public function previewPostLink($permalink, $post){
 
@@ -149,34 +164,57 @@ class UrlPlugin {
 
 
 	/**
+	 * Remove link when there is no template support
+	 * @param $url
+	 * @return
+	 */
+	public function makeRelative($url){
+
+		$make_relative = apply_filters('wp-bundle/make_link_relative', true);
+		return $make_relative ? wp_make_link_relative($url) : $url;
+	}
+
+
+	/**
+	 * Remove link when there is no template support
+	 * @param $html
+	 * @return string|string[]|null
+	 */
+	public function applyUrlMapping($html){
+
+		$html = preg_replace('/<span id="sample-permalink"><a href="(.*)">(.*)<span/', '<span id="sample-permalink"><a href="'.URL_MAPPING.'$1">'.URL_MAPPING.'$2<span', $html);
+		$html = preg_replace('/<a id="sample-permalink" href="(.*)">(.*)<\/a>/', '<a id="sample-permalink" href="'.URL_MAPPING.'$1">'.URL_MAPPING.'$2</a>', $html);
+		return $html;
+	}
+
+
+	/**
 	 * UrlPlugin constructor.
 	 * @param Data $config
 	 */
 	public function __construct($config){
 
-		add_filter('post_link', [$this, 'relativeLink']);
-		add_filter('page_link', [$this, 'relativeLink']);
-		add_filter('post_type_link', [$this, 'relativeLink']);
-		add_filter('post_type_archive_link', [$this, 'relativeLink']);
 		add_filter('preview_post_link', [$this, 'previewPostLink'], 10, 2);
-
 		add_filter('option_siteurl', [$this, 'optionSiteURL'] );
 		add_filter('network_site_url', [$this, 'networkSiteURL'] );
 		add_filter('home_url', [$this, 'homeURL'] );
 
-		if( !WP_FRONT )
+		if( HEADLESS ){
+
 			add_action( 'wp_before_admin_bar_render', [$this, 'removeAdminBarLinks'] );
 
-		if( is_admin() )
-			return;
+			if( URL_MAPPING ){
+				add_filter('get_sample_permalink_html', [$this, 'applyUrlMapping'] );
+			}
+		}
 
 		add_action('init', function()
 		{
 			// Handle subfolder in url
-			if ( is_feed() || get_query_var( 'sitemap' ) )
+			if ( is_feed() )
 				return;
 
-			if( isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id']) )
+			if( !is_admin() && (isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id']) || isset($_GET['s']) ) )
 				$this->redirect();
 
 			$filters = array(
@@ -197,7 +235,7 @@ class UrlPlugin {
 			);
 
 			foreach ( $filters as $filter )
-				add_filter( $filter, 'wp_make_link_relative' );
+				add_filter( $filter, [$this, 'makeRelative'] );
 		});
 	}
 }

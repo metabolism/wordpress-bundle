@@ -24,6 +24,7 @@ class Term extends Entity
 	public $count;
 	public $order;
 	public $title;
+	public $name;
 	public $thumbnail;
 	public $template;
 
@@ -33,6 +34,7 @@ class Term extends Entity
 	protected $term_id;
 	protected $term_taxonomy_id;
 
+	private $_term = null;
 
 	/**
 	 * Post constructor.
@@ -83,28 +85,37 @@ class Term extends Entity
 	 */
 	protected function get($pid ) {
 
-		$term = false;
-
 		if( $term = get_term($pid) )
 		{
 			if( !$term || is_wp_error($term) )
 				return false;
 			
+			$this->_term = clone $term;
+
 			$term->excerpt = strip_tags(term_description($pid),'<b><i><strong><em><br>');
 			$term->template = get_term_meta($term->term_id, 'template', true);
 
-			if( WP_FRONT )
+			if( !HEADLESS || URL_MAPPING )
 				$term->link = get_term_link($pid);
 
 			$term->ID = $term->term_id;
 			$term->term_order = intval($term->term_order);
 			$term->current = get_queried_object_id() == $pid;
+			$term->thumbnail = false;
 
 			// load thumbnail if set to optimize loading by preventing full acf load
-			if( class_exists('ACF') && $thumbnail_id = get_field('thumbnail', $term->taxonomy.'_'.$term->ID) )
-				$term->thumbnail = Factory::create($thumbnail_id, 'image');
-			else
-				$term->thumbnail = false;
+			//todo: move to ACF Provider using action
+			if( function_exists('get_field_object') )
+			{
+				$object = get_field_object('thumbnail', $term->taxonomy.'_'.$term->ID);
+
+				if( $object['value'] ){
+					if( $object['return_format'] == 'array')
+						$term->thumbnail = Factory::create( $object['value']['id'], 'image', false, $object);
+					else
+						$term->thumbnail = $object['value'];
+				}
+			}
 		}
 
 		return $term;

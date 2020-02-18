@@ -5,13 +5,21 @@ namespace Metabolism\WordpressBundle\Plugin;
 
 use Dflydev\DotAccessData\Data;
 use Intervention\Image\ImageManagerStatic;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class MediaPlugin {
 
-	protected $config, $prevent_recurssion;
+	use SingletonTrait;
+
+	protected $config, $prevent_recursion;
+
+	private static $cache=[
+		'upload_dir'=>[],
+		'relative_upload_dir'=>[]
+	];
 
 	/**
 	 * Quickly upload file
@@ -65,10 +73,10 @@ class MediaPlugin {
 	 */
 	public function updateAttachment($data, $attachment_ID )
 	{
-		if( $this->prevent_recurssion || !isset($_REQUEST['action']) || $_REQUEST['action'] != 'image-editor')
+		if( $this->prevent_recursion || !isset($_REQUEST['action']) || $_REQUEST['action'] != 'image-editor')
 			return $data;
 
-		$this->prevent_recurssion = true;
+		$this->prevent_recursion = true;
 
 		global $wpdb;
 
@@ -102,7 +110,7 @@ class MediaPlugin {
 
 		switch_to_blog($current_site_id);
 
-		$this->prevent_recurssion = false;
+		$this->prevent_recursion = false;
 
 		return $data;
 	}
@@ -114,10 +122,10 @@ class MediaPlugin {
 	 */
 	public function deleteAttachment( $attachment_ID )
 	{
-		if( $this->prevent_recurssion )
+		if( $this->prevent_recursion )
 			return;
 
-		$this->prevent_recurssion = true;
+		$this->prevent_recursion = true;
 
 		global $wpdb;
 
@@ -151,7 +159,7 @@ class MediaPlugin {
 
 		switch_to_blog($current_site_id);
 
-		$this->prevent_recurssion = false;
+		$this->prevent_recursion = false;
 	}
 
 
@@ -162,10 +170,10 @@ class MediaPlugin {
 	 */
 	public function addAttachment( $attachment_ID )
 	{
-		if( $this->prevent_recurssion )
+		if( $this->prevent_recursion )
 			return;
 
-		$this->prevent_recurssion = true;
+		$this->prevent_recursion = true;
 
 		$attachment = get_post( $attachment_ID );
 		$current_site_id = get_current_blog_id();
@@ -259,7 +267,7 @@ class MediaPlugin {
 		if( $main_site_id != $current_site_id && $original_id )
 			update_post_meta( $attachment_ID, '_wp_original_attachment_id', $original_id );
 
-		$this->prevent_recurssion = false;
+		$this->prevent_recursion = false;
 	}
 
 
@@ -270,11 +278,11 @@ class MediaPlugin {
 	 */
 	public function editAttachment($post_ID )
 	{
-		if( $this->prevent_recurssion ){
+		if( $this->prevent_recursion ){
 			return;
 		}
 
-		$this->prevent_recurssion = true;
+		$this->prevent_recursion = true;
 
 		global $wpdb;
 
@@ -316,7 +324,7 @@ class MediaPlugin {
 
 		switch_to_blog($current_site_id);
 
-		$this->prevent_recurssion = false;
+		$this->prevent_recursion = false;
 	}
 
 
@@ -488,13 +496,37 @@ class MediaPlugin {
 	 */
 	public function uploadDir($dirs)
 	{
+		$key = $dirs['subdir'];
+
+		if( isset(self::$cache['upload_dir'][$key]) )
+			return self::$cache['upload_dir'][$key];
+
 		$dirs['baseurl'] = str_replace($dirs['relative'],'/uploads', $dirs['baseurl']);
-		$dirs['basedir'] = str_replace($dirs['relative'],'/uploads', $dirs['basedir']);
+
+		$paths = explode('/', str_replace($dirs['relative'],'/uploads', $dirs['basedir']));
+		foreach ($paths as $key=>$path){
+			if( $path == '..'){
+				unset($paths[$key-1]);
+				unset($paths[$key]);
+			}
+		}
+		$dirs['basedir'] = implode('/', $paths);
 
 		$dirs['url']  = str_replace($dirs['relative'],'/uploads', $dirs['url']);
-		$dirs['path'] = str_replace($dirs['relative'],'/uploads', $dirs['path']);
+
+		$paths = explode('/', str_replace($dirs['relative'],'/uploads', $dirs['path']));
+		foreach ($paths as $key=>$path){
+			if( $path == '..'){
+				unset($paths[$key-1]);
+				unset($paths[$key]);
+			}
+		}
+		$dirs['path'] = implode('/', $paths);
 
 		$dirs['relative'] = '/uploads';
+
+		self::$cache['upload_dir'][$key] = $dirs;
+
 		return $dirs;
 	}
 
@@ -519,11 +551,36 @@ class MediaPlugin {
 	 */
 	public static function add_relative_upload_dir_key( $arr )
 	{
+		$key = $arr['subdir'];
+
+		if( isset(self::$cache['relative_upload_dir'][$key]) )
+			return self::$cache['relative_upload_dir'][$key];
+
+		$paths = explode('/', $arr['path']);
+		foreach ($paths as $key=>$path){
+			if( $path == '..'){
+				unset($paths[$key-1]);
+				unset($paths[$key]);
+			}
+		}
+		$arr['path'] = implode('/', $paths);
+
+		$paths = explode('/', $arr['basedir']);
+		foreach ($paths as $key=>$path){
+			if( $path == '..'){
+				unset($paths[$key-1]);
+				unset($paths[$key]);
+			}
+		}
+		$arr['basedir'] = implode('/', $paths);
+
 		$arr['url'] = str_replace('edition/../', '', $arr['url']);
 		$arr['baseurl'] = str_replace('edition/../', '', $arr['baseurl']);
 		
 		$arr['relative'] = str_replace(get_home_url(null,'','http'), '', $arr['baseurl']);
 		$arr['relative'] = str_replace(get_home_url(null,'','https'), '', $arr['relative']);
+
+		self::$cache['relative_upload_dir'][$key] = $arr;
 
 		return $arr;
 	}
@@ -536,25 +593,30 @@ class MediaPlugin {
 	 */
 	public function uploadResize( $image_data )
 	{
-		$valid_types = array('image/gif','image/png','image/jpeg','image/jpg');
+		$valid_types = array('image/png','image/jpeg','image/jpg');
 
 		if(in_array($image_data['type'], $valid_types) && $this->config->get('image.resize') ){
 
 			$src = $image_data['file'];
-			$image = ImageManagerStatic::make($src);
 
-			if( $image->getWidth() > $this->config->get('image.resize.max_width', 1920) ){
-				$image->resize($this->config->get('image.resize.max_width', 1920), null, function ($constraint) {
-					$constraint->aspectRatio();
-				});
-			}
-			elseif( $image->getHeight() > $this->config->get('image.resize.max_height', 2160) ){
-				$image->resize(null, $this->config->get('image.resize.max_height', 2160), function ($constraint) {
-					$constraint->aspectRatio();
-				});
-			}
+			try {
 
-			$image->save($src, 99);
+				$image = ImageManagerStatic::make($src);
+
+				if( $image->getWidth() > $this->config->get('image.resize.max_width', 1920) ){
+					$image->resize($this->config->get('image.resize.max_width', 1920), null, function ($constraint) {
+						$constraint->aspectRatio();
+					});
+				}
+				elseif( $image->getHeight() > $this->config->get('image.resize.max_height', 2160) ){
+					$image->resize(null, $this->config->get('image.resize.max_height', 2160), function ($constraint) {
+						$constraint->aspectRatio();
+					});
+				}
+
+				$image->save($src, 99);
+			}
+			catch (\Exception $e){}
 		}
 
 		return $image_data;

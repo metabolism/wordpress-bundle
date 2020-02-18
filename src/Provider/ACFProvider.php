@@ -9,7 +9,7 @@ use Dflydev\DotAccessData\Data;
  */
 class ACFProvider {
 
-	public static $folder = BASE_URI . '/config/acf-json';
+	public static $folder = '/config/acf-json';
 
 	private $config;
 
@@ -62,7 +62,7 @@ class ACFProvider {
 	/**
 	 * Customize basic toolbar
 	 * @param $toolbars
-	 * @return
+	 * @return array
 	 */
 	public function editToolbars($toolbars){
 
@@ -75,7 +75,7 @@ class ACFProvider {
 	/**
 	 * Add theme to field selection
 	 * @param $field
-	 * @return
+	 * @return mixed
 	 */
 	public function addTaxonomyTemplates($field){
 
@@ -100,7 +100,7 @@ class ACFProvider {
 	 * @param $unused
 	 * @param $post_id
 	 * @param $field
-	 * @return
+	 * @return string|null
 	 */
 	public function preLoadValue($unused, $post_id, $field){
 
@@ -112,11 +112,38 @@ class ACFProvider {
 
 
 	/**
+	 * Filter preview sizes
+	 * @param $sizes
+	 * @return array
+	 */
+	public function getImageSizes($sizes){
+
+		return ['thumbnail'=>$sizes['thumbnail'], 'full'=>$sizes['full']];
+	}
+
+
+	/**
+	 * Add entity return format
+	 * @param $sizes
+	 * @return array
+	 */
+	public function validateField($field){
+
+        if( $field['name'] == 'return_format'){
+            $field['choices']['entity'] = __('Entity');
+            $field['default_value'] = 'entity';
+        }
+
+		return $field;
+	}
+
+
+	/**
 	 * Change query to replace template by term slug
 	 * @param $args
 	 * @param $field
 	 * @param $post_id
-	 * @return
+	 * @return mixed
 	 */
 	public function filterPostsByTermTemplateMeta($args, $field, $post_id ){
 
@@ -159,20 +186,35 @@ class ACFProvider {
 	{
 		$this->config = $config;
 
-		add_filter('acf/settings/save_json', function(){ return $this::$folder; });
-		add_filter('acf/settings/load_json', function(){ return [$this::$folder]; });
+		add_filter('acf/settings/save_json', function(){ return BASE_URI.$this::$folder; });
+		add_filter('acf/settings/load_json', function(){ return [BASE_URI.$this::$folder]; });
 		add_filter('acf/pre_load_value', [$this, 'preLoadValue'], 10, 3);
 		add_filter('acf/prepare_field', [$this, 'addTaxonomyTemplates']);
 		add_filter('acf/fields/relationship/query/name=items', [$this, 'filterPostsByTermTemplateMeta'], 10, 3);
+		add_filter('acf/get_image_sizes', [$this, 'getImageSizes'] );
+
+		if( $this->config->get('acf.settings.use_entity') )
+            add_filter('acf/validate_field', [$this, 'validateField']);
 
 		// When viewing admin
 		if( is_admin() )
 		{
+			add_filter( 'wp-bundle/admin_notices', function($folders){
+
+				if( class_exists('ACF') ){
+
+					$folders[] = PUBLIC_DIR.'/uploads/acf-thumbnails';
+					$folders[] = $this::$folder;
+				}
+
+				return $folders;
+			});
+
 			// Setup ACF Settings
 			add_action( 'acf/init', [$this, 'addSettings'] );
 			add_filter( 'acf/fields/wysiwyg/toolbars' , [$this, 'editToolbars']  );
 			add_action( 'init', [$this, 'addOptionPages'] );
-			add_filter('acf/settings/show_admin', function( $show ) {
+			add_filter( 'acf/settings/show_admin', function( $show ) {
 				return current_user_can('administrator');
 			});
 		}

@@ -9,13 +9,6 @@ class AdminController {
 
 	private $config;
 
-	/**
-	 * @var string plugin domain name for translations
-	 */
-	public static $acf_folder, $languages_folder;
-
-	public static $bo_domain_name = 'bo_default';
-
 
 	/**
 	 * Init placeholder
@@ -40,11 +33,31 @@ class AdminController {
 	private function loadConfig()
 	{
 		global $_config;
-
 		$this->config = $_config;
+	}
 
-		self::$bo_domain_name   = 'bo_'.$this->config->get('domain_name', 'customer');
-		self::$languages_folder = BASE_URI . '/config/languages';
+
+	/**
+	 * Prevent Backend access based on ip whitelist
+	 */
+	private function lock()
+	{
+		$whitelist = getenv('ADMIN_IP_WHITELIST');
+
+		if( $whitelist ){
+
+			$whitelist = array_map('trim', explode(',', $whitelist));
+
+			if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) )
+				$ip = $_SERVER['HTTP_CLIENT_IP'];
+			elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) )
+				$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			else
+				$ip = $_SERVER['REMOTE_ADDR'];
+
+			if( !in_array($ip, $whitelist) )
+				wp_die('Sorry, you are not allowed to access this page. Your IP: '.$ip);
+		}
 	}
 
 
@@ -52,6 +65,8 @@ class AdminController {
 	{
 		if( defined('WP_INSTALLING') && WP_INSTALLING )
 			return;
+
+		$this->lock();
 
 		$this->loadConfig();
 		$this->registerFilters();

@@ -2,11 +2,15 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
+
 /**
  * Class TermsPlugin
  * @package Metabolism\WordpressBundle\Plugin
  */
 class TermsPlugin{
+
+	use SingletonTrait;
 
 	/**
 	 * @param $args
