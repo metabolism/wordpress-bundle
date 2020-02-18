@@ -91,7 +91,7 @@ mce_buttons:
 
 ## Add theme support
 support:
-  - post-thumbnail #add thumbnails to page
+  - thumbnail #add thumbnails to page
   - page #enable page
   - post #enable post
   - tag #enable tag taxonomy for post

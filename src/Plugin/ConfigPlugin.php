@@ -677,7 +677,7 @@ class ConfigPlugin {
 
 		foreach ($this->support as $feature){
 
-			if( $feature == 'post_thumbnails' || $feature == 'thumbnail')
+			if( $feature == 'post_thumbnails' || $feature == 'post_thumbnail' || $feature == 'thumbnail')
 				$feature = 'post-thumbnails';
 
 			if( is_array($feature) ){

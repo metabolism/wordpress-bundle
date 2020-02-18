@@ -31,6 +31,7 @@ CHANGELOG
 - template_redirect action management
 - frontpage pagination in router
 - bundle support when loaded from php server
+- less agressive search term sanitize
 - invalid url when using switch_to_blog
 - incorrect processing of gallery in ACFHelper ( merge request from @undefinedfr )
 #### Removed

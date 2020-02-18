@@ -100,8 +100,8 @@ class UrlPlugin {
 
 	    global $wp_rewrite;
 
-	    $s = sanitize_title($s);
-        return $wp_rewrite->search_base.'/'.$s;
+	    $s = remove_accents(sanitize_text_field($s));
+        return $wp_rewrite->search_base.'/'.urlencode($s);
 	}
 
 
