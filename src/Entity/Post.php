@@ -38,7 +38,7 @@ class Post extends Entity
 	public $name;
 	public $content;
 	public $sticky;
-    public $excerpt ='';
+	public $excerpt ='';
 
 	private $_next = null;
 	private $_prev = null;
@@ -101,8 +101,25 @@ class Post extends Entity
 			$post->class = implode(' ', get_post_class());
 			$post->sticky = is_sticky($pid);
 
-			if( $post->thumbnail )
-				$post->thumbnail = Factory::create($post->thumbnail, 'image');
+			if( $post->thumbnail ){
+
+				global $_config;
+				$return_format = $_config->get('image.return_format');
+				
+				if( $return_format == 'url'){
+
+					$attachment = wp_get_attachment_image_src($post->thumbnail, 'full');
+
+					if( $attachment )
+						$post->thumbnail = $attachment[0];
+					else
+						$post->thumbnail = false;
+				}
+				elseif( $return_format != 'id'){
+
+					$post->thumbnail = Factory::create($post->thumbnail, 'image');
+				}
+			}
 
 			$post->slug = $post->post_name;
 			$post->post_content = wpautop($post->post_content);
@@ -200,33 +217,33 @@ class Post extends Entity
 	public function getComments($args=[]) {
 
 		$default_args = [
-            'post_id'=> $this->ID,
-            'status'=> 'approve',
-            'type'=> 'comment',
-            'fields'=> 'ids'
-        ];
+			'post_id'=> $this->ID,
+			'status'=> 'approve',
+			'type'=> 'comment',
+			'fields'=> 'ids'
+		];
 
 
 		$args = array_merge($default_args, $args);
 
-        $comments_id = get_comments($args);
-        $comments = [];
+		$comments_id = get_comments($args);
+		$comments = [];
 
-        foreach ($comments_id as $comment_id)
-        {
-            $comments[$comment_id] = Factory::create($comment_id, 'comment');
-        }
+		foreach ($comments_id as $comment_id)
+		{
+			$comments[$comment_id] = Factory::create($comment_id, 'comment');
+		}
 
-        foreach ($comments as $comment)
-        {
-            if( $comment && $comment->parent )
-            {
-                $comments[$comment->parent]->replies[] = $comment;
-                unset($comments[$comment->ID]);
-            }
-        }
+		foreach ($comments as $comment)
+		{
+			if( $comment && $comment->parent )
+			{
+				$comments[$comment->parent]->replies[] = $comment;
+				unset($comments[$comment->ID]);
+			}
+		}
 
-        return $comments;
+		return $comments;
 	}
 
 
