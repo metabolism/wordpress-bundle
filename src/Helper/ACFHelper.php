@@ -300,7 +300,7 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == $this->use_entity?'entity':'array')
+					if ($object['return_format'] == ($this->use_entity?'entity':'array'))
 						$objects[$object['name']] = $this->load('image', $object['value'], $object);
 					else
 						$objects[$object['name']] = $object['value'];
@@ -320,7 +320,7 @@ class ACF
 
 							foreach ($object['value'] as $value){
 
-								if ($object['return_format'] == $this->use_entity?'entity':'array')
+								if ($object['return_format'] == ($this->use_entity?'entity':'array'))
 									$objects[$object['name']][] = $this->load('image', $value, $object);
 								else
 									$objects[$object['name']][] = $value;
@@ -364,7 +364,7 @@ class ACF
 
 							if ($object['return_format'] == 'id' || is_int($value) )
 								$element = $value;
-							elseif ($object['return_format'] == $this->use_entity?'entity':'object')
+							elseif ($object['return_format'] == ($this->use_entity?'entity':'object'))
 								$element = $this->load('post', $value);
 							else
 								$element = $object['value'];
@@ -382,7 +382,7 @@ class ACF
 
 					if ($object['return_format'] == 'id' || is_int($object['value']) )
 						$objects[$object['name']] = $object['value'];
-					elseif ($object['return_format'] == $this->use_entity?'entity':'object')
+					elseif ($object['return_format'] == ($this->use_entity?'entity':'object'))
 						$objects[$object['name']] = $this->load('post', $object['value']);
 					else
 						$objects[$object['name']] = $object['value'];
@@ -445,7 +445,7 @@ class ACF
 								if( $value )
 									$objects[$object['name']][] = $value;
 							}
-							elseif (is_object($value) && $object['return_format'] == $this->use_entity?'entity':'object'){
+							elseif (is_object($value) && $object['return_format'] == ($this->use_entity?'entity':'object')){
 								if( isset($value->term_id) )
 									$objects[$object['name']][] = $this->load('term', $value->term_id);
 								else
@@ -459,7 +459,7 @@ class ACF
 							if( $object['value'] )
 								$objects[$object['name']] = $object['value'];
 						}
-						elseif (is_object($object['value']) && $object['return_format'] == $this->use_entity?'entity':'object'){
+						elseif (is_object($object['value']) && $object['return_format'] == ($this->use_entity?'entity':'object')){
 
 							if( isset($object['value']->term_id) )
 								$objects[$object['name']] = $this->load('term', $object['value']->term_id);

@@ -1,6 +1,12 @@
 CHANGELOG
 ---------
 
+## 1.4.1
+#### Added
+- thumbnail return format for Wordpress thumbnail
+#### Fixed
+- Invalid ternary in ACFHelper
+
 ## 1.4.0
 #### Added
 - new entity acf return format to reduce query
