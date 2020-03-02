@@ -38,7 +38,7 @@ class Query
 			$term = TaxonomyFactory::create( $term );
 		}
 
-		return $terms;
+		return is_wp_error($terms) ? [] : array_filter($terms);
 	}
 
 	/**
@@ -135,7 +135,7 @@ class Query
 	{
 		$query = self::wp_query($args);
 
-		return $query->posts;
+		return $query ? array_filter($query->posts) : false;
 	}
 
 
