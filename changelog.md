@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.4.2
+#### Fixed
+- Empty terms/posts returned in QueryHelper now filtered
+
 ## 1.4.1
 #### Added
 - thumbnail return format for Wordpress thumbnail
