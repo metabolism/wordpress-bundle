@@ -293,7 +293,7 @@ class Post extends Entity
 	 * @param array $args
 	 * @return Term[]|[]
 	 */
-	public function getTerms( $tax = 'category', $args=[] ) {
+	public function getTerms( $tax = '', $args=[] ) {
 
 		$args['fields'] = 'ids';
 
@@ -329,8 +329,13 @@ class Post extends Entity
 			}
 			else
 			{
-				foreach ($terms as $term)
-					$term_array[$taxonomy][$term] = TaxonomyFactory::create($term);
+				foreach ($terms as $term){
+
+					if( !isset($args['hierarchical']) || $args['hierarchical'] )
+						$term_array[$taxonomy][$term] = TaxonomyFactory::create($term);
+					else
+						$term_array[] = TaxonomyFactory::create($term);
+				}
 			}
 		}
 

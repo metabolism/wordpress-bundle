@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.4.3
+#### Added
+- post->getTerms('', ['hierarchical'=>false]) now accept a 'hierarchical' options to flatten output when multiple taxonimies are requested
+
 ## 1.4.2
 #### Fixed
 - Empty terms/posts returned in QueryHelper now filtered
