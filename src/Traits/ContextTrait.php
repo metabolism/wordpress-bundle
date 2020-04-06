@@ -163,12 +163,12 @@ Trait ContextTrait
 			'is_admin'           => current_user_can('manage_options'),
 			'home_url'           => home_url('/'),
 			'maintenance_mode'   => function_exists('wp_maintenance_mode') ? wp_maintenance_mode() : false,
-            'bloginfo'           => [
-                'description'   => get_bloginfo('description'),
-                'name'          => get_bloginfo('name'),
-                'charset'       => get_bloginfo('charset'),
-                'language'      => $blog_language,
-            ],
+			'bloginfo'           => [
+				'description'   => get_bloginfo('description'),
+				'name'          => get_bloginfo('name'),
+				'charset'       => get_bloginfo('charset'),
+				'language'      => $blog_language,
+			],
 			'posts_per_page'     => intval(get_option( 'posts_per_page' )),
 			'paged'              => $paged ? $paged : 1
 		];
@@ -186,8 +186,8 @@ Trait ContextTrait
 			$wp_title = trim(wp_title(' ', false));
 			$body_class = $queried_object ? implode(' ', get_body_class()) : '';
 
-            $policy_page_id       = (int) get_option( 'wp_page_for_privacy_policy' );
-            $privacy_policy_title = ( $policy_page_id ) ? get_the_title( $policy_page_id ) : '';
+			$policy_page_id       = (int) get_option( 'wp_page_for_privacy_policy' );
+			$privacy_policy_title = ( $policy_page_id ) ? get_the_title( $policy_page_id ) : '';
 
 			$this->data = array_merge($this->data, [
 				'search_url'           => get_search_link(),
@@ -215,12 +215,26 @@ Trait ContextTrait
 		$menus = get_registered_nav_menus();
 		$this->data['menu'] = [];
 
+		$depth = $this->config->get('menu.depth',  true);
+
 		foreach ( $menus as $location => $description )
 		{
 			$menu = new Menu($location);
 
-			if( $menu->ID )
-				$this->data['menu'][$location] = $menu;
+			if( $menu->ID ){
+
+				if( $depth ){
+
+					$this->data['menu'][$location] = $menu;
+				}
+				else{
+
+					foreach ($menu->items as &$item )
+						$item->location = $location;
+
+					$this->data['menu'] = array_merge($this->data['menu'], $menu->items);
+				}
+			}
 		}
 
 		return $this->data['menu'];
@@ -352,9 +366,9 @@ Trait ContextTrait
 	protected function addCurrentUser()
 	{
 		$current_user_id = get_current_user_id();
-        $this->data['current_user'] = $current_user_id ? new User($current_user_id) : false;
+		$this->data['current_user'] = $current_user_id ? new User($current_user_id) : false;
 
-        return $this->data['current_user'];
+		return $this->data['current_user'];
 	}
 
 
@@ -534,9 +548,9 @@ Trait ContextTrait
 		$total = (int) $args['total'];
 
 		if ( $total < 2 ){
-            $this->data['pagination'] = false;
-            return false;
-        }
+			$this->data['pagination'] = false;
+			return false;
+		}
 
 		$current  = (int) $args['current'];
 		$end_size = (int) $args['end_size'];

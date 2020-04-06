@@ -1,6 +1,14 @@
 CHANGELOG
 ---------
 
+## 1.4.4
+#### Added
+- menu `depth` option in wordpress.yml
+- wordpress.yml version
+
+### Changed
+- menu regsitration in wordpress.yml can be grouped into `register`
+
 ## 1.4.3
 #### Added
 - post->getTerms('', ['hierarchical'=>false]) now accept a 'hierarchical' options to flatten output when multiple taxonimies are requested

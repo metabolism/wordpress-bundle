@@ -4,6 +4,7 @@
 ##                                           ##
 ###############################################
 
+version: 1.0
 
 ####################
 ##    Security    ##
@@ -191,8 +192,10 @@ acf:
 ################
 
 menu:
-  footer: Footer
-  header: Header
+  depth: 1
+  register:
+    footer: Footer
+    header: Header
 
 
 ###################
