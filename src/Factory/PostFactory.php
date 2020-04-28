@@ -62,7 +62,10 @@ class PostFactory {
 			case false:
 			case 'trash':
 			case 'auto-draft':
-			return false;
+
+			if( !in_array($post_status, $args['post_status']??[]) )
+				return false;
+			break;
 
 			case 'private':
 
