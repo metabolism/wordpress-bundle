@@ -212,7 +212,7 @@ class ACF
 				break;
 
 			case 'file':
-				$value = wp_get_attachment_url( $id );
+				$value = Factory::create($id, 'file', false, $object);
 				break;
 
 			case 'post':
@@ -335,22 +335,12 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'array' || $object['return_format'] == 'entity'){
-
-						$object_value = $object['value'];
-						$remove = ['id', 'link', 'name', 'status', 'uploaded_to', 'menu_order', 'icon', 'author'];
-
-						foreach($remove as $prop){
-							if( isset($object_value[$prop]) )
-								unset($object_value[$prop]);
-						}
-
-						$objects[$object['name']] = $object_value;
-					}
-					else{
-
+					if ($object['return_format'] == ($this->use_entity?'entity':'array'))
+						$objects[$object['name']] = $this->load('file', $object['value'], $object);
+					elseif($object['return_format'] == 'url')
+						$objects[$object['name']] = wp_get_attachment_url($object['value']);
+					else
 						$objects[$object['name']] = $object['value'];
-					}
 
 					break;
 
@@ -380,7 +370,7 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id' || is_int($object['value']) )
+					if ($object['return_format'] == 'id' )
 						$objects[$object['name']] = $object['value'];
 					elseif ($object['return_format'] == ($this->use_entity?'entity':'object'))
 						$objects[$object['name']] = $this->load('post', $object['value']);
