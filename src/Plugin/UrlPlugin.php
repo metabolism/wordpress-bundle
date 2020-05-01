@@ -168,9 +168,21 @@ class UrlPlugin {
 	 * @param $url
 	 * @return
 	 */
-	public function makeRelative($url){
+	public function makePostRelative($url){
 
-		$make_relative = apply_filters('wp-bundle/make_link_relative', true);
+		$make_relative = apply_filters('wp-bundle/make_post_link_relative', true);
+		return $make_relative ? wp_make_link_relative($url) : $url;
+	}
+
+
+	/**
+	 * Remove link when there is no template support
+	 * @param $url
+	 * @return
+	 */
+	public function makeAttachmentRelative($url){
+
+		$make_relative = apply_filters('wp-bundle/make_attachment_link_relative', true);
 		return $make_relative ? wp_make_link_relative($url) : $url;
 	}
 
@@ -221,7 +233,6 @@ class UrlPlugin {
 				'post_link',
 				'post_type_link',
 				'page_link',
-				'attachment_link',
 				'get_shortlink',
 				'post_type_archive_link',
 				'get_pagenum_link',
@@ -230,12 +241,19 @@ class UrlPlugin {
 				'search_link',
 				'day_link',
 				'month_link',
-				'wp_get_attachment_url',
 				'year_link'
 			);
 
 			foreach ( $filters as $filter )
-				add_filter( $filter, [$this, 'makeRelative'] );
+				add_filter( $filter, [$this, 'makePostRelative'] );
+
+			$filters = array(
+				'attachment_link',
+				'wp_get_attachment_url'
+			);
+
+			foreach ( $filters as $filter )
+				add_filter( $filter, [$this, 'makeAttachmentRelative'] );
 		});
 	}
 }

@@ -370,8 +370,8 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id' )
-						$objects[$object['name']] = $object['value'];
+					if ($object['return_format'] == 'link' )
+						$objects[$object['name']] = get_permalink($object['value']);
 					elseif ($object['return_format'] == ($this->use_entity?'entity':'object'))
 						$objects[$object['name']] = $this->load('post', $object['value']);
 					else
@@ -475,6 +475,15 @@ class ACF
 					$value = $this->bindLayoutFields($object['value'], $layout);
 
 					$objects[$object['name']] = $this->clean($value);
+
+					break;
+
+				case 'url';
+
+					if( is_int($object['value']) )
+						$objects[$object['name']] = get_permalink($object['value']);
+					else
+						$objects[$object['name']] = $object['value'];
 
 					break;
 

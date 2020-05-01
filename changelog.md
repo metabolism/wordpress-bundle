@@ -1,6 +1,13 @@
 CHANGELOG
 ---------
 
+## 1.4.5
+#### Added
+- File entity
+- Link return format for post
+- `wp-bundle/make_post_link_relative` filter
+- `wp-bundle/make_attachment_link_relative` filter
+
 ## 1.4.4
 #### Added
 - menu `depth` option in wordpress.yml
