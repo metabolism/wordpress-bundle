@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 ## 1.4.5
+#### Bugfix
+- wp-cron.php required to be logged
 #### Added
 - File entity
 - Link return format for post
