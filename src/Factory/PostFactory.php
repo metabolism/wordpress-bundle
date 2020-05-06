@@ -66,20 +66,21 @@ class PostFactory {
 			if( !in_array($post_status, $args['post_status']??[]) )
 				return false;
 			break;
-
+			
 			case 'private':
 
-				if( !is_user_logged_in() || !current_user_can( 'read_private_posts' ) )
-			return false;
+				if( (!is_user_logged_in() || !current_user_can( 'read_private_posts' )) && !in_array($post_status, $args['post_status']??[]) )
+					return false;
 				break;
 
 			case 'draft':
 			case 'pending':
 			case 'inherit':
 			case 'future':
-				if( !is_user_logged_in() || !current_user_can( 'edit_posts' ) )
-					return false;
-				break;
+
+			if( (!is_user_logged_in() || !current_user_can( 'edit_posts' ))  && !in_array($post_status, $args['post_status']??[]) )
+				return false;
+			break;
 		}
 
 		return Factory::create($id, $post_type, 'post', $args);
