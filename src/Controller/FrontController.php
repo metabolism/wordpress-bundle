@@ -22,7 +22,7 @@ class FrontController {
 	 */
 	public function redirect()
 	{
-		if( DOING_CRON )
+		if( defined('DOING_CRON') && DOING_CRON )
 			return;
 
 		$path = rtrim($_SERVER['REQUEST_URI'], '/');
