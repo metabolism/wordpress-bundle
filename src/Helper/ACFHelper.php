@@ -337,8 +337,6 @@ class ACF
 
 					if ($object['return_format'] == ($this->use_entity?'entity':'array'))
 						$objects[$object['name']] = $this->load('file', $object['value'], $object);
-					elseif($object['return_format'] == 'url')
-						$objects[$object['name']] = wp_get_attachment_url($object['value']);
 					else
 						$objects[$object['name']] = $object['value'];
 
