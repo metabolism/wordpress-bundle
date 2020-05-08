@@ -27,6 +27,7 @@ class Term extends Entity
 	public $name;
 	public $thumbnail;
 	public $template;
+	public $depth;
 
 	/** @var bool|Term[] $children */
 	public $children;
@@ -102,6 +103,7 @@ class Term extends Entity
 			$term->term_order = intval($term->term_order);
 			$term->current = get_queried_object_id() == $pid;
 			$term->thumbnail = false;
+			$term->depth = count(get_ancestors( $term->ID, $term->taxonomy ));
 
 			// load thumbnail if set to optimize loading by preventing full acf load
 			//todo: move to ACF Provider using action
