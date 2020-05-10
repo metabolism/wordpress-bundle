@@ -47,6 +47,9 @@
 .media-modal .compat-item label { font-size: 12px }
 
 /* Quick redesign */
+ul.categorychecklist.has-children > li{ padding-bottom: 8px; border-bottom: 1px solid #ddd; margin-bottom: 5px }
+ul.categorychecklist.has-children > li > label{ font-weight: 600 }
+.categorydiv ul.categorychecklist ul{ margin-left: 15px }
 .post-php, body[class*="toplevel_page_acf-options"], .post-new-php { background: linear-gradient(-90deg, rgba(238,238,238,1) 0%, rgba(238,238,238,1) 290px, rgba(230,230,230,1) 300px, rgba(255,255,255,1) 300px, rgba(255,255,255,1) 100%); }
 @media only screen and (max-width: 850px){
     .post-php, body[class*="_page_"], .post-new-php{ background: #fff }

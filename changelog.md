@@ -6,6 +6,7 @@ CHANGELOG
 - wp-cron.php required to be logged
 #### Added
 - File entity
+- taxonomy selector in admin now select parent automatically
 - Link return format for post
 - `wp-bundle/make_post_link_relative` filter
 - `wp-bundle/make_attachment_link_relative` filter
