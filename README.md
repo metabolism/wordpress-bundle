@@ -161,7 +161,7 @@ edit `routes.yaml`
 
 ```
 _wordpress:
-    resource: "@WordpressBundle/Routing/permastructs.php"
+    resource: "@WordpressBundle/Routing/Permastructs.php"
 ```
 
 Clear cache
