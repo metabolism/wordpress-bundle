@@ -338,11 +338,8 @@ class Post extends Entity
 				}
 			}
 		}
-
-		if( is_array($taxonomies) && count($taxonomies) == 1 )
-			return end($term_array);
-		else
-			return $term_array;
+		
+		return $term_array;
 	}
 
 	/**

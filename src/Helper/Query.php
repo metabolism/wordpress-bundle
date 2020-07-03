@@ -135,7 +135,7 @@ class Query
 	{
 		$query = self::wp_query($args);
 
-		return $query ? array_filter($query->posts) : false;
+		return $query ? array_filter($query->posts) : [];
 	}
 
 

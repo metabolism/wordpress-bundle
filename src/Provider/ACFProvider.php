@@ -124,7 +124,7 @@ class ACFProvider {
 
 	/**
 	 * Add entity return format
-	 * @param $sizes
+	 * @param $field
 	 * @return array
 	 */
 	public function validateField($field){

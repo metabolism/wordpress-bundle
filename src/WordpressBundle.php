@@ -17,7 +17,7 @@ class WordpressBundle extends Bundle
 
 		$rootDir = $this->container->get('kernel')->getProjectDir();
 
-		include $rootDir.'/web/edition/wp-load.php';
+		include $rootDir.'/public/edition/wp-load.php';
 
 		global $wp;
 

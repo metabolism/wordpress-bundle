@@ -1,11 +1,11 @@
 {
   "name":"metabolism/wordpress-bundle",
   "type": "symfony-bundle",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "description": "Use Wordpress 5 as a backend for a Symfony application",
   "license": "GPL-3.0-or-later",
   "require": {
-    "php" : ">=5.6.1",
+    "php" : ">=7.1.0",
     "ext-zip" : "*",
     "ext-fileinfo" : "*",
     "ext-json" : "*",
@@ -31,16 +31,16 @@
     "post-package-install": {
       "create": {
         "metabolism/wordpress-bundle": {
-          "web/uploads": 775,
-          "web/wp-bundle/upgrade": 775,
-          "web/wp-bundle/languages": 775,
+          "public/uploads": 775,
+          "public/wp-bundle/upgrade": 775,
+          "public/wp-bundle/languages": 775,
           "config/acf-json": 775
         }
       },
       "copy": {
         "metabolism/wordpress-bundle": {
-          "tools/wp-config.php": "web/wp-config.php",
-          "samples/.htaccess": "web/.htaccess",
+          "tools/wp-config.php": "public/wp-config.php",
+          "samples/.htaccess": "public/.htaccess",
           "samples/config/wordpress.yml": "config/wordpress.yml",
           "samples/service/Context.php": "src/Service/Context.php",
           "samples/controller/BlogController.php": "src/Controller/BlogController.php"
@@ -49,13 +49,14 @@
       "symlink": {
         "metabolism/wordpress-bundle": {
           "README.md": "doc/wordpress-bundle.md",
-          "tools/mu-plugins/wp-bundle.php": "web/wp-bundle/mu-plugins/wp-bundle.php"
+          "tools/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php"
         }
       }
     },
     "branch-alias": {
       "dev-1.3.x": "1.3.x-dev",
-      "dev-1.4.x": "1.4.x-dev"
+      "dev-1.4.x": "1.4.x-dev",
+      "dev-1.5.x": "1.5.x-dev"
     }
   },
   "autoload" : {

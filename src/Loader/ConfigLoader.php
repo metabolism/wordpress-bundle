@@ -174,7 +174,7 @@ class ConfigLoader {
 		 */
 
 		if (!defined('PUBLIC_DIR'))
-			define( 'PUBLIC_DIR', '/web');
+			define( 'PUBLIC_DIR', '/public');
 
 		if (!defined('WP_CONTENT_DIR'))
 			define( 'WP_CONTENT_DIR', BASE_URI . PUBLIC_DIR . '/wp-bundle');

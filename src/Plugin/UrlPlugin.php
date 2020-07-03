@@ -166,7 +166,7 @@ class UrlPlugin {
 	/**
 	 * Remove link when there is no template support
 	 * @param $url
-	 * @return
+	 * @return string
 	 */
 	public function makePostRelative($url){
 
@@ -178,7 +178,7 @@ class UrlPlugin {
 	/**
 	 * Remove link when there is no template support
 	 * @param $url
-	 * @return
+	 * @return string
 	 */
 	public function makeAttachmentRelative($url){
 

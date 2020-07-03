@@ -2,7 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Helper;
 
-class DirFilterHelper extends \RecursiveFilterIterator
+class DirFilter extends \RecursiveFilterIterator
 {
 	protected $exclude;
 
@@ -19,6 +19,6 @@ class DirFilterHelper extends \RecursiveFilterIterator
 
 	public function getChildren()
 	{
-		return new DirFilterHelper($this->getInnerIterator()->getChildren(), $this->exclude);
+		return new DirFilter($this->getInnerIterator()->getChildren(), $this->exclude);
 	}
 }

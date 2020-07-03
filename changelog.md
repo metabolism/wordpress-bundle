@@ -1,6 +1,14 @@
 CHANGELOG
 ---------
 
+## 1.5.0
+#### Bugfix
+- psr-4 for helper
+- replaced usage php7.3 function
+#### Changed
+- adopt symfony 4 folder structure, `web` -> `public`
+- php7.1 as min version
+
 ## 1.4.5
 #### Bugfix
 - wp-cron.php required to be logged
