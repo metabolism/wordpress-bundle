@@ -1,20 +1,19 @@
 CHANGELOG
 ---------
 
-## 1.4.5
+## 1.4.4
 #### Bugfix
 - wp-cron.php required to be logged
+- removed tag from post copy
+
 #### Added
+- menu `depth` option in wordpress.yml
+- wordpress.yml version
 - File entity
 - taxonomy selector in admin now select parent automatically
 - Link return format for post
 - `wp-bundle/make_post_link_relative` filter
 - `wp-bundle/make_attachment_link_relative` filter
-
-## 1.4.4
-#### Added
-- menu `depth` option in wordpress.yml
-- wordpress.yml version
 
 ### Changed
 - menu regsitration in wordpress.yml can be grouped into `register`
