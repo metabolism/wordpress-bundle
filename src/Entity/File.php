@@ -83,12 +83,9 @@ class File extends Entity
 			if( !$post || is_wp_error($post) )
 				return false;
 
-			if( empty($metadata) ){
+			$metadata['file'] = get_post_meta($id, '_wp_attached_file', true);
 
-				$mime_type = get_post_mime_type($id);
-				$metadata = ['file' => get_post_meta($id, '_wp_attached_file', true), 'image_meta' =>  []];
-			}
-			if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
+			if( !$metadata['file'] )
 				return false;
 
 			$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
