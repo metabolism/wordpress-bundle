@@ -1,6 +1,11 @@
 CHANGELOG
 ---------
 
+## 1.4.5
+#### Bugfix
+- changed php 7.3 function
+- fixed File entity loading
+
 ## 1.4.4
 #### Bugfix
 - wp-cron.php required to be logged

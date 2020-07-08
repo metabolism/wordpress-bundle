@@ -683,9 +683,9 @@ class ConfigPlugin {
 			if( $feature == 'post_thumbnails' || $feature == 'post_thumbnail' || $feature == 'thumbnail')
 				$feature = 'post-thumbnails';
 
-			if( is_array($feature) ){
+			if( is_array($feature) && !empty($feature) ){
 
-				$key = array_key_first($feature);
+				$key = array_keys($feature)[0];
 				$params = $feature[$key];
 
 				if( !in_array($key, $excluded) )
