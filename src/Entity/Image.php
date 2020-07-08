@@ -16,6 +16,8 @@ class Image extends Entity
 	public static $wp_upload_dir = false;
 	public $focus_point = false;
 	public $file;
+	public $link;
+	public $url;
 	public $meta;
 	public $alt;
 	public $mime_type;
