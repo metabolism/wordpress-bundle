@@ -22,6 +22,9 @@ class FrontController {
 	 */
 	public function redirect()
 	{
+		if( defined('DOING_CRON') && DOING_CRON )
+			return;
+
 		$path = rtrim($_SERVER['REQUEST_URI'], '/');
 
 		if( !empty($path) && strpos($path, WP_FOLDER) !== false ){

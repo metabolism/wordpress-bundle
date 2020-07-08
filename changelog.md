@@ -1,6 +1,23 @@
 CHANGELOG
 ---------
 
+## 1.4.4
+#### Bugfix
+- wp-cron.php required to be logged
+- removed tag from post copy
+
+#### Added
+- menu `depth` option in wordpress.yml
+- wordpress.yml version
+- File entity
+- taxonomy selector in admin now select parent automatically
+- Link return format for post
+- `wp-bundle/make_post_link_relative` filter
+- `wp-bundle/make_attachment_link_relative` filter
+
+### Changed
+- menu regsitration in wordpress.yml can be grouped into `register`
+
 ## 1.4.3
 #### Added
 - post->getTerms('', ['hierarchical'=>false]) now accept a 'hierarchical' options to flatten output when multiple taxonimies are requested

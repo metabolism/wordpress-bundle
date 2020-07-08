@@ -212,7 +212,7 @@ class ACF
 				break;
 
 			case 'file':
-				$value = wp_get_attachment_url( $id );
+				$value = Factory::create($id, 'file', false, $object);
 				break;
 
 			case 'post':
@@ -335,22 +335,10 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'array' || $object['return_format'] == 'entity'){
-
-						$object_value = $object['value'];
-						$remove = ['id', 'link', 'name', 'status', 'uploaded_to', 'menu_order', 'icon', 'author'];
-
-						foreach($remove as $prop){
-							if( isset($object_value[$prop]) )
-								unset($object_value[$prop]);
-						}
-
-						$objects[$object['name']] = $object_value;
-					}
-					else{
-
+					if ($object['return_format'] == ($this->use_entity?'entity':'array'))
+						$objects[$object['name']] = $this->load('file', $object['value'], $object);
+					else
 						$objects[$object['name']] = $object['value'];
-					}
 
 					break;
 
@@ -380,8 +368,8 @@ class ACF
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'id' || is_int($object['value']) )
-						$objects[$object['name']] = $object['value'];
+					if ($object['return_format'] == 'link' )
+						$objects[$object['name']] = get_permalink($object['value']);
 					elseif ($object['return_format'] == ($this->use_entity?'entity':'object'))
 						$objects[$object['name']] = $this->load('post', $object['value']);
 					else
@@ -485,6 +473,15 @@ class ACF
 					$value = $this->bindLayoutFields($object['value'], $layout);
 
 					$objects[$object['name']] = $this->clean($value);
+
+					break;
+
+				case 'url';
+
+					if( is_int($object['value']) )
+						$objects[$object['name']] = get_permalink($object['value']);
+					else
+						$objects[$object['name']] = $object['value'];
 
 					break;
 

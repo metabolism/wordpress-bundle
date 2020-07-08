@@ -130,6 +130,10 @@ class ACFProvider {
 	public function validateField($field){
 
         if( $field['name'] == 'return_format'){
+
+	        if( isset($field['choices']['object'] ) )
+		        $field['choices']['link'] = __('Link');
+
             $field['choices']['entity'] = __('Entity');
             $field['default_value'] = 'entity';
         }

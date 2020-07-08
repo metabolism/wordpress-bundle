@@ -142,7 +142,6 @@ class Image extends Entity
 				if($mime_type == 'image/svg' || $mime_type == 'image/svg+xml' )
 					$metadata = ['file' => get_post_meta($id, '_wp_attached_file', true), 'image_meta' =>  []];
 			}
-
 			if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
 				return false;
 
@@ -153,6 +152,7 @@ class Image extends Entity
 				return false;
 
 			$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
+			$metadata['link'] = home_url($this->uploadDir('relative').'/'.$metadata['file']);
 			$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
 
 			foreach($post_meta as $key=>$value)
@@ -217,6 +217,7 @@ class Image extends Entity
 			$metadata = [
 				'src' => $filename,
 				'file' => str_replace(PUBLIC_DIR, '', $id),
+				'link' => home_url(str_replace(PUBLIC_DIR, '', $id)),
 				'width' => count($image_size)?$image_size[0]:false,
 				'height' => count($image_size)>1?$image_size[1]:false,
 				'mime_type' => $image_size['mime'],

@@ -245,7 +245,10 @@ class ConfigPlugin {
 	 */
 	public function addMenus()
 	{
-		foreach ($this->config->get('menu', []) as $location => $description)
+		$version = $this->config->get('version', 0);
+		$config = $version>=1?'menu.register':'menu';
+
+		foreach ($this->config->get($config, []) as $location => $description)
 		{
 			register_nav_menu($location, __($description, 'wordpress-bundle'));
 		}

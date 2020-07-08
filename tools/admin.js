@@ -12,6 +12,23 @@
 			disableACFLayoutReorder();
 			setInterval(disableACFLayoutReorder, 1000);
 		}
+
+		$('.postbox-container [data-wp-lists]').each(function(){
+
+			if( $(this).find('.children').length )
+				$(this).addClass('has-children');
+
+			$(this).find('input[type="checkbox"]').click(function(){
+
+				if( !$(this).attr('checked') ){
+
+					$(this).closest('li').find('input[type="checkbox"]').attr('checked', false)
+				}
+				else{
+					$(this).parents('li').find('> label input[type="checkbox"]').attr('checked', true)
+				}
+			})
+		})
 	});
 
 

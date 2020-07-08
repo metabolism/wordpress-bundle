@@ -1,7 +1,7 @@
 {
   "name":"metabolism/wordpress-bundle",
   "type": "symfony-bundle",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Use Wordpress 5 as a backend for a Symfony application",
   "license": "GPL-3.0-or-later",
   "require": {
@@ -10,7 +10,6 @@
     "ext-fileinfo" : "*",
     "ext-json" : "*",
     "ext-mbstring" : "*",
-    "ext-posix": "*",
     "ext-zlib": "*",
     "metabolism/wordpress-core-installer": "1.0.*",
     "metabolism/package-actions": "1.1.*",

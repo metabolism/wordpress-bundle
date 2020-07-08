@@ -71,7 +71,10 @@ class Menu extends Entity
 		foreach ($menu_items as $item)
 			$this->items[] = new $this->menuItemClass($item, $this->args);
 
-		$this->items = $this->addDepth();
+		global $_config;
+
+		if( $_config->get('menu.depth',  true) )
+			$this->items = $this->addDepth();
 
 		$menu_info = wp_get_nav_menu_object($menu_id);
 
