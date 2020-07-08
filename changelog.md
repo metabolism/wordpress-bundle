@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.4.6
+#### Added
+- link and url fallback for File and Image
+
 ## 1.4.5
 #### Bugfix
 - changed php 7.3 function

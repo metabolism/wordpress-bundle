@@ -15,6 +15,7 @@ class File extends Entity
 
 	public $file;
 	public $link;
+	public $url;
 	public $mime_type;
 	public $extension;
 	public $date;
@@ -101,7 +102,7 @@ class File extends Entity
 			$post['caption'] = $post['post_excerpt'];
 			$post['description'] = $post['post_content'];
 			$post['size'] = filesize($metadata['src']);
-			$post['link'] = home_url($metadata['file']);
+			$post['link'] = $post['url'] = home_url($metadata['file']);
 
 			unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
 		}
