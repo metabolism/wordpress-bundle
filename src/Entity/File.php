@@ -84,6 +84,9 @@ class File extends Entity
 			if( !$post || is_wp_error($post) )
 				return false;
 
+			if( !is_array($metadata) )
+				$metadata = [];
+
 			$metadata['file'] = get_post_meta($id, '_wp_attached_file', true);
 
 			if( !$metadata['file'] )
