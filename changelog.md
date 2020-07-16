@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.4.7
+#### Bugfix
+- link and url fallback for File and Image
+
 ## 1.4.6
 #### Added
 - link and url fallback for File and Image

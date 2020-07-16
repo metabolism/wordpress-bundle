@@ -132,6 +132,8 @@ class File extends Entity
 				'post_modified' => filectime($filename),
 				'post_modified_gmt' => date("Y-m-d H:i:s", filectime($filename))
 			];
+
+			$metadata['url'] = $metadata['link'];
 		}
 
 		if( is_array($metadata) )
