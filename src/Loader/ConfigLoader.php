@@ -102,10 +102,10 @@ class ConfigLoader {
 		 */
 		$isSecure = false;
 
-		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'){
+		if (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on'){
 			$isSecure = true;
 		}
-		elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on'){
+		elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) == 'on'){
 			$isSecure = true;
 			$_SERVER['HTTPS']='on';
 		}
@@ -122,7 +122,7 @@ class ConfigLoader {
         if(filter_var($_SERVER['SERVER_NAME'], FILTER_VALIDATE_IP) !== false)
             define('COOKIE_DOMAIN', '' );
         else
-            define( 'COOKIE_DOMAIN', $_SERVER[ 'HTTP_HOST' ] );
+            define( 'COOKIE_DOMAIN', strtok($_SERVER[ 'HTTP_HOST' ], ':') );
 
 		/**
 		 * Define DB settings

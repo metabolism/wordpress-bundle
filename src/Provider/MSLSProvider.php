@@ -49,6 +49,9 @@ class MSLSProvider {
 
 				if( !is_wp_error($post) )
 				{
+					//remove tags
+					unset($post['tags_input']);
+
 					// get the original meta
 					$meta = get_post_meta($_GET['post_id']);
 

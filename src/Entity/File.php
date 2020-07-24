@@ -15,6 +15,7 @@ class File extends Entity
 
 	public $file;
 	public $link;
+	public $url;
 	public $mime_type;
 	public $extension;
 	public $date;
@@ -83,12 +84,12 @@ class File extends Entity
 			if( !$post || is_wp_error($post) )
 				return false;
 
-			if( empty($metadata) ){
+			if( !is_array($metadata) )
+				$metadata = [];
 
-				$mime_type = get_post_mime_type($id);
-				$metadata = ['file' => get_post_meta($id, '_wp_attached_file', true), 'image_meta' =>  []];
-			}
-			if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
+			$metadata['file'] = get_post_meta($id, '_wp_attached_file', true);
+
+			if( !$metadata['file'] )
 				return false;
 
 			$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
@@ -104,7 +105,7 @@ class File extends Entity
 			$post['caption'] = $post['post_excerpt'];
 			$post['description'] = $post['post_content'];
 			$post['size'] = filesize($metadata['src']);
-			$post['link'] = home_url($metadata['file']);
+			$post['link'] = $post['url'] = home_url($metadata['file']);
 
 			unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
 		}
@@ -131,6 +132,8 @@ class File extends Entity
 				'post_modified' => filectime($filename),
 				'post_modified_gmt' => date("Y-m-d H:i:s", filectime($filename))
 			];
+
+			$metadata['url'] = $metadata['link'];
 		}
 
 		if( is_array($metadata) )
