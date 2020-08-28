@@ -20,13 +20,10 @@
 
 			$(this).find('input[type="checkbox"]').click(function(){
 
-				if( !$(this).attr('checked') ){
-
+				if( !$(this).is(':checked') )
 					$(this).closest('li').find('input[type="checkbox"]').attr('checked', false)
-				}
-				else{
+				else
 					$(this).parents('li').find('> label input[type="checkbox"]').attr('checked', true)
-				}
 			})
 		})
 	});
