@@ -126,3 +126,13 @@ th#mslscol{ width: 25px }
 #your-profile select, #your-profile textarea, #your-profile .description, #your-profile .select2, #your-profile .acf-taxonomy-field{ max-width: 25em; width: 100% }
 #your-profile .description{ line-height: 1; opacity: 0.5 }
 #your-profile label, #your-profile th[scope=row], #your-profile .user-profile-picture th{ font-weight: normal }
+
+/* WP5.5 */
+.php-error #adminmenuback, .php-error #adminmenuwrap{ margin-top: 0 }
+.handle-order-higher, .handle-order-lower{ display: none }
+.acf-postbox.seamless > .postbox-header{ display: none }
+.postbox-header{ border-bottom: 0 }
+#wpfooter{ display: none }
+.acf-field{ min-height: auto!important }
+.acf-fields>.acf-field{ padding: 6px 12px }
+.acf-field .acf-label{ margin-bottom: 6px }
