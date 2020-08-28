@@ -1,6 +1,14 @@
 CHANGELOG
 ---------
 
+## 1.4.9
+#### Bugfix
+- CSS update
+
+## 1.4.8
+#### Bugfix
+- failed loading when twig service is not installed
+
 ## 1.4.7
 #### Bugfix
 - link and url fallback for File and Image
