@@ -134,5 +134,5 @@ th#mslscol{ width: 25px }
 .postbox-header{ border-bottom: 0 }
 #wpfooter{ display: none }
 .acf-field{ min-height: auto!important }
-.acf-fields>.acf-field{ padding: 6px 12px }
+.acf-fields>.acf-field{ padding: 12px }
 .acf-field .acf-label{ margin-bottom: 6px }
