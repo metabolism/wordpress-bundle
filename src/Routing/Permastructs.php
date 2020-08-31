@@ -6,7 +6,7 @@ use Dflydev\DotAccessData\Data;
 use Symfony\Component\Routing\Route,
 	Symfony\Component\Routing\RouteCollection;
 
-class Permastruct{
+class Permastructs{
 
 	public $collection;
 	private $controller_name, $wp_rewrite, $locale;
