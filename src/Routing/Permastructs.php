@@ -1,6 +1,6 @@
 <?php
 
-namespace Metabolism\WordpressBundle;
+namespace Metabolism\WordpressBundle\Routing;
 
 use Dflydev\DotAccessData\Data;
 use Symfony\Component\Routing\Route,
