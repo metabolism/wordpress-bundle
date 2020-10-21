@@ -144,9 +144,10 @@ class Image extends Entity
 				if($mime_type == 'image/svg' || $mime_type == 'image/svg+xml' )
 					$metadata = ['file' => get_post_meta($id, '_wp_attached_file', true), 'image_meta' =>  []];
 			}
-			if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
+			if( empty($metadata) || !isset($metadata['file']) )
 				return false;
 
+			$metadata['file'] = ltrim($metadata['file'], '/');
 			$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
 			$metadata['src']  = str_replace(WP_FOLDER.'/..', '', $metadata['src']);
 
@@ -154,7 +155,7 @@ class Image extends Entity
 				return false;
 
 			$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
-			$metadata['link'] = home_url($this->uploadDir('relative').'/'.$metadata['file']);
+			$metadata['link'] = home_url($metadata['file']);
 			$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
 
 			foreach($post_meta as $key=>$value)
@@ -198,7 +199,7 @@ class Image extends Entity
 			if( isset($post['mime_type']) && ($post['mime_type'] == 'image/svg+xml' || $this->mime_type == 'image/svg') )
 				unset($metadata['meta'], $metadata['width'], $metadata['height']);
 
-			if( $this->show_meta )
+			if( $this->show_meta && isset($metadata['image_meta']) )
 				$metadata['meta'] = $metadata['image_meta'];
 			else
 				$metadata['meta'] = false;
@@ -322,6 +323,9 @@ class Image extends Entity
 	 * @return string
 	 */
 	private function process($params, $ext=null){
+
+		if( !in_array($this->extension, ['jpg','jpeg','png','gif','webp']) )
+			return $this->src;
 
 		//redefine ext if webp is not supported
 		if( $ext === 'webp' && !function_exists('imagewebp'))

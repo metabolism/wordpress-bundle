@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.4.10
+#### Bugfix
+- SVG loading and resize
+
 ## 1.4.9
 #### Bugfix
 - CSS update

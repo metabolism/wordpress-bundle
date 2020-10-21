@@ -100,20 +100,43 @@ class Cache {
 	public function purgeUrl($url=false){
 
 		if( !$url )
-			$url = get_home_url(null, '*');
+			$url = get_home_url(null, '.*');
 
-		$varnish = isset($_SERVER['VARNISH_IP'])?$_SERVER['VARNISH_IP']:false;
+		$varnish_ssl = isset($_SERVER['VARNISH_SSL'])?$_SERVER['VARNISH_SSL']:false;
+
+		if( isset($_SERVER['VARNISH_IPS']) )
+			$varnish_ips = explode(',',$_SERVER['VARNISH_IPS']);
+		elseif( isset($_SERVER['VARNISH_IP']) )
+			$varnish_ips = [$_SERVER['VARNISH_IP']];
+		else{
+			$response = new \WP_Error('No Varnish Ip defined');
+			return [$url, $response];
+		}
 
 		$args = [
 			'method' => 'PURGE',
-			'headers' => ['Host' => $_SERVER['HTTP_HOST']],
+			'headers' => [
+				'host' => $_SERVER['HTTP_HOST'],
+				'X-VC-Purge-Method' => 'regex',
+				'X-VC-Purge-Host' => $_SERVER['HTTP_HOST']
+			],
 			'sslverify' => false
 		];
 
-		if( $varnish )
-			$url = str_replace($_SERVER['HTTP_HOST'], $varnish, $url);
+		foreach ($varnish_ips as $varnish_ip){
 
-		return [$url, wp_remote_request($url, $args)];
+			$varnish_url = str_replace($_SERVER['HTTP_HOST'], $varnish_ip, $url);
+
+			if( !$varnish_ssl )
+				$varnish_url = str_replace('https://', 'http://', $varnish_url);
+
+			$response = wp_remote_request($varnish_url, $args);
+
+			if( is_wp_error($response) )
+				return [$varnish_url, $response];
+		}
+
+		return [$varnish_url, $response];
 	}
 
 

@@ -266,7 +266,7 @@ class ACF
 
 			switch ($object['type']) {
 
-				case 'clone';
+				case 'clone':
 
 					if( $object['display'] == 'group' && isset($object['sub_fields']) && is_iterable($object['sub_fields']) ){
 
@@ -284,7 +284,7 @@ class ACF
 
 					break;
 
-				case 'latest_posts';
+				case 'latest_posts':
 
 					$objects[$object['name']] = [];
 
@@ -295,7 +295,7 @@ class ACF
 
 					break;
 
-				case 'image';
+				case 'image':
 
 					if( empty($object['value']) )
 						break;
@@ -307,7 +307,7 @@ class ACF
 
 					break;
 
-				case 'gallery';
+				case 'gallery':
 
 					if( empty($object['value']) )
 						break;
@@ -330,7 +330,7 @@ class ACF
 
 					break;
 
-				case 'file';
+				case 'file':
 
 					if( empty($object['value']) )
 						break;
@@ -342,7 +342,7 @@ class ACF
 
 					break;
 
-				case 'relationship';
+				case 'relationship':
 
 					$objects[$object['name']] = [];
 
@@ -363,7 +363,7 @@ class ACF
 					}
 					break;
 
-				case 'post_object';
+				case 'post_object':
 
 					if( empty($object['value']) )
 						break;
@@ -377,7 +377,7 @@ class ACF
 
 					break;
 
-				case 'user';
+				case 'user':
 
 					if( empty($object['value']) )
 						break;
@@ -385,7 +385,7 @@ class ACF
 					$objects[$object['name']] = $this->load('user', $object['value']);
 					break;
 
-				case 'flexible_content';
+				case 'flexible_content':
 
 					$objects[$object['name']] = [];
 
@@ -404,7 +404,7 @@ class ACF
 
 					break;
 
-				case 'repeater';
+				case 'repeater':
 
 					$objects[$object['name']] = [];
 
@@ -421,7 +421,7 @@ class ACF
 
 					break;
 
-				case 'taxonomy';
+				case 'taxonomy':
 
 					$objects[$object['name']] = [];
 
@@ -458,7 +458,7 @@ class ACF
 
 					break;
 
-				case 'select';
+				case 'select':
 
 					if( !$object['multiple'] && is_array($object['value']) &&($object['value']) )
 						$objects[$object['name']] = $object['value'][0];
@@ -467,7 +467,7 @@ class ACF
 
 					break;
 
-				case 'group';
+				case 'group':
 
 					$layout = $this->layoutAsKeyValue($object['sub_fields']);
 					$value = $this->bindLayoutFields($object['value'], $layout);
@@ -476,7 +476,7 @@ class ACF
 
 					break;
 
-				case 'url';
+				case 'url':
 
 					if( is_int($object['value']) )
 						$objects[$object['name']] = get_permalink($object['value']);
@@ -484,6 +484,10 @@ class ACF
 						$objects[$object['name']] = $object['value'];
 
 					break;
+
+				case 'wysiwyg':
+					$objects[$object['name']] = do_shortcode($object['value']);
+				    break;
 
 				default:
 

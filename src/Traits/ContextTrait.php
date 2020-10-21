@@ -183,7 +183,7 @@ Trait ContextTrait
 
 		if( !HEADLESS || URL_MAPPING )
 		{
-			$wp_title = trim(wp_title(' ', false));
+			$wp_title = trim(@wp_title(' ', false));
 			$body_class = $queried_object ? implode(' ', get_body_class()) : '';
 
 			$policy_page_id       = (int) get_option( 'wp_page_for_privacy_policy' );
@@ -633,7 +633,7 @@ Trait ContextTrait
 			foreach ($raw_terms as $term)
 				$terms[$term->taxonomy][$term->term_id] = is_wp_error($term) ? false : $term;
 
-			if( !isset($args['sort']) || $args['sort'] ){
+			if( !isset($args['child_of']) && (!isset($args['sort']) || $args['sort']) ){
 
 				foreach ($terms as &$term_group)
 					$term_group = TermsPlugin::sortHierarchically( $term_group );
@@ -651,7 +651,7 @@ Trait ContextTrait
 		}
 		else
 		{
-			if( !isset($args['sort']) || $args['sort']  )
+			if( !isset($args['child_of']) && (!isset($args['sort']) || $args['sort'])  )
 				$raw_terms = TermsPlugin::sortHierarchically( $raw_terms );
 
 			foreach ($raw_terms as $term)

@@ -177,6 +177,11 @@ class WPSEOProvider
 					return $make && empty($wp_query->query_vars["sitemap"]) && empty($wp_query->query_vars["yoast-sitemap-xsl"]);
 				});
 
+				add_filter('wpseo_opengraph_url', function($url){
+
+					return trim(home_url('/'), '/').$url;
+				});
+
 				add_filter('robots_txt', [$this, 'sitemapToRobots'], 9999, 1 );
 			});
 		}
