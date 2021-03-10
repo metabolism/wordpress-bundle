@@ -122,7 +122,7 @@ class ConfigLoader {
         if(filter_var($_SERVER['SERVER_NAME'], FILTER_VALIDATE_IP) !== false)
             define('COOKIE_DOMAIN', '' );
         else
-            define( 'COOKIE_DOMAIN', $_SERVER[ 'HTTP_HOST' ] );
+            define( 'COOKIE_DOMAIN', strtok($_SERVER[ 'HTTP_HOST' ], ':') );
 
 		/**
 		 * Define DB settings

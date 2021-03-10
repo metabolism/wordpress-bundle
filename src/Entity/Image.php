@@ -142,16 +142,15 @@ class Image extends Entity
 				$mime_type = get_post_mime_type($id);
 
 				if($mime_type == 'image/svg' || $mime_type == 'image/svg+xml' )
-					$metadata = ['file' => get_post_meta($id, '_wp_attached_file', true), 'image_meta' =>  []];
+					$metadata = ['file' => ($post_meta['_wp_attached_file'][0]??false), 'image_meta' =>  []];
 			}
 			if( empty($metadata) || !isset($metadata['file']) )
 				return false;
 
-			$metadata['file'] = ltrim($metadata['file'], '/');
+			$metadata['file'] = ltrim(($post_meta['_wp_attached_file'][0]??false), '/');
 			$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
-			$metadata['src']  = str_replace(WP_FOLDER.'/..', '', $metadata['src']);
 
-			if( !file_exists($metadata['src']) )
+			if( !@file_exists($metadata['src']) )
 				return false;
 
 			$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
@@ -305,11 +304,9 @@ class Image extends Entity
 	 */
 	public function edit($params, $ext=null){
 
-		$abspath = str_replace(WP_FOLDER.'/..', '', $this->uploadDir('basedir'));
-
 		$file = $this->process($params, $ext);
 
-		$url = str_replace($abspath, $this->uploadDir('relative'), $file);
+		$url = str_replace($this->uploadDir('basedir'), $this->uploadDir('relative'), $file);
 		$url = str_replace(BASE_URI.PUBLIC_DIR, '', $url);
 
 		return $url;
@@ -618,7 +615,7 @@ class Image extends Entity
 
 
 	/**
-	 * @param $image
+	 * @param \Intervention\Image\Image $image
 	 * @param $w
 	 * @param int $h
 	 * @return void
@@ -647,7 +644,7 @@ class Image extends Entity
 			$ratio_height = $src_height/$h;
 			$ratio_width = $src_width/$w;
 
-			if( $dest_ratio < 1)
+			if( $src_ratio >= 1 && $dest_ratio <= 1)
 			{
 				$dest_width = $w*$ratio_height;
 				$dest_height = $src_height;
@@ -658,26 +655,20 @@ class Image extends Entity
 				$dest_height = $h*$ratio_width;
 			}
 
-			if ($ratio_height < $ratio_width) {
-
-				list($cropX1, $cropX2) = $this->calculateCrop($src_width, $dest_width, $this->focus_point['x']/100);
-				$cropY1 = 0;
-				$cropY2 = $src_height;
-			} else {
-
-				list($cropY1, $cropY2) = $this->calculateCrop($src_height, $dest_height, $this->focus_point['y']/100);
-				$cropX1 = 0;
-				$cropX2 = $src_width;
+			if( $dest_width > $src_width ){
+				$dest_width = $src_width;
+				$dest_height = $h*$ratio_width;
 			}
 
+			if( $dest_height > $src_height ){
+				$dest_height = $src_height;
+				$dest_width = $w*$ratio_height;
+			}
+
+				list($cropX1, $cropX2) = $this->calculateCrop($src_width, $dest_width, $this->focus_point['x']/100);
+				list($cropY1, $cropY2) = $this->calculateCrop($src_height, $dest_height, $this->focus_point['y']/100);
+
 			$image->crop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
-
-			$tmp = tempnam("/tmp", "II");
-
-			$image->save($tmp, 100);
-
-			$image = ImageManagerStatic::make($tmp);
-
 			$image->fit($w, $h);
 		}
 		else{

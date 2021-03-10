@@ -551,6 +551,12 @@ class MediaPlugin {
 	 */
 	public static function add_relative_upload_dir_key( $arr )
 	{
+		if (DIRECTORY_SEPARATOR === '\\') {
+
+			$arr['path'] = str_replace('\\', '/', $arr['path']);
+			$arr['basedir'] = str_replace('\\', '/', $arr['basedir']);
+		}
+
 		$key = $arr['subdir'];
 
 		if( isset(self::$cache['relative_upload_dir'][$key]) )

@@ -1,6 +1,12 @@
 CHANGELOG
 ---------
 
+## 1.4.11
+#### Bugfix
+- Better smart resize
+- image loading on Windows
+- cookie management for host with non default port
+
 ## 1.4.10
 #### Bugfix
 - SVG loading and resize
