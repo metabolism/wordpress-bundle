@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.4.12
+#### Bugfix
+- Prevent image resize on upload when filename end with _hd or _cmjk
+
 ## 1.4.11
 #### Bugfix
 - Better smart resize

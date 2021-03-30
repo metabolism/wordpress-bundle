@@ -599,6 +599,15 @@ class MediaPlugin {
 	 */
 	public function uploadResize( $image_data )
 	{
+	    if( isset($_POST['name']) ){
+
+	        $info = pathinfo($_POST['name']);
+	        $info = explode('_', str_replace('-', '_', ($info['filename']??'')));
+
+	        if(count($info) && in_array($info[count($info)-1], ['hd','cmjk','cmjn']) )
+	            return $image_data;
+        }
+
 		$valid_types = array('image/png','image/jpeg','image/jpg');
 
 		if(in_array($image_data['type'], $valid_types) && $this->config->get('image.resize') ){
