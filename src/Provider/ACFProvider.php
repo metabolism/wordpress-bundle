@@ -205,7 +205,7 @@ class ACFProvider {
 		{
 			add_filter( 'wp-bundle/admin_notices', function($folders){
 
-				if( class_exists('ACFHelper') ){
+				if( class_exists('ACF') ){
 
 					$folders[] = PUBLIC_DIR.'/uploads/acf-thumbnails';
 					$folders[] = $this::$folder;

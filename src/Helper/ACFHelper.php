@@ -200,10 +200,23 @@ class ACFHelper
 	{
 		$value = false;
 
-		if( is_array($id) && (isset($id['id'])||isset($id['ID'])) )
-            $id = isset($id['id'])?$id['id']:$id['ID'];
-		elseif( is_object($id) && (isset($id->id)||isset($id->ID)) )
-            $id = isset($id->id)?$id->id:$id->ID;
+		if( $type == 'term' ){
+
+            if(is_array($id) )
+                $id = $id['term_id']??false;
+            elseif( is_object($id) )
+                $id = $id->term_id??false;
+        }
+        else{
+
+            if(is_array($id) )
+                $id = $id['id']??$id['ID']??false;
+            elseif( is_object($id) )
+                $id = $id->id??$id->ID??false;
+        }
+
+        if( !$id )
+            return null;
 
 		switch ($type)
 		{
@@ -300,7 +313,7 @@ class ACFHelper
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == ($this->use_entity?'entity':'array'))
+					if ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'array'))
 						$objects[$object['name']] = $this->load('image', $object['value'], $object);
 					else
 						$objects[$object['name']] = $object['value'];
@@ -320,7 +333,7 @@ class ACFHelper
 
 							foreach ($object['value'] as $value){
 
-								if ($object['return_format'] == ($this->use_entity?'entity':'array'))
+								if ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'array'))
 									$objects[$object['name']][] = $this->load('image', $value, $object);
 								else
 									$objects[$object['name']][] = $value;
@@ -335,7 +348,7 @@ class ACFHelper
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == ($this->use_entity?'entity':'array'))
+					if ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'array'))
 						$objects[$object['name']] = $this->load('file', $object['value'], $object);
 					else
 						$objects[$object['name']] = $object['value'];
@@ -352,7 +365,7 @@ class ACFHelper
 
 							if ($object['return_format'] == 'id' || is_int($value) )
 								$element = $value;
-							elseif ($object['return_format'] == ($this->use_entity?'entity':'object'))
+							elseif ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'object'))
 								$element = $this->load('post', $value);
 							else
 								$element = $object['value'];
@@ -370,7 +383,7 @@ class ACFHelper
 
 					if ($object['return_format'] == 'link' )
 						$objects[$object['name']] = get_permalink($object['value']);
-					elseif ($object['return_format'] == ($this->use_entity?'entity':'object'))
+					elseif ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'object'))
 						$objects[$object['name']] = $this->load('post', $object['value']);
 					else
 						$objects[$object['name']] = $object['value'];
@@ -429,31 +442,30 @@ class ACFHelper
 
 						foreach ($object['value'] as $value) {
 
-							if ($object['return_format'] == 'id'){
-								if( $value )
-									$objects[$object['name']][] = $value;
-							}
-							elseif (is_object($value) && $object['return_format'] == ($this->use_entity?'entity':'object')){
-								if( isset($value->term_id) )
-									$objects[$object['name']][] = $this->load('term', $value->term_id);
-								else
-									$objects[$object['name']][] = $this->load('term', $value);
-							}
+                            if( $value ){
+
+                                if($object['return_format'] == 'link' )
+                                    $objects[$object['name']][] = get_term_link($value);
+                                elseif($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'object') )
+                                    $objects[$object['name']][] = $this->load('term', $value);
+                                else
+                                    $objects[$object['name']][] = $value;
+                            }
 						}
 					}
 					else{
 
-						if ($object['return_format'] == 'id'){
-							if( $object['value'] )
-								$objects[$object['name']] = $object['value'];
-						}
-						elseif (is_object($object['value']) && $object['return_format'] == ($this->use_entity?'entity':'object')){
+                        if( $object['value'] ){
 
-							if( isset($object['value']->term_id) )
-								$objects[$object['name']] = $this->load('term', $object['value']->term_id);
-							else
-								$objects[$object['name']] = $this->load('term', $object['value']);
-						}
+                            $value = $object['value'];
+
+                            if($object['return_format'] == 'link' )
+                                $objects[$object['name']] = get_term_link($value);
+                            elseif($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'object') )
+                                $objects[$object['name']] = $this->load('term', $value);
+                            else
+                                $objects[$object['name']] = $value;
+                        }
 					}
 
 					break;

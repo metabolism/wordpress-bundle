@@ -7,6 +7,7 @@ CHANGELOG
 - replaced usage php7.3 function
 - https in base url sometime failed
 - Invalid cookie domain when port is in url
+- ACF link return type for term
 #### Changed
 - adopt symfony 4 folder structure, `web` -> `public`
 - php7.1 as min version

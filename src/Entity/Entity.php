@@ -100,7 +100,7 @@ class Entity
 	 */
 	protected function addCustomFields( $id)
 	{
-		if( class_exists('ACFHelper') && !$this->custom_fields )
+		if( class_exists('ACF') && !$this->custom_fields )
 		{
 			$this->custom_fields = new ACFHelper( $id );
 			$this->bindCustomFields();
