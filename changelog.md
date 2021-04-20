@@ -11,6 +11,41 @@ CHANGELOG
 - adopt symfony 4 folder structure, `web` -> `public`
 - php7.1 as min version
 
+## 1.4.12
+#### Bugfix
+- Prevent image resize on upload when filename end with _hd or _cmjk
+
+## 1.4.11
+#### Bugfix
+- Better smart resize
+- image loading on Windows
+- cookie management for host with non default port
+
+## 1.4.10
+#### Bugfix
+- SVG loading and resize
+
+## 1.4.9
+#### Bugfix
+- CSS update
+
+## 1.4.8
+#### Bugfix
+- failed loading when twig service is not installed
+
+## 1.4.7
+#### Bugfix
+- link and url fallback for File and Image
+
+## 1.4.6
+#### Added
+- link and url fallback for File and Image
+
+## 1.4.5
+#### Bugfix
+- changed php 7.3 function
+- fixed File entity loading
+
 ## 1.4.4
 #### Bugfix
 - wp-cron.php required to be logged

@@ -9,7 +9,7 @@ use Metabolism\WordpressBundle\Factory\Factory,
 	Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 
-class ACF
+class ACFHelper
 {
 	private $raw_objects;
 	private $objects;
@@ -21,7 +21,7 @@ class ACF
 	protected static $DEPTH = 0;
 
 	/**
-	 * ACF constructor.
+	 * ACFHelper constructor.
 	 * @param $id
 	 * @param string $type
 	 */

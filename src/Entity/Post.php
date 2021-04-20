@@ -5,7 +5,7 @@ namespace Metabolism\WordpressBundle\Entity;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
-use Metabolism\WordpressBundle\Helper\Query;
+use Metabolism\WordpressBundle\Helper\QueryHelper;
 
 /**
  * Class Post
@@ -143,7 +143,7 @@ class Post extends Entity
 	 */
 	public function adjacents($args=[], $loop=false){
 
-		return Query::get_adjacent_posts($this->ID, $args, $loop);
+		return QueryHelper::get_adjacent_posts($this->ID, $args, $loop);
 	}
 
 

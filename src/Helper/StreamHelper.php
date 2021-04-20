@@ -2,7 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Helper{
 
-	class Stream {
+	class StreamHelper {
 
 		public static function send($file)
 		{
@@ -14,7 +14,7 @@ namespace Metabolism\WordpressBundle\Helper{
 			header('Content-Disposition: attachment; filename='.basename($file));
 			header('Content-Transfer-Encoding: binary');
 			header('Expires: 0');
-			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('CacheHelper-Control: must-revalidate, post-check=0, pre-check=0');
 			header('Pragma: public');
 			header('Content-Length: ' . filesize($file));
 

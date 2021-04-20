@@ -8,20 +8,20 @@ use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
 
 /**
- * Class Query
+ * Class QueryHelper
  *
  * @package Metabolism\WordpressBundle\Entity
  */
-class Query
+class QueryHelper
 {
 	public static function get_fields($id)
 	{
-		$acf_helper = new ACF($id);
+		$acf_helper = new ACFHelper($id);
 		return $acf_helper->get();
 	}
 
 	/**
-	 * Query terms
+	 * QueryHelper terms
 	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
 	 * @return Term[]
 	 */

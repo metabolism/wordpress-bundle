@@ -7,8 +7,8 @@ use lloc\Msls\MslsOptions;
 use Metabolism\WordpressBundle\Entity\User;
 use Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
-use Metabolism\WordpressBundle\Helper\ACF,
-	Metabolism\WordpressBundle\Helper\Query;
+use Metabolism\WordpressBundle\Helper\ACFHelper,
+	Metabolism\WordpressBundle\Helper\QueryHelper;
 use Metabolism\WordpressBundle\Plugin\ConfigPlugin;
 use Metabolism\WordpressBundle\Plugin\TermsPlugin;
 
@@ -48,7 +48,7 @@ Trait ContextTrait
 
 
 	/**
-	 * load ACF options
+	 * load ACFHelper options
 	 * @return void
 	 */
 	protected function addOptions()
@@ -253,13 +253,13 @@ Trait ContextTrait
 
 
 	/**
-	 * Get ACF Fields wrapper
+	 * Get ACFHelper Fields wrapper
 	 * @param $id
 	 * @return object|bool
 	 */
 	public function getFields($id)
 	{
-		$fields = new ACF($id);
+		$fields = new ACFHelper($id);
 		return $fields->get();
 	}
 
@@ -444,7 +444,7 @@ Trait ContextTrait
 
 
 	/**
-	 * Query posts
+	 * QueryHelper posts
 	 *
 	 * @see Post
 	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters,
@@ -455,7 +455,7 @@ Trait ContextTrait
 	 */
 	public function addPosts($args=[], $key='posts', $callback=false){
 
-		$wp_query = Query::wp_query($args);
+		$wp_query = QueryHelper::wp_query($args);
 		$raw_posts = $wp_query->posts;
 		$posts = [];
 
@@ -616,7 +616,7 @@ Trait ContextTrait
 
 
 	/**
-	 * Query terms
+	 * QueryHelper terms
 	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/,
 	 * added output=array|object, group=bool and sort=bool
 	 * @param string $key
@@ -625,7 +625,7 @@ Trait ContextTrait
 	 */
 	public function addTerms($args=[], $key='terms', $callback=false)
 	{
-		$raw_terms = Query::get_terms($args);
+		$raw_terms = QueryHelper::get_terms($args);
 		$terms = [];
 
 		if( isset($args['taxonomy'], $args['group']) && is_array($args['taxonomy']) && $args['group']) {

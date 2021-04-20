@@ -8,7 +8,7 @@ use Metabolism\WordpressBundle\Plugin\MediaPlugin as Media;
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class Form {
+class FormHelper {
 
 	/**
 	 * Get request parameter

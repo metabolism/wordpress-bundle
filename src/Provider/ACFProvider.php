@@ -31,7 +31,7 @@ class ACFProvider {
 
 
 	/**
-	 * Add wordpress configuration 'options_page' fields as ACF Options pages
+	 * Add wordpress configuration 'options_page' fields as ACFHelper Options pages
 	 */
 	public function addOptionPages()
 	{
@@ -205,7 +205,7 @@ class ACFProvider {
 		{
 			add_filter( 'wp-bundle/admin_notices', function($folders){
 
-				if( class_exists('ACF') ){
+				if( class_exists('ACFHelper') ){
 
 					$folders[] = PUBLIC_DIR.'/uploads/acf-thumbnails';
 					$folders[] = $this::$folder;
@@ -214,7 +214,7 @@ class ACFProvider {
 				return $folders;
 			});
 
-			// Setup ACF Settings
+			// Setup ACFHelper Settings
 			add_action( 'acf/init', [$this, 'addSettings'] );
 			add_filter( 'acf/fields/wysiwyg/toolbars' , [$this, 'editToolbars']  );
 			add_action( 'init', [$this, 'addOptionPages'] );

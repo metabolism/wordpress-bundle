@@ -4,7 +4,7 @@ namespace Metabolism\WordpressBundle\Helper;
 
 use Symfony\Component\HttpFoundation\Response;
 
-class Cache {
+class CacheHelper {
 
 	public function __construct(){}
 

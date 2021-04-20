@@ -5,7 +5,7 @@ namespace Metabolism\WordpressBundle\Helper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class Robots {
+class RobotsHelper {
 
 	public function doAction(){
 

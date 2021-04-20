@@ -106,7 +106,7 @@ class Term extends Entity
 			$term->depth = count(get_ancestors( $term->ID, $term->taxonomy ));
 
 			// load thumbnail if set to optimize loading by preventing full acf load
-			//todo: move to ACF Provider using action
+			//todo: move to ACFHelper Provider using action
 			if( function_exists('get_field_object') )
 			{
 				$object = get_field_object('thumbnail', $term->taxonomy.'_'.$term->ID);

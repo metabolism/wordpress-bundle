@@ -2,7 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
-use Metabolism\WordpressBundle\Helper\ACF;
+use Metabolism\WordpressBundle\Helper\ACFHelper;
 
 /**
  * Class Entity
@@ -85,7 +85,7 @@ class Entity
 
 
 	/**
-	 * Load ACF Fields
+	 * Load ACFHelper Fields
 	 */
 	public function load()
 	{
@@ -100,9 +100,9 @@ class Entity
 	 */
 	protected function addCustomFields( $id)
 	{
-		if( class_exists('ACF') && !$this->custom_fields )
+		if( class_exists('ACFHelper') && !$this->custom_fields )
 		{
-			$this->custom_fields = new ACF( $id );
+			$this->custom_fields = new ACFHelper( $id );
 			$this->bindCustomFields();
 		}
 	}

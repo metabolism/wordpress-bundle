@@ -3,7 +3,7 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 use Dflydev\DotAccessData\Data;
-use Metabolism\WordpressBundle\Helper\Cache;
+use Metabolism\WordpressBundle\Helper\CacheHelper;
 use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 
@@ -42,10 +42,10 @@ class CachePlugin
 	public function message()
 	{
 		if( !empty($this->noticeMessage) )
-			echo '<div id="message" class="updated fade"><p><strong>' . __('Cache') . '</strong><br />' . $this->noticeMessage . '</p></div>';
+			echo '<div id="message" class="updated fade"><p><strong>' . __('CacheHelper') . '</strong><br />' . $this->noticeMessage . '</p></div>';
 
 		if( !empty($this->errorMessage) )
-			echo '<div id="message" class="error fade"><p><strong>' . __('Cache') . '</strong><br />' . $this->errorMessage . '</p></div>';
+			echo '<div id="message" class="error fade"><p><strong>' . __('CacheHelper') . '</strong><br />' . $this->errorMessage . '</p></div>';
 	}
 
 
@@ -131,7 +131,7 @@ class CachePlugin
 		$env = isset($_SERVER['APP_ENV'])?$_SERVER['APP_ENV']:'dev';
 		$debug = (bool) ( isset($_SERVER['APP_DEBUG'])?$_SERVER['APP_DEBUG']:('prod' !== $env));
 
-		$this->cacheHelper = new Cache();
+		$this->cacheHelper = new CacheHelper();
 
 		if( isset($_GET['cache']) && $_GET['cache'] == 'purge' )
 			$this->purge();

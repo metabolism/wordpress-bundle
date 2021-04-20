@@ -121,7 +121,7 @@ install-multisite: true
 #  disallow_file_edit: false
 
 ###############
-##    ACF    ##
+##    ACFHelper    ##
 ###############
 
 acf:

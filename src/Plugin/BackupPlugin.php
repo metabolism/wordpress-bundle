@@ -4,8 +4,8 @@ namespace Metabolism\WordpressBundle\Plugin{
 	
 	use Dflydev\DotAccessData\Data;
 	use Ifsnop\Mysqldump as IMysqldump;
-	use Metabolism\WordpressBundle\Helper\DirFilter;
-	use Metabolism\WordpressBundle\Helper\Stream;
+	use Metabolism\WordpressBundle\Helper\DirFilterHelper;
+	use Metabolism\WordpressBundle\Helper\StreamHelper;
 	use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 	/**
@@ -47,7 +47,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 				if ( is_dir( $source ) === true ) {
 					
 					$directory = new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS);
-					$filtered = new DirFilter($directory, $exclude);
+					$filtered = new DirFilterHelper($directory, $exclude);
 					$iterator = new \RecursiveIteratorIterator($filtered, \RecursiveIteratorIterator::SELF_FIRST);
 					
 					foreach ( $iterator as $file ) {
@@ -232,12 +232,12 @@ namespace Metabolism\WordpressBundle\Plugin{
 
 
 		/**
-		 * Stream file to browser
+		 * StreamHelper file to browser
 		 * @param $file
 		 */
 		private function stream($file)
 		{
-			if( Stream::send($file) )
+			if( StreamHelper::send($file) )
 				unlink($file);
 		}
 		
@@ -311,7 +311,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 
 namespace {
 	
-	use Metabolism\WordpressBundle\Helper\Stream;
+	use Metabolism\WordpressBundle\Helper\StreamHelper;
 	use Metabolism\WordpressBundle\Plugin\BackupPlugin;
 
 	/**

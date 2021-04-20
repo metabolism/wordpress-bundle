@@ -3,8 +3,8 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 use Dflydev\DotAccessData\Data;
-use Metabolism\WordpressBundle\Helper\Query;
-use Metabolism\WordpressBundle\Helper\Table;
+use Metabolism\WordpressBundle\Helper\QueryHelper;
+use Metabolism\WordpressBundle\Helper\TableHelper;
 use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
 /**
@@ -550,7 +550,7 @@ class ConfigPlugin {
 			$args = array_merge($default_args, $args);
 			$args['menu_icon'] = 'dashicons-'.$args['menu_icon'];
 
-			$table = new Table($name, $args);
+			$table = new TableHelper($name, $args);
 
 			add_action('admin_menu', function() use($name, $table, $args) {
 

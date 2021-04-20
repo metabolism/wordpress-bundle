@@ -5,12 +5,12 @@ namespace Metabolism\WordpressBundle\Helper;
 if(!class_exists('WP_List_Table'))
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 
-class Table extends \WP_List_Table {
+class TableHelper extends \WP_List_Table {
 
 	private $table, $args, $fields, $column_title, $total_items, $delimiter;
 
 	/**
-	 * Table constructor.
+	 * TableHelper constructor.
 	 * @param $table
 	 * @param $args
 	 */
@@ -30,7 +30,7 @@ class Table extends \WP_List_Table {
 		$structure = $wpdb->get_col( "DESCRIBE {$wpdb->prefix}{$this->table}", 0 );
 
 		if(!$structure || !is_array($structure) )
-			wp_die("Table {$wpdb->prefix}{$this->table} is missing");
+			wp_die("TableHelper {$wpdb->prefix}{$this->table} is missing");
 
 		if( !in_array('id', $structure))
 			wp_die("Field `id` is missing from table {$wpdb->prefix}{$this->table}");

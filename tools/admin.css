@@ -103,7 +103,7 @@ th#mslscol{ width: 25px }
 #msls_noncename ~ .button-secondary{ display: none }
 
 
-/* ACF */
+/* ACFHelper */
 .select2-container.-acf .select2-selection{ border-color: #e0e0e0; border-radius: 0 }
 .acf-label:empty{ display: none }
 .acf-fields.-border{ border-color:#eee }

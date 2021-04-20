@@ -5,7 +5,7 @@ namespace Metabolism\WordpressBundle\Helper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class SiteHealth {
+class SiteHealthHelper {
 
 	private $status = [
 		'pages' => [],
