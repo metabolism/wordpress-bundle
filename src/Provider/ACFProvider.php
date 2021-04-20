@@ -9,7 +9,7 @@ use Dflydev\DotAccessData\Data;
  */
 class ACFProvider {
 
-	public static $folder = '/config/packages/wordpress_bundle/acf-json';
+	public static $folder = '/config/packages/acf';
 
 	private $config;
 

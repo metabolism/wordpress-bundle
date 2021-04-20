@@ -44,19 +44,19 @@
           "public/uploads": 775,
           "public/wp-bundle/upgrade": 775,
           "public/wp-bundle/languages": 775,
-          "config/packages/wordpress_bundle/acf-json": 775
+          "config/packages/acf": 775
         }
       },
       "copy": {
         "metabolism/wordpress-bundle": {
-          "config/wp-config.php": "public/wp-config.php",
+          "wordpress/wp-config.php": "public/wp-config.php",
           "config/wordpress_bundle.yml": "config/packages/wordpress_bundle.yml"
         }
       },
       "symlink": {
         "metabolism/wordpress-bundle": {
           "docs/index.md": "docs/wordpress_bundle.md",
-          "plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php"
+          "wordpress/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php"
         }
       }
     },

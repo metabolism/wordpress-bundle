@@ -137,8 +137,8 @@ class EditorPlugin {
 	 */
 	function addCustomHeader()
 	{
-		echo '<style type="text/css">'.file_get_contents(__DIR__ . '/../../public/admin.css').'</style>';
-		echo '<script type="text/javascript">'.file_get_contents(__DIR__ . '/../../public/admin.js').'</script>';
+		echo '<style type="text/css">'.file_get_contents(__DIR__ . '/../../wordpress/admin.css').'</style>';
+		echo '<script type="text/javascript">'.file_get_contents(__DIR__ . '/../../wordpress/admin.js').'</script>';
 	}
 
 	/**
