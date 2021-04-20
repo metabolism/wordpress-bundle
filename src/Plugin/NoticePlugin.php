@@ -25,9 +25,34 @@ class NoticePlugin {
 
 		global $wpdb, $table_prefix;
 
-		if( isset($_GET['fix'])?$_GET['fix']:false == 'database' ){
+		if( ($_GET['fix']??false) == 'database' ){
 			$wpdb->update($table_prefix."options", ['option_value' => WP_SITEURL], ['option_name' => 'siteurl']);
 			$wpdb->update($table_prefix."options", ['option_value' => WP_HOME], ['option_name' => 'home']);
+		}
+
+		if( ($_GET['fix']??false) == 'controller' ){
+
+            $controller = BASE_URI.'/src/Controller/'.$this->config->get('extra_permastructs.controller', 'BlogController').'.php';
+            $template = BASE_URI.'/src/templates/generic.html.twig';
+
+            if( !file_exists($controller) )
+                copy(__DIR__.'/../../samples/controller/BlogController.php', $controller);
+
+            if( !file_exists($template) )
+                copy(__DIR__.'/../../samples/template/generic.html.twig', $template);
+		}
+
+		if( ($_GET['fix']??false) == 'service' ){
+
+            $context = BASE_URI.'/src/Service/Context.php';
+
+            if( !file_exists($context) ){
+
+                if(!is_dir(BASE_URI.'/src/Service') )
+                    mkdir(BASE_URI.'/src/Service');
+
+                copy(__DIR__.'/../../samples/service/Context.php', $context);
+            }
 		}
 
 		$notices = [];
@@ -67,7 +92,13 @@ class NoticePlugin {
 			$notices[] = '<a href="?fix=database">Fix database now</a>';
 
 		if( is_blog_installed() && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
-			$notices[] = 'Wordpress is now installed, you should add WP_INSTALLED=1 to the <i>.env</i> file';
+			$notices[] = 'Wordpress is now installed, you should add WP_INSTALLED=1 to the <i>.env</i>';
+
+		if( !file_exists(BASE_URI.'/src/Controller/'.$this->config->get('extra_permastructs.controller', 'BlogController').'.php') )
+            $errors[] = 'There is no controller defined : <a href="?fix=controller">Create one</a>';
+
+		if( !file_exists(BASE_URI.'/src/Service/Context.php') )
+            $errors[] = 'There is no context service defined : <a href="?fix=service">Create one</a>';
 
 		if( !empty($errors) )
 			echo '<div class="error"><p>'.implode('<br/>', $errors ).'</p></div>';

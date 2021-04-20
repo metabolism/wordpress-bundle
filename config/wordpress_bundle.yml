@@ -385,6 +385,6 @@ domain_name: rocket # MO/PO traductions
 #search: # change search settings
 # posts_per_page: 12
 
-## controller name used when importing @WordpressBundle/Routing/permastructs.php
+## controller name used when importing @WordpressBundle/config/routing.php
 extra_permastructs:
   controller: BlogController

@@ -29,7 +29,7 @@ class FrontController {
 
 		if( !empty($path) && strpos($path, WP_FOLDER) !== false ){
 
-			wp_redirect(is_user_logged_in() ? admin_url() : wp_login_url());
+			wp_redirect(is_user_logged_in() ? admin_url('index.php') : wp_login_url());
 			exit;
 		}
 	}
@@ -117,6 +117,7 @@ class FrontController {
 			return;
 
 		$this->loadConfig();
+
 
 		add_action( 'init', [$this, 'init']);
 		add_action( 'init', [$this, 'redirect']);

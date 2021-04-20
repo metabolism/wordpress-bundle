@@ -76,11 +76,27 @@ Make sure Composer is installed globally, as explained in the
 [installation chapter](https://getcomposer.org/doc/00-intro.md)
 of the Composer documentation.
 
+### Define installation path for Wordpress core and plugins
+
+Edit composer.json and add :
+
+```json
+"extra": {
+    //...
+    "installer-paths": {
+        "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+        "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
+        "public/edition/": ["type:wordpress-core"]
+    }
+    //...
+}
+```
+
 ### Applications that use Symfony Flex
 
 Open a command console, enter your project directory and execute:
 
-```console
+```shell
 $ composer require metabolim/wordpress-bundle
 ```
 
@@ -91,7 +107,7 @@ $ composer require metabolim/wordpress-bundle
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
-```console
+```shell
 $ composer require metabolim/wordpress-bundle
 ```
 
@@ -108,6 +124,10 @@ return [
     \Metabolism\WordpressBundle\WordpressBundle::class => ['all' => true],
 ];
 ```
+
+### Step 3: Install and configure Wordpress
+
+Please read the [bundle documentation](docs/index.md) to continue
   
 ## Why not using Bedrock
 

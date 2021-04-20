@@ -1,7 +1,5 @@
 <?php
 
-namespace Metabolism\WordpressBundle\Routing;
-
 use Dflydev\DotAccessData\Data;
 use Symfony\Component\Routing\Route,
 	Symfony\Component\Routing\RouteCollection;
@@ -198,6 +196,7 @@ class Permastruct{
 		}
 	}
 }
+
 
 /** @var Data $_config */
 global $_config;

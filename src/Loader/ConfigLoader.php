@@ -128,7 +128,7 @@ class ConfigLoader {
 		 * Define DB settings
 		 */
 		if( !isset($_SERVER['DATABASE_URL']) )
-			die('DATABASE_URL is missing in env');
+            die('<code>Database configuration is missing, please add <b>DATABASE_URL=mysql://user:pwd@localhost:3306/dbname</b> to your environment</code>');
 
 		$mysql = explode('@', str_replace('mysql://', '', $_SERVER['DATABASE_URL']));
 		$mysql[0] = explode(':', $mysql[0]);

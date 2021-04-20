@@ -1,110 +1,35 @@
 # Installation & Configuration
 
-## Installation
-
-#### 1 - Start a fresh project
-
-```
-symfony new --full my_project
-```
-or
-```
-composer create-project symfony/website-skeleton my_project
-```
-
-#### 2 - Prepare composer to work with Wordpress
+### Add wpackagist.org repository (optional)
 
 Edit `composer.json`
 
 Add https://wpackagist.org repository
 
-```
+```json
 "repositories": [
     {
         "type":"composer", "url":"https://wpackagist.org"
     }
-],
+]
 ```
 
-Define installation path for Wordpress related packages
-
-```
-"extra": {
-    ...
-    "installer-paths": {
-        "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
-        "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
-        "public/edition/": ["type:wordpress-core"]
-    }
-    ...
-}
-```
-
-Use optimized autoloader
-
-```
-"config": {
-    ...
-    "optimize-autoloader": true,
-    "apcu-autoloader": true,
-    ...
-}
-```
-
-#### 3 - Configure database
+### Configure database and table prefix
 
 edit `.env`
 
-```
+```dotenv
 ###> metabolism/wordpress-bundle ###
-DATABASE_URL=mysql://user:pwd@host:3306/dbname
+DATABASE_URL=mysql://user:pwd@localhost:3306/dbname
 TABLE_PREFIX=wp_
 ###< metabolism/wordpress-bundle ###
 ```
 
-Only mysql is supported
-
-#### 4 - Require Wordpress Bundle
-
-```
-composer require metabolism/wordpress-bundle
-```
-
-if you want to use the development version (not recommended), edit `composer.json` before
-```
-"license": "GPL-3.0-or-later",
-...
-"prefer-stable": true,
-"minimum-stability": "dev",
-...
-```
-
-then 
-
-```
-composer require metabolism/wordpress-bundle:dev-develop
-```
-
-#### 5 - Add Wordpress routing
-
-edit `routes.yaml`
-
-```
-_wordpress:
-    resource: "@WordpressBundle/Routing/Permastructs.php"
-```
-
-Clear cache
-
-```
-./bin/console cache:clear
-```
-
-#### 6 - Update gitignore
+### Update gitignore
 
 edit `.gitignore`
 
-```
+```gitignore
 /public/uploads/*
 !/public/uploads/acf-thumbnails
 /public/edition
@@ -112,23 +37,43 @@ edit `.gitignore`
 /public/wp-bundle
 ```
 
-#### 7 - Start the server
+### Start the server
 
-Configure a vhost mounted to `/public`, or start the built-in Symfony server
+Configure a vhost mounted to `/public`, or start Symfony server
 
+```shell
+symfony serve
 ```
-./bin/console server:start
+
+Accessing the server url will now start the Wordpress Installation
+
+### Add default Wordpress routing
+
+edit `/config/routes.yaml`
+
+```yml
+_wordpress:
+    resource: "@WordpressBundle/config/routing.php"
 ```
 
-Accessing the server url will now start the Wordpress Installation, 
+Clear cache
 
-#### 8 - Develop your website !
+```shell
+php bin/console cache:clear
+```
 
-Take a look at `src/Controller/BlogController.php`, `templates/generic.html.twig` and `config/wordpress.yml` and continue to read the doc bellow.
+View routes
+
+```shell
+php bin/console debug:router
+```
+
+if output is empty, double check that Wordpress is installed and you have added WP_INSTALLED=1 in your environment
+
 
 ## Wordpress configuration
 
-When the bundle is installed, a default `wordpress.yml` is copied to `/config/`
+When the bundle is installed, a default `wordpress_bundle.yml` is copied to `/config/packages`
 
 This file allow you to manage :
  * Keys and Salts
@@ -152,17 +97,27 @@ This file allow you to manage :
  * Domain name
  * Controller name
 
+## Controllers
+
+See our sample [controllers](samples/controller) that you might want to copy to your `/src/Controller` folder.
+
+## Theme
+
+This bundle come without theme, you can start reading the official [documentation](https://symfony.com/doc/current/templates.html)
+
+Also, you can take a look at our sample [template](samples/templates/generic.html.twig) and start writing your own in `/templates`
+
 ## Plugin installation
 
 Please use https://wpackagist.org to find your plugin.
 
 edit `composer.json`
 
-```
+```json
 "require": {
-    ...
+    //...
     "wpackagist-plugin/classic-editor":"1.*"
-    ...
+    //...
 }
 ```
 
@@ -172,13 +127,13 @@ Edit `composer.json`
 
 Declare a new repository
 
-```
+```json
 "repositories": [
   {
     "type": "package",
     "package": {
       "name": "elliotcondon/advanced-custom-fields-pro",
-      "version": "5.8.4",
+      "version": "5.9.5",
       "type": "wordpress-plugin",
       "dist": {"type": "zip", "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download&k={%ACF_PRO_KEY}&t={%version}"},
       "require": {
@@ -195,16 +150,16 @@ Declare a new repository
 
 Add ACF
 
-```
+```json
 "require": {
    "elliotcondon/advanced-custom-fields-pro": "5.*",
-   ...
+   //...
 }
 ```
       
 Edit `.env` to set ACF_PRO_KEY
 
-```
+```dotenv
 ACF_PRO_KEY=Your-Key-Here      
 ```
 
@@ -246,7 +201,7 @@ To preview/debug context, just add `?debug=context` to any url, it will output a
   "body_class": "fr-FR home page-template-default page page-id-38",
   "page_title": "Home",
   "system": "-- Removed from debug --",
-  "menu": [...],
+  "menu": [/*...*/],
   "post": {
     "excerpt": "",
     "thumbnail": "",
@@ -275,8 +230,8 @@ To preview/debug context, just add `?debug=context` to any url, it will output a
       }
     }
   },
-  "portraits": [...],
-  "sitemap": [...],
+  "portraits": [/*...*/],
+  "sitemap": [/*...*/],
   "layout": "default"
 }
 ```   
