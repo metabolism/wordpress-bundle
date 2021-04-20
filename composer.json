@@ -5,12 +5,16 @@
   "description": "Use Wordpress 5 as a backend for a Symfony application",
   "license": "GPL-3.0-or-later",
   "require": {
-    "php" : ">=7.1.0",
+    "php" : ">=7.1.3",
     "ext-zip" : "*",
     "ext-fileinfo" : "*",
     "ext-json" : "*",
     "ext-mbstring" : "*",
     "ext-zlib": "*",
+    "symfony/monolog-bundle": "^4.0|^5.0",
+    "symfony/templating": "^4.0|^5.0",
+    "symfony/twig-bundle": "^4.0|^5.0",
+    "symfony/asset": "^4.0|^5.0",
     "metabolism/wordpress-core-installer": "1.0.*",
     "metabolism/package-actions": "1.1.*",
     "johnpbloch/wordpress-core": "5.*",
@@ -18,6 +22,12 @@
     "dflydev/dot-access-data":"~1.0",
     "enshrined/svg-sanitize": "0.*",
     "intervention/image": "2.*"
+  },
+  "require-dev":{
+    "symfony/debug-bundle": "^4.0|^5.0",
+    "symfony/console": "^4.0|^5.0",
+    "symfony/web-profiler-bundle": "^4.0|^5.0",
+    "symfony/stopwatch": "^4.0|^5.0"
   },
   "suggest": {
     "elliotcondon/advanced-custom-fields-pro": "Customise WordPress with powerful, professional and intuitive fields.",
@@ -34,22 +44,19 @@
           "public/uploads": 775,
           "public/wp-bundle/upgrade": 775,
           "public/wp-bundle/languages": 775,
-          "config/acf-json": 775
+          "config/packages/wordpress_bundle/acf-json": 775
         }
       },
       "copy": {
         "metabolism/wordpress-bundle": {
-          "tools/wp-config.php": "public/wp-config.php",
-          "samples/.htaccess": "public/.htaccess",
-          "samples/config/wordpress.yml": "config/wordpress.yml",
-          "samples/service/Context.php": "src/Service/Context.php",
-          "samples/controller/BlogController.php": "src/Controller/BlogController.php"
+          "config/wp-config.php": "public/wp-config.php",
+          "config/wordpress_bundle.yml": "config/packages/wordpress_bundle.yml"
         }
       },
       "symlink": {
         "metabolism/wordpress-bundle": {
-          "README.md": "doc/wordpress-bundle.md",
-          "tools/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php"
+          "docs/index.md": "docs/wordpress_bundle.md",
+          "plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php"
         }
       }
     },

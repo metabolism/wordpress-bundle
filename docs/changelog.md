@@ -262,7 +262,7 @@ See : http://image.intervention.io/
 
 ## 1.2.0
 #### Feature
-- Site health is now available by typing `/_site-health` url [README.md](README.md)
+- Site health is now available by typing `/_site-health` url [README.md](../README.md)
 - Cache clear button is now available for administrators to remove filecache.
 - New API URLs are available for cache clearing
   - `/_cache/purge` call varnish cache
@@ -304,7 +304,7 @@ See : http://image.intervention.io/
 - Auto-resize for images
 - Focus point for smart cropping is now available from backoffice media page
 - Table prefix is now supported in .env file
-- Entity support, check [README.md](README.md)
+- Entity support, check [README.md](../README.md)
 ###Fixes
 - Fix SSL errors
 - Enhanced form helper

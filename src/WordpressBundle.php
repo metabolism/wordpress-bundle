@@ -7,6 +7,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class WordpressBundle extends Bundle
 {
+    public function getPath()
+    {
+        return \dirname(__DIR__);
+    }
+
 	/**
 	 * 	@see wp-includes/class-wp.php, main function
 	 */

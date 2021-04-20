@@ -41,7 +41,7 @@ if (!isset($_SERVER['APP_ENV'])) {
 
 
 $loader = new ConfigLoader();
-$loader->import( dirname(__DIR__).'/config/wordpress.yml' );
+$loader->import(dirname(__DIR__) . '/config/packages/wordpress_bundle.yml');
 
 global $table_prefix;
 
