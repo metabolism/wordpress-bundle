@@ -142,19 +142,20 @@ class Image extends Entity
 				$mime_type = get_post_mime_type($id);
 
 				if($mime_type == 'image/svg' || $mime_type == 'image/svg+xml' )
-					$metadata = ['file' => get_post_meta($id, '_wp_attached_file', true), 'image_meta' =>  []];
+					$metadata = ['file' => ($post_meta['_wp_attached_file'][0]??false), 'image_meta' =>  []];
 			}
-			if( empty($metadata) || !isset($metadata['file'], $metadata['image_meta']) )
+
+			if( empty($metadata) || !isset($metadata['file']) )
 				return false;
 
+			$metadata['file'] = ltrim(($post_meta['_wp_attached_file'][0]??false), '/');
 			$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
-			$metadata['src']  = str_replace(WP_FOLDER.'/..', '', $metadata['src']);
 
-			if( !file_exists($metadata['src']) )
+			if( !@file_exists($metadata['src']) )
 				return false;
 
 			$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
-			$metadata['link'] = home_url($this->uploadDir('relative').'/'.$metadata['file']);
+			$metadata['link'] = home_url($metadata['file']);
 			$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
 
 			foreach($post_meta as $key=>$value)
@@ -198,7 +199,7 @@ class Image extends Entity
 			if( isset($post['mime_type']) && ($post['mime_type'] == 'image/svg+xml' || $this->mime_type == 'image/svg') )
 				unset($metadata['meta'], $metadata['width'], $metadata['height']);
 
-			if( $this->show_meta )
+			if( $this->show_meta && isset($metadata['image_meta']) )
 				$metadata['meta'] = $metadata['image_meta'];
 			else
 				$metadata['meta'] = false;
@@ -304,11 +305,9 @@ class Image extends Entity
 	 */
 	public function edit($params, $ext=null){
 
-		$abspath = str_replace(WP_FOLDER.'/..', '', $this->uploadDir('basedir'));
-
 		$file = $this->process($params, $ext);
 
-		$url = str_replace($abspath, $this->uploadDir('relative'), $file);
+		$url = str_replace($this->uploadDir('basedir'), $this->uploadDir('relative'), $file);
 		$url = str_replace(BASE_URI.PUBLIC_DIR, '', $url);
 
 		return $url;
@@ -322,6 +321,9 @@ class Image extends Entity
 	 * @return string
 	 */
 	private function process($params, $ext=null){
+
+		if( !in_array($this->extension, ['jpg','jpeg','png','gif','webp']) )
+			return $this->src;
 
 		//redefine ext if webp is not supported
 		if( $ext === 'webp' && !function_exists('imagewebp'))
@@ -614,7 +616,7 @@ class Image extends Entity
 
 
 	/**
-	 * @param $image
+	 * @param \Intervention\Image\Image $image
 	 * @param $w
 	 * @param int $h
 	 * @return void
@@ -643,7 +645,7 @@ class Image extends Entity
 			$ratio_height = $src_height/$h;
 			$ratio_width = $src_width/$w;
 
-			if( $dest_ratio < 1)
+			if( $src_ratio >= 1 && $dest_ratio <= 1)
 			{
 				$dest_width = $w*$ratio_height;
 				$dest_height = $src_height;
@@ -654,26 +656,20 @@ class Image extends Entity
 				$dest_height = $h*$ratio_width;
 			}
 
-			if ($ratio_height < $ratio_width) {
-
-				list($cropX1, $cropX2) = $this->calculateCrop($src_width, $dest_width, $this->focus_point['x']/100);
-				$cropY1 = 0;
-				$cropY2 = $src_height;
-			} else {
-
-				list($cropY1, $cropY2) = $this->calculateCrop($src_height, $dest_height, $this->focus_point['y']/100);
-				$cropX1 = 0;
-				$cropX2 = $src_width;
+			if( $dest_width > $src_width ){
+				$dest_width = $src_width;
+				$dest_height = $h*$ratio_width;
 			}
 
+			if( $dest_height > $src_height ){
+				$dest_height = $src_height;
+				$dest_width = $w*$ratio_height;
+			}
+
+				list($cropX1, $cropX2) = $this->calculateCrop($src_width, $dest_width, $this->focus_point['x']/100);
+				list($cropY1, $cropY2) = $this->calculateCrop($src_height, $dest_height, $this->focus_point['y']/100);
+
 			$image->crop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
-
-			$tmp = tempnam("/tmp", "II");
-
-			$image->save($tmp, 100);
-
-			$image = ImageManagerStatic::make($tmp);
-
 			$image->fit($w, $h);
 		}
 		else{

@@ -95,6 +95,7 @@ th#mslscol{ width: 25px }
 #save-action+#preview-action{ margin-top: 10px }
 .postbox-container .inside{ margin: 10px 0 }
 .form-wrap p, p.description, p.help, span.description { line-height: 110%; opacity: 0.8 }
+.field-link-target{ clear: both }
 #wp-content-editor-tools{ background: none }
 #timestampdiv select{ width: auto }
 
