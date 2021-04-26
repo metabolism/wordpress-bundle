@@ -45,95 +45,74 @@
 .compat-item .field { width: 77%; margin: 0; padding-top: 5px }
 .compat-item .field > input { margin-left: 0!important; margin-top: 0!important }
 .media-modal .compat-item label { font-size: 12px }
+#editable-post-name input{ min-height: 0 }
 
 /* Quick redesign */
-ul.categorychecklist.has-children > li{ padding-bottom: 8px; border-bottom: 1px solid #ddd; margin-bottom: 5px }
-ul.categorychecklist.has-children > li > label{ font-weight: 600 }
-.categorydiv ul.categorychecklist ul{ margin-left: 15px }
-.post-php, body[class*="toplevel_page_acf-options"], .post-new-php { background: linear-gradient(-90deg, rgba(238,238,238,1) 0%, rgba(238,238,238,1) 290px, rgba(230,230,230,1) 300px, rgba(255,255,255,1) 300px, rgba(255,255,255,1) 100%); }
-@media only screen and (max-width: 850px){
-    .post-php, body[class*="_page_"], .post-new-php{ background: #fff }
-}
-.post-php .wrap h1, .post-new-php .wrap h1{ font-size: 16px }
-.post-new-php .wp-core-ui .notice.is-dismissible, .post-new-php .update-nag, .post-new-php .notice, .post-new-php div.error, .post-new-php div.updated,
-.post-php .wp-core-ui .notice.is-dismissible, .post-php .update-nag, .post-php .notice, .post-php div.error, .post-php div.updated,
-body[class*="_page_"] .wp-core-ui .notice.is-dismissible, body[class*="_page_"] .update-nag, body[class*="_page_"] .notice, body[class*="_page_"] div.error,
-body[class*="_page_"] div.updated{
-    box-shadow: 0 0 3px rgba(0,0,0,0.15)!important; width: calc(100% - 300px); margin-top: 10px; box-sizing: border-box;
-}
-.wp-admin select, #menu-management .menu-edit, #menu-settings-column .accordion-container, .comment-ays, .feature-filter,
-.imgedit-group, .manage-menus, .menu-item-handle, .popular-tags, .stuffbox, .widget-inside, .widget-top,
-.widgets-holder-wrap, .wp-editor-container, p.popular-tags, table.widefat, .widefat thead td, .widefat thead th,
+h1, h2, h3, h4, h5, h6, #adminmenu .wp-submenu li.current, #adminmenu .wp-submenu li.current a, #adminmenu .wp-submenu li.current a:hover,
+#comment-status-display, #dashboard_right_now .versions .b, #ed_reply_toolbar #ed_reply_strong,
+#pass-strength-result.short, #pass-strength-result.strong, #post-status-display, #post-visibility-display,
+.feature-filter .feature-name, .item-controls .item-order a, .media-item .percent, .plugins .name, b, strong, .row-title{ font-weight: 500 }
+
+table.widefat, .widefat thead td, .widefat thead th, .widefat tfoot td, .widefat tfoot th{ border-color: #e0e0e0 }
+table.widefat{ box-shadow: 0 0 0 1px rgb(63 63 68 / 5%), 0 1px 3px 0 rgb(63 63 68 / 15%); outline: 1px solid transparent; border-radius: 3px; border: 0 }
+.widefat tfoot td, .widefat th, .widefat thead td{ font-size: 13px }
+.post-state{ font-size: 90%; vertical-align: bottom }
+
+.wp-core-ui select{ font-size: 13px }
+.post-php .wrap h1, .post-new-php .wrap h1 { font-size: 16px }
+.post-php .page-title-action{ display: none }
+#comment-link-box, #edit-slug-box{ padding: 0 }
+.wp-tab-active, ul.add-menu-item-tabs li.tabs, ul.category-tabs li.tabs, .acf-tab-group li a, .nav-tab { border-radius: 3px 3px 0 0 }
+.postbox, .card, .accordion-container, .menu-edit{ border: 0!important; border-radius: 3px; box-shadow: 0 0 0 1px rgb(63 63 68 / 5%), 0 1px 3px 0 rgb(63 63 68 / 15%)!important; overflow: hidden }
+.postbox.seamless{ box-shadow: none!important }
+#major-publishing-actions{ background: none }
+.menu-item-handle, .attachment-preview{ border-radius: 3px }
+
 input[type=color], input[type=date], input[type=datetime-local], input[type=datetime], input[type=email], input[type=month],
-input[type=number], input[type=password], input[type=search], input[type=tel], input[type=text], input[type=time],input[type=checkbox],
-input[type=url], input[type=week], select, textarea, .widefat tfoot td, .widefat tfoot th, .postbox{ border-color: #e0e0e0; border-radius: 0 }
-input[type=checkbox]{ border-color:#b4b9be; border-radius: 0 }
-.wp-core-ui .button, .wp-core-ui .button-secondary { color: #555; border-color: #ccc; background: #f7f7f7; box-shadow: 0 1px 0 #ccc }
-.wp-core-ui .button-primary { color:#fff; background: #007cba; border-color: #007cba }
-.postbox .hndle, .stuffbox .hndle { border-bottom: 0 }
-.meta-box-sortables select { padding: 4px 8px; }
-.notice, div.error, div.updated{ border-bottom: 0; border-right: 0; border-top: 0 }
+input[type=number], input[type=password], input[type=search], input[type=tel], input[type=text], input[type=time], input[type=url],
+input[type=week], textarea, #titlediv #title {
+    box-shadow: inset 0 1px 0 0 rgb(63 63 68 / 5%); border-color: #c4cdd5; transition-duration: 200ms; border-radius: 3px;
+    transition-timing-function: cubic-bezier(0.64, 0, 0.35, 1); transition-property: background, border, box-shadow, -webkit-box-shadow; outline: none
+}
+.wp-core-ui select{ border-color: #c4cdd5;  }
+input[type=color]:focus, input[type=date]:focus, input[type=datetime-local]:focus, input[type=datetime]:focus, input[type=email]:focus, input[type=month]:focus,
+input[type=number]:focus, input[type=password]:focus, input[type=search]:focus, input[type=tel]:focus, input[type=text]:focus, input[type=time]:focus, input[type=url]:focus,
+input[type=week]:focus, select:focus, textarea:focus, #titlediv #title:focus {
+    outline: none; box-shadow: inset 0 1px 0 0 rgb(63 63 68 / 5%);
+}
 
-#side-sortables .postbox{ background: none; border: 0; border-bottom: 1px solid #ddd; margin-bottom: 0; padding: 10px 0 }
-#side-sortables .postbox:last-of-type{ border-bottom: 0 }
-#major-publishing-actions{ background: none; padding-bottom: 0 }
-input[type=email], input[type=number], input[type=password], input[type=search], input[type=tel], input[type=text], input[type=url], textarea { box-shadow: inset 0 1px 2px rgba(0,0,0,.07)!important }
-.meta-box-sortables select { width: 100%; border-radius: 3px }
-#post-body.columns-2 #postbox-container-1 { width: 270px }
-*{ box-shadow: none!important; text-shadow: none!important }
-#footer-thankyou{ display: none }
-th#mslscol{ width: 25px }
-.fixed th.column-date{ width: 15% }
-#minor-publishing-actions .preview{ width: 100% }
-#post-body #visibility:before, #post-body .misc-pub-post-status:before, #post-body .misc-pub-revisions:before, .curtime #timestamp:before{ font-size: 18px }
-#contextual-help-link-wrap{ display: none }
-#comment-link-box, #edit-slug-box{ padding-left: 0 }
+div.mce-toolbar-grp, .html-active .switch-html, .tmce-active .switch-tmce { background: #F9F9F9!important }
 .mce-top-part::before{ display: none }
-.misc-pub-section a{ float: right }
-#save-post, #save-action .spinner{ float: right }
-#save-action:after, #poststuff .inside:after{ content: ''; display: table; clear: both }
-#save-action+#preview-action{ margin-top: 10px }
-.postbox-container .inside{ margin: 10px 0 }
+.wrap .page-title-action, .wrap .page-title-action:active, .wrap .page-title-action:hover, .wp-core-ui .button, .wp-core-ui .button-secondary {
+    padding: 7px 16px; background: linear-gradient(180deg,#fff,#f9fafb); border: 1px solid #c4cdd5;
+    box-shadow: 0 1px 0 0 rgb(22 29 37 / 5%); border-radius: 3px; line-height: 1; color: #212b36;
+}
 .form-wrap p, p.description, p.help, span.description { line-height: 110%; opacity: 0.8 }
-.field-link-target{ clear: both }
-#wp-content-editor-tools{ background: none }
-#timestampdiv select{ width: auto }
+.form-table p{ max-width: 600px }
+.form-table p.description{ font-size: 90% }
+input.large-text, textarea.large-text { width: 35.7rem }
+.form-table td fieldset label { margin: .35em 0 1em!important }
 
-/* MSLS */
-#msls_noncename ~ .button-secondary{ display: none }
+/* ACF */
+.acf-field .acf-label label, .post-attributes-label, .acf-flexible-content .layout .acf-fc-layout-handle span, #edittag .form-table th {
+    font-weight: normal;
+}
+.acf-tab-group li a{ font-weight: normal; font-size: 13px }
+.acf-tab-group li.active a{ font-weight: 500 }
+.acf-true-false{ padding: 5px 0 }
+.acf-input-prepend, .acf-input-append{ border-color:#c4cdd5; font-size: 13px }
+.acf-fields>.acf-field{ padding: 10px }
+.acf-field{ min-height: auto!important }
+.inside.acf-fields>.acf-field>.acf-label label{ cursor: default }
+.acf-field .acf-label{ margin-bottom: 6px }
+.acf-fields.-border, .acf-file-uploader .file-wrap{ border-radius: 3px; overflow: hidden }
+.acf-field select{ font-size: 13px }
+.acf-postbox.seamless>.inside { margin-left: -10px !important; margin-right: -10px !important }
 
-
-/* ACFHelper */
-.select2-container.-acf .select2-selection{ border-color: #e0e0e0; border-radius: 0 }
-.acf-label:empty{ display: none }
-.acf-fields.-border{ border-color:#eee }
-.acf-relationship .filters .filter input, .acf-relationship .filters .filter select { height: 30px; padding: 4px 8px }
-#postbox-container-1 .acf-gallery-sort{ display: none }
-.acf-table, .acf-input-prepend, .acf-input-append, .acf-relationship, .acf-relationship .filters{ border-color:#e0e0e0 }
-.acf-editor-wrap .wp-editor-container, .html-active .switch-html, .tmce-active .switch-tmce{ border-color:#E5E5E5 }
-.acf-editor-wrap{ margin-top: -10px }
-.acf-postbox.seamless>.acf-fields>.acf-tab-wrap .acf-tab-group li.active a { background: #fff }
-.acf-image-uploader .image-wrap img{ max-width: 86px }
-.acf-icon.-pencil { font-size: 11px }
-.select2-container--default .select2-selection--single{ border-radius: 0 }
-.select2-container--default .select2-selection--single .select2-selection__arrow b{ border-color: #000 transparent transparent transparent }
-.select2-container--default .select2-selection--single { border-color: #ddd }
-.acf-field .acf-label label, .post-attributes-label, .acf-flexible-content .layout .acf-fc-layout-handle span, #edittag .form-table th{ font-weight: normal }
-.acf-flexible-content .layout .acf-fc-layout-handle, .acf-accordion .acf-accordion-title label{ font-weight: 600 }
-.acf-field.acf-accordion .acf-accordion-title{ padding: 9px }
-.acf-relationship .filters .filter input { border: 1px solid #ddd }
-
-/* User */
-#your-profile select, #your-profile textarea, #your-profile .description, #your-profile .select2, #your-profile .acf-taxonomy-field{ max-width: 25em; width: 100% }
-#your-profile .description{ line-height: 1; opacity: 0.5 }
-#your-profile label, #your-profile th[scope=row], #your-profile .user-profile-picture th{ font-weight: normal }
-
-/* WP5.5 */
-.php-error #adminmenuback, .php-error #adminmenuwrap{ margin-top: 0 }
+/* Fix WP5.5 Contrast */
 .handle-order-higher, .handle-order-lower{ display: none }
 .acf-postbox.seamless > .postbox-header{ display: none }
 .postbox-header{ border-bottom: 0 }
 #wpfooter{ display: none }
-.acf-field{ min-height: auto!important }
-.acf-fields>.acf-field{ padding: 6px 12px }
-.acf-field .acf-label{ margin-bottom: 6px }
+.form-table th{ font-weight: normal }
+#side-sortables .acf-gallery-sort{ display: none }
