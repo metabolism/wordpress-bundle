@@ -9,8 +9,11 @@ CHANGELOG
 - Invalid cookie domain when port is in url
 - ACF link return type for term
 #### Changed
-- adopt symfony 4 folder structure, `web` -> `public`
+- adopt Symfony 4 folder structure, `web` -> `public`
+- add Symfony 5 compatibility and auto generated recipe  
 - php7.1 as min version
+### Added
+- Entity implements ArrayAccess
 
 ## 1.4.12
 #### Bugfix

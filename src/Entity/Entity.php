@@ -9,7 +9,7 @@ use Metabolism\WordpressBundle\Helper\ACFHelper;
  *
  * @package Metabolism\WordpressBundle\Entity
  */
-class Entity
+class Entity implements \ArrayAccess
 {
 	public static $remove = [
 		'xfn', 'db_id', 'post_mime_type', 'ping_status', 'to_ping', 'pinged', '_edit_lock',
@@ -20,8 +20,33 @@ class Entity
 	public $entity;
 	public static $date_format = false;
 
-	private $custom_fields=false;
+    /**
+     * @var bool|ACFHelper
+     */
+    private $custom_fields=false;
 	private $imported=false;
+
+	/*
+	 * ArrayAccess
+	 * */
+    public function offsetExists($offset)
+    {
+        return property_exists($this, $offset);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->$offset;
+    }
+    public function offsetSet($offset, $value)
+    {
+        $this->$offset = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->$offset);
+    }
 
 
 	/**
