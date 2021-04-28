@@ -6,214 +6,239 @@ use Dflydev\DotAccessData\Data;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
+use Env\Env;
+use function Env\env;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
 class ConfigLoader {
 
-	public function get($resource, $default=false){
+    public function get($resource, $default=false){
 
-		global $_config;
-		return $_config->get($resource, $default);
-	}
+        global $_config;
+        return $_config->get($resource, $default);
+    }
 
-	public function import($resource)
-	{
+    public function import($resource)
+    {
 
-		/**
-		 * Wordpress configuration file
-		 */
+        Env::$options = Env::USE_ENV_ARRAY;
 
-		if (!defined('BASE_URI'))
-		{
-			$base_uri = dirname( __DIR__ );
+        /**
+         * Wordpress configuration file
+         */
 
-			if( '\\' === \DIRECTORY_SEPARATOR ){
-			// windows
-			$base_uri = preg_replace( "/\\web$/", '', $base_uri );
-			$base_uri = preg_replace( "/\\\\vendor\\\\metabolism\\\\wordpress-bundle\\\\src$/", '', $base_uri );
-			}
-			else{
-				// unix
-				$base_uri = preg_replace( "/\/web$/", '', $base_uri );
-				$base_uri = preg_replace( "/\/vendor\/metabolism\/wordpress-bundle\/src$/", '', $base_uri );
-			}
+        if (!defined('BASE_URI'))
+        {
+            $base_uri = dirname( __DIR__ );
 
-			define( 'BASE_URI', $base_uri);
-		}
+            if( '\\' === \DIRECTORY_SEPARATOR ){
+                // windows
+                $base_uri = preg_replace( "/\\web$/", '', $base_uri );
+                $base_uri = preg_replace( "/\\\\vendor\\\\metabolism\\\\wordpress-bundle\\\\src$/", '', $base_uri );
+            }
+            else{
+                // unix
+                $base_uri = preg_replace( "/\/web$/", '', $base_uri );
+                $base_uri = preg_replace( "/\/vendor\/metabolism\/wordpress-bundle\/src$/", '', $base_uri );
+            }
 
-		/**
-		 * Load App configuration
-		 */
-		global $_config;
+            define( 'BASE_URI', $base_uri);
+        }
 
-		try{
+        /**
+         * Load App configuration
+         */
+        global $_config;
 
-			$config = Yaml::parseFile($resource);
-		}
-		catch (ParseException $e){
+        try{
 
-			die(basename($resource).' loading error: '.$e->getMessage());
-		}
+            $config = Yaml::parseFile($resource);
+        }
+        catch (ParseException $e){
 
-		$_config = new Data($config);
+            die(basename($resource).' loading error: '.$e->getMessage());
+        }
 
-		/**
-		 * Set env default
-		 */
-		$env = isset($_SERVER['APP_ENV'])?$_SERVER['APP_ENV']:'dev';
+        $_config = new Data($config);
+
+        /**
+         * Set env default
+         */
+        $env = env('APP_ENV')?:(env('WP_ENV')?:'dev');
 
 
-		/**
-		 * Define constant
-		 */
-		foreach ($_config->get('define', []) as $constant=>$value)
-			define( strtoupper($constant), $value);
+        /**
+         * Define constant
+         */
+        foreach ($_config->get('define', []) as $constant=>$value)
+            define( strtoupper($constant), $value);
 
-		/**
-		 * Define basic environment
-		 */
-		define( 'WP_ENV', $env);
-		define( 'WP_DEBUG', $env === 'dev');
-		define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
+        /**
+         * Define basic environment
+         */
+        define( 'WP_ENV', $env);
+        define( 'WP_DEBUG', $env === 'dev');
+        define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
 
-		define( 'HEADLESS', $_config->get('headless') );
-		define( 'URL_MAPPING', $_config->get('headless.mapping')?getenv('MAPPED_URL'):false );
+        define( 'HEADLESS', $_config->get('headless') );
+        define( 'URL_MAPPING', $_config->get('headless.mapping')?env('MAPPED_URL'):false );
 
-		/**
-		 * Enable multisite
-		 */
-		if( $_config->get('multisite') && (!isset($_ENV['MULTISITE']) || getenv('MULTISITE')) )
-		{
-			define( 'MULTISITE', true );
-			define( 'SUBDOMAIN_INSTALL', $_config->get('multisite.subdomain_install') );
-			define( 'DOMAIN_CURRENT_SITE', $_config->get('multisite.domain', $_SERVER['HTTP_HOST']));
-			define( 'SITE_ID_CURRENT_SITE', $_config->get('multisite.site_id', 1));
-			define( 'BLOG_ID_CURRENT_SITE', $_config->get('multisite.blog_id', 1));
-		}
-		elseif( $_config->get('install-multisite') )
-		{
-			define( 'WP_ALLOW_MULTISITE', true );
-		}
+        /**
+         * Enable multisite
+         */
+        if( $_config->get('multisite') || env('MULTISITE') )
+        {
+            define( 'MULTISITE', true );
+            define( 'SUBDOMAIN_INSTALL', $_config->get('multisite.subdomain_install') );
+            define( 'DOMAIN_CURRENT_SITE', $_config->get('multisite.domain', $_SERVER['HTTP_HOST']));
+            define( 'SITE_ID_CURRENT_SITE', $_config->get('multisite.site_id', 1));
+            define( 'BLOG_ID_CURRENT_SITE', $_config->get('multisite.blog_id', 1));
+        }
+        elseif( $_config->get('install-multisite') )
+        {
+            define( 'WP_ALLOW_MULTISITE', true );
+        }
 
-		/**
-		 * Configure URLs
-		 */
-		$isSecure = false;
+        /**
+         * Configure URLs
+         */
 
-		if (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on'){
-			$isSecure = true;
-		}
-		elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) == 'on'){
-			$isSecure = true;
-			$_SERVER['HTTPS']='on';
-		}
+        if( !$wp_home = env('WP_HOME') ){
 
-		$base_uri = ( $isSecure ? 'https' : 'http' ) . '://'.trim($_SERVER['HTTP_HOST'], '/');
+            $isSecure = false;
 
-		define( 'WP_FOLDER', '/edition' );
+            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'){
+                $isSecure = true;
+            }
+            elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on'){
+                $isSecure = true;
+                $_SERVER['HTTPS']='on';
+            }
 
-		if( !defined('WP_HOME') )
-			define( 'WP_HOME', $base_uri);
+            $wp_home = ( $isSecure ? 'https' : 'http' ) . '://'.trim($_SERVER['HTTP_HOST'], '/');
+        }
 
-		define( 'WP_SITEURL', WP_HOME.WP_FOLDER);
+        define( 'WP_FOLDER', '/edition' );
+
+        if( !defined('WP_HOME') )
+            define( 'WP_HOME', $wp_home);
+
+        if( !$wp_siteurl = env('WP_SITEURL') )
+            $wp_siteurl = WP_HOME.WP_FOLDER;
+
+        define( 'WP_SITEURL', $wp_siteurl);
 
         if(filter_var($_SERVER['SERVER_NAME'], FILTER_VALIDATE_IP) !== false)
             define('COOKIE_DOMAIN', '' );
         else
             define( 'COOKIE_DOMAIN', strtok($_SERVER[ 'HTTP_HOST' ], ':') );
 
-		/**
-		 * Define DB settings
-		 */
-		if( !isset($_SERVER['DATABASE_URL']) )
+        /**
+         * Define DB settings
+         */
+        if( !env('DATABASE_URL') && !env('DB_NAME') )
             die('<code>Database configuration is missing, please add <b>DATABASE_URL=mysql://user:pwd@localhost:3306/dbname</b> to your environment</code>');
 
-		$mysql = explode('@', str_replace('mysql://', '', $_SERVER['DATABASE_URL']));
-		$mysql[0] = explode(':', $mysql[0]);
-		$mysql[1] = explode('/', $mysql[1]);
+        if( $database_url = env('DATABASE_URL') ){
 
-		define( 'DB_NAME', $mysql[1][1]);
-		define( 'DB_USER', $mysql[0][0]);
-		define( 'DB_PASSWORD', $mysql[0][1]);
-		define( 'DB_HOST', $mysql[1][0]);
-		define( 'DB_CHARSET', $_config->get('database.charset', 'utf8mb4'));
-		define( 'DB_COLLATE', $_config->get('database.collate', ''));
+            $mysql = explode('@', str_replace('mysql://', '', str_replace('mariadb://', '', $database_url)));
+            $mysql[0] = explode(':', $mysql[0]);
+            $mysql[1] = explode('/', $mysql[1]);
 
+            define( 'DB_NAME', $mysql[1][1]);
+            define( 'DB_USER', $mysql[0][0]);
+            define( 'DB_PASSWORD', $mysql[0][1]);
+            define( 'DB_HOST', $mysql[1][0]);
+        }
+        else{
 
-		/**
-		 * Authentication Unique Keys and Salts
-		 */
-		define( 'AUTH_KEY', $_config->get('key.auth','O-} !h|JpOq^w,CXn+O5=o3MvkN_So+ O0-chs$+a>KJq*i~/!ykEd<]IsPdgI#6'));
-		define( 'SECURE_AUTH_KEY', $_config->get('key.secure_auth','r HvS?mdf^4xc.Iy^G*<ZliwL5r_w.]CUWIu|j0{sfq-M)k:Lhi-),qCDcN<Yy+w'));
-		define( 'LOGGED_IN_KEY', $_config->get('key.logged_in','u`UAyT)Wp0bT&Z.^e3RWTWDs?Je9K0UBQDJqG$W*yb9YG1yl,|*:LQV^ZUt|Q~#.'));
-		define( 'NONCE_KEY', $_config->get('key.nonce','cV9Q^z7H{oI>H6>>vLHQYB[)1N&#ur(# Iqw*k?r-FkQ+#eo9<R^1N?uo.*N~!J5'));
+            define( 'DB_NAME', env('DB_NAME'));
+            define( 'DB_USER', env('DB_USER'));
+            define( 'DB_PASSWORD', env('DB_PASSWORD'));
+            define( 'DB_HOST', env('DB_HOST'));
+            define( 'DB_PORT', env('DB_PORT'));
+        }
 
-		define( 'AUTH_SALT', $_config->get('salt.auth','w9J/dNw/bv}@Z#/YcrjPcH$^_[ni&4tji0JA0?na}yTw#0}yuZW>BXDVVjVGA+vk'));
-		define( 'SECURE_AUTH_SALT', $_config->get('salt.secure_auth','T7ntE>-j*2G3Qosn;0?|7{aqs&SU) }_S ~6f5k~PTedeX^jNe&T h)9(k4nT2Rq'));
-		define( 'LOGGED_IN_SALT', $_config->get('salt.logged_in','w/iowiks]_i5b#/SqYuD2`28o</-L|P4H3vq@!<OrH 7Q!gxB[Q4m`/*CiVdylGs'));
-		define( 'NONCE_SALT', $_config->get('salt.nonce','gelPRQb4NzO=4pOG_5YnuN(5G~YJCIutY*BL%!:ds(TqwDd;F[PsI,gT_1J-9;;D'));
+        define( 'DB_CHARSET', $_config->get('database.charset', 'utf8mb4'));
+        define( 'DB_COLLATE', $_config->get('database.collate', ''));
 
 
-		/**
-		 * Redefine cookie name without wordpress
-		 */
-		define( 'COOKIEHASH',           md5( WP_SITEURL )    );
+        /**
+         * Authentication Unique Keys and Salts
+         */
+        define( 'AUTH_KEY', env('AUTH_KEY'));
+        define( 'SECURE_AUTH_KEY', env('SECURE_AUTH_KEY'));
+        define( 'LOGGED_IN_KEY', env('LOGGED_IN_KEY'));
+        define( 'NONCE_KEY', env('NONCE_KEY'));
 
-		define( 'USER_COOKIE',          $_SERVER['COOKIE_PREFIX'].'_user_'      . COOKIEHASH );
-		define( 'PASS_COOKIE',          $_SERVER['COOKIE_PREFIX'].'_pass_'      . COOKIEHASH );
-		define( 'AUTH_COOKIE',          $_SERVER['COOKIE_PREFIX'].'_'           . COOKIEHASH );
-		define( 'SECURE_AUTH_COOKIE',   $_SERVER['COOKIE_PREFIX'].'_sec_'       . COOKIEHASH );
-		define( 'LOGGED_IN_COOKIE',     $_SERVER['COOKIE_PREFIX'].'_logged_in_' . COOKIEHASH );
-		define( 'TEST_COOKIE',          'test_cookie_'.COOKIEHASH                            );
-
-
-		/**
-		 * Custom Content Directory
-		 */
-
-		if (!defined('PUBLIC_DIR'))
-			define( 'PUBLIC_DIR', '/public');
-
-		if (!defined('WP_CONTENT_DIR'))
-			define( 'WP_CONTENT_DIR', BASE_URI . PUBLIC_DIR . '/wp-bundle');
-
-		if (!defined('UPLOADS'))
-			define( 'UPLOADS', '../uploads');
-
-		if (!defined('WP_PLUGIN_DIR'))
-			define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins');
-
-		if (!defined('WPMU_PLUGIN_DIR'))
-			define('WPMU_PLUGIN_DIR', WP_CONTENT_DIR.'/mu-plugins');
+        define( 'AUTH_SALT', env('AUTH_SALT'));
+        define( 'SECURE_AUTH_SALT', env('SECURE_AUTH_SALT'));
+        define( 'LOGGED_IN_SALT', env('LOGGED_IN_SALT'));
+        define( 'NONCE_SALT', env('NONCE_SALT'));
 
 
-		if (!defined('WP_CONTENT_URL'))
-			define( 'WP_CONTENT_URL', WP_HOME.'/wp-bundle' );
+        /**
+         * Redefine cookie name without wordpress
+         */
+        define( 'COOKIEHASH',           md5( WP_SITEURL )    );
 
-		define('WP_UPLOADS_DIR', realpath(WP_CONTENT_DIR.'/'.UPLOADS));
+        if( $cookie_prefix = env('COOKIE_PREFIX') ) {
 
-		/**
-		 * Custom Settings
-		 */
-		if (!defined('DISALLOW_FILE_EDIT'))
-			define( 'DISALLOW_FILE_EDIT', true);
+            define('USER_COOKIE', $cookie_prefix . '_user_' . COOKIEHASH);
+            define('PASS_COOKIE', $cookie_prefix . '_pass_' . COOKIEHASH);
+            define('AUTH_COOKIE', $cookie_prefix . '_' . COOKIEHASH);
+            define('SECURE_AUTH_COOKIE', $cookie_prefix . '_sec_' . COOKIEHASH);
+            define('LOGGED_IN_COOKIE', $cookie_prefix . '_logged_in_' . COOKIEHASH);
+            define('TEST_COOKIE', 'test_cookie_' . COOKIEHASH);
+        }
 
-		if (!defined('WP_POST_REVISIONS'))
-			define( 'WP_POST_REVISIONS', 3);
+        /**
+         * Custom Content Directory
+         */
 
-		if (!defined('DISABLE_WP_CRON'))
-			define('DISABLE_WP_CRON', true);
+        if (!defined('PUBLIC_DIR'))
+            define( 'PUBLIC_DIR', '/web');
 
-		/**
-		 * Bootstrap WordPress
-		 */
+        if (!defined('WP_CONTENT_DIR'))
+            define( 'WP_CONTENT_DIR', BASE_URI . PUBLIC_DIR . '/wp-bundle');
 
-		if (!defined('WP_USE_THEMES'))
-			define( 'WP_USE_THEMES', false);
+        if (!defined('UPLOADS'))
+            define( 'UPLOADS', '../uploads');
 
-		if (!defined('ABSPATH'))
-			define( 'ABSPATH', BASE_URI . PUBLIC_DIR . WP_FOLDER .'/');
-	}
+        if (!defined('WP_PLUGIN_DIR'))
+            define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins');
+
+        if (!defined('WPMU_PLUGIN_DIR'))
+            define('WPMU_PLUGIN_DIR', WP_CONTENT_DIR.'/mu-plugins');
+
+
+        if (!defined('WP_CONTENT_URL'))
+            define( 'WP_CONTENT_URL', WP_HOME.'/wp-bundle' );
+
+        define('WP_UPLOADS_DIR', realpath(WP_CONTENT_DIR.'/'.UPLOADS));
+
+        /**
+         * Custom Settings
+         */
+        if (!defined('DISALLOW_FILE_EDIT'))
+            define( 'DISALLOW_FILE_EDIT', true);
+
+        if (!defined('WP_POST_REVISIONS'))
+            define( 'WP_POST_REVISIONS', 3);
+
+        if (!defined('DISABLE_WP_CRON'))
+            define('DISABLE_WP_CRON', true);
+
+        /**
+         * Bootstrap WordPress
+         */
+
+        if (!defined('WP_USE_THEMES'))
+            define( 'WP_USE_THEMES', false);
+
+        if (!defined('ABSPATH'))
+            define( 'ABSPATH', BASE_URI . PUBLIC_DIR . WP_FOLDER .'/');
+    }
 }

@@ -1,0 +1,14 @@
+export DB_NAME=$(echo $PLATFORM_RELATIONSHIPS | base64 --decode | jq -r ".database[0].path")
+export DB_HOST=$(echo $PLATFORM_RELATIONSHIPS | base64 --decode | jq -r ".database[0].host")
+export DB_PORT=$(echo $PLATFORM_RELATIONSHIPS | base64 --decode | jq -r ".database[0].port")
+export DB_USER=$(echo $PLATFORM_RELATIONSHIPS | base64 --decode | jq -r ".database[0].username")
+export DB_PASSWORD=$(echo $PLATFORM_RELATIONSHIPS | base64 --decode | jq -r ".database[0].password")
+
+export AUTH_KEY=$PLATFORM_PROJECT_ENTROPY
+export SECURE_AUTH_KEY=$PLATFORM_PROJECT_ENTROPY
+export LOGGED_IN_KEY=$PLATFORM_PROJECT_ENTROPY
+export NONCE_KEY=$PLATFORM_PROJECT_ENTROPY
+export AUTH_SALT=$PLATFORM_PROJECT_ENTROPY
+export SECURE_AUTH_SALT=$PLATFORM_PROJECT_ENTROPY
+export LOGGED_IN_SALT=$PLATFORM_PROJECT_ENTROPY
+export NONCE_SALT=$PLATFORM_PROJECT_ENTROPY

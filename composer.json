@@ -11,6 +11,7 @@
     "ext-json" : "*",
     "ext-mbstring" : "*",
     "ext-zlib": "*",
+    "oscarotero/env": "^2.1",
     "symfony/templating": "^4.0|^5.0",
     "symfony/twig-bundle": "^4.0|^5.0",
     "symfony/asset": "^4.0|^5.0",
