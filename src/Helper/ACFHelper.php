@@ -28,6 +28,10 @@ class ACFHelper
 	public function __construct( $id, $type='objects' )
 	{
         global $_config;
+
+        if( !$_config )
+            return;
+
         $this->use_entity = $_config->get('acf.settings.use_entity');
 
 		$this->id = $id;
