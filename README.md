@@ -31,7 +31,7 @@ From Symfony :
 * Installation via Composer for Wordpress Core and plugins
 * YML configuration ( even for Wordpress )
 * DotEnv
-* Enhanced Security ( Wordpress is hidden )
+* Enhanced Security ( Wordpress is 'hidden' )
 * Dynamic image resize
 
 From the bundle itself :

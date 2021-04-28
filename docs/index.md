@@ -75,8 +75,7 @@ if output is empty, double check that Wordpress is installed and you have added 
 
 When the bundle is installed, a default `wordpress_bundle.yml` is copied to `/config/packages`
 
-This file allow you to manage :
- * Keys and Salts
+This file allows you to manage :
  * Image options
  * Maintenance support
  * Admin pages removal
@@ -160,7 +159,8 @@ Add ACF
 Edit `.env` to set ACF_PRO_KEY
 
 ```dotenv
-ACF_PRO_KEY=Your-Key-Here      
+ACF_PRO_KEY=Your-Key-Here
+GOOGLE_MAP_API_KEY=Your-Key-Here
 ```
 
 ## Context service
