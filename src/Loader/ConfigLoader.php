@@ -35,12 +35,12 @@ class ConfigLoader {
 
             if( '\\' === \DIRECTORY_SEPARATOR ){
                 // windows
-                $base_uri = preg_replace( "/\\web$/", '', $base_uri );
+                $base_uri = preg_replace( "/\\\public$/", '', $base_uri );
                 $base_uri = preg_replace( "/\\\\vendor\\\\metabolism\\\\wordpress-bundle\\\\src$/", '', $base_uri );
             }
             else{
                 // unix
-                $base_uri = preg_replace( "/\/web$/", '', $base_uri );
+                $base_uri = preg_replace( "/\/public$/", '', $base_uri );
                 $base_uri = preg_replace( "/\/vendor\/metabolism\/wordpress-bundle\/src$/", '', $base_uri );
             }
 
@@ -199,7 +199,7 @@ class ConfigLoader {
          */
 
         if (!defined('PUBLIC_DIR'))
-            define( 'PUBLIC_DIR', '/web');
+            define( 'PUBLIC_DIR', '/public');
 
         if (!defined('WP_CONTENT_DIR'))
             define( 'WP_CONTENT_DIR', BASE_URI . PUBLIC_DIR . '/wp-bundle');
