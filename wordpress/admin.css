@@ -54,7 +54,7 @@ h1, h2, h3, h4, h5, h6, #adminmenu .wp-submenu li.current, #adminmenu .wp-submen
 .feature-filter .feature-name, .item-controls .item-order a, .media-item .percent, .plugins .name, b, strong, .row-title{ font-weight: 500 }
 
 table.widefat, .widefat thead td, .widefat thead th, .widefat tfoot td, .widefat tfoot th{ border-color: #e0e0e0 }
-table.widefat{ box-shadow: 0 0 0 1px rgb(63 63 68 / 5%), 0 1px 3px 0 rgb(63 63 68 / 15%); outline: 1px solid transparent; border-radius: 3px; border: 0 }
+table.widefat{ box-shadow: 0 0 0 1px rgba(63,63,68,0.05), 0 1px 3px 0 rgba(63,63,68,0.15); outline: 1px solid transparent; border-radius: 3px; border: 0 }
 .widefat tfoot td, .widefat th, .widefat thead td{ font-size: 13px }
 .post-state{ font-size: 90%; vertical-align: bottom }
 
@@ -62,8 +62,9 @@ table.widefat{ box-shadow: 0 0 0 1px rgb(63 63 68 / 5%), 0 1px 3px 0 rgb(63 63 6
 .post-php .wrap h1, .post-new-php .wrap h1 { font-size: 16px }
 .post-php .page-title-action{ display: none }
 #comment-link-box, #edit-slug-box{ padding: 0 }
+ul.category-tabs{ margin-bottom: 4px }
 .wp-tab-active, ul.add-menu-item-tabs li.tabs, ul.category-tabs li.tabs, .acf-tab-group li a, .nav-tab { border-radius: 3px 3px 0 0 }
-.postbox, .card, .accordion-container, .menu-edit{ border: 0!important; border-radius: 3px; box-shadow: 0 0 0 1px rgb(63 63 68 / 5%), 0 1px 3px 0 rgb(63 63 68 / 15%)!important; overflow: hidden }
+.postbox, .card, .accordion-container, .menu-edit{ border: 0!important; border-radius: 3px; box-shadow: 0 0 0 1px rgba(3,63,68,0.05), 0 1px 3px 0 rgba(63,63,68,0.15)!important; overflow: hidden }
 .postbox.seamless{ box-shadow: none!important }
 #major-publishing-actions{ background: none }
 .menu-item-handle, .attachment-preview{ border-radius: 3px }
@@ -71,21 +72,21 @@ table.widefat{ box-shadow: 0 0 0 1px rgb(63 63 68 / 5%), 0 1px 3px 0 rgb(63 63 6
 input[type=color], input[type=date], input[type=datetime-local], input[type=datetime], input[type=email], input[type=month],
 input[type=number], input[type=password], input[type=search], input[type=tel], input[type=text], input[type=time], input[type=url],
 input[type=week], textarea, #titlediv #title {
-    box-shadow: inset 0 1px 0 0 rgb(63 63 68 / 5%); border-color: #c4cdd5; transition-duration: 200ms; border-radius: 3px;
+    box-shadow: inset 0 1px 0 0 rgba(63,63,68,0.05); border-color: #c4cdd5; transition-duration: 200ms; border-radius: 3px;
     transition-timing-function: cubic-bezier(0.64, 0, 0.35, 1); transition-property: background, border, box-shadow, -webkit-box-shadow; outline: none
 }
 .wp-core-ui select{ border-color: #c4cdd5;  }
 input[type=color]:focus, input[type=date]:focus, input[type=datetime-local]:focus, input[type=datetime]:focus, input[type=email]:focus, input[type=month]:focus,
 input[type=number]:focus, input[type=password]:focus, input[type=search]:focus, input[type=tel]:focus, input[type=text]:focus, input[type=time]:focus, input[type=url]:focus,
 input[type=week]:focus, select:focus, textarea:focus, #titlediv #title:focus {
-    outline: none; box-shadow: inset 0 1px 0 0 rgb(63 63 68 / 5%);
+    outline: none; box-shadow: inset 0 1px 0 0 rgba(63,63,68,0.05);
 }
 
 div.mce-toolbar-grp, .html-active .switch-html, .tmce-active .switch-tmce { background: #F9F9F9!important }
 .mce-top-part::before{ display: none }
 .wrap .page-title-action, .wrap .page-title-action:active, .wrap .page-title-action:hover, .wp-core-ui .button, .wp-core-ui .button-secondary {
     padding: 7px 16px; background: linear-gradient(180deg,#fff,#f9fafb); border: 1px solid #c4cdd5;
-    box-shadow: 0 1px 0 0 rgb(22 29 37 / 5%); border-radius: 3px; line-height: 1; color: #212b36;
+    box-shadow: 0 1px 0 0 rgba(22,29,37, 0.05); border-radius: 3px; line-height: 1; color: #212b36;
 }
 .form-wrap p, p.description, p.help, span.description { line-height: 110%; opacity: 0.8 }
 .form-table p{ max-width: 600px }
