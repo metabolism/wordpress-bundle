@@ -6,23 +6,6 @@
 
 version: 1.0
 
-####################
-##    Security    ##
-####################
-
-key: #https://api.wordpress.org/secret-key/1.1/salt/
-  auth : 'O-} !h|JpOq^w,CXn+O5=o3MvkN_So+ O0-chs$+a>KJq*i~/!ykEd<]IsPdgI#6'
-  secure_auth : 'r HvS?mdf^4xc.Iy^G*<ZliwL5r_w.]CUWIu|j0{sfq-M)k:Lhi-),qCDcN<Yy+w'
-  logged_in : 'u`UAyT)Wp0bT&Z.^e3RWTWDs?Je9K0UBQDJqG$W*yb9YG1yl,|*:LQV^ZUt|Q~#.'
-  nonce : 'cV9Q^z7H{oI>H6>>vLHQYB[)1N&#ur(# Iqw*k?r-FkQ+#eo9<R^1N?uo.*N~!J5'
-
-salt:
-  auth : 'w9J/dNw/bv}@Z#/YcrjPcH$^_[ni&4tji0JA0?na}yTw#0}yuZW>BXDVVjVGA+vk'
-  secure_auth : 'T7ntE>-j*2G3Qosn;0?|7{aqs&SU) }_S ~6f5k~PTedeX^jNe&T h)9(k4nT2Rq'
-  logged_in : 'w/iowiks]_i5b#/SqYuD2`28o</-L|P4H3vq@!<OrH 7Q!gxB[Q4m`/*CiVdylGs'
-  nonce : 'gelPRQb4NzO=4pOG_5YnuN(5G~YJCIutY*BL%!:ds(TqwDd;F[PsI,gT_1J-9;;D'
-
-
 #########################
 ##    Image options    ##
 #########################
@@ -128,7 +111,6 @@ acf:
   settings:
     use_entity: true #add new optimised return format
     autoload: true #autoload options
-    google_api_key: XXXYYYZZZ #https://developers.google.com/maps/documentation/javascript/get-api-key
   options_page: #add option pages https://www.advancedcustomfields.com/resources/options-page/
     - 'Personnalisation'
   toolbars: #customize wysiwyg toolbar

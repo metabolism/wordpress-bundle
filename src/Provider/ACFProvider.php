@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\Provider;
 
 use Dflydev\DotAccessData\Data;
+use function Env\env;
 
 /**
  * Class Metabolism\WordpressBundle Framework
@@ -21,12 +22,11 @@ class ACFProvider {
 	{
 		$acf_settings = $this->config->get('acf.settings');
 
-		//retro compat
-		if(!$acf_settings)
-			$acf_settings = ['google_api_key'=>$this->config->get('acf.google_api_key')];
-
 		foreach ($acf_settings as $name=>$value)
 			acf_update_setting($name, $value);
+
+		if( $google_api_key = env('GOOGLE_MAP_API_KEY') )
+            acf_update_setting('google_api_key', $google_api_key);
 	}
 
 

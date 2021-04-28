@@ -22,9 +22,6 @@ class ConfigLoader {
 
     public function import($resource)
     {
-
-        Env::$options = Env::USE_ENV_ARRAY;
-
         /**
          * Wordpress configuration file
          */
