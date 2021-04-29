@@ -345,7 +345,7 @@ class MediaPlugin {
 				<td><a class="button button-primary" href="'.get_admin_url().'?clear_all_thumbnails">Remove '.count($thumbnails).' images</a></td>
 			</tr>';
 
-			if( $this->config->get('multisite.shared_media') )
+			if( $this->config->get('multisite.shared_media', false) )
 				echo '<tr>
 				<th scope="row">'.__('Multisite').'</th>
 				<td><a class="button button-primary" href="'.get_admin_url().'?syncronize_images">Synchronize images</a></td>
@@ -397,7 +397,7 @@ class MediaPlugin {
 		$folder = wp_upload_dir();
 		$folder = $folder['basedir'];
 
-		if( is_multisite() && get_current_blog_id() != 1 && !$this->config->get('multisite.shared_media') && !$all )
+		if( is_multisite() && get_current_blog_id() != 1 && !$this->config->get('multisite.shared_media', false) && !$all )
 			$folder = $folder. '/sites/' . get_current_blog_id() . '/';
 
 		$file_list = [];
@@ -610,7 +610,7 @@ class MediaPlugin {
 
 		$valid_types = array('image/png','image/jpeg','image/jpg');
 
-		if(in_array($image_data['type'], $valid_types) && $this->config->get('image.resize') ){
+		if(in_array($image_data['type'], $valid_types) && $this->config->get('image.resize', false) ){
 
 			$src = $image_data['file'];
 
@@ -660,7 +660,7 @@ class MediaPlugin {
 		add_filter('upload_dir', [$this, 'add_relative_upload_dir_key'], 10, 2);
 		add_filter('wp_calculate_image_srcset_meta', '__return_null');
 
-		if( $this->config->get('multisite.shared_media') && is_multisite() ){
+		if( $this->config->get('multisite.shared_media', false) && is_multisite() ){
 
 			add_filter('upload_dir', [$this, 'uploadDir'], 11 );
 			add_filter('wp_get_attachment_url', [$this, 'attachmentUrl'], 10, 2 );
@@ -674,7 +674,7 @@ class MediaPlugin {
 			add_filter('intermediate_image_sizes_advanced', [$this, 'intermediateImageSizesAdvanced'] );
 
 			// Replicate media on network
-			if( $this->config->get('multisite.shared_media') && is_multisite() )
+			if( $this->config->get('multisite.shared_media', false) && is_multisite() )
 			{
 				add_action('add_attachment', [$this, 'addAttachment']);
 				add_action('delete_attachment', [$this, 'deleteAttachment']);

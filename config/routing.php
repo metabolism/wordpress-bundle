@@ -207,7 +207,7 @@ if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_
 
 $controller_name = $_config->get('extra_permastructs.controller', 'BlogController');
 
-if( $_config->get('multisite') && !$_config->get('multisite.subdomain_install') )
+if( $_config->get('multisite', false) && !$_config->get('multisite.subdomain_install', false) )
 {
 	$current_site_id = get_current_blog_id();
 

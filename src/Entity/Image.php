@@ -52,7 +52,7 @@ class Image extends Entity
 		$this->args = $args;
 
 		$this->compression = $_config->get('image.compression', 90);
-		$this->show_meta = $_config->get('image.show_meta');
+		$this->show_meta = $_config->get('image.show_meta', false);
 
 		if( isset($_REQUEST['debug']) && $_REQUEST['debug'] == 'image' && WP_ENV == 'dev' ){
 			$this->ID = 0;

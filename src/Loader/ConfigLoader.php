@@ -79,21 +79,21 @@ class ConfigLoader {
         define( 'WP_DEBUG', $env === 'dev');
         define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
 
-        define( 'HEADLESS', $_config->get('headless') );
-        define( 'URL_MAPPING', $_config->get('headless.mapping')?env('MAPPED_URL'):false );
+        define( 'HEADLESS', $_config->get('headless', false) );
+        define( 'URL_MAPPING', $_config->get('headless.mapping', false)?env('MAPPED_URL'):false );
 
         /**
          * Enable multisite
          */
-        if( $_config->get('multisite') || env('MULTISITE') )
+        if( $_config->get('multisite', false) || env('MULTISITE') )
         {
             define( 'MULTISITE', true );
-            define( 'SUBDOMAIN_INSTALL', $_config->get('multisite.subdomain_install') );
+            define( 'SUBDOMAIN_INSTALL', $_config->get('multisite.subdomain_install', false) );
             define( 'DOMAIN_CURRENT_SITE', $_config->get('multisite.domain', $_SERVER['HTTP_HOST']));
             define( 'SITE_ID_CURRENT_SITE', $_config->get('multisite.site_id', 1));
             define( 'BLOG_ID_CURRENT_SITE', $_config->get('multisite.blog_id', 1));
         }
-        elseif( $_config->get('install-multisite') )
+        elseif( $_config->get('install-multisite', false) )
         {
             define( 'WP_ALLOW_MULTISITE', true );
         }

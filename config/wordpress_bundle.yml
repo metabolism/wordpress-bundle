@@ -362,7 +362,7 @@ rewrite_rules:
 ##    Misc    ##
 ################
 
-domain_name: rocket # MO/PO traductions
+domain_name: app # MO/PO traductions
 
 #search: # change search settings
 # posts_per_page: 12

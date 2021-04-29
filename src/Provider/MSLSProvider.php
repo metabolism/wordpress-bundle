@@ -184,7 +184,7 @@ class MSLSProvider {
 
 			if( is_admin() ) {
 
-				if( $config->get('multisite.clone_post') )
+				if( $config->get('multisite.clone_post', false) )
 					$this->setupClone();
 			}
 		}

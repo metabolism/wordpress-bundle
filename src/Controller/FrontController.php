@@ -59,24 +59,24 @@ class FrontController {
 		{
 			if( get_class($object) == 'WP_Post_Type' ){
 
-				if( $ppp= $this->config->get('post_type.'.$object->name.'.posts_per_page') )
+				if( $ppp = $this->config->get('post_type.'.$object->name.'.posts_per_page', false) )
 					$query->set( 'posts_per_page', $ppp );
 
-				if( $orderby = $this->config->get('post_type.'.$object->name.'.orderby') )
+				if( $orderby = $this->config->get('post_type.'.$object->name.'.orderby', false) )
 					$query->set( 'orderby', $orderby );
 
-				if( $order = $this->config->get('post_type.'.$object->name.'.order') )
+				if( $order = $this->config->get('post_type.'.$object->name.'.order', false) )
 					$query->set( 'order', $order );
 			}
 			elseif( get_class($object) == 'WP_Term' ){
 
-				if( $ppp = $this->config->get('taxonomy.'.$object->taxonomy.'.posts_per_page') )
+				if( $ppp = $this->config->get('taxonomy.'.$object->taxonomy.'.posts_per_page', false) )
 					$query->set( 'posts_per_page', $ppp );
 
-				if( $orderby = $this->config->get('taxonomy.'.$object->name.'.orderby') )
+				if( $orderby = $this->config->get('taxonomy.'.$object->name.'.orderby', false) )
 					$query->set( 'orderby', $orderby );
 
-				if( $order = $this->config->get('taxonomy.'.$object->name.'.order') )
+				if( $order = $this->config->get('taxonomy.'.$object->name.'.order', false) )
 					$query->set( 'order', $order );
 			}
 		}
@@ -93,7 +93,7 @@ class FrontController {
 
 		if( $query->is_search ) {
 
-			if( $ppp = $this->config->get('search.posts_per_page') )
+			if( $ppp = $this->config->get('search.posts_per_page', false) )
 				$query->set( 'posts_per_page', $ppp );
 		}
 

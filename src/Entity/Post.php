@@ -104,7 +104,7 @@ class Post extends Entity
 			if( $post->thumbnail ){
 
 				global $_config;
-				$return_format = $_config->get('image.return_format');
+				$return_format = $_config->get('image.return_format', false);
 				
 				if( $return_format == 'url'){
 

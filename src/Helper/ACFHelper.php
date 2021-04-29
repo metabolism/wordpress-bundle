@@ -32,7 +32,7 @@ class ACFHelper
         if( !$_config )
             return;
 
-        $this->use_entity = $_config->get('acf.settings.use_entity');
+        $this->use_entity = $_config->get('acf.settings.use_entity', true);
 
 		$this->id = $id;
 

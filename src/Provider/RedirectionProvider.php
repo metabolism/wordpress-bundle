@@ -17,7 +17,7 @@ class RedirectionProvider
 	 */
 	public function __construct($config)
 	{
-		$role = $config->get('plugins.redirection.redirection_role');
+		$role = $config->get('plugins.redirection.redirection_role', false);
 
 		if( $role ){
 

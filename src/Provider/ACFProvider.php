@@ -20,7 +20,7 @@ class ACFProvider {
 	 */
 	public function addSettings()
 	{
-		$acf_settings = $this->config->get('acf.settings');
+		$acf_settings = $this->config->get('acf.settings', []);
 
 		foreach ($acf_settings as $name=>$value)
 			acf_update_setting($name, $value);
@@ -66,7 +66,7 @@ class ACFProvider {
 	 */
 	public function editToolbars($toolbars){
 
-		$custom_toolbars = $this->config->get('acf.toolbars');
+		$custom_toolbars = $this->config->get('acf.toolbars', false);
 
 		return $custom_toolbars ? $custom_toolbars : $toolbars;
 	}
@@ -197,7 +197,7 @@ class ACFProvider {
 		add_filter('acf/fields/relationship/query/name=items', [$this, 'filterPostsByTermTemplateMeta'], 10, 3);
 		add_filter('acf/get_image_sizes', [$this, 'getImageSizes'] );
 
-		if( $this->config->get('acf.settings.use_entity') )
+		if( $this->config->get('acf.settings.use_entity', true) )
             add_filter('acf/validate_field', [$this, 'validateField']);
 
 		// When viewing admin

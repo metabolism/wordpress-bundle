@@ -706,9 +706,9 @@ class ConfigPlugin {
 	public function __construct($config)
 	{
 		$this->config = $config;
-		$this->support = $config->get('support');
+		$this->support = $config->get('support', []);
 
-		if( $jpeg_quality = $this->config->get('jpeg_quality') )
+		if( $jpeg_quality = $this->config->get('jpeg_quality', false) )
 			add_filter( 'jpeg_quality', function() use ($jpeg_quality){ return $jpeg_quality; });
 
 		// Global init action
@@ -722,7 +722,7 @@ class ConfigPlugin {
 			$this->addRoles();
 			$this->addThemeSupport();
 
-			load_theme_textdomain( $this->config->get('domain_name'), BASE_URI. '/translations' );
+			load_theme_textdomain( $this->config->get('domain_name', 'app'), BASE_URI. '/translations' );
 
 			if( !HEADLESS || URL_MAPPING ){
 
@@ -736,7 +736,7 @@ class ConfigPlugin {
 
 				$this->addTableViews();
 
-				if( $editor_style = $this->config->get('editor_style') )
+				if( $editor_style = $this->config->get('editor_style', false) )
 					add_editor_style( $editor_style );
 			}
 		});
