@@ -136,7 +136,7 @@ class ConfigLoader {
          * Define DB settings
          */
         if( !env('DATABASE_URL') && !env('DB_NAME') )
-            die('<code>Database configuration is missing, please add <b>DATABASE_URL=mysql://user:pwd@localhost:3306/dbname</b> to your environment</code>');
+            die('<code>Database configuration is missing, please add <b>DATABASE_URL=mysql://user:pwd@localhost:3306/dbname</b> to your environment or DB_NAME, DB_USER, DB_PASSWORD, DB_HOST separately.</code>');
 
         if( $database_url = env('DATABASE_URL') ){
 
