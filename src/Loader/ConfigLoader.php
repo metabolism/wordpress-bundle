@@ -138,7 +138,17 @@ class ConfigLoader {
         if( !env('DATABASE_URL') && !env('DB_NAME') )
             die('<code>Database configuration is missing, please add <b>DATABASE_URL=mysql://user:pwd@localhost:3306/dbname</b> to your environment or DB_NAME, DB_USER, DB_PASSWORD, DB_HOST separately.</code>');
 
-        if( $database_url = env('DATABASE_URL') ){
+        if(env('DB_NAME')){
+
+            define( 'DB_NAME', env('DB_NAME'));
+            define( 'DB_USER', env('DB_USER'));
+            define( 'DB_PASSWORD', env('DB_PASSWORD'));
+            define( 'DB_HOST', env('DB_HOST'));
+            define( 'DB_PORT', env('DB_PORT'));
+        }
+        else{
+
+            $database_url = env('DATABASE_URL');
 
             $mysql = explode('@', str_replace('mysql://', '', str_replace('mariadb://', '', $database_url)));
             $mysql[0] = explode(':', $mysql[0]);
@@ -148,14 +158,6 @@ class ConfigLoader {
             define( 'DB_USER', $mysql[0][0]);
             define( 'DB_PASSWORD', $mysql[0][1]);
             define( 'DB_HOST', $mysql[1][0]);
-        }
-        else{
-
-            define( 'DB_NAME', env('DB_NAME'));
-            define( 'DB_USER', env('DB_USER'));
-            define( 'DB_PASSWORD', env('DB_PASSWORD'));
-            define( 'DB_HOST', env('DB_HOST'));
-            define( 'DB_PORT', env('DB_PORT'));
         }
 
         define( 'DB_CHARSET', $_config->get('database.charset', 'utf8mb4'));
