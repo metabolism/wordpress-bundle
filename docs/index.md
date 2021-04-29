@@ -136,8 +136,8 @@ Declare a new repository
       "type": "wordpress-plugin",
       "dist": {"type": "zip", "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download&k={%ACF_PRO_KEY}&t={%version}"},
       "require": {
-        "ffraenz/private-composer-installer": "^2.0",
-        "composer/installers": "^1.0"
+        "ffraenz/private-composer-installer": "^5.0",
+        "composer/installers": "^1.4"
       }
     }
   },
