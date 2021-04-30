@@ -88,7 +88,6 @@ Edit composer.json and add :
 
 ```json
 "extra": {
-    //...
     "installer-paths": {
         "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
         "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
