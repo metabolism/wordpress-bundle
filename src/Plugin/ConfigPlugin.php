@@ -693,7 +693,7 @@ class ConfigPlugin {
 			}
 			elseif( !in_array($feature, $excluded) ){
 
-				add_theme_support( $feature );
+				@add_theme_support( $feature );
 			}
 		}
 	}

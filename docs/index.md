@@ -1,40 +1,31 @@
 # Installation & Configuration
 
-### Add wpackagist.org repository (optional)
+### Configure database, table prefix ans security
 
-Edit `composer.json`
-
-Add https://wpackagist.org repository
-
-```json
-"repositories": [
-    {
-        "type":"composer", "url":"https://wpackagist.org"
-    }
-]
-```
-
-### Configure database and table prefix
-
-edit `.env`
+Edit or create `.env.local`
 
 ```dotenv
 ###> metabolism/wordpress-bundle ###
-DATABASE_URL=mysql://user:pwd@localhost:3306/dbname
 TABLE_PREFIX=wp_
+
+DATABASE_URL=mysql://user:pwd@localhost:3306/dbname
+# or
+DB_NAME=dbname
+DB_USER=user
+DB_PASSWORD=pwd
+DB_HOST=localhost
+DB_PORT=3306
+
+## use https://roots.io/salts.html to generate salts
+AUTH_KEY=xxxxxxxxxxxxxxxxxxxxxx
+SECURE_AUTH_KEY=xxxxxxxxxxxxxxxxxxxxxx
+LOGGED_IN_KEY=xxxxxxxxxxxxxxxxxxxxxx
+NONCE_KEY=xxxxxxxxxxxxxxxxxxxxxx
+AUTH_SALT=xxxxxxxxxxxxxxxxxxxxxx
+SECURE_AUTH_SALT=xxxxxxxxxxxxxxxxxxxxxx
+LOGGED_IN_SALT=xxxxxxxxxxxxxxxxxxxxxx
+NONCE_SALT=xxxxxxxxxxxxxxxxxxxxxx
 ###< metabolism/wordpress-bundle ###
-```
-
-### Update gitignore
-
-edit `.gitignore`
-
-```gitignore
-/public/uploads/*
-!/public/uploads/acf-thumbnails
-/public/edition
-/public/cache
-/public/wp-bundle
 ```
 
 ### Start the server
@@ -45,11 +36,17 @@ Configure a vhost mounted to `/public`, or start Symfony server
 symfony serve
 ```
 
-Accessing the server url will now start the Wordpress Installation
+### Install Wordpress
 
-### Add default Wordpress routing
+You will not be asked for database credentials
 
-edit `/config/routes.yaml`
+### Post Install
+
+You will be asked to add `WP_INSTALLED=1` to the environment, this is required to perform routing optimisation
+
+### Add default Wordpress routing (optional)
+
+Edit `/config/routes.yaml`
 
 ```yml
 _wordpress:
@@ -70,6 +67,17 @@ php bin/console debug:router
 
 if output is empty, double check that Wordpress is installed and you have added WP_INSTALLED=1 in your environment
 
+### Update gitignore
+
+edit `.gitignore`
+
+```gitignore
+/public/uploads/*
+!/public/uploads/acf-thumbnails
+/public/edition
+/public/cache
+/public/wp-bundle
+```
 
 ## Wordpress configuration
 
@@ -82,7 +90,7 @@ This file allows you to manage :
  * WYSIWYG MCE Editor
  * Feature Support
  * Multi-site configuration
- * Constants
+ * Constants definition
  * ACF configuration
  * Menu
  * Custom Post type
@@ -96,28 +104,36 @@ This file allows you to manage :
  * Domain name
  * Controller name
 
-## Controllers
-
-See our sample [controllers](samples/controller) that you might want to copy to your `/src/Controller` folder.
-
 ## Theme
 
-This bundle come without theme, you can start reading the official [documentation](https://symfony.com/doc/current/templates.html)
+This bundle come without theme, you can start reading the official Symfony [documentation](https://symfony.com/doc/current/templates.html) to create templates.
 
 Also, you can take a look at our sample [template](samples/templates/generic.html.twig) and start writing your own in `/templates`
 
-## Plugin installation
+## Hello World !
 
-Please use https://wpackagist.org to find your plugin.
+Navigate to https://127.0.0.1:8000/hello-world you should see your first post, rendered using Symfony !
 
-edit `composer.json`
+## Plugins installation
+
+### Add wpackagist.org repository
+
+Edit `composer.json`
+
+Add https://wpackagist.org repository
 
 ```json
-"require": {
-    //...
-    "wpackagist-plugin/classic-editor":"1.*"
-    //...
-}
+"repositories": [
+    {
+        "type":"composer", "url":"https://wpackagist.org"
+    }
+],
+```
+
+then
+
+```shell
+$ composer require wpackagist-plugin/classic-editor
 ```
 
 ## ACF Pro installation
@@ -147,20 +163,44 @@ Declare a new repository
 ]
 ```
 
-Add ACF
+then
 
-```json
-"require": {
-   "elliotcondon/advanced-custom-fields-pro": "5.*",
-   //...
-}
+```shell
+$ composer require elliotcondon/advanced-custom-fields-pro
 ```
       
-Edit `.env` to set ACF_PRO_KEY
+Edit `.env` to set `ACF_PRO_KEY` and `GOOGLE_MAP_API_KEY` ( optional )
 
 ```dotenv
 ACF_PRO_KEY=Your-Key-Here
 GOOGLE_MAP_API_KEY=Your-Key-Here
+```
+
+## Controllers
+
+See our sample [controllers](samples/controller) that you might want to copy to your `/src/Controller` folder.
+
+This is the controller for the homepage
+```php
+public function frontAction(Context $context)
+{
+    $context->add('section', 'Homepage');
+    return $this->render('homepage.html.twig', $context->toArray());
+}
+```
+
+note that Wordpress functions are available directly in the controller
+
+```php
+public function frontAction(Context $context)
+{
+    if( is_user_logged_in() )
+        $context->add('section', 'Homepage for logged in user');
+    else
+        $context->add('section', 'Homepage');
+	    
+    return $this->render('homepage.html.twig', $context->toArray());
+}
 ```
 
 ## Context service
@@ -176,6 +216,7 @@ public function articleAction(Context $context)
 {
     $context->addPosts(['category__and' => [1,3], 'posts_per_page' => 2, 'orderby' => 'title'], 'portraits');
     $context->addSitemap();
+    
     return $this->render( 'page/article.twig', $context->toArray() );
 }
 ```
@@ -260,7 +301,7 @@ public function articleAction(Context $context)
 {% endif %}
 ```
 
-ACF fields are directly available so let say you've added a `copyright` text field :
+ACF fields are directly available :
 
 ```twig
 <h1>{{ post.title }}</h1>

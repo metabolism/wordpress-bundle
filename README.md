@@ -76,6 +76,18 @@ Make sure Composer is installed globally, as explained in the
 [installation chapter](https://getcomposer.org/doc/00-intro.md)
 of the Composer documentation.
 
+### Create project
+
+```shell
+$ symfony new my_project_name
+```
+
+or 
+
+```shell
+$ composer create-project symfony/skeleton my_project_name
+```
+
 ### Define installation path for Wordpress core and plugins
 
 Edit composer.json and add :
@@ -88,11 +100,10 @@ Edit composer.json and add :
         "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
         "public/edition/": ["type:wordpress-core"]
     }
-    //...
 }
 ```
 
-### Applications that use Symfony Flex
+### Install the bundle
 
 Open a command console, enter your project directory and execute:
 
@@ -100,20 +111,10 @@ Open a command console, enter your project directory and execute:
 $ composer require metabolim/wordpress-bundle
 ```
 
-### Applications that don't use Symfony Flex
+#### For applications that don't use Symfony Flex
 
-### Step 1: Download the Bundle
 
-Open a command console, enter your project directory and execute the
-following command to download the latest stable version of this bundle:
-
-```shell
-$ composer require metabolim/wordpress-bundle
-```
-
-### Step 2: Enable the Bundle
-
-Then, enable the bundle by adding it to the list of registered bundles
+Enable the bundle by adding it to the list of registered bundles
 in the `config/bundles.php` file of your project:
 
 ```php
@@ -121,11 +122,15 @@ in the `config/bundles.php` file of your project:
 
 return [
     // ...
-    \Metabolism\WordpressBundle\WordpressBundle::class => ['all' => true],
+    Metabolism\WordpressBundle\WordpressBundle::class => ['all' => true],
 ];
 ```
 
-### Step 3: Install and configure Wordpress
+### Install and configure Wordpress
+
+```shell
+$ symfony serve
+```
 
 Please read the [bundle documentation](docs/index.md) to continue
   
@@ -139,18 +144,16 @@ Btw this Bundle comes from years of Bedrock usage + Timber plugin...
 The philosophy is not the same, Ekino use Symfony to manipulate Wordpress database.
 Plus the last release was in 2015...
 
-
 ## Is Wordpress classic theme bad ?
 
-We don't want to judge anyone, it's more like a code philosophy, once you go Symfony you can't go back.
+It's more like a code philosophy, once you go Symfony you can't go back.
 
 Plus the security is a requirement for us and Wordpress failed to provide something good because of it's huge usage.
 
 ## Roadmap
 
-* Create Symfony recipe
-* Provide more samples
-* Woo-commerce Provider rework
+* More samples
+* Woo-commerce Provider rewrite
 * Global maintenance mode for multi-site
 * Unit tests
 

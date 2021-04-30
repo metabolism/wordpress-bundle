@@ -33,16 +33,13 @@ class NoticePlugin {
 		if( ($_GET['fix']??false) == 'controller' ){
 
             $controller = BASE_URI.'/src/Controller/'.$this->config->get('extra_permastructs.controller', 'BlogController').'.php';
-            $template = BASE_URI.'/src/templates/generic.html.twig';
+            $template = BASE_URI.'/templates/generic.html.twig';
 
             if( !file_exists($controller) )
                 copy(__DIR__.'/../../samples/controller/BlogController.php', $controller);
 
             if( !file_exists($template) )
                 copy(__DIR__.'/../../samples/template/generic.html.twig', $template);
-		}
-
-		if( ($_GET['fix']??false) == 'service' ){
 
             $context = BASE_URI.'/src/Service/Context.php';
 
@@ -96,9 +93,6 @@ class NoticePlugin {
 
 		if( !file_exists(BASE_URI.'/src/Controller/'.$this->config->get('extra_permastructs.controller', 'BlogController').'.php') )
             $errors[] = 'There is no controller defined : <a href="?fix=controller">Create one</a>';
-
-		if( !file_exists(BASE_URI.'/src/Service/Context.php') )
-            $errors[] = 'There is no context service defined : <a href="?fix=service">Create one</a>';
 
 		if( !empty($errors) )
 			echo '<div class="error"><p>'.implode('<br/>', $errors ).'</p></div>';
