@@ -62,13 +62,7 @@ From the bundle itself :
 Because of Wordpress design, functions are available in the global namespace, 
 it's not perfect but Wordpress will surely change this soon.
 
-Some plugins may not work directly, Woocommerce provider needs some rework 
- 
-## Demo
-
-A demo is available at https://github.com/wearemetabolism/wordpress-bundle-demo, 
-
-it's an implementation of the Twenty Nineteen theme for Wordpress 5.
+Some plugins may not work directly, Woocommerce provider needs some rework
 
 ## Installation
 
@@ -108,7 +102,7 @@ Edit composer.json and add :
 Open a command console, enter your project directory and execute:
 
 ```shell
-$ composer require metabolim/wordpress-bundle
+$ composer require metabolism/wordpress-bundle
 ```
 
 #### For applications that don't use Symfony Flex
@@ -134,12 +128,12 @@ $ symfony serve
 
 Please read the [bundle documentation](docs/index.md) to continue
   
-## Why not using Bedrock
+## Why not Bedrock
 
 Because Bedrock "only" provides a folder organisation with composer dependencies management.
 Btw this Bundle comes from years of Bedrock usage + Timber plugin...
        
-## Why not using Ekino Wordpress Bundle
+## Why not Ekino Wordpress Bundle
 
 The philosophy is not the same, Ekino use Symfony to manipulate Wordpress database.
 Plus the last release was in 2015...
