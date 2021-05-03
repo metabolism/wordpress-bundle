@@ -6,7 +6,6 @@ Use Wordpress 5 as a backend for a Symfony application
 
 The main idea is to use the power of Symfony for the front / webservices with the ease of Wordpress for the backend.
 
-
 ## How does it work ?
 
 When the Wordpress bundle is loaded, it loads a small amount of Wordpress Core files to allow usage of Wordpress functions 
@@ -15,7 +14,6 @@ inside Symfony Controllers.
 Wordpress is then linked to the bundle via a plugin located in the mu folder.
 
 Because it's a Symfony bundle, there is no theme management in Wordpress and the entire routing is powered by Symfony.
-
 
 ## Features
 
@@ -56,13 +54,28 @@ From the bundle itself :
 * Extensible, entities, controller and bundle plugins can be extended in the app
 * Site health checker
  
- 
 ## Drawbacks
 
 Because of Wordpress design, functions are available in the global namespace, 
 it's not perfect but Wordpress will surely change this soon.
 
 Some plugins may not work directly, Woocommerce provider needs some rework
+
+## Demo
+
+https://github.com/wearemetabolism/wordpress-bundle-demo
+
+This is an implementation of the Twenty Nineteen Wordpress theme for wordpress-bundle.
+
+Code
+[![Screenshot from 2021-05-03 10-08-22](https://user-images.githubusercontent.com/4919596/116854347-d8f2e180-abf7-11eb-9dec-29480cffa720.png)](https://user-images.githubusercontent.com/4919596/116854347-d8f2e180-abf7-11eb-9dec-29480cffa720.png)
+
+Front
+[![Screenshot from 2021-05-03 10-09-02](https://user-images.githubusercontent.com/4919596/116854351-d98b7800-abf7-11eb-9843-a57d521a2b7a.png)](https://user-images.githubusercontent.com/4919596/116854351-d98b7800-abf7-11eb-9843-a57d521a2b7a.png)
+
+Backoffice
+[![Screenshot from 2021-05-03 10-09-32](https://user-images.githubusercontent.com/4919596/116854353-d98b7800-abf7-11eb-9063-0520125a0e9e.png)](https://user-images.githubusercontent.com/4919596/116854353-d98b7800-abf7-11eb-9063-0520125a0e9e.png)
+
 
 ## Installation
 

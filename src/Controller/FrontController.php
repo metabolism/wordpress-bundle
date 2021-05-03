@@ -27,7 +27,7 @@ class FrontController {
 
 		$path = rtrim($_SERVER['REQUEST_URI'], '/');
 
-		if( !empty($path) && strpos($path, WP_FOLDER) !== false ){
+		if( !empty($path) && strpos($path, WP_FOLDER) !== false && 'POST' !== $_SERVER['REQUEST_METHOD'] ){
 
 			wp_redirect(is_user_logged_in() ? admin_url('index.php') : wp_login_url());
 			exit;

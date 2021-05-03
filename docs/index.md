@@ -72,11 +72,13 @@ if output is empty, double check that Wordpress is installed and you have added 
 edit `.gitignore`
 
 ```gitignore
+###> metabolism/wordpress-bundle ###
 /public/uploads/*
 !/public/uploads/acf-thumbnails
 /public/edition
 /public/cache
 /public/wp-bundle
+###< metabolism/wordpress-bundle ###
 ```
 
 ## Wordpress configuration
