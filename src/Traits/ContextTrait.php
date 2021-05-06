@@ -295,6 +295,36 @@ Trait ContextTrait
 
 
 	/**
+	 * Get menus
+	 * @return Menu[]|bool
+	 */
+	public function getMenus()
+	{
+		return $this->get('menu');
+	}
+
+
+	/**
+	 * Get options
+	 * @return array
+	 */
+	public function getOptions()
+	{
+		return $this->get('options');
+	}
+
+
+	/**
+	 * Get current user
+	 * @return User|bool
+	 */
+	public function getCurrentUser()
+	{
+		return $this->get('current_user');
+	}
+
+
+	/**
 	 * Add list of all wordpress post, page and custom post
 	 * @param array $args see https://codex.wordpress.org/Class_Reference/WP_Query#Parameters
 	 * @param bool $title_meta

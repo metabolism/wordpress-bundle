@@ -108,7 +108,7 @@ namespace {
 	/**
 	 * @param $state
 	 * @param $output
-	 * @return bool
+	 * @return WP_Post|bool
 	 */
 	function get_page_by_state($state, $output = OBJECT)
 	{

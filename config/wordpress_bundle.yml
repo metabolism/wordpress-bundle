@@ -197,7 +197,7 @@ sidebar: # https://developer.wordpress.org/themes/functionality/sidebars/#regist
 ##    New post types    ##
 ##########################
 
-post_type: # https://codex.wordpress.org/Function_Reference/register_post_type
+post_type: # https://developer.wordpress.org/reference/functions/register_post_type/
   guide:
     menu_icon: book #https://developer.wordpress.org/resource/dashicons/
     has_archive: true
@@ -210,12 +210,21 @@ post_type: # https://codex.wordpress.org/Function_Reference/register_post_type
     #publicly_queryable: false
     ## options for archive page
     #posts_per_page: 11
-    #orderby: name #https://codex.wordpress.org/Class_Reference/WP_Query#Order_.26_Orderby_Parameters
+    #orderby: name #https://developer.wordpress.org/reference/classes/wp_query/#order-orderby-parameters
     #order: ASC
     supports:
       - title
       - excerpt
       - thumbnail
+      #- editor
+      #- author
+      #- excerpt
+      #- trackbacks
+      #- custom-fields
+      #- comments
+      #- revisions
+      #- page-attributes
+      #- post-formats
     #columns: #add new column to post listing, thumbnail|meta
      # - thumbnail
     #taxonomies:
@@ -238,7 +247,7 @@ post_type: # https://codex.wordpress.org/Function_Reference/register_post_type
 ##    New taxonomies    ##
 ##########################
 
-taxonomy: # https://codex.wordpress.org/Function_Reference/register_taxonomy
+taxonomy: # https://developer.wordpress.org/reference/functions/register_taxonomy/
   item:
     ## options for archive page
     #posts_per_page: 11
@@ -316,6 +325,7 @@ taxonomy: # https://codex.wordpress.org/Function_Reference/register_taxonomy
 #  translator:
 #    display_name: Traducteur
 #    force: true
+#    redirect_to: edit.php?post_type=guide
 #    #inherit: editor
 #    capabilities:
 #      read: true

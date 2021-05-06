@@ -201,6 +201,30 @@ class UrlPlugin {
 
 
 	/**
+	 * Redirect admin after login
+	 * @param $config
+	 * @return void
+	 */
+	public function redirectAdmin($config){
+
+        foreach ( $config->get('role', []) as $role => $args )
+        {
+            if( isset($args['redirect_to']) ){
+
+                add_filter( 'login_redirect', function($redirect_to, $requested_redirect_to, $user) use ($role, $args){
+
+                    if( !is_wp_error($user) && in_array($role, $user->roles) )
+                        return get_admin_url(null, $args['redirect_to']);
+
+                    return $redirect_to;
+
+                }, 10, 3);
+            }
+        }
+	}
+
+
+	/**
 	 * UrlPlugin constructor.
 	 * @param Data $config
 	 */
@@ -219,6 +243,8 @@ class UrlPlugin {
 				add_filter('get_sample_permalink_html', [$this, 'applyUrlMapping'] );
 			}
 		}
+
+		$this->redirectAdmin($config);
 
 		add_action('init', function()
 		{
