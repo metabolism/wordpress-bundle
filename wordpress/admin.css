@@ -46,6 +46,13 @@
 .compat-item .field > input { margin-left: 0!important; margin-top: 0!important }
 .media-modal .compat-item label { font-size: 12px }
 #editable-post-name input{ min-height: 0 }
+.form-field textarea, .form-field input{ width: 100%!important; }
+.form-field select{ max-width: none }
+#addtag{ padding-right: 5% }
+#addtag #acf-term-fields{ padding-right: 0 }
+@media screen and (max-width: 782px){
+    #addtag{ padding-right: 0 }
+}
 
 /* Quick redesign */
 h1, h2, h3, h4, h5, h6, #adminmenu .wp-submenu li.current, #adminmenu .wp-submenu li.current a, #adminmenu .wp-submenu li.current a:hover,
@@ -109,6 +116,13 @@ input.large-text, textarea.large-text { width: 35.7rem }
 .acf-fields.-border, .acf-file-uploader .file-wrap{ border-radius: 3px; overflow: hidden }
 .acf-field select{ font-size: 13px }
 .acf-postbox.seamless>.inside { margin-left: -10px !important; margin-right: -10px !important }
+.form-table>tbody>.acf-tab-wrap td{ padding: 0; padding-left: 220px; }
+.form-table>tbody>tr.acf-tab-wrap .acf-tab-group{ padding: 0 }
+@media screen and (max-width: 782px){
+    .form-table>tbody>.acf-tab-wrap td{ padding-left: 0 }
+    .form-table>tbody>.acf-field>.acf-label{ padding: 0; margin: 0; padding-top: 10px }
+    .form-table>tbody>.acf-field>.acf-input{ padding: 0 }
+}
 
 /* Fix WP5.5 Contrast */
 .handle-order-higher, .handle-order-lower{ display: none }

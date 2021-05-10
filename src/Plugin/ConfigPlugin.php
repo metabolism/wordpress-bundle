@@ -415,7 +415,7 @@ class ConfigPlugin {
 	{
 		foreach ( $this->config->get('role', []) as $role => $args )
 		{
-			if( isset($args['force']) && $args['force'] )
+			if( is_admin() && isset($_GET['reload_role']) && $_GET['reload_role'] )
 				remove_role($role);
 
 			if( isset($args['inherit']) && !empty($args['inherit']) ){

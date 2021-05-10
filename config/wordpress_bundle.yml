@@ -318,13 +318,16 @@ taxonomy: # https://developer.wordpress.org/reference/functions/register_taxonom
 #      company: Company
 #      request: Request
 
-#####################
-##    Add Roles    ##
-#####################
+#############################################
+##               Add Roles                 ##
+##                                         ##
+##    To reload role please go to          ##
+##    /wp-admin/index.php?reload_role=1    ##
+##                                         ##
+#############################################
 #role:
 #  translator:
 #    display_name: Traducteur
-#    force: true
 #    redirect_to: edit.php?post_type=guide
 #    #inherit: editor
 #    capabilities:
