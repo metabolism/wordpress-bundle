@@ -361,22 +361,23 @@ class ACFHelper
 
 				case 'relationship':
 
-					$objects[$object['name']] = [];
-
 					if( isset($object['value']) && is_iterable($object['value']) ){
 
-						foreach ($object['value'] as $value) {
+                        $relationship = [];
 
-							if ($object['return_format'] == 'id' || is_int($value) )
-								$element = $value;
-							elseif ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'object'))
-								$element = $this->load('post', $value);
+                        foreach ($object['value'] as $value) {
+
+                            if ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'object'))
+                                $item = $this->load('post', $value);
 							else
-								$element = $object['value'];
+                                $item = $value;
 
-							if( $element )
-								$objects[$object['name']][] = $element;
-						}
+							if( $item )
+                                $relationship[] = $item;
+                        }
+
+                        if( !empty($relationship) )
+                            $objects[$object['name']] = $relationship;
 					}
 					break;
 
