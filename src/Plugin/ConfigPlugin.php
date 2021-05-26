@@ -214,8 +214,9 @@ class ConfigPlugin {
 
 		// Loop through each role and assign capabilities
 		foreach($roles as $the_role) {
-
-			$role = get_role($the_role);
+		    
+			if( !$role = get_role($the_role) )
+			    continue;
 
 			foreach ( $this->config->get('post_type', []) as $post_type => $args ){
 
