@@ -12,14 +12,19 @@ class Menu extends Entity
 {
 	public $entity = 'menu';
 
+    public $description;
 	/** @var MenuItem[] $items */
 	public $items;
+    public $slug;
 	public $title;
-	public $slug;
-	public $description;
 
 	private $menuItemClass;
 	private $args;
+
+    public function __toString()
+    {
+        return $this->title;
+    }
 
 	/**
 	 * Menu constructor.

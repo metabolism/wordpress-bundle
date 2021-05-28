@@ -45,6 +45,19 @@ class Permastruct{
 		$this->addRoute('maintenance', '{req}', ['req'=>".*"], false, $maintenanceController);
 	}
 
+
+	private function getSlugs($taxonomy){
+
+        $terms = get_terms($taxonomy);
+
+        $slugs = [];
+
+        foreach ($terms as $term)
+            $slugs[] = $term->slug;
+
+        return $slugs;
+    }
+
 	/**
 	 * Define all routes from post types and taxonomies
 	 */
@@ -58,6 +71,8 @@ class Permastruct{
 
 		foreach ($wp_post_types as $post_type)
 		{
+		    $requirements = [];
+
 			if( $post_type->public && $post_type->publicly_queryable ){
 
 				if( isset($this->wp_rewrite->extra_permastructs[$post_type->name]) ){
@@ -70,7 +85,16 @@ class Permastruct{
 					else
 						$struct = $base_struct;
 
-					$this->addRoute($post_type->name, $struct);
+					if( substr($struct,0, 2) == '/%' ){
+
+					    $struct = explode('%', $struct);
+
+                        $requirements[$struct[1]] = implode('|', $this->getSlugs($struct[1]));
+
+                        $struct = implode('%', $struct);
+                    }
+
+					$this->addRoute($post_type->name, $struct, $requirements);
 				}
 
 				if( $post_type->has_archive ){
@@ -89,6 +113,8 @@ class Permastruct{
 
 		foreach ($wp_taxonomies as $taxonomy){
 
+            $requirements = [];
+
 			if( $taxonomy->public && $taxonomy->publicly_queryable ){
 
 				if( isset($this->wp_rewrite->extra_permastructs[$taxonomy->name]) ){
@@ -101,11 +127,19 @@ class Permastruct{
 					else
 						$struct = $base_struct;
 
+                    if( substr($struct,0, 8) == '/%empty%' ){
 
-					$this->addRoute($taxonomy->name, $struct, [], $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
+                        $struct = explode('%', $struct);
+                        $requirements[$struct[3]] = implode('|', $this->getSlugs($struct[3]));
+
+                        $struct = implode('%', $struct);
+                        $struct = str_replace('%empty%/','', $struct);
+                    }
+
+					$this->addRoute($taxonomy->name, $struct, $requirements, $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
 
 					if( strpos($struct, '/%parent%') !== false )
-						$this->addRoute($taxonomy->name.'_parent', str_replace('/%parent%', '', $struct), [], $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
+						$this->addRoute($taxonomy->name.'_parent', str_replace('/%parent%', '', $struct), $requirements, $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
 
 					$registered[] = $taxonomy->name;
 				}

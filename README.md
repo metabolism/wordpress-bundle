@@ -34,7 +34,7 @@ From Symfony :
 
 From the bundle itself :
 * YML configuration for Wordpress (see bellow )
-* Permalink settings for custom post type and taxonomy
+* Permalink configuration for custom post type and taxonomy
 * ACF data cleaning
 * SF Cache invalidation ( Varnish compatible )
 * Post/Image/Menu/Term/User/Comment/Query entities

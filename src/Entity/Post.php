@@ -16,36 +16,39 @@ class Post extends Entity
 {
 	public $entity = 'post';
 
-	/** @var Image */
-	public $thumbnail = false;
+    public $author;
+    public $class;
+    public $comment_status;
+    public $comment_count;
+    public $content;
+    public $date;
+    public $date_gmt;
+    public $excerpt ='';
 	public $link = '';
-	public $template = '';
-	public $comment_status;
-	public $menu_order;
-	public $comment_count;
-	public $author;
-	public $date;
-	public $date_gmt;
-	public $class;
-	public $modified;
-	public $modified_gmt;
-	public $title;
+    public $menu_order;
+    public $modified;
+    public $modified_gmt;
+    public $parent;
+    public $password;
+    public $slug;
 	public $status;
-	public $password;
-	public $parent;
+    public $sticky;
+    public $template = '';
+    /** @var Image|bool */
+    public $thumbnail = false;
+    public $title;
 	public $type;
-	public $slug;
-	public $name;
-	public $content;
-	public $sticky;
-	public $excerpt ='';
 
 	private $_next = null;
 	private $_prev = null;
 	private $_post = null;
 	private $args = [];
 
-
+    public function __toString()
+    {
+        return $this->title;
+    }
+    
 	/**
 	 * Post constructor.
 	 *
@@ -66,7 +69,7 @@ class Post extends Entity
 	}
 
 
-	/**
+    /**
 	 * Validate class
 	 * @param \WP_Post $post
 	 * @return bool

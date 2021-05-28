@@ -14,6 +14,7 @@ CHANGELOG
 - php7.1 as min version
 ### Added
 - Entity implements ArrayAccess
+- Prefix removal for permalinks
 
 ## 1.4.12
 #### Bugfix

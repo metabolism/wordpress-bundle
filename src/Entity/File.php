@@ -15,7 +15,6 @@ class File extends Entity
 
 	public $file;
 	public $link;
-	public $url;
 	public $mime_type;
 	public $extension;
 	public $date;
@@ -30,6 +29,11 @@ class File extends Entity
 	private $args = [];
 
 	protected $src;
+
+    public function __toString()
+    {
+        return $this->link;
+    }
 
 	/**
 	 * Post constructor.

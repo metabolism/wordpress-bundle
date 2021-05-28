@@ -14,28 +14,31 @@ class Term extends Entity
 {
 	public $entity = 'term';
 
+    /** @var bool|Term[] $children */
+    public $children;
+
+    public $count;
+    public $current;
+    public $depth;
 	public $excerpt;
 	public $link;
-	public $ID;
-	public $current;
+    public $order;
+    public $parent;
 	public $slug;
 	public $taxonomy;
-	public $parent;
-	public $count;
-	public $order;
+    public $template;
+    public $thumbnail;
 	public $title;
-	public $name;
-	public $thumbnail;
-	public $template;
-	public $depth;
-
-	/** @var bool|Term[] $children */
-	public $children;
 
 	protected $term_id;
 	protected $term_taxonomy_id;
 
 	private $_term = null;
+
+    public function __toString()
+    {
+        return $this->title;
+    }
 
 	/**
 	 * Post constructor.

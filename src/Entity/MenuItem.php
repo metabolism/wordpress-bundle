@@ -12,20 +12,24 @@ class MenuItem extends Entity
 {
 	public $entity = 'menu-item';
 
-	/** @var bool $menu_item_parent */
-	public $menu_item_parent;
+    /** @var MenuItem[] $children */
+    public $children;
 
 	public $class;
 	public $description;
-	public $target;
+    public $link;
+    public $menu_order;
+    /** @var bool $menu_item_parent */
+    public $menu_item_parent;
+    public $object;
+    public $object_id;
+    public $target;
 	public $title;
-	public $menu_order;
-	public $object_id;
-	public $object;
-	public $link;
 
-	/** @var MenuItem[] $children */
-	public $children;
+    public function __toString()
+    {
+        return '<a href="'.$this->link.'" target="'.$this->$target.'">'.$this->title.'</a>';
+    }
 
 	/**
 	 * MenuItem constructor.

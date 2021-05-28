@@ -26,6 +26,11 @@ class Comment extends Entity
 	public $user_id;
 	public $replies=[];
 
+    public function __toString()
+    {
+        return $this->content;
+    }
+
 	/**
 	 * Post constructor
 	 * @param null $id

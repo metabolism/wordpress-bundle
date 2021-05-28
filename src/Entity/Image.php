@@ -14,30 +14,35 @@ class Image extends Entity
 	public $entity = 'image';
 
 	public static $wp_upload_dir = false;
-	public $focus_point = false;
-	public $file;
+
+    public $alt;
+    public $caption;
+    public $date;
+    public $date_gmt;
+    public $description;
+    public $extension;
+    public $file;
+    public $focus_point = false;
+    public $height;
 	public $link;
-	public $url;
 	public $meta;
-	public $alt;
 	public $mime_type;
-	public $extension;
+    public $modified;
+    public $modified_gmt;
+    public $sizes = [];
+    public $title;
 	public $width;
-	public $height;
-	public $date;
-	public $date_gmt;
-	public $modified;
-	public $modified_gmt;
-	public $title;
-	public $caption;
-	public $description;
-	public $sizes = [];
 
 	private $compression = 90;
 	private $show_meta = false;
 	private $args = [];
 
 	protected $src;
+
+    public function __toString()
+    {
+        return $this->link;
+    }
 
 	/**
 	 * Post constructor.

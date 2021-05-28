@@ -11,15 +11,20 @@ class User extends Entity
 {
 	public $entity = 'user';
 
+    public $display_name;
+    public $email;
 	public $login;
 	public $nicename;
-	public $email;
-	public $url;
 	public $registered;
 	public $status;
-	public $display_name;
+    public $url;
 
 	private $_user = null;
+
+    public function __toString()
+    {
+        return $this->display_name;
+    }
 
 	/**
 	 * User constructor.
