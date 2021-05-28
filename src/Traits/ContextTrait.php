@@ -53,7 +53,7 @@ Trait ContextTrait
 	 */
 	protected function addOptions()
 	{
-		$this->data['options'] = $this->getFields('options');
+		$this->data['options'] = ACFHelper::get('options');
 	}
 
 
@@ -249,18 +249,6 @@ Trait ContextTrait
 	{
 		global $wp_query;
 		return $wp_query->get_queried_object();
-	}
-
-
-	/**
-	 * Get ACFHelper Fields wrapper
-	 * @param $id
-	 * @return object|bool
-	 */
-	public function getFields($id)
-	{
-		$fields = new ACFHelper($id);
-		return $fields->get();
 	}
 
 

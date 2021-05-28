@@ -17,8 +17,14 @@ class ACFHelper
 	private $loaded=false;
 	private $use_entity=false;
 
-	protected static $MAX_DEPTH = 1;
+	protected static $MAX_DEPTH = 2;
 	protected static $DEPTH = 0;
+
+	public static function get($id){
+
+	    $fields = new self($id);
+	    return $fields->loadFromCache();
+    }
 
 	/**
 	 * ACFHelper constructor.
@@ -80,7 +86,7 @@ class ACFHelper
 	 * @param bool $force
 	 * @return array|bool|Entity|mixed|\WP_Error
 	 */
-	public function get($force=false)
+	public function loadFromCache($force=false)
 	{
 		if( !$this->loaded() && $force ){
 

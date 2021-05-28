@@ -125,7 +125,7 @@ class Entity implements \ArrayAccess
 	 */
 	protected function addCustomFields( $id)
 	{
-		if( class_exists('ACF') && !$this->custom_fields )
+        if( class_exists('ACF') && !$this->custom_fields )
 		{
 			$this->custom_fields = new ACFHelper( $id );
 			$this->bindCustomFields();
@@ -141,8 +141,8 @@ class Entity implements \ArrayAccess
 	{
 		if( $this->custom_fields )
 		{
-			$objects = $this->custom_fields->get($force);
-
+			$objects = $this->custom_fields->loadFromCache($force);
+			
 			if( $objects && is_array($objects) )
 			{
 				foreach ($objects as $name => $value )
