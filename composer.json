@@ -11,7 +11,7 @@
     "ext-json" : "*",
     "ext-mbstring" : "*",
     "ext-zlib": "*",
-    "metabolism/wordpress-core-installer": "1.0.*",
+    "metabolism/wordpress-core-installer": "1.1.*",
     "metabolism/package-actions": "1.1.*",
     "johnpbloch/wordpress-core": "5.*",
     "ifsnop/mysqldump-php":"2.*",
