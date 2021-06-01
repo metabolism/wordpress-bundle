@@ -12,7 +12,7 @@
     "ext-mbstring" : "*",
     "ext-zlib": "*",
     "metabolism/wordpress-core-installer": "1.1.*",
-    "metabolism/package-actions": "1.1.*",
+    "metabolism/package-actions": "1.2.*",
     "johnpbloch/wordpress-core": "5.*",
     "ifsnop/mysqldump-php":"2.*",
     "dflydev/dot-access-data":"~1.0",
