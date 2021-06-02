@@ -28,7 +28,7 @@ class MenuItem extends Entity
 
     public function __toString()
     {
-        return '<a href="'.$this->link.'" target="'.$this->$target.'">'.$this->title.'</a>';
+        return '<a href="'.$this->link.'" target="'.$this->target.'">'.$this->title.'</a>';
     }
 
 	/**
