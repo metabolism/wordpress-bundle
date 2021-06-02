@@ -262,6 +262,7 @@ class UrlPlugin {
 				'get_shortlink',
 				'post_type_archive_link',
 				'get_pagenum_link',
+				'author_link',
 				'get_comments_pagenum_link',
 				'term_link',
 				'search_link',

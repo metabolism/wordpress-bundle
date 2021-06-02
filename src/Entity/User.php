@@ -11,6 +11,9 @@ class User extends Entity
 {
 	public $entity = 'user';
 
+    public $firstname;
+    public $lastname;
+    public $description;
     public $display_name;
     public $email;
 	public $login;
@@ -38,7 +41,13 @@ class User extends Entity
 
 			$this->import($user->data, false, 'user_');
 
-			$this->ID = $id;
+            $user_meta = get_user_meta( $id );
+
+            $this->ID = $id;
+
+            $this->firstname = $user_meta['first_name'][0]??'';
+			$this->lastname = $user_meta['last_name'][0]??'';
+			$this->description = $user_meta['description'][0]??'';
 			$this->link = get_author_posts_url($id);
 
 			if( !isset($args['depth']) || $args['depth'] )
