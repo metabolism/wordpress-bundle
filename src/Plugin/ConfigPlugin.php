@@ -3,7 +3,6 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 use Dflydev\DotAccessData\Data;
-use Metabolism\WordpressBundle\Helper\QueryHelper;
 use Metabolism\WordpressBundle\Helper\TableHelper;
 use Metabolism\WordpressBundle\Traits\SingletonTrait;
 
@@ -138,18 +137,20 @@ class ConfigPlugin {
                     if( isset($args['columns']) )
                     {
                         $columns_arr = [];
+
                         foreach ( $args['columns'] as $id=>$column ){
 
                             if( is_int($id) )
                                 $columns_arr[$column] = ucfirst(str_replace('_', ' ', $column));
                             else
-                                $columns_arr[$id] = $column;
+                                $columns_arr[$id] = ucfirst(str_replace('_', ' ', $id));
                         }
-                        $args['columns'] = $columns_arr;
+
+                        $args['custom_columns'] = $columns_arr;
 
                         add_filter ( 'manage_'.$post_type.'_posts_columns', function ( $columns ) use ( $args )
                         {
-                            $columns = array_merge ( $columns, $args['columns']);
+                            $columns = array_merge ( $columns, $args['custom_columns']);
 
                             if( isset($columns['date']) ){
                                 $date = $columns['date'];
@@ -162,11 +163,12 @@ class ConfigPlugin {
 
                         add_action ( 'manage_'.$post_type.'_posts_custom_column', function ( $column, $post_id ) use ( $args )
                         {
-                            if( isset($args['columns'][$column]) )
+                            if( isset($args['custom_columns'][$column]) )
                             {
                                 if( $column == 'thumbnail'){
 
                                     if( in_array('thumbnail', $args['supports']) ){
+
                                         $thumbnail = get_the_post_thumbnail($post_id, 'thumbnail');
                                         echo '<a class="attachment-thumbnail-container">'.$thumbnail.$thumbnail.'</a>';
                                     }
@@ -180,18 +182,26 @@ class ConfigPlugin {
                                     }
                                 }
                                 else{
-                                    echo get_post_meta( $post_id, $args['columns'][$column], true );
+
+                                    $params = $args['columns'][$column]??'';
+                                    $value = get_post_meta( $post_id, $column, true );
+
+                                    if( $value ){
+
+                                        if( is_numeric($value) )
+                                            $value = str_replace(',00', '', number_format($value, 2, ',', ' '));
+
+                                        echo $value.' '.$params;
+                                    }
                                 }
                             }
-
                         }, 10, 2 );
-
                     }
 
-                    if( isset($args['has_options']) && function_exists('acf_add_options_sub_page') )
-                    {
-                        if( is_bool($args['has_options']) )
-                        {
+                    if( isset($args['has_options']) && function_exists('acf_add_options_sub_page') ) {
+
+                        if( is_bool($args['has_options']) ) {
+
                             $args = [
                                 'page_title' 	=> ucfirst($name).' archive options',
                                 'menu_title' 	=> __('Archive options'),
@@ -207,6 +217,7 @@ class ConfigPlugin {
                 }
 
             }else{
+
                 wp_die($post_type. ' is not allowed, reserved keyword');
             }
         }

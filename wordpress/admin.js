@@ -26,6 +26,12 @@
 					$(this).parents('li').find('> label input[type="checkbox"]').attr('checked', true)
 			})
 		})
+
+		$('.acf-label').each(function(){
+
+			if( $(this).text().length < 2 )
+				$(this).remove()
+		})
 	});
 
 
