@@ -13,6 +13,7 @@ CHANGELOG
 - add Symfony 5 compatibility and auto generated recipe  
 - php7.1 as min version
 ### Added
+- `wp_make_url_relative` filter
 - Entity implements ArrayAccess
 - Prefix removal for permalinks
 

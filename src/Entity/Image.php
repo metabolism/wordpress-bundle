@@ -159,7 +159,11 @@ class Image extends Entity
 			if( !@file_exists($metadata['src']) )
 				return false;
 
-			$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
+            if( apply_filters('wp_make_url_relative', true) )
+                $metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
+            else
+                $metadata['file'] = $this->uploadDir('baseurl').'/'.$metadata['file'];
+
 			$metadata['link'] = home_url($metadata['file']);
 			$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
 
@@ -312,7 +316,11 @@ class Image extends Entity
 
 		$file = $this->process($params, $ext);
 
-		$url = str_replace($this->uploadDir('basedir'), $this->uploadDir('relative'), $file);
+        if( apply_filters('wp_make_url_relative', true) )
+            $url = str_replace($this->uploadDir('basedir'), $this->uploadDir('relative'), $file);
+        else
+            $url = str_replace($this->uploadDir('basedir'), $this->uploadDir('baseurl'), $file);
+
 		$url = str_replace(BASE_URI.PUBLIC_DIR, '', $url);
 
 		return $url;
