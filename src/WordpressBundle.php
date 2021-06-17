@@ -20,6 +20,9 @@ class WordpressBundle extends Bundle
 	    if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
 	        return;
 
+	    if( !isset($_SERVER['REQUEST_METHOD']) )
+            $_SERVER['REQUEST_METHOD'] = 'GET';
+
 		$rootDir = $this->container->get('kernel')->getProjectDir();
 
 		include $rootDir.'/public/edition/wp-load.php';
