@@ -186,13 +186,16 @@ class ConfigPlugin {
                                     $params = $args['columns'][$column]??'';
                                     $value = get_post_meta( $post_id, $column, true );
 
-                                    if( $value ){
+                                    if( $params == 'bool' ){
 
-                                        if( is_numeric($value) )
-                                            $value = str_replace(',00', '', number_format($value, 2, ',', ' '));
-
-                                        echo $value.' '.$params;
+                                        $value = boolval($value)?'☑':0;
+                                        $params = '';
                                     }
+                                    elseif( $value && is_numeric($value) )
+                                        $value = str_replace(',00', '', number_format($value, 2, ',', ' '));
+
+                                    if( $value )
+                                        echo $value.' '.$params;
                                 }
                             }
                         }, 10, 2 );
