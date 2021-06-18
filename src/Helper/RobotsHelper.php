@@ -2,7 +2,6 @@
 
 namespace Metabolism\WordpressBundle\Helper;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class RobotsHelper {
@@ -10,7 +9,7 @@ class RobotsHelper {
 	public function doAction(){
 
 		ob_start();
-		do_action( 'do_robots' );
+		@do_action( 'do_robots' );
 		$content = ob_get_contents();
 		ob_end_clean();
 

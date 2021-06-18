@@ -24,11 +24,11 @@ class Permastruct{
 		$this->locale = $locale;
 		$this->wp_rewrite = $wp_rewrite;
 
-		$this->addRoute('robots', 'robots.txt', [], false, 'Metabolism\WordpressBundle\Helper\Robots::doAction');
-		$this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealth::check');
+		$this->addRoute('robots', 'robots.txt', [], false, 'Metabolism\WordpressBundle\Helper\RobotsHelper::doAction');
+		$this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealthHelper::check');
 
-		$this->addRoute('cache-purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\Cache::purge');
-		$this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\Cache::clear');
+		$this->addRoute('cache-purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::purge');
+		$this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::clear');
 
 		if( wp_maintenance_mode() )
 			$this->addMaintenanceRoute();
