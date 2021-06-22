@@ -310,7 +310,7 @@ class ConfigPlugin {
 
         foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args ) {
 
-            if( !in_array($taxonomy, ['category', 'tag', 'edition']) ) {
+            if( !in_array($taxonomy, ['category', 'tag', 'edition', 'theme']) ) {
 
                 $args = array_merge($default_args, $args);
                 $name = str_replace('_', ' ', isset($args['name']) ? $args['name'] : $taxonomy);

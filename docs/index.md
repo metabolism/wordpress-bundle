@@ -279,6 +279,100 @@ To preview/debug context, just add `?debug=context` to any url, it will output a
 }
 ```   
 
+## Twig extension
+
+### Filters
+
+Use a placeholder if the image doesn't exists
+
+``{{ (data.image|default|placeholder).toHTML(800,600)|raw }}``
+
+### Functions
+
+Execute php functions
+
+``{{ fn('sanitize_title', 'My title') }}`` ``{{ function('sanitize_title', 'My title') }}``
+
+Search content for shortcodes and filter shortcodes through their hooks, see https://developer.wordpress.org/reference/functions/do_shortcode/
+
+``{{ shortcode(post.content) }}``
+
+Get login url, see https://developer.wordpress.org/reference/functions/wp_login_url/
+
+``{{ login_url() }}``
+
+Display search form, see https://developer.wordpress.org/reference/functions/get_search_form/
+
+``{{ search_form() }}``
+
+Retrieves the permalink for a post type archive, see https://developer.wordpress.org/reference/functions/get_post_type_archive_link/
+
+``{{ archive_url('guide') }}``
+
+Retrieve the URL for an attachment, see https://developer.wordpress.org/reference/functions/wp_get_attachment_url/
+
+``{{ attachment_url(10) }}``
+
+Get post permalink by value, available options are : id, state, path, title
+
+``{{ post_url('My post', 'title') }}``
+
+Get term permalink, see https://developer.wordpress.org/reference/functions/get_term_link/
+
+``{{ term_url(10, 'item') }}``
+
+Retrieves information about the current site, see https://developer.wordpress.org/reference/functions/get_bloginfo/
+
+``{{ bloginfo('name') }}``
+
+Display dynamic sidebar, see https://developer.wordpress.org/reference/functions/dynamic_sidebar/
+
+``{{ dynamic_sidebar(1) }}``
+
+Outputs a complete commenting form for use within a template, see https://developer.wordpress.org/reference/functions/comment_form/
+
+``{{ comment_form() }}``
+
+Determines whether a sidebar contains widgets., see https://developer.wordpress.org/reference/functions/is_active_sidebar/
+
+``{{ is_active_sidebar(1) }}``
+
+Retrieve the translation of text, see https://developer.wordpress.org/reference/functions/translate/
+
+``{{ _e('Submit') }}`` ``{{ __('Submit') }}``
+
+Retrieve translated string with gettext context, https://developer.wordpress.org/reference/functions/_x/
+
+``{{ _x() }}``
+
+Translates and retrieves the singular or plural form based on the supplied number, https://developer.wordpress.org/reference/functions/_n/
+
+``{{ _n() }}``
+
+Fire the wp_head action
+
+``{{ wp_head() }}``
+
+Fire the wp_footer action.
+
+``{{ wp_footer() }}``
+
+Create new Wordpress bundle post entity
+
+``{% set post = Post(10) %}``
+
+Create new Wordpress bundle user entity
+
+``{{% set user = User(10) %}``
+
+Create new Wordpress bundle term entity
+
+``{% set term = Term(10) %}``
+
+Create new Wordpress bundle image entity
+
+``{% set image = Image(10) %}``
+
 ## Entities
 
 ### Post
