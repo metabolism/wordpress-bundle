@@ -727,6 +727,21 @@ Trait ContextTrait
 		}
 
 		$this->data['breadcrumb'] = $breadcrumb;
+
+		if( !empty($data) ){
+
+		    foreach (($this->data['menu']??[]) as &$menu){
+
+                foreach(($menu['items']??[]) as &$item){
+
+                    foreach ($data as $entry){
+
+                        if( $item['link'] == $entry['link'] && strpos('current-menu-ancestor', $item['class']) === false )
+                            $item['class'].= ' current-menu-ancestor';
+                    }
+                }
+            }
+        }
 		
 		return $this->data['breadcrumb'];
 	}

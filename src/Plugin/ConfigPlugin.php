@@ -48,7 +48,8 @@ class ConfigPlugin {
             'has_archive' => true,
             'supports' => [],
             'menu_position' => 25,
-            'map_meta_cap' => true
+            'map_meta_cap' => null,
+            'capability_type' => 'post'
         ];
 
         $is_admin = is_admin();
@@ -235,7 +236,7 @@ class ConfigPlugin {
 
             foreach ( $this->config->get('post_type', []) as $post_type => $args ){
 
-                if( (!isset($args['map_meta_cap']) || $args['map_meta_cap']) && (!isset($args['capability_type']) || ($args['capability_type'] != 'page' && $args['capability_type'] != 'post'))){
+                if( ($args['map_meta_cap']??false) && (($args['capability_type']??'') != 'page' && ($args['capability_type']??'') != 'post')){
 
                     $post_types = $this->plural($post_type);
 
@@ -305,7 +306,10 @@ class ConfigPlugin {
     public function addTaxonomies(){
 
         $default_args = [
-            'public' => true
+            'public' => true,
+            'hierarchical' => true,
+            'show_admin_column' => true,
+            'capabilities'=> []
         ];
 
         foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args ) {
@@ -329,23 +333,6 @@ class ConfigPlugin {
 
                 if( !is_null($slug) && !empty($slug) )
                     $args['rewrite'] = ['slug'=>$slug];
-
-                if (!isset($args['hierarchical']))
-                    $args['hierarchical'] = true;
-
-                if (!isset($args['capabilities'])){
-
-                    $taxonomies = $this->plural($taxonomy);
-                    $args['capabilities'] = [
-                        'manage_terms' => 'manage_'.$taxonomies,
-                        'edit_terms' => 'edit_'.$taxonomies,
-                        'delete_terms' => 'delete_'.$taxonomies,
-                        'assign_terms' => 'assign_'.$taxonomies
-                    ];
-                }
-
-                if (!isset($args['show_admin_column']))
-                    $args['show_admin_column'] = true;
 
                 if (isset($args['labels']))
                     $args['labels'] = array_merge($labels, $args['labels']);
@@ -388,21 +375,9 @@ class ConfigPlugin {
 
             foreach ( $this->config->get('taxonomy', []) as $taxonomy => $args ){
 
-                if( !isset($args['capabilities']) ){
+                foreach (($args['capabilities']??[]) as $type=>$capability){
 
-                    $taxonomies = $this->plural($taxonomy);
-
-                    $role->add_cap( 'manage_'.$taxonomies);
-                    $role->add_cap( 'edit_'.$taxonomies );
-                    $role->add_cap( 'delete_'.$taxonomies );
-                    $role->add_cap( 'assign_'.$taxonomies );
-                }
-                else{
-
-                    foreach ($args['capabilities'] as $type=>$capability){
-
-                        $role->add_cap( $capability );
-                    }
+                    $role->add_cap( $capability );
                 }
             }
         }
@@ -505,6 +480,14 @@ class ConfigPlugin {
      */
     public function addRoles()
     {
+        if( is_admin() && isset($_GET['populate_roles']) && $_GET['populate_roles'] ){
+
+            if ( !function_exists( 'populate_roles' ) )
+                require_once( ABSPATH . 'wp-admin/includes/schema.php' );
+
+            populate_roles();
+        }
+
         foreach ( $this->config->get('role', []) as $role => $args )
         {
             if( is_admin() && isset($_GET['reload_role']) && $_GET['reload_role'] )

@@ -102,8 +102,14 @@ input.large-text, textarea.large-text { width: 35.7rem }
 .form-table td fieldset label { margin: .35em 0 1em!important }
 
 /* ACF */
+.acf-field input[type="text"], .acf-field input[type="password"], .acf-field input[type="date"], .acf-field input[type="datetime"],
+.acf-field input[type="datetime-local"], .acf-field input[type="email"], .acf-field input[type="month"], .acf-field input[type="number"],
+.acf-field input[type="search"], .acf-field input[type="tel"], .acf-field input[type="time"], .acf-field input[type="url"],
+.acf-field input[type="week"], .acf-field textarea, .acf-field select{
+    font-size: 13px;
+}
 .acf-field .acf-label label, .post-attributes-label, .acf-flexible-content .layout .acf-fc-layout-handle span, #edittag .form-table th {
-    font-weight: normal;
+    font-weight: 500;
 }
 .acf-tab-group li a{ font-weight: normal; font-size: 13px }
 .acf-tab-group li.active a{ font-weight: 500 }
@@ -118,6 +124,9 @@ input.large-text, textarea.large-text { width: 35.7rem }
 .acf-postbox.seamless>.inside { margin-left: -10px !important; margin-right: -10px !important }
 .form-table>tbody>.acf-tab-wrap td{ padding: 0; padding-left: 220px; }
 .form-table>tbody>tr.acf-tab-wrap .acf-tab-group{ padding: 0 }
+.acf-flexible-content .layout{ margin-top: 10px; border-radius: 3px }
+.acf-flexible-content .layout .acf-fc-layout-handle{ font-size: 13px }
+.acf-image-uploader .image-wrap img{ border-radius: 3px; max-width: 125px }
 @media screen and (max-width: 782px){
     .form-table>tbody>.acf-tab-wrap td{ padding-left: 0 }
     .form-table>tbody>.acf-field>.acf-label{ padding: 0; margin: 0; padding-top: 10px }
