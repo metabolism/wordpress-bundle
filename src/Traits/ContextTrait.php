@@ -714,8 +714,18 @@ Trait ContextTrait
 			{
 				$post = $this->get('post');
 
-				if( $post )
-					$breadcrumb[] = ['title' => $post->title];
+				if( $post ){
+
+                    if( $post->parent ){
+
+                        $parents = get_post_ancestors($post->ID);
+
+                        foreach (array_reverse($parents) as $parent_id)
+                            $breadcrumb[] = ['title' => get_the_title($parent_id), 'link' => get_permalink($parent_id)];
+                    }
+
+                    $breadcrumb[] = ['title' => $post->title];
+                }
 			}
 			elseif( is_archive() )
 			{
