@@ -141,6 +141,15 @@ class EditorPlugin {
 		echo '<script type="text/javascript">'.file_get_contents(__DIR__ . '/../../wordpress/admin.js').'</script>';
 	}
 
+
+	/**
+	 * add Custom css
+	 */
+	function addCustomLoginHeader()
+	{
+		echo '<style type="text/css">'.file_get_contents(__DIR__ . '/../../wordpress/login.css').'</style>';
+	}
+
 	/**
 	 * Update editor role
 	 */
@@ -167,7 +176,7 @@ class EditorPlugin {
 			$wp_admin_bar->remove_menu('customize');
 		} );
 
-		if( is_admin() )
+        if( is_admin() )
 		{
 			add_filter('mce_buttons', [$this, 'TinyMceButtons']);
 			add_action('admin_menu', [$this, 'adminMenu']);
@@ -185,7 +194,8 @@ class EditorPlugin {
 			});
 		}
 
-		add_action( 'admin_bar_menu', [$this, 'editBarMenu'], 80);
+        add_action('login_head', [$this, 'addCustomLoginHeader']);
+        add_action( 'admin_bar_menu', [$this, 'editBarMenu'], 80);
 
 		if( $config->get('optimizations.disable_update', true) )
 			$this->disableUpdate();
