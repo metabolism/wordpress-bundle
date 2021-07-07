@@ -15,7 +15,7 @@ class Permastruct{
 	 * @param $locale
 	 * @param $controller_name
 	 */
-	public function __construct($collection, $locale, $controller_name)
+	public function __construct($collection, $locale, $controller_name, $_config)
 	{
 		global $wp_rewrite;
 
@@ -24,16 +24,27 @@ class Permastruct{
 		$this->locale = $locale;
 		$this->wp_rewrite = $wp_rewrite;
 
-		$this->addRoute('robots', 'robots.txt', [], false, 'Metabolism\WordpressBundle\Helper\RobotsHelper::doAction');
-		$this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealthHelper::check');
+		if( empty($locale) ){
 
-		$this->addRoute('cache-purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::purge');
-		$this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::clear');
+            $this->addRoute('robots', 'robots.txt', [], false, 'Metabolism\WordpressBundle\Helper\RobotsHelper::doAction');
+            $this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealthHelper::check');
 
-		if( wp_maintenance_mode() )
-			$this->addMaintenanceRoute();
-		else
-			$this->addRoutes();
+            $this->addRoute('cache-purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::purge');
+            $this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::clear');
+
+            if( wp_maintenance_mode() ){
+
+                $this->addMaintenanceRoute();
+                return;
+            }
+		}
+
+        $remove_rewrite_rules = $_config->get('rewrite_rules.remove', []);
+
+		if( !in_array('feed', $remove_rewrite_rules) )
+            $this->addRoute('feed', '{feed}', ['feed'=>'feed|rdf|rss|rss2|atom'], false, 'Metabolism\WordpressBundle\Helper\FeedHelper::doAction');
+
+		$this->addRoutes();
 	}
 
 	/**
@@ -250,14 +261,14 @@ if( $_config->get('multisite', false) && !$_config->get('multisite.subdomain_ins
 		switch_to_blog( $site->blog_id );
 
 		$locale = trim($site->path, '/');
-		new Permastruct($collection, $locale, $controller_name);
+		new Permastruct($collection, $locale, $controller_name, $_config);
 	}
 
 	switch_to_blog($current_site_id);
 }
 else{
 
-	new Permastruct($collection, '', $controller_name);
+	new Permastruct($collection, '', $controller_name, $_config);
 }
 
 return $collection;

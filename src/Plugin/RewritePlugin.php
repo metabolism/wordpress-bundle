@@ -41,26 +41,29 @@ class RewritePlugin {
 	 */
 	public function remove($wp_rewrite ){
 
-		$remove = $this->config->get('rewrite_rules.remove', []);
+        $remove = $this->config->get('rewrite_rules.remove', []);
 
-		foreach ($wp_rewrite->rules as $rule=>$rewrite){
+        foreach (['rules', 'extra_rules_top'] as $item){
 
-			if( in_array('attachment', $remove) && strpos($rule, '/attachment/') !== false )
-				unset( $wp_rewrite->rules [$rule] );
+            foreach ($wp_rewrite->$item as $rule=>$rewrite){
 
-			if( in_array('embed', $remove) && strpos($rule, '/embed/') !== false )
-				unset( $wp_rewrite->rules [$rule] );
+                if( in_array('attachment', $remove) && (strpos($rule, '/attachment/') !== false || strpos($rewrite, 'attachment=') !== false) )
+                    unset( $wp_rewrite->$item[$rule] );
 
-			if( in_array('feed', $remove) && (strpos($rule, '/(feed|rdf|rss|rss2|atom)/') !== false || strpos($rule, '/feed/') !== false) )
-				unset( $wp_rewrite->rules [$rule] );
+                if( in_array('embed', $remove) && strpos($rule, '/embed/') !== false )
+                    unset( $wp_rewrite->$item[$rule] );
 
-			if( in_array('trackback', $remove) && strpos($rule, '/trackback/') !== false )
-				unset( $wp_rewrite->rules [$rule] );
+                if( in_array('feed', $remove) && (strpos($rule, '/(feed|rdf|rss|rss2|atom)/') !== false || strpos($rule, '/feed/') !== false) )
+                    unset( $wp_rewrite->$item[$rule] );
 
-			if( in_array('comment', $remove) && strpos($rule, '/comment-page-') !== false )
-				unset( $wp_rewrite->rules [$rule] );
-		}
-	}
+                if( in_array('trackback', $remove) && strpos($rule, '/trackback/') !== false )
+                    unset( $wp_rewrite->$item[$rule] );
+
+                if( in_array('comment', $remove) && strpos($rule, '/comment-page-') !== false )
+                    unset( $wp_rewrite->$item[$rule] );
+            }
+        }
+    }
 
 	/**
 	 * RewritePlugin constructor.

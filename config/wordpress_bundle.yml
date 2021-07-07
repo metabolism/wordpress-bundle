@@ -368,8 +368,8 @@ rewrite_rules:
     - attachment
     - embed
     - trackback
-    - feed
     - comment
+#    - feed
 
 ################
 ##    Misc    ##

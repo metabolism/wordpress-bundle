@@ -177,6 +177,9 @@ class SecurityPlugin {
 			add_filter( 'pings_open', '__return_false');
 			add_filter( 'xmlrpc_enabled', '__return_false');
 
+            foreach (['html', 'xhtml', 'atom', 'rss2', 'rdf', 'comment', 'export'] as $type )
+                add_filter( 'get_the_generator_'.$type, '__return_empty_string' );
+
 			add_action( 'after_setup_theme', [$this, 'cleanHeader']);
 			add_action( 'wp_footer', [$this, 'cleanFooter']);
 
