@@ -106,6 +106,21 @@ This file allows you to manage :
  * Domain name
  * Controller name
 
+### Multisite
+
+in the wordpress_bundle.yml, you can allow multisite installation, `install-multisite: true`
+
+After running Tools > Network setup, add `WP_MULTISITE=1` in you .env.local file
+
+You can change multisite configuration in the wordpress_bundle.yml
+
+```yml
+multisite:
+ subdomain_install: true
+ shared_media: true
+ clone_post: true
+```
+
 ## Theme
 
 This bundle come without theme, you can start reading the official Symfony [documentation](https://symfony.com/doc/current/templates.html) to create templates.

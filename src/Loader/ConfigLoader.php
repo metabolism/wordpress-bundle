@@ -85,11 +85,11 @@ class ConfigLoader {
         /**
          * Enable multisite
          */
-        if( $_config->get('multisite', false) || env('MULTISITE') )
+        if( env('WP_MULTISITE') )
         {
             define( 'MULTISITE', true );
             define( 'SUBDOMAIN_INSTALL', $_config->get('multisite.subdomain_install', false) );
-            define( 'DOMAIN_CURRENT_SITE', $_config->get('multisite.domain', $_SERVER['HTTP_HOST']));
+            define( 'DOMAIN_CURRENT_SITE', $_SERVER['HTTP_HOST']);
             define( 'SITE_ID_CURRENT_SITE', $_config->get('multisite.site_id', 1));
             define( 'BLOG_ID_CURRENT_SITE', $_config->get('multisite.blog_id', 1));
         }

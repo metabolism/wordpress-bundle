@@ -92,11 +92,10 @@ support:
 ## Allow multisite installation
 install-multisite: true
 
-## Multisite configuration ( after install )
+## Multisite configuration
 # multisite:
 #  subdomain_install: true
 #  shared_media: true
-#  multidomain: true
 #  clone_post: true
 
 ## Declare constant
