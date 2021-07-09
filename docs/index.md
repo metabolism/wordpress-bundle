@@ -436,9 +436,9 @@ To debug images, just add `?debug=image` to any url, it will replace images with
 
 ```twig
 <h1>{{ post.title }}</h1>
-<img src="{{ post.thumbnail.resize(800, 600) }}" alt="{{ post.thumbnail.alt }}">
-<img src="{{ post.thumbnail.resize(0, 600) }}" alt="{{ post.thumbnail.alt }}">
-<img src="{{ post.thumbnail.resize(800, 0, 'webp') }}" alt="{{ post.thumbnail.alt }}">
+<img src="{{ post.thumbnail.resize(800, 600) }}" alt="{{ post.thumbnail.alt }}" loading="lazy">
+<img src="{{ post.thumbnail.resize(0, 600) }}" alt="{{ post.thumbnail.alt }}" loading="lazy">
+<img src="{{ post.thumbnail.resize(800, 0, 'webp') }}" alt="{{ post.thumbnail.alt }}" loading="lazy">
 ```
 
 Generate picture element ( width, height, media queries ), it use wepb if enabled in PHP

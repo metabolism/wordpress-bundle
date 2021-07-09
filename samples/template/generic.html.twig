@@ -33,7 +33,7 @@
                     <section>
                         <h3><a href="{{ post.link }}">{{ post.title }}</a></h3>
                         {% if post.thumbnail %}
-                            <img src="{{ post.thumbnail.resize(120,120) }}" alt="{{ post.thumbnail.alt }}">
+                            <img src="{{ post.thumbnail.resize(120,120) }}" alt="{{ post.thumbnail.alt }}" loading="lazy">
                         {% endif %}
                         <div>{{ post.excerpt|raw }}</div>
                         <div>{{ post.content|raw }}</div>
@@ -52,7 +52,7 @@
                     </nav>
                 {% endif %}
                 {% if post.thumbnail %}
-                    <img src="{{ post.thumbnail.resize(640,480) }}" alt="{{ post.thumbnail.alt }}">
+                    <img src="{{ post.thumbnail.resize(640,480) }}" alt="{{ post.thumbnail.alt }}" loading="lazy">
                 {% endif %}
                 <div>{{ post.content|raw }}</div>
             </section>

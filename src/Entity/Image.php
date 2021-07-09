@@ -588,7 +588,7 @@ class Image extends Entity
 			}
 
 			$html .='	<source srcset="'.$this->placeholder($w, $h).'">';
-			$html .= '<img src="'.$this->placeholder($w, $h).'">';
+			$html .= '<img src="'.$this->placeholder($w, $h).'" alt="'.$this->alt.'" loading="lazy">';
 			$html .='</picture>';
 
 			return new \Twig\Markup($html, 'UTF-8');
@@ -601,7 +601,7 @@ class Image extends Entity
 
 		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' ){
 
-			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'">';
+			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="lazy">';
 		}
 		else{
 
@@ -619,7 +619,7 @@ class Image extends Entity
 			if( $ext == 'webp' )
 				$html .='	<source srcset="'.$this->edit(['resize'=>[$w, $h]], $ext).'" type="'.$mime.'">';
 
-			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'">';
+			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="lazy">';
 		}
 
 		$html .='</picture>';

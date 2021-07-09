@@ -103,25 +103,33 @@ class CacheHelper {
 			$url = get_home_url(null, '.*');
 
 		$varnish_ssl = isset($_SERVER['VARNISH_SSL'])?$_SERVER['VARNISH_SSL']:false;
+        $result = [];
 
-		if( isset($_SERVER['VARNISH_IPS']) )
-			$varnish_ips = explode(',',$_SERVER['VARNISH_IPS']);
-		elseif( isset($_SERVER['VARNISH_IP']) )
-			$varnish_ips = [$_SERVER['VARNISH_IP']];
-		else{
-			$response = new \WP_Error('No Varnish Ip defined');
-			return [$url, $response];
-		}
+        $args = [
+            'method' => 'PURGE',
+            'headers' => [
+                'host' => $_SERVER['HTTP_HOST'],
+                'X-VC-Purge-Method' => 'regex',
+                'X-VC-Purge-Host' => $_SERVER['HTTP_HOST']
+            ],
+            'sslverify' => false
+        ];
 
-		$args = [
-			'method' => 'PURGE',
-			'headers' => [
-				'host' => $_SERVER['HTTP_HOST'],
-				'X-VC-Purge-Method' => 'regex',
-				'X-VC-Purge-Host' => $_SERVER['HTTP_HOST']
-			],
-			'sslverify' => false
-		];
+		if( isset($_SERVER['VARNISH_IPS']) ){
+
+            $varnish_ips = explode(',',$_SERVER['VARNISH_IPS']);
+        }
+		elseif( isset($_SERVER['VARNISH_IP']) ){
+
+            $varnish_ips = [$_SERVER['VARNISH_IP']];
+        }
+        else{
+
+            $response = wp_remote_request(str_replace('.*', '*', $url), $args);
+            $result[] = ['url'=>$url, 'request'=>$response];
+
+            return $result;
+        }
 
 		foreach ($varnish_ips as $varnish_ip){
 
@@ -131,12 +139,10 @@ class CacheHelper {
 				$varnish_url = str_replace('https://', 'http://', $varnish_url);
 
 			$response = wp_remote_request($varnish_url, $args);
-
-			if( is_wp_error($response) )
-				return [$varnish_url, $response];
+            $result[] = ['url'=>$varnish_url, 'request'=>$response];
 		}
 
-		return [$varnish_url, $response];
+		return $result;
 	}
 
 
