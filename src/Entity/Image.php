@@ -584,11 +584,10 @@ class Image extends Entity
 			if( $sources && is_array($sources) ){
 
 				foreach ($sources as $media=>$size)
-					$html .='	<source media="('.$media.')"  srcset="'.$this->placeholder($size[0], count($size)>1?$size[1]:0).'">';
+					$html .='<source media="('.$media.')" srcset="'.$this->placeholder($size[0], count($size)>1?$size[1]:0).'" type="image/jpeg"/>';
 			}
 
-			$html .='	<source srcset="'.$this->placeholder($w, $h).'">';
-			$html .= '<img src="'.$this->placeholder($w, $h).'" alt="'.$this->alt.'" loading="lazy">';
+			$html .= '<img src="'.$this->placeholder($w, $h).'" alt="'.$this->alt.'" loading="lazy"/>';
 			$html .='</picture>';
 
 			return new \Twig\Markup($html, 'UTF-8');
@@ -601,7 +600,7 @@ class Image extends Entity
 
 		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' ){
 
-			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="lazy">';
+			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="lazy" type="'.$this->mime_type.'"/>';
 		}
 		else{
 
@@ -610,16 +609,16 @@ class Image extends Entity
 				foreach ($sources as $media=>$size){
 
 					if( $ext == 'webp' )
-						$html .='	<source media="('.$media.')"  srcset="'.$this->edit(['resize'=>$size], $ext).'" type="'.$mime.'">';
+						$html .='<source media="('.$media.')" srcset="'.$this->edit(['resize'=>$size], $ext).'" type="'.$mime.'"/>';
 
-					$html .='	<source media="('.$media.')"  srcset="'.$this->edit(['resize'=>$size]).'" type="'.$this->mime_type.'">';
+					$html .='<source media="('.$media.')" srcset="'.$this->edit(['resize'=>$size]).'" type="'.$this->mime_type.'"/>';
 				}
 			}
 
 			if( $ext == 'webp' )
-				$html .='	<source srcset="'.$this->edit(['resize'=>[$w, $h]], $ext).'" type="'.$mime.'">';
+				$html .='<source srcset="'.$this->edit(['resize'=>[$w, $h]], $ext).'" type="'.$mime.'"/>';
 
-			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="lazy">';
+			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="lazy"/>';
 		}
 
 		$html .='</picture>';
