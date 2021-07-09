@@ -41,11 +41,29 @@ class CachePlugin
 
 	public function message()
 	{
-		if( !empty($this->noticeMessage) )
-			echo '<div id="message" class="updated fade"><p><strong>' . __('Cache') . '</strong><br />' . $this->noticeMessage . '</p></div>';
+        $html = '';
 
-		if( !empty($this->errorMessage) )
-			echo '<div id="message" class="error fade"><p><strong>' . __('Cache') . '</strong><br />' . $this->errorMessage . '</p></div>';
+        if( !empty($this->noticeMessage) ){
+
+            $html .= '<div id="message" class="updated fade"><p><strong>' . __('Cache') . '</strong><br />';
+
+            foreach ( $this->noticeMessage as $message )
+                $html .= $message.'<br/>';
+
+            $html .= '</p></div>';
+        }
+
+        if( !empty($this->errorMessage) ){
+
+            $html .= '<div id="message" class="error fade"><p><strong>' . __('Cache') . '</strong><br />';
+
+            foreach ( $this->errorMessage as $message )
+                $html .= $message.'<br/>';
+
+            $html .= '</p></div>';
+        }
+
+        echo $html;
 	}
 
 
@@ -65,14 +83,19 @@ class CachePlugin
 	 */
 	private function purge($url=false)
 	{
-		list($url, $response) = $this->cacheHelper->purgeUrl($url);
-		
-		if ( is_wp_error($response) )
-			$this->errorMessage = $url.' : '.$response->get_error_code().' '.$response->get_error_message();
-		elseif ( is_array($response) and isset($response['response']) )
-			$this->noticeMessage = $url.' : '.$response['response']['code'].' '.$response['response']['message'];
+        $results = $this->cacheHelper->purgeUrl($url);
 
-		add_action('admin_notices', [$this, 'message'], 999);
+        foreach ($results as $result){
+
+            if ( is_wp_error($result['request']) )
+                $this->errorMessage[] = $result['url'].' : '.$result['request']->get_error_code().' '.$result['request']->get_error_message();
+            elseif($result['request']['response']['code'] >= 300)
+                $this->errorMessage[] = $result['url'].' : '.$result['request']['response']['code'].' '.$result['request']['response']['message'];
+            else
+                $this->noticeMessage[] = $result['url'].' : '.$result['request']['response']['code'].' '.$result['request']['response']['message'];
+        }
+
+        add_action('admin_notices', [$this, 'message'], 999);
 	}
 
 
@@ -84,9 +107,9 @@ class CachePlugin
 		$response = $this->cacheHelper->clear();
 
 		if ( !$response )
-			$this->errorMessage = 'Unable to clear cache';
+			$this->errorMessage[] = 'Unable to clear cache';
 		else
-			$this->noticeMessage = 'Cleared';
+			$this->noticeMessage[] = 'Cleared';
 
 		add_action('admin_notices', [$this, 'message'], 999);
 	}
