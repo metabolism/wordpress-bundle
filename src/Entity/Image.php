@@ -400,6 +400,12 @@ class Image extends Entity
 
 		// get suffix
 		// add width height
+        if( is_string($h))
+            $h = intval($h);
+
+        if( is_string($w))
+            $w = intval($w);
+
 		$suffix = '-'.round($w).'x'.round($h);
 
 		// add focus point
@@ -587,7 +593,7 @@ class Image extends Entity
 					$html .='<source media="('.$media.')" srcset="'.$this->placeholder($size[0], count($size)>1?$size[1]:0).'" type="image/jpeg"/>';
 			}
 
-			$html .= '<img src="'.$this->placeholder($w, $h).'" alt="'.$this->alt.'" loading="lazy"/>';
+			$html .= '<img src="'.$this->placeholder($w, $h).'" alt="'.$this->alt.'" loading="lazy" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
 			$html .='</picture>';
 
 			return new \Twig\Markup($html, 'UTF-8');
@@ -600,7 +606,7 @@ class Image extends Entity
 
 		if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' ){
 
-			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="lazy" type="'.$this->mime_type.'"/>';
+			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="lazy" type="'.$this->mime_type.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
 		}
 		else{
 
@@ -618,7 +624,10 @@ class Image extends Entity
 			if( $ext == 'webp' )
 				$html .='<source srcset="'.$this->edit(['resize'=>[$w, $h]], $ext).'" type="'.$mime.'"/>';
 
-			$html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="lazy"/>';
+			$edited = $this->edit(['resize'=>[$w, $h]]);
+            $image_info = file_exists(BASE_URI.PUBLIC_DIR.$edited)?getimagesize(BASE_URI.PUBLIC_DIR.$edited):[0,0];
+
+			$html .= '<img src="'.$edited.'" alt="'.$this->alt.'" loading="lazy" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[0]?'height="'.$image_info[1].'"':'').'/>';
 		}
 
 		$html .='</picture>';
