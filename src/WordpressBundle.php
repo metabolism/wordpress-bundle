@@ -5,6 +5,9 @@ namespace Metabolism\WordpressBundle;
 use Metabolism\WordpressBundle\Extension\TwigExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+use Env\Env;
+use function Env\env;
+
 class WordpressBundle extends Bundle
 {
     public function getPath()
@@ -23,8 +26,15 @@ class WordpressBundle extends Bundle
 	    if( !isset($_SERVER['REQUEST_METHOD']) )
             $_SERVER['REQUEST_METHOD'] = 'GET';
 
-        if( !isset($_SERVER['HTTP_HOST']) && isset($_SERVER['SERVER_NAME']) )
-            $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'];
+        if( !isset($_SERVER['HTTP_HOST']) ) {
+
+            if( isset($_SERVER['SERVER_NAME']) )
+                $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'];
+            elseif( $multisite = env('WP_MULTISITE') )
+                $_SERVER['HTTP_HOST'] = $multisite;
+            else
+                $_SERVER['HTTP_HOST'] = 'localhost';
+        }
 
 		$rootDir = $this->container->get('kernel')->getProjectDir();
 
