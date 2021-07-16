@@ -97,6 +97,16 @@ class FrontController {
 				$query->set( 'posts_per_page', $ppp );
 		}
 
+		// opti
+		if( $post_type = $query->get('post_type') ){
+
+            if( is_array($post_type) && count($post_type) == 1 ){
+
+                $query->set('post_type', $post_type[0]);
+                $query->query['post_type'] = $post_type[0];
+            }
+        }
+
 		return $query;
 	}
 
