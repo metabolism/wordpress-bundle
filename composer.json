@@ -23,7 +23,7 @@
     "symfony/asset": "^4.0|^5.0",
     "metabolism/wordpress-core-installer": "^1.0",
     "metabolism/package-actions": "^1.0",
-    "johnpbloch/wordpress-core": "^5.0",
+    "johnpbloch/wordpress-core": "^5.2",
     "ifsnop/mysqldump-php":"^2.0",
     "dflydev/dot-access-data":"^3.0",
     "enshrined/svg-sanitize": "0.*",

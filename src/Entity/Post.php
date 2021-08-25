@@ -125,7 +125,12 @@ class Post extends Entity
 			}
 
 			$post->slug = $post->post_name;
-			$post->post_content = do_shortcode(wpautop($post->post_content));
+
+			$post_content = get_the_content(null, false, $post);
+			$post_content = apply_filters( 'the_content', $post_content );
+			$post_content = str_replace( ']]>', ']]&gt;', $post_content );
+
+			$post->post_content = $post_content;
 			$post->post_excerpt = get_the_excerpt($post);
 
 			unset($post->post_name);

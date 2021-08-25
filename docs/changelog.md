@@ -8,10 +8,12 @@ CHANGELOG
 - https in base url sometime failed
 - Invalid cookie domain when port is in url
 - ACF link return type for term
+- post content not filtered
 #### Changed
 - adopt Symfony 4 folder structure, `web` -> `public`
 - add Symfony 5 compatibility and auto generated recipe  
 - php7.1 as min version
+- add Worpress 5.2 as min version
 ### Added
 - `wp_make_url_relative` filter
 - Entity implements ArrayAccess
