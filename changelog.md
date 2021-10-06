@@ -1,6 +1,14 @@
 CHANGELOG
 ---------
 
+## 1.4.15
+#### Bugfix
+- Prevent cache purge on non public post type
+
+## 1.4.14
+#### Bugfix
+- Fix varnish caching
+
 ## 1.4.12
 #### Bugfix
 - Prevent image resize on upload when filename end with _hd or _cmjk

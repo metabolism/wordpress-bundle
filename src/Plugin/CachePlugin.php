@@ -27,8 +27,9 @@ class CachePlugin
 		if( $pid ){
 
 			$post = get_post($pid);
+			$post_type_object = get_post_type_object($post->post_type);
 
-			if( $post && $post->post_status === 'publish' ){
+			if( $post && $post->post_status === 'publish' && $post_type_object->publicly_queryable ){
 
 				$home_url = get_home_url(null);
 				$url = $home_url.get_permalink($pid);
@@ -164,10 +165,13 @@ class CachePlugin
 
 		if( !$debug ) {
 
-			add_action( 'init', [$this, 'addClearCacheButton']);
+			add_action( 'init', function(){
 
-			foreach (['save_post', 'deleted_post', 'trashed_post', 'edit_post', 'delete_attachment'] as $action)
-				add_action( $action, [$this, 'purgeCache']);
+				$this->addClearCacheButton();
+
+				foreach (['save_post', 'deleted_post', 'trashed_post', 'edit_post'] as $action)
+					add_action( $action, [$this, 'purgeCache']);
+			});
 		}
 
 		add_action( 'reset_cache', [$this, 'reset']);
