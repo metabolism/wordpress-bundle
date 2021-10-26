@@ -162,6 +162,7 @@ Trait ContextTrait
 			'locale'             => count($language) ? $language[0] : 'en',
 			'is_admin'           => current_user_can('manage_options'),
 			'home_url'           => home_url('/'),
+			'domain'             => strtok(preg_replace('/https?:\/\//', '', home_url('')),':'),
 			'maintenance_mode'   => function_exists('wp_maintenance_mode') ? wp_maintenance_mode() : false,
 			'bloginfo'           => [
 				'description'   => get_bloginfo('description'),

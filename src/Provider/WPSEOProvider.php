@@ -161,15 +161,14 @@ class WPSEOProvider
 		add_filter( 'get_the_terms', [$this, 'changeTermsOrder'], 10, 3);
 
 		if( is_admin() ) {
+
 			add_filter( 'wp_editor_settings', [$this, 'editorSettings'], 10, 2);
 		}
 		else{
 			add_action('init', function() {
 
-				if( class_exists( 'WPSEO_Frontend' ) && method_exists( 'WPSEO_Frontend', 'debug_mark' ) )
-					remove_action( 'wpseo_head', [\WPSEO_Frontend::get_instance(), 'debug_mark'], 2);
-
-				add_filter('wpseo_canonical', [$this, 'filterCanonical']);
+                add_filter( 'wpseo_debug_markers', '__return_false' );
+                add_filter('wpseo_canonical', [$this, 'filterCanonical']);
 
 				add_filter('wp-bundle/make_link_relative', function($make){
 

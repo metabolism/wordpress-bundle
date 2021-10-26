@@ -46,7 +46,7 @@ You will be asked to add `WP_INSTALLED=1` to the environment, this is required t
 
 ### Add default Wordpress routing (optional)
 
-Edit `/config/routes.yaml`
+Edit or create `/config/routes.yaml`
 
 ```yml
 _wordpress:
