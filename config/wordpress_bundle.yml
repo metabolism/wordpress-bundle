@@ -362,6 +362,7 @@ taxonomy: # https://developer.wordpress.org/reference/functions/register_taxonom
 #########################
 ##    Optimisations    ##
 #########################
+
 rewrite_rules:
   remove:
     - attachment
@@ -369,6 +370,13 @@ rewrite_rules:
     - trackback
     - comment
 #    - feed
+
+####################
+##    Security    ##
+####################
+
+rest_api: false
+xmlrpc: false
 
 ################
 ##    Misc    ##

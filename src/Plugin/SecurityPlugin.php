@@ -162,12 +162,26 @@ class SecurityPlugin {
 
 
 	/**
+	 * add admin parameters
+	 */
+	public function redirect()
+	{
+		wp_redirect(get_home_url());
+		exit;
+	}
+
+
+	/**
 	 * SecurityPlugin constructor.
 	 * @param Data $config
 	 */
 	public function __construct($config)
 	{
 		add_filter( 'flush_rewrite_rules_hard', '__return_false');
+
+		add_filter( 'login_errors', function(){
+			return __('Something is wrong!');
+		} );
 
 		if( is_admin() )
 		{
@@ -178,6 +192,12 @@ class SecurityPlugin {
 		}
 		else
 		{
+			if( !$config->get('rest_api') )
+				add_filter( 'rest_api_init', [$this, 'redirect'] );
+
+			if( !$config->get('xmlrpc') )
+				add_filter( 'xmlrpc_enabled', '__return_false' );
+
 			add_filter( 'pings_open', '__return_false');
 			add_filter( 'xmlrpc_enabled', '__return_false');
 
@@ -189,6 +209,9 @@ class SecurityPlugin {
 
 			add_action('init', function()
 			{
+				if ( isset($_GET['author']) )
+					$this->redirect();
+
 				global $wp_rewrite;
 
 				$wp_rewrite->feeds = array();

@@ -15,6 +15,7 @@ $page = end($uri);
 
 if( in_array( $page, ['wp-login.php', 'wp-signup.php'] ) )
 {
+	PluginLoader::load('SecurityPlugin');
 	PluginLoader::load('UrlPlugin');
 	PluginLoader::load('EditorPlugin');
 	return;
