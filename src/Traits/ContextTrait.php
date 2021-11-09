@@ -157,6 +157,7 @@ Trait ContextTrait
 		$paged     = get_query_var('paged', 1);
 
 		$this->data = [
+			'version'            => '1.0.0',
 			'debug'              => WP_DEBUG,
 			'environment'        => WP_ENV,
 			'locale'             => count($language) ? $language[0] : 'en',
@@ -173,6 +174,12 @@ Trait ContextTrait
 			'posts_per_page'     => intval(get_option( 'posts_per_page' )),
 			'paged'              => $paged ? $paged : 1
 		];
+
+        if( file_exists(BASE_URI.'/composer.json') ){
+
+            $composer = json_decode(file_get_contents(BASE_URI.'/composer.json'), true);
+            $this->data['version'] = $composer['version'];
+        }
 
 		if( is_multisite() ){
 
