@@ -137,6 +137,12 @@ class SecurityPlugin {
 			if(isset($headers['X-Pingback']))
 				unset($headers['X-Pingback']);
 
+			if(isset($headers['X-Powered-By']))
+				unset($headers['X-Powered-By']);
+
+			if(isset($headers['Server']))
+				unset($headers['Server']);
+
 			return $headers;
 		});
 	}
