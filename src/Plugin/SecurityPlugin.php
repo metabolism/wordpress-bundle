@@ -192,8 +192,21 @@ class SecurityPlugin {
 		}
 		else
 		{
-			if( !$config->get('security.rest_api', false) )
-				add_filter( 'rest_api_init', [$this, 'redirect'] );
+			if( !$config->get('security.rest_api', false) ){
+
+                add_filter('rest_jsonp_enabled', '__return_false');
+
+                add_filter( 'rest_authentication_errors', function( $result ) {
+
+                    if ( true === $result || is_wp_error( $result ) )
+                        return $result;
+
+                    if ( ! is_user_logged_in() )
+                        $this->redirect();
+
+                    return $result;
+                });
+            }
 
 			if( !$config->get('security.xmlrpc', false) )
 				add_filter( 'xmlrpc_enabled', '__return_false' );
@@ -206,8 +219,9 @@ class SecurityPlugin {
 
 			add_action( 'after_setup_theme', [$this, 'cleanHeader']);
 			add_action( 'wp_footer', [$this, 'cleanFooter']);
+            add_filter( 'x_redirect_by', '__return_false' );
 
-			add_action('init', function()
+            add_action('init', function()
 			{
 				if ( isset($_GET['author']) )
 					$this->redirect();
