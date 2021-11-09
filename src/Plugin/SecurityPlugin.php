@@ -192,14 +192,14 @@ class SecurityPlugin {
 		}
 		else
 		{
-			if( !$config->get('rest_api') )
+			if( !$config->get('security.rest_api') )
 				add_filter( 'rest_api_init', [$this, 'redirect'] );
 
-			if( !$config->get('xmlrpc') )
+			if( !$config->get('security.xmlrpc') )
 				add_filter( 'xmlrpc_enabled', '__return_false' );
 
-			add_filter( 'pings_open', '__return_false');
-			add_filter( 'xmlrpc_enabled', '__return_false');
+            if( !$config->get('security.pings') )
+                add_filter( 'pings_open', '__return_false');
 
             foreach (['html', 'xhtml', 'atom', 'rss2', 'rdf', 'comment', 'export'] as $type )
                 add_filter( 'get_the_generator_'.$type, '__return_empty_string' );

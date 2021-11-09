@@ -375,8 +375,10 @@ rewrite_rules:
 ##    Security    ##
 ####################
 
-rest_api: false
-xmlrpc: false
+security:
+  rest_api: false
+  xmlrpc: false
+  pings: false
 
 ################
 ##    Misc    ##
