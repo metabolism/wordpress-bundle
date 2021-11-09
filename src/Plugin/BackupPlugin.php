@@ -268,7 +268,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 		 */
 		public function adminInit()
 		{
-			if(!current_user_can('administrator'))
+			if( !current_user_can('administrator') )
 				return;
 
 			if( isset($_GET['download_backup']) )
@@ -299,7 +299,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 		{
 			$this->config = $config;
 			
-			if( !is_admin() || (isset($_SERVER['BACKUP']) && !$_SERVER['BACKUP']) )
+			if( !is_admin() || !WP_DEBUG )
 				return;
 			
 			add_action( 'admin_init', [$this, 'adminInit'] );
