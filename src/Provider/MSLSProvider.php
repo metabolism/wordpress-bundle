@@ -187,6 +187,11 @@ class MSLSProvider {
 				if( $config->get('multisite.clone_post', false) )
 					$this->setupClone();
 			}
-		}
+
+            //todo: find why $url is buggy
+            add_filter( 'mlsl_output_get_alternate_links', function ($url, $blog){
+                return null;
+            }, 10, 2);
+        }
 	}
 }
