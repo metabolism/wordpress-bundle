@@ -189,8 +189,12 @@ class MSLSProvider {
 			}
 
             //todo: find why $url is buggy
-            add_filter( 'mlsl_output_get_alternate_links', function ($url, $blog){
-                return null;
+           add_filter( 'mlsl_output_get_alternate_links', function ($url, $blog){
+
+               if( strpos($url, 'http') === false )
+                   return null;
+
+               return $url;
             }, 10, 2);
         }
 	}
