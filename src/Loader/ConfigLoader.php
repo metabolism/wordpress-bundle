@@ -150,7 +150,7 @@ class ConfigLoader {
 
             $database_url = env('DATABASE_URL');
 
-            $mysql = explode('@',str_replace('?','@', str_replace('mysql://', '', str_replace('mariadb://', '', $database_url))));
+            $mysql = explode('@', strtok(str_replace('mysql://', '', str_replace('mariadb://', '', $database_url)), '?'));
             $mysql[0] = explode(':', $mysql[0]);
             $mysql[1] = explode('/', $mysql[1]);
 
