@@ -38,6 +38,7 @@ From the bundle itself :
 * ACF data cleaning
 * SF Cache invalidation ( Varnish compatible )
 * Post/Image/Menu/Term/User/Comment/Query entities
+* Sticky support for custom post type
 * Download backup ( uploads + bdd ) from the admin
 * Maintenance mode
 * Multisite images sync ( for multisite as multilangue )

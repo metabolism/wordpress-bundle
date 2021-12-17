@@ -773,6 +773,23 @@ class ConfigPlugin {
         }
     }
 
+    public function addStickySupport(){
+
+        global $post, $typenow;
+
+        $post_supports = $this->config->get('post_type.'.$typenow.'.supports', []);
+
+        if ( in_array('sticky', $post_supports) && current_user_can( 'edit_others_posts' ) ) : ?>
+            <script>
+                jQuery(function($) {
+                    var sticky = "<br/><span id='sticky-span'><input type='checkbox' style='display:none' name='hidden_post_sticky' id='hidden-post-sticky' value='sticky' <?php checked( is_sticky( $post->ID ) ); ?> /> <input id='sticky' name='sticky' type='checkbox' value='sticky' <?php checked( is_sticky( $post->ID ) ); ?> /> <label for='sticky' class='selectit'><?php _e( 'Sticky Post' ); ?></label><br /></span>";
+                    $('[for=visibility-radio-public]').append(sticky);
+                    $('#post-visibility-select .save-post-visibility').click()
+                });
+            </script>
+        <?php endif;
+    }
+
 
     /**
      * ConfigPlugin constructor.
@@ -811,6 +828,9 @@ class ConfigPlugin {
             }
 
             if( is_admin() ){
+
+                add_action( 'admin_footer-post.php', [$this, 'addStickySupport'] );
+                add_action( 'admin_footer-post-new.php', [$this, 'addStickySupport'] );
 
                 $this->addTableViews();
 
