@@ -14,7 +14,7 @@ class WordpressBundle extends Bundle
     private $root_dir;
     private $wp_path = "public/edition/";
 
-    public function getPath()
+    public function getPath(): string
     {
         return \dirname(__DIR__);
     }
