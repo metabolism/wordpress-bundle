@@ -1,6 +1,6 @@
 <?php
 
-namespace Metabolism\WordpressBundle\Controller;
+namespace Metabolism\WordpressBundle\Command;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Command\Command;
