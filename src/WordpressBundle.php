@@ -11,7 +11,11 @@ use function Env\env;
 
 class WordpressBundle extends Bundle
 {
+    //protected $name = 'wp';
+
     private $root_dir;
+    private $public_dir;
+
     private $wp_path = "public/edition/";
 
     public function getPath(): string
@@ -22,7 +26,7 @@ class WordpressBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
-        $ext = new WordpressBundleExtension([],$container);
+        //$ext = new WordpressBundleExtension([],$container);
     }
 
 	public function boot()
@@ -44,6 +48,7 @@ class WordpressBundle extends Bundle
         }
 
 		$this->root_dir = $this->container->get('kernel')->getProjectDir();
+		$this->public_dir = $this->root_dir.(is_dir($this->root_dir.'/public') ? '/public' : '/web');
 
         $this->loadWordpress();
 
@@ -61,6 +66,12 @@ class WordpressBundle extends Bundle
      * 	@see wp-includes/class-wp.php, main function
      */
     private function loadWordpress(){
+
+        if( !file_exists($this->public_dir.'/wp-config.php') ){
+
+            if( !file_put_contents($this->public_dir.'/wp-config.php', file_get_contents($this->getPath().'/samples/wp-config.php')) )
+                return;
+        }
 
         $composer = $this->root_dir.'/composer.json';
 

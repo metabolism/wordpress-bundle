@@ -22,6 +22,7 @@
     "symfony/twig-bundle": "^4.0|^5.0",
     "symfony/asset": "^4.0|^5.0",
     "metabolism/wordpress-core-installer": "^1.0",
+    "metabolism/package-actions": "^1.0",
     "johnpbloch/wordpress-core": "^5.2",
     "ifsnop/mysqldump-php":"^2.0",
     "dflydev/dot-access-data":"^3.0",
@@ -38,6 +39,28 @@
     "wpackagist-plugin/query-monitor": "Query Monitor is the developer tools panel for WordPress."
   },
   "extra": {
+    "post-package-install": {
+      "create": {
+        "metabolism/wordpress-bundle": {
+          "public/uploads": 775,
+          "public/wp-bundle/upgrade": 775,
+          "public/wp-bundle/languages": 775,
+          "config/packages/acf": 775
+        }
+      },
+      "copy": {
+        "metabolism/wordpress-bundle": {
+          "samples/public/wp-config.php": "public/wp-config.php",
+          "samples/config/packages/wordpress_bundle.yml": "config/packages/wordpress_bundle.yml"
+        }
+      },
+      "symlink": {
+        "metabolism/wordpress-bundle": {
+          "docs/index.md": "docs/wordpress_bundle.md",
+          "samples/public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php"
+        }
+      }
+    },
     "branch-alias": {
       "dev-1.3.x": "1.3.x-dev",
       "dev-1.4.x": "1.4.x-dev",
