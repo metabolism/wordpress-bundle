@@ -183,8 +183,10 @@ class SecurityPlugin {
 	 */
 	public function __construct($config)
 	{
+        //prevent .htaccess writing
 		add_filter( 'flush_rewrite_rules_hard', '__return_false');
 
+        //hide login error
 		add_filter( 'login_errors', function(){
 			return __('Something is wrong!');
 		} );

@@ -8,7 +8,6 @@ class Context
 {
 	use WordpressContext;
 
-	protected $data;
 
 	/**
 	 * Add generic entry
@@ -65,7 +64,7 @@ class Context
 
 		foreach ($keys as $key)
 		{
-			if( isset(((array)$data)[$key]) )
+			if( is_object($data)?isset($data->$key):isset($data[$key]) )
 				$data = is_object($data)?$data->$key:$data[$key];
 			else
 				return $fallback;

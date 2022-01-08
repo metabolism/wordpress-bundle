@@ -2,22 +2,29 @@
 
 namespace Metabolism\WordpressBundle;
 
+use Metabolism\WordpressBundle\DependencyInjection\WordpressBundleExtension;
 use Metabolism\WordpressBundle\Extension\TwigExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Env\Env;
 use function Env\env;
 
 class WordpressBundle extends Bundle
 {
+    private $root_dir;
+    private $wp_path = "public/edition/";
+
     public function getPath()
     {
         return \dirname(__DIR__);
     }
 
-	/**
-	 * 	@see wp-includes/class-wp.php, main function
-	 */
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+        $ext = new WordpressBundleExtension([],$container);
+    }
+
 	public function boot()
 	{
 	    if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
@@ -36,23 +43,11 @@ class WordpressBundle extends Bundle
                 $_SERVER['HTTP_HOST'] = 'localhost';
         }
 
-		$rootDir = $this->container->get('kernel')->getProjectDir();
+		$this->root_dir = $this->container->get('kernel')->getProjectDir();
 
-		include $rootDir.'/public/edition/wp-load.php';
+        $this->loadWordpress();
 
-		global $wp;
-
-		$wp->init();
-		$wp->parse_request();
-		$wp->query_posts();
-
-		$this->registerGlobals();
-
-		do_action_ref_array( 'wp', array( &$wp ) );
-
-		remove_action( 'template_redirect', 'redirect_canonical' );
-		do_action( 'template_redirect' );
-
+        //todo: use dependency injection
 		if( $this->container->has('twig') ){
 
 			$twig = $this->container->get('twig');
@@ -62,26 +57,44 @@ class WordpressBundle extends Bundle
 		}
 	}
 
-	/**
-	 * Analyse query and load posts
-	 */
-	protected function registerGlobals() {
+    /**
+     * 	@see wp-includes/class-wp.php, main function
+     */
+    private function loadWordpress(){
 
-		global $wp_query, $wp;
+        $composer = $this->root_dir.'/composer.json';
 
-		// Extract updated query vars back into global namespace.
-		foreach ( (array) $wp_query->query_vars as $key => $value )
-			$GLOBALS[ $key ] = $value;
+        // get Wordpress path
+        if( file_exists($composer) ){
 
-		$GLOBALS['query_string'] = $wp->query_string;
-		$GLOBALS['posts'] = & $wp_query->posts;
-		$GLOBALS['post'] = isset( $wp_query->post ) ? $wp_query->post : null;
+            $composer = json_decode(file_get_contents($composer), true);
+            $installer_paths= $composer['extra']['installer-paths']??[];
 
-		if( !$wp_query->get_queried_object() ){
+            foreach ($installer_paths as $installer_path=>$types){
 
-			$wp_query->is_single = false;
-			$wp_query->is_singular = false;
-		}
-	}
+                if( in_array("type:wordpress-core", $types) )
+                    $this->wp_path = $installer_path;
+            }
+        }
 
+        // start loading Wordpress core without theme support
+        $wp_load_script = $this->root_dir.'/'.$this->wp_path.'wp-load.php';
+
+        if( !file_exists($wp_load_script) )
+            return;
+
+        include $wp_load_script;
+
+        global $wp;
+
+        $wp->init();
+        $wp->parse_request();
+        $wp->query_posts();
+        $wp->register_globals();
+
+        do_action_ref_array( 'wp', array( &$wp ) );
+
+        remove_action( 'template_redirect', 'redirect_canonical' );
+        do_action( 'template_redirect' );
+    }
 }

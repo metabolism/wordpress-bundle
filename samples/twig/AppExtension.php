@@ -29,28 +29,6 @@ class AppExtension extends AbstractExtension{
 	public function __construct($defaultLocale, $projectDir, $emailSender )
 	{
 		$this->projectDir = $projectDir;
-		$this->getTranslations();
-	}
-
-	/**
-	 *
-	 */
-	private function getTranslations()
-	{
-		$options = new ACFHelper('options');
-		$this->options = $options->get();
-
-		if( isset($this->options['translations']) )
-		{
-			$translations = [];
-			foreach ($this->options['translations'] as $translation)
-			{
-				$key = sanitize_title($translation['key']);
-				$translations[$key] = $translation['translation'];
-			}
-
-			$this->options['translations'] = $translations;
-		}
 	}
 
 
@@ -86,7 +64,6 @@ class AppExtension extends AbstractExtension{
 	public function getFunctions()
 	{
 		return [
-			new TwigFunction( '__t', [$this,'translate'] ),
 			new TwigFunction( 'GT', [$this,'GT'] ),
 			new TwigFunction( 'GTE', [$this,'GTE'] ),
 			new TwigFunction( 'LT', [$this,'LT'] ),
@@ -153,21 +130,6 @@ class AppExtension extends AbstractExtension{
 	public function blank()
 	{
 		return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-	}
-
-
-	/**
-	 * @param $text
-	 * @return mixed
-	 */
-	public function translate($text)
-	{
-		$key = sanitize_title($text);
-
-		if( isset($this->options['translations'], $this->options['translations'][$key]) )
-			return $this->options['translations'][$key];
-		else
-			return $text;
 	}
 
 

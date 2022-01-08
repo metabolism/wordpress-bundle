@@ -7,95 +7,145 @@ use Metabolism\WordpressBundle\Entity\Entity;
 
 use Metabolism\WordpressBundle\Factory\Factory,
 	Metabolism\WordpressBundle\Factory\PostFactory,
-	Metabolism\WordpressBundle\Factory\TaxonomyFactory;
+	Metabolism\WordpressBundle\Factory\TermFactory;
 
 class ACFHelper
 {
-	private $raw_objects;
 	private $objects;
 	private $id;
-	private $loaded=false;
-	private $use_entity=false;
 
-	protected static $MAX_DEPTH = 2;
-	protected static $DEPTH = 0;
+    public static $use_entity;
 
-	public static function get($id){
-
-	    $fields = new self($id);
-	    return $fields->loadFromCache();
-    }
-
-	/**
-	 * ACFHelper constructor.
-	 * @param $id
-	 * @param string $type
-	 */
-	public function __construct( $id, $type='objects' )
+    /**
+     * ACFHelper constructor.
+     * @param $id
+     * @param bool $type
+     * @param bool $load_value
+     */
+	public function __construct( $id, $type=false, $load_value=false )
 	{
-        global $_config;
+		global $_config;
 
-        if( !$_config )
-            return;
+		if( !$_config || !class_exists('ACF') )
+			return;
 
-        $this->use_entity = $_config->get('acf.settings.use_entity', true);
+        if( is_null(self::$use_entity) )
+            self::$use_entity = $_config->get('acf.settings.use_entity', false);
+
+		if( !in_array($type, ['menu', 'menuItem', 'post', 'site']) && $type)
+			$id = $type.'_'.$id;
 
 		$this->id = $id;
 
-		self::$DEPTH++;
+        if( $load_value )
+            $this->getFieldObjects( true );
+	}
 
-		if( $cached = wp_cache_get( $id.'::'.self::$DEPTH, 'acf_helper' ) ){
-			$this->objects = $cached;
-		}
-		else{
 
-			if( self::$DEPTH > self::$MAX_DEPTH ) {
-				$this->objects = [];
-			}
-			else {
-				$this->loaded = true;
-				$this->objects = $this->load($type, $id);
+    /**
+     * Magic method to check properties
+     *
+     * @param $id
+     * @param $args
+     * @return null|string|array|object
+     */
+	public function __isset($id) {
 
-				wp_cache_set( $id.'::'.self::$DEPTH, $this->objects, 'acf_helper' );
-			}
-		}
+		return $this->has($id);
+	}
 
-		self::$DEPTH--;
+
+    /**
+     * Magic method to load properties
+     *
+     * @param $id
+     * @param $args
+     * @return null|string|array|object
+     */
+	public function __get($id) {
+
+		return $this->getValue($id);
 	}
 
 
 	/**
-	 * @return bool|int
+	 * @param $id
+	 * @return bool
+	 */
+	public function has($id){
+
+        $this->getFieldObjects();
+
+        return isset($this->objects[$id]);
+	}
+
+
+	/**
+	 * @param $id
+	 * @return null|string|array|object
+	 */
+	public function get_value($id){
+
+		return $this->getValue($id);
+	}
+
+	public function getValue($id){
+
+		if( ! $this->has($id) )
+			return null;
+
+        $field = $this->objects[$id];
+
+        if( isset($field['value']) )
+            return $field['value'];
+
+        $field['value'] = acf_get_value( $this->id, $field );
+        $field['value'] = acf_format_value( $field['value'], $this->id, $field );
+
+        $data = $this->format([$field]);
+
+        $this->objects[$id]['value'] = $data[$id]??null;
+
+		return $this->objects[$id]['value'];
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function get($id){
+
+		$self = new self($id, false, true);
+
+		return $self->format($self->objects);
+	}
+
+
+	/**
+	 * @return bool
 	 */
 	public function loaded()
 	{
-		return $this->loaded;
+		return !is_null($this->objects);
 	}
 
 
 	/**
-	 * @param $value
+	 * @return void
 	 */
-	public static function setMaxDepth($value )
+	public function getFieldObjects($load_value=false)
 	{
-		self::$MAX_DEPTH = $value;
-	}
+        if( $this->loaded() )
+            return;
 
+        if( $cached = wp_cache_get( $this->id, 'acf_helper' ) ){
 
-	/**
-	 * @param bool $force
-	 * @return array|bool|Entity|mixed|\WP_Error
-	 */
-	public function loadFromCache($force=false)
-	{
-		if( !$this->loaded() && $force ){
+            $this->objects = $cached;
+        }
+        else{
 
-			$this->loaded  = true;
-			$this->objects = $this->load('objects', $this->id);
-			wp_cache_set( $this->id.'::'.self::$DEPTH, $this->objects, 'acf_helper' );
-		}
-
-		return $this->objects;
+            $this->objects = get_field_objects($this->id, $load_value, $load_value);
+            wp_cache_set( $this->id, $this->objects, 'acf_helper' );
+        }
 	}
 
 
@@ -200,6 +250,7 @@ class ACFHelper
 		return $data;
 	}
 
+
 	/**
 	 * @param $type
 	 * @param $id
@@ -212,21 +263,21 @@ class ACFHelper
 
 		if( $type == 'term' ){
 
-            if(is_array($id) )
-                $id = $id['term_id']??false;
-            elseif( is_object($id) )
-                $id = $id->term_id??false;
-        }
-        else{
+			if(is_array($id) )
+				$id = $id['term_id']??false;
+			elseif( is_object($id) )
+				$id = $id->term_id??false;
+		}
+		else{
 
-            if(is_array($id) )
-                $id = $id['id']??$id['ID']??false;
-            elseif( is_object($id) )
-                $id = $id->id??$id->ID??false;
-        }
+			if(is_array($id) )
+				$id = $id['id']??$id['ID']??false;
+			elseif( is_object($id) )
+				$id = $id->id??$id->ID??false;
+		}
 
-        if( !$id )
-            return null;
+		if( !$id )
+			return null;
 
 		switch ($type)
 		{
@@ -247,18 +298,7 @@ class ACFHelper
 				break;
 
 			case 'term':
-				$value = TaxonomyFactory::create( $id );
-				break;
-
-			case 'objects':
-
-				if( function_exists('get_field_objects') )
-					$this->raw_objects = get_field_objects($id);
-				else
-					$this->raw_objects = [];
-
-				$value = $this->clean( $this->raw_objects);
-
+				$value = TermFactory::create( $id );
 				break;
 		}
 		
@@ -270,7 +310,7 @@ class ACFHelper
 	 * @param $raw_objects
 	 * @return array
 	 */
-	public function clean($raw_objects)
+	public function format($raw_objects)
 	{
 		$objects = [];
 
@@ -302,7 +342,7 @@ class ACFHelper
 							}
 						}
 
-						$objects[$object['name']] = $this->clean($object['sub_fields']);
+						$objects[$object['name']] = $this->format($object['sub_fields']);
 					}
 
 					break;
@@ -323,7 +363,7 @@ class ACFHelper
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'array'))
+					if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'array'))
 						$objects[$object['name']] = $this->load('image', $object['value'], $object);
 					else
 						$objects[$object['name']] = $object['value'];
@@ -343,7 +383,7 @@ class ACFHelper
 
 							foreach ($object['value'] as $value){
 
-								if ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'array'))
+								if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'array'))
 									$objects[$object['name']][] = $this->load('image', $value, $object);
 								else
 									$objects[$object['name']][] = $value;
@@ -358,7 +398,7 @@ class ACFHelper
 					if( empty($object['value']) )
 						break;
 
-					if ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'array'))
+					if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'array'))
 						$objects[$object['name']] = $this->load('file', $object['value'], $object);
 					else
 						$objects[$object['name']] = $object['value'];
@@ -369,21 +409,21 @@ class ACFHelper
 
 					if( isset($object['value']) && is_iterable($object['value']) ){
 
-                        $relationship = [];
+						$relationship = [];
 
-                        foreach ($object['value'] as $value) {
+						foreach ($object['value'] as $value) {
 
-                            if ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'object'))
-                                $item = $this->load('post', $value);
+							if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'object'))
+								$item = $this->load('post', $value);
 							else
-                                $item = $value;
+								$item = $value;
 
 							if( $item )
-                                $relationship[] = $item;
-                        }
+								$relationship[] = $item;
+						}
 
-                        if( !empty($relationship) )
-                            $objects[$object['name']] = $relationship;
+						if( !empty($relationship) )
+							$objects[$object['name']] = $relationship;
 					}
 					break;
 
@@ -394,7 +434,7 @@ class ACFHelper
 
 					if ($object['return_format'] == 'link' )
 						$objects[$object['name']] = get_permalink($object['value']);
-					elseif ($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'object'))
+					elseif ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'object'))
 						$objects[$object['name']] = $this->load('post', $object['value']);
 					else
 						$objects[$object['name']] = $object['value'];
@@ -420,7 +460,7 @@ class ACFHelper
 						foreach ($object['value'] as $value) {
 							$type = $value['acf_fc_layout'];
 							$value = $this->bindLayoutsFields($value, $layouts);
-							$data = $this->clean($value);
+							$data = $this->format($value);
 
 							$objects[$object['name']][] = ['type'=>$type, 'data'=>$data];
 						}
@@ -439,7 +479,7 @@ class ACFHelper
 						foreach ($object['value'] as $value)
 						{
 							$value = $this->bindLayoutFields($value, $layout);
-							$objects[$object['name']][] = $this->clean($value);
+							$objects[$object['name']][] = $this->format($value);
 						}
 					}
 
@@ -453,30 +493,30 @@ class ACFHelper
 
 						foreach ($object['value'] as $value) {
 
-                            if( $value ){
+							if( $value ){
 
-                                if($object['return_format'] == 'link' )
-                                    $objects[$object['name']][] = get_term_link($value);
-                                elseif($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'object') )
-                                    $objects[$object['name']][] = $this->load('term', $value);
-                                else
-                                    $objects[$object['name']][] = $value;
-                            }
+								if($object['return_format'] == 'link' )
+									$objects[$object['name']][] = get_term_link($value);
+								elseif($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'object') )
+									$objects[$object['name']][] = $this->load('term', $value);
+								else
+									$objects[$object['name']][] = $value;
+							}
 						}
 					}
 					else{
 
-                        if( $object['value'] ){
+						if( $object['value'] ){
 
-                            $value = $object['value'];
+							$value = $object['value'];
 
-                            if($object['return_format'] == 'link' )
-                                $objects[$object['name']] = get_term_link($value);
-                            elseif($object['return_format'] == 'entity' || (!$this->use_entity && $object['return_format'] == 'object') )
-                                $objects[$object['name']] = $this->load('term', $value);
-                            else
-                                $objects[$object['name']] = $value;
-                        }
+							if($object['return_format'] == 'link' )
+								$objects[$object['name']] = get_term_link($value);
+							elseif($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'object') )
+								$objects[$object['name']] = $this->load('term', $value);
+							else
+								$objects[$object['name']] = $value;
+						}
 					}
 
 					break;
@@ -495,7 +535,7 @@ class ACFHelper
 					$layout = $this->layoutAsKeyValue($object['sub_fields']);
 					$value = $this->bindLayoutFields($object['value'], $layout);
 
-					$objects[$object['name']] = $this->clean($value);
+					$objects[$object['name']] = $this->format($value);
 
 					break;
 
@@ -510,7 +550,7 @@ class ACFHelper
 
 				case 'wysiwyg':
 					$objects[$object['name']] = do_shortcode($object['value']);
-				    break;
+					break;
 
 				default:
 

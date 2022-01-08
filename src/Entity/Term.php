@@ -3,7 +3,7 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use Metabolism\WordpressBundle\Factory\Factory;
-use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
+use Metabolism\WordpressBundle\Factory\TermFactory;
 
 /**
  * Class Term
@@ -14,30 +14,26 @@ class Term extends Entity
 {
 	public $entity = 'term';
 
-    /** @var bool|Term[] $children */
-    public $children;
-
-    public $count;
     public $current;
-    public $depth;
-	public $excerpt;
-	public $link;
-    public $order;
-    public $parent;
-	public $slug;
-	public $taxonomy;
-    public $template;
-    public $thumbnail;
-	public $title;
+    public $count;
+    public $taxonomy;
+    public $slug;
+    public $title;
 
-	protected $term_id;
-	protected $term_taxonomy_id;
+    protected $depth;
+    protected $excerpt;
+    protected $link;
+    /** @var Term */
+    protected $parent;
+    protected $template;
+    protected $thumbnail;
 
-	private $_term = null;
+    /** @var \WP_Term|bool */
+	private $term;
 
-    public function __toString()
-    {
-        return $this->title;
+    public function __toString(){
+
+        return $this->title??'Invalid term';
     }
 
 	/**
@@ -46,84 +42,118 @@ class Term extends Entity
 	 * @param null $id
 	 * @param array $args
 	 */
-	public function __construct($id, $args = [])
-	{
-		if( is_array($id) )
-		{
+	public function __construct($id, $args = []){
+
+		if( is_array($id) ) {
+
 			if( empty($id) || isset($id['invalid_taxonomy']) )
 				return;
 
 			$id = $id[0];
 		}
 
-		if( $term = $this->get($id) )
-		{
-			$this->import($term, false, 'term_');
+		if( $term = $this->get($id) ) {
 
-			if( !empty($term->taxonomy) ){
+            $this->ID = $term->term_id;
+            $this->current = get_queried_object_id() == $this->ID;
+            $this->taxonomy = $term->taxonomy;
+            $this->count = $term->count;
+            $this->slug = $term->slug;
+            $this->title = $term->name;
 
-				if( !isset($args['depth']) || $args['depth'] )
-					$this->addCustomFields($term->taxonomy.'_'.$id);
-			}
+            $this->loadMetafields($this->ID, $this->taxonomy);
 		}
 	}
 
 
-	/**
-	 * Validate class
-	 * @param \WP_Term $term
-	 * @return bool
-	 */
-	protected function isValidClass($term){
+    /**
+     * Has parent term
+     *
+     * @return bool
+     */
+    public function hasParent() {
 
-		$class = explode('\\', get_class($this));
-		$class = end($class);
-		return $class == "Term" || Factory::getClassname($term->taxonomy) == $class;
-
-	}
+        return $this->term->parent > 0;
+    }
 
 
 	/**
 	 * @param $pid
-	 * @return array|bool|\WP_Error|\WP_Term|null
+	 * @return \WP_Term|false
 	 */
 	protected function get($pid ) {
 
-		if( $term = get_term($pid) )
-		{
-			if( !$term || is_wp_error($term) )
+		if( $term = get_term($pid) ) {
+
+			if( is_wp_error($term) || !$term )
 				return false;
 			
-			$this->_term = clone $term;
-
-			$term->excerpt = strip_tags(term_description($pid),'<b><i><strong><em><br>');
-			$term->template = get_term_meta($term->term_id, 'template', true);
-
-			if( !HEADLESS || URL_MAPPING )
-				$term->link = get_term_link($pid);
-
-			$term->ID = $term->term_id;
-			$term->term_order = intval($term->term_order);
-			$term->current = get_queried_object_id() == $pid;
-			$term->thumbnail = false;
-			$term->depth = count(get_ancestors( $term->ID, $term->taxonomy ));
-
-			// load thumbnail if set to optimize loading by preventing full acf load
-			//todo: move to ACFHelper Provider using action
-			if( function_exists('get_field_object') )
-			{
-				$object = get_field_object('thumbnail', $term->taxonomy.'_'.$term->ID);
-
-				if( $object && $object['value'] ){
-
-					if( $object['return_format'] == 'array')
-						$term->thumbnail = Factory::create( $object['value']['id'], 'image', false, $object);
-					else
-						$term->thumbnail = $object['value'];
-				}
-			}
+			$this->term = $term;
 		}
 
 		return $term;
 	}
+
+
+    /**
+     * Get parent term
+     *
+     * @return Post|false
+     */
+    public function getParent() {
+
+        if( is_null($this->parent) )
+            $this->parent = TermFactory::create($this->term->parent);
+
+        return $this->parent;
+    }
+
+    public function getLink(){
+
+        if( is_null($this->link) )
+            $this->link = get_term_link( $this->term );
+
+        return $this->link;
+    }
+
+    public function getDepth(){
+
+        if( is_null($this->depth) )
+            $this->depth = count(get_ancestors( $this->ID, $this->taxonomy ));
+
+        return $this->depth;
+    }
+
+    public function getTemplate(){
+
+        if( is_null($this->template) )
+            $this->template =  get_term_meta($this->ID, 'template', true);
+
+        return $this->template;
+    }
+
+    public function getExcerpt(){
+
+        if( is_null($this->excerpt) )
+            $this->excerpt = strip_tags(term_description($this->ID),'<b><i><strong><em><br>');
+
+        return $this->excerpt;
+    }
+
+    public function getThumbnail(){
+
+        //todo: move to ACFHelper Provider using action
+        if( is_null($this->thumbnail) && function_exists('get_field_object') ){
+
+            $object = get_field_object('thumbnail', $this->taxonomy.'_'.$this->ID);
+
+            if( $object && $object['value'] ){
+
+                $id = $object['return_format'] == 'array' ? $object['value']['id'] : $object['value'];
+                $this->thumbnail = Factory::create( $id, 'image', false, $object);
+            }
+        }
+
+        return $this->thumbnail;
+    }
 }

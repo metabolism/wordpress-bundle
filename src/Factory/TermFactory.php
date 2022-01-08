@@ -2,7 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Factory;
 
-class TaxonomyFactory {
+class TermFactory {
 
 	/**
 	 * Create entity from taxonomy name

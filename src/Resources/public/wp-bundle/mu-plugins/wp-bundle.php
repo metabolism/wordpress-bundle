@@ -10,6 +10,7 @@
 use Metabolism\WordpressBundle\Plugin\Loader as PluginLoader;
 use Metabolism\WordpressBundle\Provider\Loader as ProviderLoader;
 
+
 $uri = explode('/', $_SERVER['SCRIPT_NAME']);
 $page = end($uri);
 

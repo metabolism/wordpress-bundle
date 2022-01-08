@@ -20,9 +20,11 @@ class User extends Entity
 	public $nicename;
 	public $registered;
 	public $status;
-    public $url;
+    public $link;
 
-	private $_user = null;
+    protected $avatar;
+
+    private $user;
 
     public function __toString()
     {
@@ -39,19 +41,19 @@ class User extends Entity
 	{
 		if( $user = $this->get($id) ) {
 
-			$this->import($user->data, false, 'user_');
-
-            $user_meta = get_user_meta( $id );
-
             $this->ID = $id;
+            $this->firstname = $user->first_name;
+            $this->lastname = $user->last_name;
+            $this->description = $user->description;
+            $this->display_name = $user->display_name;
+            $this->email = $user->user_email;
+            $this->login = $user->user_login;
+            $this->nicename = $user->user_nicename;
+            $this->registered = $user->user_registered;
+            $this->status = $user->user_status;
+            $this->link = $user->user_url;
 
-            $this->firstname = $user_meta['first_name'][0]??'';
-			$this->lastname = $user_meta['last_name'][0]??'';
-			$this->description = $user_meta['description'][0]??'';
-			$this->link = get_author_posts_url($id);
-
-			if( !isset($args['depth']) || $args['depth'] )
-				$this->addCustomFields('user_'.$id);
+			$this->loadMetafields($id, 'user');
 		}
 	}
 
@@ -66,10 +68,10 @@ class User extends Entity
 
 		if( $user = get_userdata($pid) ){
 
-			if( is_wp_error($user) )
+			if( is_wp_error($user) || !$user )
 				return false;
 
-			$this->_user = $user;
+			$this->user = $user;
 		}
 
 		return $user;
@@ -84,7 +86,12 @@ class User extends Entity
      */
 	public function getAvatar($args = []){
 
-        $args = get_avatar_data( $this->ID, $args );
-        return $args['url'];
+        if( is_null($this->avatar)){
+
+            $args = get_avatar_data( $this->ID, $args );
+            $this->avatar = $args['url'];
+        }
+
+        return $this->avatar;
     }
 }

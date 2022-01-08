@@ -11,6 +11,7 @@ use function Env\env;
 class ACFProvider {
 
 	public static $folder = '/config/packages/acf';
+    public static $folder_legacy = '/config/acf-json';
 
 	private $config;
 
@@ -189,6 +190,9 @@ class ACFProvider {
 	public function __construct($config)
 	{
 		$this->config = $config;
+        
+        if( !is_dir(BASE_URI.$this::$folder) && is_dir(BASE_URI.$this::$folder_legacy) && $this::$folder != $this::$folder_legacy )
+            $this::$folder = $this::$folder_legacy;
 
 		add_filter('acf/settings/save_json', function(){ return BASE_URI.$this::$folder; });
 		add_filter('acf/settings/load_json', function(){ return [BASE_URI.$this::$folder]; });

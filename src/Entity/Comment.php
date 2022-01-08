@@ -39,8 +39,8 @@ class Comment extends Entity
 
 		if( $comment = $this->get($id) )
 		{
-		    $comment->comment_ID = intval($comment->comment_ID);
-			$this->import($comment, false, 'comment_');
+            $this->ID = intval($comment->comment_ID);
+            //todo: bind
 		}
     }
 
@@ -50,6 +50,7 @@ class Comment extends Entity
 	 * @return array|\WP_Comment|null
 	 */
 	protected function get($pid ) {
+
 		return get_comment($pid);
 	}
 

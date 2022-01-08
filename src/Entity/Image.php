@@ -15,33 +15,34 @@ class Image extends Entity
 
 	public static $wp_upload_dir = false;
 
-    public $alt;
     public $caption;
-    public $date;
-    public $date_gmt;
     public $description;
-    public $extension;
     public $file;
-    public $focus_point = false;
-    public $height;
-	public $link;
-	public $meta;
+	public $width;
+	public $height;
 	public $mime_type;
-    public $modified;
-    public $modified_gmt;
     public $sizes = [];
     public $title;
-	public $width;
+
+    protected $link;
+    protected $extension;
+    protected $alt;
+    protected $size;
+    protected $focus_point;
+    protected $metadata;
+    protected $date;
+    protected $date_gmt;
+    protected $modified;
+    protected $modified_gmt;
+    protected $src;
 
 	private $compression = 90;
-	private $show_meta = false;
+	private $post;
 	private $args = [];
-
-	protected $src;
 
     public function __toString()
     {
-        return $this->link;
+        return $this->getLink();
     }
 
 	/**
@@ -50,59 +51,25 @@ class Image extends Entity
 	 * @param int|string $id
 	 * @param array $args
 	 */
-	public function __construct($id=null, $args=[]) {
-
+	public function __construct($id=null, $args=[])
+	{
 		global $_config;
 
 		$this->args = $args;
 
-		$this->compression = $_config->get('image.compression', 90);
-		$this->show_meta = $_config->get('image.show_meta', false);
+		if (isset($this->args['compression']))
+			$this->compression = $this->args['compression'];
+		else
+			$this->compression = $_config->get('image.compression', 90);
 
-		if( isset($_REQUEST['debug']) && $_REQUEST['debug'] == 'image' && WP_ENV == 'dev' ){
+		if (isset($_REQUEST['debug']) && $_REQUEST['debug'] == 'image' && WP_ENV == 'dev') {
+
 			$this->ID = 0;
 		}
-		elseif( $data = $this->get($id) ){
+		else {
 
-			$this->import($data, false, 'post_');
-
-			if( isset($this->args['sizes']) && !empty($this->args['sizes']) && $this->mime_type != 'image/svg+xml' && $this->mime_type != 'image/svg' )
-				$this->generateSizes($this->args['sizes'], isset($this->args['scaled_down'])?$this->args['scaled_down']:false);
+			$this->get($id);
 		}
-	}
-
-
-	/**
-	 * Generate image sizes from args
-	 * ex for sizes: large:1920x1080.webp, small:150x150.jpg, medium:800x600
-	 *
-	 * @param string $sizes
-	 * @param bool $scaled_down
-	 */
-	private function generateSizes($sizes, $scaled_down=false)
-	{
-		$sizes = explode(',', trim(str_replace(' ', '', $sizes)));
-
-		foreach ($sizes as $size)
-		{
-			$size = explode(':', $size);
-			if( count($size) <= 1 ) continue;
-
-			$name = $size[0];
-			$spec = explode('.', $size[1]);
-
-			$width_height = explode('x', $spec[0]);
-			$extension = count($spec)>1?$spec[1]:null;
-
-			if( $extension != 'webp' && function_exists('imagewebp') )
-				$this->resize($width_height[0], count($width_height)>1?$width_height[1]:0, 'webp', ['name'=>$name]);
-
-			if( $scaled_down )
-				$this->resize($width_height[0], count($width_height)>1?$width_height[1]:0, $extension, ['name'=>$name, 'blur'=>5, 'gcd'=>1]);
-
-			$this->resize($width_height[0], count($width_height)>1?$width_height[1]:0, $extension, ['name'=>$name]);
-		}
-
 	}
 
 
@@ -127,68 +94,107 @@ class Image extends Entity
 	/**
 	 * Remove useless data
 	 * @param $id
-	 * @return array|bool|\WP_Post|null
+	 * @return void
 	 */
 	protected function get($id)
 	{
-		$post = $metadata = false;
-
 		if( is_numeric($id) ){
 
-			$metadata = wp_get_attachment_metadata($id);
-			$post = get_post($id, ARRAY_A);
-			$post_meta = get_post_meta($id);
+			if( $post = get_post($id) ) {
 
-			if( !$post || is_wp_error($post) )
-				return false;
+				if( is_wp_error($post) || !$post )
+					return;
 
-			if( empty($metadata) ){
+				$post_meta = get_post_meta($id);
 
-				$mime_type = get_post_mime_type($id);
+				$attachment_metadata = apply_filters( 'wp_get_attachment_metadata', maybe_unserialize($post_meta['_wp_attachment_metadata'][0]??''), $id );
 
-				if($mime_type == 'image/svg' || $mime_type == 'image/svg+xml' )
-					$metadata = ['file' => ($post_meta['_wp_attached_file'][0]??false), 'image_meta' =>  []];
-			}
+				if( !$attachment_metadata ){
 
-			if( empty($metadata) || !isset($metadata['file']) )
-				return false;
+					if( $post->post_mime_type != 'image/svg' && $post->post_mime_type != 'image/svg+xml' )
+						return;
 
-			$metadata['file'] = ltrim(($post_meta['_wp_attached_file'][0]??false), '/');
-			$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
+					$attachment_metadata = [
+						'file' => $post_meta['_wp_attached_file'][0],
+						'width' =>  '',
+						'height' =>  '',
+						'image_meta' =>  []
+					];
 
-			if( !@file_exists($metadata['src']) )
-				return false;
-
-            if( apply_filters('wp_make_url_relative', true) )
-                $metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
-            else
-                $metadata['file'] = $this->uploadDir('baseurl').'/'.$metadata['file'];
-
-			$metadata['link'] = home_url($metadata['file']);
-			$metadata['alt']  = trim(strip_tags(get_post_meta($id, '_wp_attachment_image_alt', true)));
-
-			foreach($post_meta as $key=>$value)
-			{
-				if( in_array($key, ['_wp_attached_file', '_wp_attachment_metadata', '_wpsmartcrop_enabled', '_wpsmartcrop_image_focus']) )
-					continue;
-
-				if($key == '_wp_attachment_image_alt')
-				{
-					$post['alt'] = trim($value[0]);
+					$this->focus_point = false;
 				}
-				else
-				{
-					$value = (is_array($value) && count($value)==1) ? $value[0] : $value;
-					$unserialized = is_string($value)?@unserialize($value):false;
 
-					if( substr($key, 0, 1) == '_')
-						$key = substr($key, 1);
+				$filename = $this->uploadDir('basedir').'/'.$attachment_metadata['file'];
 
-					$post[$key] = $unserialized?$unserialized:$value;
-				}
+				if( !file_exists( $filename) )
+					return;
+
+				$this->ID = $post->ID;
+				$this->caption = $post->post_excerpt;
+				$this->description = $post->post_content;
+				$this->file = $attachment_metadata['file'];
+				$this->src = $filename;
+				$this->post = $post;
+
+				$this->title = $post->post_title;
+
+				$this->width = $attachment_metadata['width'];
+				$this->height = $attachment_metadata['height'];
+				$this->metadata = $attachment_metadata['image_meta'];
+				$this->mime_type = $post->post_mime_type;
 			}
+		}
+		else{
 
-			//wpsmartcrop plugin support
+			$filename = BASE_URI.$id;
+
+			if( !file_exists( $filename) || is_dir( $filename ) )
+				return;
+
+			$this->ID = 0;
+			$this->file = $id;
+			$this->src = $filename;
+			$this->post = false;
+			$this->title = str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME));
+
+			$image_size = getimagesize($filename);
+			$this->width = $image_size[0]??false;
+			$this->height = $image_size[1]??false;
+			$this->metadata = false;
+			$this->mime_type = mime_content_type($filename);
+		}
+    }
+
+	public function getLink(){
+
+        if( is_null($this->link) && $this->src )
+            $this->link = home_url($this->file);
+
+        return $this->link;
+    }
+
+	public function getExtension(){
+
+        if( is_null($this->extension) && $this->src )
+            $this->extension = pathinfo($this->src, PATHINFO_EXTENSION);
+
+        return $this->extension;
+    }
+
+	public function getSize(){
+
+        if( is_null($this->size) && $this->src )
+            $this->size = filesize($this->src);
+
+        return $this->size;
+    }
+
+	public function getFocusPoint(){
+
+		if( is_null($this->focus_point) && $this->ID ){
+
+			$post_meta = get_post_meta($this->ID);
+
 			if( isset($post_meta['_wpsmartcrop_enabled'], $post_meta['_wpsmartcrop_image_focus']) && $post_meta['_wpsmartcrop_enabled'][0] ){
 				$focus_point =  @unserialize($post_meta['_wpsmartcrop_image_focus'][0]);
 				$this->focus_point = ['x'=>$focus_point['left'], 'y'=>$focus_point['top']];
@@ -197,61 +203,82 @@ class Image extends Entity
 			elseif( isset($post_meta['focus_point']) ){
 				$this->focus_point = $post_meta['focus_point'];
 			}
+		}
 
-			$post['mime_type'] = mime_content_type($metadata['src']);
-			$post['extension'] = pathinfo($metadata['src'], PATHINFO_EXTENSION);
-			$post['caption'] = $post['post_excerpt'];
-			$post['description'] = $post['post_content'];
+		return $this->focus_point;
+	}
 
-			unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
+	public function getDate(){
 
-			if( isset($post['mime_type']) && ($post['mime_type'] == 'image/svg+xml' || $this->mime_type == 'image/svg') )
-				unset($metadata['meta'], $metadata['width'], $metadata['height']);
+		if( is_null($this->date) ){
 
-			if( $this->show_meta && isset($metadata['image_meta']) )
-				$metadata['meta'] = $metadata['image_meta'];
+			if( $this->post )
+				$this->date = $this->formatDate($this->post->post_date);
 			else
-				$metadata['meta'] = false;
-
-			unset($metadata['image_meta'], $metadata['sizes']);
-		}
-		elseif( is_string($id) ){
-
-			$filename = BASE_URI.$id;
-
-			if( !file_exists( $filename) )
-				return false;
-
-			$post = $post_meta = [];
-
-			$image_size = getimagesize($filename);
-
-			$metadata = [
-				'src' => $filename,
-				'file' => str_replace(PUBLIC_DIR, '', $id),
-				'link' => home_url(str_replace(PUBLIC_DIR, '', $id)),
-				'width' => count($image_size)?$image_size[0]:false,
-				'height' => count($image_size)>1?$image_size[1]:false,
-				'mime_type' => $image_size['mime'],
-				'post_title' => str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME)),
-				'post_date' => filemtime($filename),
-				'post_date_gmt' => date("Y-m-d H:i:s", filemtime($filename)),
-				'post_modified' => filectime($filename),
-				'post_modified_gmt' => date("Y-m-d H:i:s", filectime($filename))
-			];
-
-			if( $this->show_meta && function_exists('exif_read_data') )
-				$metadata['meta'] = @exif_read_data($filename);
+				$this->date = $this->formatDate(filemtime($this->src));
 		}
 
-		if( is_array($metadata) )
-			return array_merge($post, $metadata);
-		else
-			return $post;
+		return $this->date;
+	}
+
+	public function getModified(){
+
+		if( is_null($this->modified) ){
+
+			if( $this->post )
+				$this->modified = $this->formatDate($this->post->post_modified);
+			else
+				$this->modified = $this->formatDate(filectime($this->src));
+		}
+
+		return $this->modified;
+	}
+
+	public function getDateGmt(){
+
+		if( is_null($this->date_gmt) ){
+
+			if( $this->post )
+				$this->date_gmt = $this->formatDate($this->post->post_date_gmt);
+			else
+				$this->date_gmt = $this->formatDate(filemtime($this->src));
+		}
+
+		return $this->date_gmt;
+	}
+
+	public function getModifiedGmt(){
+
+		if( is_null($this->modified_gmt) ){
+
+			if( $this->post )
+				$this->modified_gmt = $this->formatDate($this->post->post_modified_gmt);
+			else
+				$this->modified_gmt = $this->formatDate(filectime($this->src));
+		}
+
+		return $this->modified_gmt;
+	}
+
+	public function getMetadata(){
+
+		if(is_null($this->metadata) && function_exists('exif_read_data'))
+			$this->metadata = @exif_read_data($this->src);
+
+		return $this->metadata;
+	}
+
+	public function getAlt(){
+
+		if( is_null($this->alt) && $this->ID )
+			$this->alt = trim(strip_tags(get_post_meta($this->ID, '_wp_attachment_image_alt', true)));
+
+		return $this->alt;
 	}
 
 
 	public function getSrc(){
+
 		return $this->src;
 	}
 
@@ -335,8 +362,10 @@ class Image extends Entity
 	 */
 	private function process($params, $ext=null){
 
-		if( !in_array($this->extension, ['jpg','jpeg','png','gif','webp']) )
+		if( !in_array($this->getExtension(), ['jpg','jpeg','png','gif','webp']) )
 			return $this->src;
+
+		$this->getFocusPoint();
 
 		//redefine ext if webp is not supported
 		if( $ext === 'webp' && !function_exists('imagewebp'))

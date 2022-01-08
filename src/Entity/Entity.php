@@ -3,232 +3,155 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use Metabolism\WordpressBundle\Helper\ACFHelper;
+use Metabolism\WordpressBundle\Helper\DataHelper;
+use ReflectionObject;
+use ReflectionProperty;
+use ReflectionMethod;
 
 /**
  * Class Entity
  *
  * @package Metabolism\WordpressBundle\Entity
  */
-class Entity implements \ArrayAccess
+class Entity
 {
-	public static $remove = [
-		'xfn', 'db_id', 'post_mime_type', 'ping_status', 'to_ping', 'pinged', '_edit_lock',
-		'guid', 'filter', 'post_content_filtered', 'author_IP', 'agent'
-	];
-
 	public $ID;
 	public $entity;
+
 	public static $date_format = false;
 
     /**
      * @var bool|ACFHelper
      */
-    private $custom_fields=false;
-	private $imported=false;
-
-	/*
-	 * ArrayAccess
-	 * */
-    public function offsetExists($offset)
-    {
-        return property_exists($this, $offset);
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->$offset;
-    }
-    public function offsetSet($offset, $value)
-    {
-        $this->$offset = $value;
-    }
-
-    public function offsetUnset($offset)
-    {
-        unset($this->$offset);
-    }
+	public $metafields = false;
 
 
 	/**
-	 * @param $info
-	 * @param bool $remove
-	 * @param bool $replace
-	 */
-	public function import($info, $remove=false , $replace=false )
-	{
-		$info = self::normalize($info, $remove, $replace);
-
-		if ( is_object($info) )
-			$info = get_object_vars($info);
-
-		if ( is_array($info) )
-		{
-			foreach ( $info as $key => $value )
-			{
-				if ( $key === '' || ord($key[0]) === 0 )
-					continue;
-
-				if ( !empty($key) && !method_exists($this, $key) && property_exists($this, $key) )
-					$this->$key = $value;
-			}
-		}
-
-		$this->imported = true;
-	}
-
-
-	/**
-	 * Return true if all fields have been loaded to the entity
-	 */
-	public function loaded()
-	{
-		return (!$this->custom_fields || $this->custom_fields->loaded()) && $this->imported;
-	}
-
-
-	/**
-	 * Magic method to load async properties
+	 * Magic method to load properties
 	 *
-	 * @param $method
-	 * @param $arguments
+	 */
+    public function __toArray() {
+
+        $data = [];
+
+        $reflection = new ReflectionObject($this);
+        $properties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+
+        foreach ($properties as $property){
+
+            $name = $property->name;
+            $data[$name] = $this->$name;
+        }
+
+        $methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
+
+        foreach ($methods as $method){
+
+            $name = $method->name;
+            if( substr($name,0,3) == 'get'){
+
+                $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', preg_replace('/get(.*)/', '$1', $name)));
+                $data[$key] = new DataHelper($this, $name, $key);
+            }
+        }
+
+        return $data;
+	}
+
+    private function getMethodName($id){
+
+        return 'get'.str_replace(' ', '', ucwords(strtolower(str_replace('_', ' ', $id))));
+    }
+
+
+	/**
+	 * Magic method to load properties
+     * todo: to be deprecated
+	 *
+	 * @param $id
 	 * @return string
 	 */
-	public function __call($method, $arguments) {
+	public function __get($id) {
 
-		$this->load();
-		return isset($this->$method)?$this->$method:'';
+        $method = $this->getMethodName($id);
+
+		if( method_exists($this, $method) )
+			return call_user_func([$this, $method]);
+        elseif( $this->metafields && $this->metafields->has($id) )
+            return $this->metafields->getValue($id);
+
+		return null;
 	}
 
 
 	/**
-	 * Return true if id exists
+	 * Magic method to load properties from call
+     * todo: to be deprecated
+	 *
+	 * @param $id
+	 * @param $args
+	 * @return string
 	 */
-	public function exist()
+	public function __call($id, $args) {
+
+        $method = $this->getMethodName($id);
+
+		if( method_exists($this, $method) )
+			return call_user_func_array([$this, $method], $args);
+
+		return null;
+	}
+
+
+	/**
+	 * Magic method to check properties
+     * todo: to be deprecated
+	 *
+	 * @param $id
+	 * @return string
+	 */
+	public function __isset($id) {
+
+        $method = $this->getMethodName($id);
+
+		return method_exists($this, $method) || ($this->metafields && $this->metafields->has($id));
+	}
+
+
+    /**
+     * Return true if id exists
+     * @return bool
+     */
+    public function exist()
 	{
 		return is_int( $this->ID );
 	}
 
 
-	/**
-	 * Load ACFHelper Fields
-	 */
-	public function load()
+    /**
+     * load custom fields data
+     * @param $id
+     * @param $type
+     */
+	protected function loadMetafields($id, $type)
 	{
-		if( !$this->loaded() )
-			$this->bindCustomFields(true);
+		if( $this->metafields )
+			return;
+
+        if( class_exists('ACF') )
+	        $this->metafields = new ACFHelper( $id, $type );
 	}
 
+    /**
+     * @param $date
+     * @return mixed|void
+     */
+    protected function formatDate($date){
 
-	/**
-	 * load custom fields data
-	 * @param $id
-	 */
-	protected function addCustomFields( $id)
-	{
-        if( class_exists('ACF') && !$this->custom_fields )
-		{
-			$this->custom_fields = new ACFHelper( $id );
-			$this->bindCustomFields();
-		}
-	}
+        if( !self::$date_format )
+            self::$date_format = get_option('date_format');
 
-
-	/**
-	 * Bind custom fields as members of the post
-	 * @param bool $force
-	 */
-	protected function bindCustomFields($force=false )
-	{
-		if( $this->custom_fields )
-		{
-			$objects = $this->custom_fields->loadFromCache($force);
-			
-			if( $objects && is_array($objects) )
-			{
-				foreach ($objects as $name => $value )
-				{
-					$this->$name = $value;
-				}
-			}
-		}
-	}
-
-
-	/**
-	 * @param $object
-	 * @param bool $remove
-	 * @param bool $replace
-	 * @return array|bool
-	 */
-	public static function normalize($object, $remove=false, $replace=false)
-	{
-		if( is_object($object) )
-			$object = get_object_vars($object);
-
-		if( !is_array($object) )
-			return false;
-
-		if( isset($object['url']) )
-			$object['link'] = $object['url'];
-
-		if( isset($object['post_author']) && is_string($object['post_author']) )
-			$object['post_author'] = intval($object['post_author']);
-
-		if( isset($object['comment_count']) && is_string($object['comment_count']) )
-			$object['comment_count'] = intval($object['comment_count']);
-
-		if( isset($object['name']) && !isset($object['title']) )
-			$object['title'] = $object['name'];
-
-		if( !self::$date_format )
-			self::$date_format = get_option('date_format');
-
-		if( isset($object['post_date']) ){
-			$object['post_date'] = (string) mysql2date( self::$date_format, $object['post_date']);
-			$object['post_date'] = apply_filters('get_the_date', $object['post_date'], self::$date_format);
-		}
-
-		if( isset($object['post_modified']) ){
-			$object['post_modified'] = (string) mysql2date( self::$date_format, $object['post_modified']);
-			$object['post_modified'] = apply_filters('get_the_date', $object['post_modified'], self::$date_format);
-		}
-
-		foreach(self::$remove as $prop){
-
-			if( isset($object[$prop]) )
-				unset($object[$prop]);
-		}
-
-		if( isset($object['classes']) && count($object['classes']) )
-		{
-			if( empty($object['classes'][0]))
-				array_shift($object['classes']);
-
-			$object['class'] = implode(' ', $object['classes']);
-		}
-
-		if( $remove )
-		{
-			foreach($object as $key=>$value)
-			{
-				if( strpos($key, $remove) === 0 )
-					unset($object[$key]);
-			}
-		}
-
-		foreach($object as $key=>$value)
-		{
-			if($replace && strpos($key, $replace) === 0 ){
-
-				$new_key = str_replace($replace,'', $key);
-
-				if( !isset($object[$new_key]) || empty($object[$new_key]))
-					$object[$new_key] = $value;
-
-				unset($object[$key]);
-			}
-		}
-
-		return $object;
+		$date = (string) mysql2date( self::$date_format, $date);
+        return apply_filters('get_the_date', $date, self::$date_format);
 	}
 }

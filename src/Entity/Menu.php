@@ -21,17 +21,19 @@ class Menu extends Entity
 	private $menuItemClass;
 	private $args;
 
+    public static $locations;
+
     public function __toString()
     {
         return $this->title;
     }
 
-	/**
-	 * Menu constructor.
-	 * @param int $slug
-	 * @param array $args
-	 */
-	public function __construct($slug = 0, $args = [] ) {
+    /**
+     * Menu constructor.
+     * @param int $id
+     * @param array $args
+     */
+	public function __construct($id, $args = [] ) {
 
 		$this->args = $args;
 
@@ -42,27 +44,24 @@ class Menu extends Entity
 		else
 			$this->menuItemClass = 'Metabolism\WordpressBundle\Entity\MenuItem';
 
-		$menu_id = false;
-		$locations = get_nav_menu_locations();
+        if( is_string($id) )
+            $id = $this->getMenuIdFromLocations($id);
 
-		if ( $slug != 0 && is_numeric($slug) )
-			$menu_id = $slug;
-		else if ( is_array($locations) && count($locations) )
-			$menu_id = $this->get_menu_id_from_locations($slug, $locations);
-		else if ( $slug === false )
-			$menu_id = false;
+		if ( $id && $menu = $this->get($id) ){
 
-		if ( $menu_id && $menu = $this->get($menu_id) ){
+            $this->ID = $id;
+            $this->title = $menu->name;
+            $this->slug = $menu->slug;
+            $this->description = $menu->description;
 
-			if( !isset($args['depth']) || $args['depth'] )
-				$this->addCustomFields($menu_id);
-		}
+            $this->loadMetafields($id, 'menu');
+        }
 	}
 
 
 	/**
 	 * @param $menu_id
-	 * @return bool
+	 * @return false|\WP_Term
 	 */
 	protected function get($menu_id )
 	{
@@ -81,14 +80,7 @@ class Menu extends Entity
 		if( $_config->get('menu.depth',  true) )
 			$this->items = $this->addDepth();
 
-		$menu_info = wp_get_nav_menu_object($menu_id);
-
-		$this->ID = $menu_id;
-		$this->title = $menu_info->name;
-		$this->slug = $menu_info->slug;
-		$this->description = $menu_info->description;
-
-		return true;
+        return wp_get_nav_menu_object($menu_id);
 	}
 
 
@@ -118,16 +110,17 @@ class Menu extends Entity
 	/**
 	 * @internal
 	 * @param string $slug
-	 * @param array $locations
 	 * @return false|integer
 	 */
-	protected function get_menu_id_from_locations( $slug, $locations )
+	protected function getMenuIdFromLocations( $slug )
 	{
-		if ( isset($locations[$slug]) ) {
-			$menu_id = $locations[$slug];
-			if ( function_exists('wpml_object_id_filter') ) {
-				$menu_id = wpml_object_id_filter($locations[$slug], 'nav_menu');
-			}
+        if( is_null(self::$locations) )
+            self::$locations = get_nav_menu_locations();
+
+        if ( is_array(self::$locations) && count(self::$locations) && $menu_id = (self::$locations[$slug]??false) ) {
+
+			if ( function_exists('wpml_object_id_filter') )
+				$menu_id = wpml_object_id_filter($menu_id, 'nav_menu');
 
 			return $menu_id;
 		}

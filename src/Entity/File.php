@@ -17,18 +17,20 @@ class File extends Entity
 	public $link;
 	public $mime_type;
 	public $extension;
-	public $date;
-	public $date_gmt;
-	public $modified;
-	public $modified_gmt;
 	public $title;
 	public $caption;
 	public $description;
 	public $size;
 
-	private $args = [];
+    protected $alt;
+    protected $date;
+    protected $date_gmt;
+    protected $modified;
+    protected $modified_gmt;
+    protected $src;
 
-	protected $src;
+    private $post;
+    private $args = [];
 
     public function __toString()
     {
@@ -43,13 +45,10 @@ class File extends Entity
 	 */
 	public function __construct($id=null, $args=[]) {
 
-		global $_config;
-
 		$this->args = $args;
 
-		if( $data = $this->get($id) )
-			$this->import($data, false, 'post_');
-	}
+		$this->get($id);
+    }
 
 
 	protected function uploadDir($field)
@@ -71,85 +70,115 @@ class File extends Entity
 
 
 	/**
-	 * Remove useless data
+	 * Get file data
 	 * @param $id
-	 * @return array|bool|\WP_Post|null
+	 * @return void
 	 */
 	protected function get($id)
 	{
-		$post = $metadata = false;
+        if( is_numeric($id) ){
 
-		if( is_numeric($id) ){
+            if( $post = get_post($id) ) {
 
-			$metadata = wp_get_attachment_metadata($id);
-			$post = get_post($id, ARRAY_A);
-			$post_meta = get_post_meta($id);
+                if( is_wp_error($post) )
+                    return;
 
-			if( !$post || is_wp_error($post) )
-				return false;
+                $file = get_post_meta($id, '_wp_attached_file', true);
+                $filename = $this->uploadDir('basedir').'/'.$file;
 
-			if( !is_array($metadata) )
-				$metadata = [];
+                if( !file_exists( $filename) )
+                    return;
 
-			$metadata['file'] = get_post_meta($id, '_wp_attached_file', true);
+                $this->ID = $post->ID;
+                $this->caption = $post->post_excerpt;
+                $this->description = $post->post_content;
+                $this->file = $file;
+                $this->src = $filename;
+                $this->post = $post;
+                $this->title = $post->post_title;
+                $this->mime_type = $post->post_mime_type;
+            }
+        }
+        else{
 
-			if( !$metadata['file'] )
-				return false;
+            $filename = BASE_URI.$id;
 
-			$metadata['src']  = $this->uploadDir('basedir').'/'.$metadata['file'];
-			$metadata['src']  = str_replace(WP_FOLDER.'/..', '', $metadata['src']);
+            if( !file_exists( $filename) || is_dir( $filename ) )
+                return;
 
-			if( !file_exists($metadata['src']) )
-				return false;
+            $this->ID = 0;
+            $this->file = $id;
+            $this->src = $filename;
+            $this->post = false;
+            $this->title = str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME));
+            $this->mime_type = mime_content_type($filename);
+        }
 
-			$metadata['file'] = $this->uploadDir('relative').'/'.$metadata['file'];
+        if( $this->src ){
 
-			$post['mime_type'] = mime_content_type($metadata['src']);
-			$post['extension'] = pathinfo($metadata['src'], PATHINFO_EXTENSION);
-			$post['caption'] = $post['post_excerpt'];
-			$post['description'] = $post['post_content'];
-			$post['size'] = filesize($metadata['src']);
-			$post['link'] = $post['url'] = home_url($metadata['file']);
-
-			unset($post['post_category'], $post['tags_input'], $post['page_template'], $post['ancestors']);
-		}
-		elseif( is_string($id) ){
-
-			$filename = BASE_URI.$id;
-
-			if( !file_exists( $filename) )
-				return false;
-
-			$post = $post_meta = [];
-
-			$image_size = getimagesize($filename);
-
-			$metadata = [
-				'src' => $filename,
-				'file' => str_replace(PUBLIC_DIR, '', $id),
-				'link' => home_url(str_replace(PUBLIC_DIR, '', $id)),
-				'size' => filesize($filename),
-				'mime_type' => $image_size['mime'],
-				'post_title' => str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME)),
-				'post_date' => filemtime($filename),
-				'post_date_gmt' => date("Y-m-d H:i:s", filemtime($filename)),
-				'post_modified' => filectime($filename),
-				'post_modified_gmt' => date("Y-m-d H:i:s", filectime($filename))
-			];
-
-			$metadata['url'] = $metadata['link'];
-		}
-
-		if( is_array($metadata) )
-			return array_merge($post, $metadata);
-		else
-			return $post;
-	}
+            $this->link = home_url($this->file);
+            $this->extension = pathinfo($this->src, PATHINFO_EXTENSION);
+            $this->size = filesize($this->src);
+        }
+    }
 
 
 	public function getSrc(){
+
 		return $this->src;
 	}
+
+    public function getDate(){
+
+        if( is_null($this->date) ){
+
+            if( $this->post )
+                $this->date = $this->formatDate($this->post->post_date);
+            else
+                $this->date = $this->formatDate(filemtime($this->src));
+        }
+
+        return $this->date;
+    }
+
+    public function getModified(){
+
+        if( is_null($this->modified) ){
+
+            if( $this->post )
+                $this->modified = $this->formatDate($this->post->post_modified);
+            else
+                $this->modified = $this->formatDate(filectime($this->src));
+        }
+
+        return $this->modified;
+    }
+
+    public function getDateGmt(){
+
+        if( is_null($this->date_gmt) ){
+
+            if( $this->post )
+                $this->date_gmt = $this->formatDate($this->post->post_date_gmt);
+            else
+                $this->date_gmt = $this->formatDate(filemtime($this->src));
+        }
+
+        return $this->date_gmt;
+    }
+
+    public function getModifiedGmt(){
+
+        if( is_null($this->modified_gmt) ){
+
+            if( $this->post )
+                $this->modified_gmt = $this->formatDate($this->post->post_modified_gmt);
+            else
+                $this->modified_gmt = $this->formatDate(filectime($this->src));
+        }
+
+        return $this->modified_gmt;
+    }
 
 
 	/**

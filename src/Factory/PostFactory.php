@@ -13,7 +13,7 @@ class PostFactory {
 	 */
 	public static function create($id=null, $post_type = false, $args = []){
 
-		if( is_null($id) || empty($id) ){
+		if( is_null($id) || empty($id) || !$id ){
 
 			return false;
 		}

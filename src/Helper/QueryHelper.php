@@ -5,7 +5,7 @@ namespace Metabolism\WordpressBundle\Helper;
 use Metabolism\WordpressBundle\Entity\Post;
 use Metabolism\WordpressBundle\Entity\Term;
 use Metabolism\WordpressBundle\Factory\PostFactory;
-use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
+use Metabolism\WordpressBundle\Factory\TermFactory;
 
 /**
  * Class QueryHelper
@@ -14,12 +14,7 @@ use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
  */
 class QueryHelper
 {
-	public static function get_fields($id)
-	{
-		$acf_helper = new ACFHelper($id);
-		return $acf_helper->get();
-	}
-
+	
 	/**
 	 * QueryHelper terms
 	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
@@ -35,7 +30,7 @@ class QueryHelper
 		$terms = get_terms( $args );
 
 		foreach ($terms as &$term) {
-			$term = TaxonomyFactory::create( $term );
+			$term = TermFactory::create( $term );
 		}
 
 		return is_wp_error($terms) ? [] : array_filter($terms);
@@ -98,7 +93,7 @@ class QueryHelper
 		$term = get_term_by( $field, $value, $taxonomy );
 
 		if( $term )
-			return TaxonomyFactory::create( $term );
+			return TermFactory::create( $term );
 		else
 			return false;
 	}

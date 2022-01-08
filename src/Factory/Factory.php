@@ -96,10 +96,10 @@ class Factory {
 			}
 		}
 
-		if( is_wp_error($item) || !$item->exist() )
+		if( is_wp_error($item) || !$item || !$item->exist() )
 			$item = false;
 
-		if( !$item || $item->loaded() )
+		if( !$item )
 			self::saveToCache($id, $item, $class, $args);
 
 		return $item;

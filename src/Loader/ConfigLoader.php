@@ -45,6 +45,40 @@ class ConfigLoader {
         }
 
         /**
+         * Load Composer
+         */
+
+        $composer = BASE_URI.'/composer.json';
+
+        $wp_path = 'pubic/edition/';
+        $wp_muplugin_path = 'pubic/wp-bundle/mu-plugins/';
+        $wp_plugin_path = 'pubic/wp-bundle/plugins/';
+
+        // get Wordpress path
+        if( file_exists($composer) ){
+
+            $composer = json_decode(file_get_contents($composer), true);
+            $installer_paths= $composer['extra']['installer-paths']??[];
+
+            foreach ($installer_paths as $installer_path=>$types){
+
+                if( in_array("type:wordpress-core", $types) )
+                    $wp_path = $installer_path;
+
+                if( in_array("type:wordpress-muplugin", $types) )
+                    $wp_muplugin_path = str_replace('{$name}/', '', $installer_path);
+
+                if( in_array("type:wordpress-plugin", $types) )
+                    $wp_plugin_path = str_replace('{$name}/', '', $installer_path);
+            }
+        }
+
+        $folders = array_filter(explode('/', $wp_path));
+
+        $wp_folder = end($folders);
+        $public_folder = reset($folders);
+
+        /**
          * Load App configuration
          */
         global $_config;
@@ -117,7 +151,7 @@ class ConfigLoader {
             $wp_home = ( $isSecure ? 'https' : 'http' ) . '://'.trim($_SERVER['HTTP_HOST'], '/');
         }
 
-        define( 'WP_FOLDER', '/edition' );
+        define( 'WP_FOLDER', '/'.$wp_folder);
 
         if( !defined('WP_HOME') )
             define( 'WP_HOME', $wp_home);
@@ -181,7 +215,7 @@ class ConfigLoader {
         /**
          * Redefine cookie name without wordpress
          */
-        define( 'COOKIEHASH',           md5( WP_SITEURL )    );
+        define( 'COOKIEHASH', md5( WP_SITEURL )    );
 
         if( $cookie_prefix = env('COOKIE_PREFIX') ) {
 
@@ -198,7 +232,7 @@ class ConfigLoader {
          */
 
         if (!defined('PUBLIC_DIR'))
-            define( 'PUBLIC_DIR', '/public');
+            define( 'PUBLIC_DIR', '/'.$public_folder);
 
         if (!defined('WP_CONTENT_DIR'))
             define( 'WP_CONTENT_DIR', BASE_URI . PUBLIC_DIR . '/wp-bundle');
@@ -229,6 +263,9 @@ class ConfigLoader {
 
         if (!defined('DISABLE_WP_CRON'))
             define('DISABLE_WP_CRON', true);
+
+        if (!defined('WP_DISABLE_FATAL_ERROR_HANDLER'))
+            define( 'WP_DISABLE_FATAL_ERROR_HANDLER', true );
 
         /**
          * Bootstrap WordPress

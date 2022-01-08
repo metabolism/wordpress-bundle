@@ -290,10 +290,15 @@ class ConfigPlugin {
      */
     private function getSlug($entity){
 
-        $slug = get_option( $entity. '_rewrite_slug' );
+        if( !$slug = wp_cache_get( $entity, 'rewrite_slug' ) ){
 
-        $slug = preg_replace('/^%/', '{', preg_replace('/%$/', '}', $slug));
-        $slug = preg_replace('/%\//', '}/', preg_replace('/\/%/', '/{', $slug));
+            $slug = get_option( $entity. '_rewrite_slug' );
+
+            $slug = preg_replace('/^%/', '{', preg_replace('/%$/', '}', $slug));
+            $slug = preg_replace('/%\//', '}/', preg_replace('/\/%/', '/{', $slug));
+
+            wp_cache_set( $entity, $slug, 'rewrite_slug' );
+        }
 
         return $slug;
     }
@@ -515,13 +520,16 @@ class ConfigPlugin {
     /**
      * Set permalink structure
      */
-    public function setPermalink()
+    public function setPermalinkStructure()
     {
         global $wp_rewrite;
+	    $permalink_structure = $this->config->get('permalink_structure', '/%postname%');
 
-        $wp_rewrite->set_permalink_structure($this->config->get('permalink_structure', '/%postname%'));
+		if( $wp_rewrite->permalink_structure != $permalink_structure ){
 
-        update_option( 'rewrite_rules', FALSE );
+		    $wp_rewrite->set_permalink_structure($permalink_structure);
+		    update_option( 'rewrite_rules', FALSE );
+	    }
     }
 
 
@@ -600,7 +608,6 @@ class ConfigPlugin {
             }, 'permalink', 'custom_taxonomy_rewrite' );
         }
 
-
         if( $updated )
             do_action('reset_cache');
     }
@@ -641,7 +648,7 @@ class ConfigPlugin {
     }
 
 
-    public function loadJS(){
+    public function adminHead(){
 
         echo '<script>jQuery(document).ready(function(jQuery){';
 
@@ -654,6 +661,25 @@ class ConfigPlugin {
         }
 
         echo '})</script>';
+        echo "\n";
+
+		$entrypoints = BASE_URI . '/public/build/entrypoints.json';
+
+		if( file_exists($entrypoints) ){
+
+			$entrypoints = json_decode(file_get_contents($entrypoints), true);
+
+			if( $entrypoints = $entrypoints['entrypoints']['backoffice']??false ){
+
+				foreach ($entrypoints['js']??[] as $file)
+					echo '<script src="'.$file.'"></script>';
+
+				foreach ($entrypoints['css']??[] as $file)
+					echo '<link rel="stylesheet" href="'.$file.'" media="all"/>';
+			}
+
+			echo "\n";
+		}
     }
 
 
@@ -773,23 +799,6 @@ class ConfigPlugin {
         }
     }
 
-    public function addStickySupport(){
-
-        global $post, $typenow;
-
-        $post_supports = $this->config->get('post_type.'.$typenow.'.supports', []);
-
-        if ( in_array('sticky', $post_supports) && current_user_can( 'edit_others_posts' ) ) : ?>
-            <script>
-                jQuery(function($) {
-                    var sticky = "<br/><span id='sticky-span'><input type='checkbox' style='display:none' name='hidden_post_sticky' id='hidden-post-sticky' value='sticky' <?php checked( is_sticky( $post->ID ) ); ?> /> <input id='sticky' name='sticky' type='checkbox' value='sticky' <?php checked( is_sticky( $post->ID ) ); ?> /> <label for='sticky' class='selectit'><?php _e( 'Sticky Post' ); ?></label><br /></span>";
-                    $('[for=visibility-radio-public]').append(sticky);
-                    $('#post-visibility-select .save-post-visibility').click()
-                });
-            </script>
-        <?php endif;
-    }
-
 
     /**
      * ConfigPlugin constructor.
@@ -821,16 +830,13 @@ class ConfigPlugin {
 
             if( !HEADLESS || URL_MAPPING ){
 
-                $this->setPermalink();
+                $this->setPermalinkStructure();
 
                 add_filter( 'post_type_link', [$this, 'updatePostTypePermalink'], 10, 2);
                 add_filter( 'term_link', [$this, 'updateTermPermalink'], 10, 2);
             }
 
             if( is_admin() ){
-
-                add_action( 'admin_footer-post.php', [$this, 'addStickySupport'] );
-                add_action( 'admin_footer-post-new.php', [$this, 'addStickySupport'] );
 
                 $this->addTableViews();
 
@@ -839,7 +845,12 @@ class ConfigPlugin {
             }
         });
 
-        add_action('switch_blog', [$this, 'reload']);
+        add_action('switch_blog', function($new_blog_id, $prev_blog_id){
+
+            if( $new_blog_id != $prev_blog_id )
+                $this->reload();
+
+        }, 10, 2);
 
         // When viewing admin
         if( is_admin() )
@@ -847,7 +858,7 @@ class ConfigPlugin {
             if( !HEADLESS || URL_MAPPING )
                 add_action( 'load-options-permalink.php', [$this, 'LoadPermalinks']);
 
-            add_action('admin_head', [$this, 'loadJS']);
+            add_action('admin_head', [$this, 'adminHead']);
         }
     }
 }

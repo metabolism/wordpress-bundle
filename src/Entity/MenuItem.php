@@ -15,16 +15,22 @@ class MenuItem extends Entity
     /** @var MenuItem[] $children */
     public $children;
 
+	public $classes;
 	public $class;
 	public $description;
     public $link;
     public $menu_order;
-    /** @var bool $menu_item_parent */
     public $menu_item_parent;
     public $object;
     public $object_id;
     public $target;
 	public $title;
+	public $type;
+	public $current;
+	public $current_item_ancestor;
+	public $current_item_parent;
+
+    private $post;
 
     public function __toString()
     {
@@ -33,21 +39,32 @@ class MenuItem extends Entity
 
 	/**
 	 * MenuItem constructor.
-	 * @param $data
+	 * @param \WP_Post $post
 	 * @param array $args
 	 */
-	public function __construct($data, $args = [] ) {
+	public function __construct($post, $args = [] ) {
 		
-		if ( $data ){
-			$this->import($data, false, 'post_');
+		if ( $post ){
 
-			$this->object_id = intval($this->object_id);
-			$this->menu_item_parent = intval($this->menu_item_parent);
+			$this->post = $post;
 
-			unset($this->date, $this->date_gmt, $this->modified, $this->modified_gmt, $this->name);
+			$this->ID = $post->ID;
+			$this->object_id = intval($post->object_id);
+			$this->menu_item_parent = $post->menu_item_parent;
+            $this->menu_order = $post->menu_order;
+            $this->link = $post->url;
+			$this->title = $post->title;
+			$this->target = $post->target;
+			$this->class = implode(' ', $post->classes);
+			$this->classes = $post->classes;
+			$this->object = $post->object;
+			$this->type = $post->type;
+			$this->description = $post->description;
+            $this->current = $post->current;
+            $this->current_item_ancestor = $post->current_item_ancestor;
+            $this->current_item_parent = $post->current_item_parent;
 
-			if( !isset($args['depth']) || $args['depth'] )
-				$this->addCustomFields($this->ID);
+			$this->loadMetafields($this->ID, 'menuItem');
 		}
 	}
 }

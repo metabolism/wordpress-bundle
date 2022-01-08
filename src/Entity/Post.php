@@ -4,7 +4,7 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
-use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
+use Metabolism\WordpressBundle\Factory\TermFactory;
 use Metabolism\WordpressBundle\Helper\QueryHelper;
 
 /**
@@ -16,37 +16,46 @@ class Post extends Entity
 {
 	public $entity = 'post';
 
-    public $author;
-    public $class;
     public $comment_status;
     public $comment_count;
-    public $content;
-    public $date;
-    public $date_gmt;
-    public $excerpt ='';
-	public $link = '';
     public $menu_order;
-    public $modified;
-    public $modified_gmt;
-    public $parent;
     public $password;
     public $slug;
 	public $status;
-    public $sticky;
-    public $template = '';
-    /** @var Image|bool */
-    public $thumbnail = false;
     public $title;
 	public $type;
+	public $public;
 
-	private $_next = null;
-	private $_prev = null;
-	private $_post = null;
+	/** @var Image|bool */
+	protected $thumbnail;
+	/** @var Post[] */
+	protected $ancestors;
+	/** @var Post */
+	protected $parent;
+	/** @var User */
+	protected $author;
+	protected $template;
+	protected $content;
+	protected $class;
+	protected $link;
+	protected $sticky;
+	protected $excerpt;
+	/** @var Post */
+	protected $next;
+	/** @var Post */
+	protected $prev;
+	protected $date;
+	protected $date_gmt;
+	protected $modified;
+	protected $modified_gmt;
+
+	/** @var \WP_Post|bool */
+	private $post;
 	private $args = [];
 
-    public function __toString()
-    {
-        return $this->title;
+    public function __toString(){
+
+        return $this->title??'Invalid post';
     }
     
 	/**
@@ -61,82 +70,145 @@ class Post extends Entity
 
 		if( $post = $this->get($id) ) {
 
-			$this->import($post, false, 'post_');
+			$this->ID = $post->ID;
+			$this->comment_status = $post->comment_status;
+			$this->comment_count = $post->comment_count;
+			$this->menu_order = $post->menu_order;
+			$this->password = $post->post_password;
+			$this->slug = $post->post_name;
+			$this->status = $post->post_status;
+			$this->title = $post->post_title;
+			$this->type = $post->post_type;
+			$this->public = is_post_type_viewable($post->post_type);
 
-			if( !isset($args['depth']) || $args['depth'] )
-				$this->addCustomFields($post->ID);
-		}
-	}
-
-
-    /**
-	 * Validate class
-	 * @param \WP_Post $post
-	 * @return bool
-	 */
-	protected function isValidClass($post){
-
-		$class =  explode('\\', get_class($this));
-		$class =  end($class);
-
-		return $class == "Post" || Factory::getClassname($post->post_type) == $class;
+			$this->loadMetafields($this->ID, 'post');
+        }
 	}
 
 
 	/**
 	 * @param $pid
-	 * @return array|bool|\WP_Post|null
+	 * @return \WP_Post|false
 	 */
-	protected function get($pid ) {
+	protected function get($pid) {
 
 		if( $post = get_post($pid) ) {
 
-			if( is_wp_error($post) || !$this->isValidClass($post) )
+			if( is_wp_error($post) || !$post )
 				return false;
 
-			$this->_post = clone $post;
-
-			if( !HEADLESS || URL_MAPPING )
-				$post->link = get_permalink( $post );
-
-			$post->template = get_page_template_slug( $post );
-			$post->thumbnail = get_post_thumbnail_id( $post );
-			$post->class = implode(' ', get_post_class());
-			$post->sticky = is_sticky($pid);
-
-			if( $post->thumbnail ){
-
-				global $_config;
-				$return_format = $_config->get('image.return_format', false);
-				
-				if( $return_format == 'url'){
-
-					$attachment = wp_get_attachment_image_src($post->thumbnail, 'full');
-
-					if( $attachment )
-						$post->thumbnail = $attachment[0];
-					else
-						$post->thumbnail = false;
-				}
-				elseif( $return_format != 'id'){
-
-					$post->thumbnail = Factory::create($post->thumbnail, 'image');
-				}
-			}
-
-			$post->slug = $post->post_name;
-
-			$post_content = get_the_content(null, false, $post);
-			$post_content = apply_filters( 'the_content', $post_content );
-			$post_content = str_replace( ']]>', ']]&gt;', $post_content );
-
-			$post->post_content = $post_content;
-			$post->post_excerpt = get_the_excerpt($post);
-
-			unset($post->post_name);
+			$this->post = $post;
 		}
 
 		return $post;
+	}
+
+	public function getDate(){
+
+		if( is_null($this->date) )
+			$this->date = $this->formatDate($this->post->post_date);
+
+		return $this->date;
+	}
+
+	public function getModified(){
+
+		if( is_null($this->modified) )
+			$this->modified = $this->formatDate($this->post->post_modified);
+
+		return $this->modified;
+	}
+
+	public function getDateGmt(){
+
+		if( is_null($this->date_gmt) )
+			$this->date_gmt = $this->formatDate($this->post->post_date_gmt);
+
+		return $this->date_gmt;
+	}
+
+	public function getModifiedGmt(){
+
+		if( is_null($this->modified_gmt) )
+			$this->modified_gmt = $this->formatDate($this->post->post_modified_gmt);
+
+		return $this->modified_gmt;
+	}
+
+	public function getExcerpt(){
+
+		if( is_null($this->excerpt) )
+			$this->excerpt = apply_filters( 'get_the_excerpt', $this->post->post_excerpt, $this->post );
+
+		return $this->excerpt;
+	}
+
+	public function getAuthor(){
+
+		if( is_null($this->author) )
+			$this->author = Factory::create($this->post->post_author, 'user');
+
+		return $this->author;
+	}
+
+	public function getClass(){
+
+		if( is_null($this->class) )
+			$this->class = implode(' ', get_post_class('', $this->post));
+
+		return $this->class;
+	}
+
+	public function getSticky(){
+
+		if( is_null($this->sticky) )
+			$this->sticky = is_sticky($this->post->ID);
+
+		return $this->sticky;
+	}
+
+	public function getLink(){
+
+		if( is_null($this->link) && $this->public )
+			$this->link = get_permalink( $this->post );
+
+		return $this->link;
+	}
+
+	public function getContent(){
+
+		if( is_null($this->content) ){
+
+			$post_content = get_the_content(null, false, $this->post);
+			$post_content = apply_filters( 'the_content', $post_content );
+			$post_content = str_replace( ']]>', ']]&gt;', $post_content );
+
+			$this->content = $post_content;
+		}
+
+		return $this->content;
+
+	}
+
+	public function getTemplate(){
+
+		if( is_null($this->template) )
+			$this->template = get_page_template_slug( $this->post );
+
+		return $this->template;
+	}
+
+	public function getThumbnail(){
+
+		if( is_null($this->thumbnail) ){
+
+			$post_thumbnail_id = get_post_thumbnail_id( $this->post );
+
+			if( $post_thumbnail_id )
+				$this->thumbnail = Factory::create($post_thumbnail_id, 'image');
+		}
+
+		return $this->thumbnail;
 	}
 
 
@@ -168,7 +240,7 @@ class Post extends Entity
 		global $post;
 		
 		$old_global = $post;
-		$post = $this->_post;
+		$post = $this->post;
 
 		if( $direction === 'prev')
 			$sibling = get_previous_post($in_same_term , $excluded_terms, $taxonomy);
@@ -177,7 +249,7 @@ class Post extends Entity
 
 		$post = $old_global;
 
-		if( $sibling && $sibling instanceof \WP_Post)
+		if( $sibling instanceof \WP_Post)
 			return PostFactory::create($sibling->ID);
 		else
 			return false;
@@ -193,14 +265,23 @@ class Post extends Entity
 	 * @param string $taxonomy
 	 * @return Post|false
 	 */
-	public function next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
+	public function getNext($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
 
-		if( !is_null($this->_next) )
-			return $this->_next;
+		if( is_null($this->next) )
+			$this->next = $this->getSibling('next', $in_same_term , $excluded_terms, $taxonomy);
 
-		$this->_next = $this->getSibling('next', $in_same_term , $excluded_terms, $taxonomy);
+		return $this->next;
+	}
 
-		return $this->_next;
+
+	/**
+	 * Has parent post
+	 *
+	 * @return bool
+	 */
+	public function hasParent() {
+
+		return $this->post->post_parent > 0;
 	}
 
 
@@ -211,10 +292,30 @@ class Post extends Entity
 	 */
 	public function getParent() {
 
-		if( $this->parent )
-			return PostFactory::create($this->parent);
+		if( is_null($this->parent) )
+			$this->parent = PostFactory::create($this->post->post_parent);
 
-		return false;
+		return $this->parent;
+	}
+
+	public function getAncestors($reverse=true){
+
+		if( is_null($this->ancestors) ){
+
+			$parents_id = get_post_ancestors($this->ID);
+
+			if( $reverse )
+				$parents_id = array_reverse($parents_id);
+
+			$ancestors = [];
+
+			foreach ($parents_id as $post_id)
+				$ancestors[] = PostFactory::create($post_id);
+
+			$this->ancestors = $ancestors;
+		}
+
+		return $this->ancestors;
 	}
 
 
@@ -237,11 +338,14 @@ class Post extends Entity
 		$args = array_merge($default_args, $args);
 
 		$comments_id = get_comments($args);
+
 		$comments = [];
 
 		foreach ($comments_id as $comment_id)
 		{
-			$comments[$comment_id] = Factory::create($comment_id, 'comment');
+            /** @var Comment $comment */
+            $comment = Factory::create($comment_id, 'comment');
+			$comments[$comment_id] = $comment;
 		}
 
 		foreach ($comments as $comment)
@@ -266,13 +370,12 @@ class Post extends Entity
 	 * @param string $taxonomy
 	 * @return Post|false
 	 */
-	public function prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
+	public function getPrev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category') {
 
-		if( !is_null($this->_prev) )
-			return $this->_prev;
+		if( is_null($this->prev) )
+			$this->prev = $this->getSibling('prev', $in_same_term , $excluded_terms, $taxonomy);
 
-		$this->_prev = $this->getSibling('prev', $in_same_term , $excluded_terms, $taxonomy);
-		return $this->_prev;
+		return $this->prev;
 	}
 
 
@@ -342,9 +445,9 @@ class Post extends Entity
 				foreach ($terms as $term){
 
 					if( (!isset($args['hierarchical']) || $args['hierarchical']) && count($taxonomies)>1 )
-						$term_array[$taxonomy][] = TaxonomyFactory::create($term);
+						$term_array[$taxonomy][] = TermFactory::create($term);
 					else
-						$term_array[] = TaxonomyFactory::create($term);
+						$term_array[] = TermFactory::create($term);
 				}
 			}
 		}

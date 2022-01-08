@@ -12,7 +12,7 @@ namespace Metabolism\WordpressBundle\Extension;
 use Metabolism\WordpressBundle\Entity\Image;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
-use Metabolism\WordpressBundle\Factory\TaxonomyFactory;
+use Metabolism\WordpressBundle\Factory\TermFactory;
 
 use Twig\Extension\AbstractExtension,
 	Twig\TwigFilter,
@@ -55,7 +55,7 @@ class TwigExtension extends AbstractExtension{
 			new TwigFunction( 'wp_footer', function(){ return @$this->getOutput('wp_footer'); }, ['is_safe' => array('html')]  ),
 			new TwigFunction( 'Post', function($id){ return PostFactory::create($id); } ),
 			new TwigFunction( 'User', function($id){ return Factory::create($id, 'user'); } ),
-			new TwigFunction( 'Term', function($id){ return TaxonomyFactory::create($id); } ),
+			new TwigFunction( 'Term', function($id){ return TermFactory::create($id); } ),
 			new TwigFunction( 'Image', function($id, $path=false){ return Factory::create($id, 'image', false, ['path'=>$path]); } )
 		];
 	}

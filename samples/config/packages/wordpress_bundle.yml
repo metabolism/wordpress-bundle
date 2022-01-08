@@ -215,7 +215,6 @@ post_type: # https://developer.wordpress.org/reference/functions/register_post_t
       - title
       - excerpt
       - thumbnail
-      #- sticky
       #- editor
       #- author
       #- excerpt

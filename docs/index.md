@@ -487,6 +487,10 @@ class Guide extends Post
 
 Menu, Comment, MenuItem, Product, Term and User can be extended by creating the same file in the `/src/Entity` folder. 
 
+## Backoffice assets
+
+Bundle will autoload public/build/entrypoints.json js and css files for backoffice if exists, add an entry named `backoffice` in your webpack configuration
+
 ## Additional routes
 
 ### Site health
