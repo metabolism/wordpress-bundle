@@ -2,7 +2,6 @@
 
 namespace Metabolism\WordpressBundle\Service;
 
-
 use Metabolism\WordpressBundle\Entity\Menu;
 use Metabolism\WordpressBundle\Entity\Post;
 use Metabolism\WordpressBundle\Entity\Site;

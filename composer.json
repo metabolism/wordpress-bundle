@@ -40,6 +40,11 @@
   },
   "extra": {
     "post-package-install": {
+      "rename": {
+        "metabolism/wordpress-bundle": {
+          "config/packages/wordpress_bundle.yml": "config/packages/wordpress.yml"
+        }
+      },
       "create": {
         "metabolism/wordpress-bundle": {
           "public/uploads": 775,
@@ -51,7 +56,7 @@
       "copy": {
         "metabolism/wordpress-bundle": {
           "samples/public/wp-config.php": "public/wp-config.php",
-          "samples/config/packages/wordpress_bundle.yml": "config/packages/wordpress_bundle.yml"
+          "samples/config/packages/wordpress.yml": "config/packages/wordpress.yml"
         }
       },
       "symlink": {

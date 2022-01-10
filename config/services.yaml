@@ -5,8 +5,15 @@ services:
 
 
   Metabolism\WordpressBundle\:
-    resource: '../../'
+    resource: '../src/'
     exclude:
-      - '../../DependencyInjection/'
-      - '../../Resources/'
-      - '../../Tests/'
+      - '../src/DependencyInjection/'
+      - '../src/Controller/'
+      - '../src/Entity/'
+      - '../src/Extension/'
+      - '../src/Factory/'
+      - '../src/Helper/'
+      - '../src/Loader/'
+      - '../src/Plugin/'
+      - '../src/Provider/'
+      - '../src/Traits/'

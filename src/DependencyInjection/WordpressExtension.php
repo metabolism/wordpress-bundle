@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class WordpressBundleExtension extends Extension implements PrependExtensionInterface
+class WordpressExtension extends Extension implements PrependExtensionInterface
 {
 
     /**
@@ -19,7 +19,7 @@ class WordpressBundleExtension extends Extension implements PrependExtensionInte
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader =new YamlFileLoader($container,new FileLocator(__DIR__.'/../../config'));
+        $loader = new YamlFileLoader($container,new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.yaml');
     }
 
