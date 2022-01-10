@@ -1,6 +1,6 @@
 # Installation & Configuration
 
-### Configure database, table prefix ans security
+### Configure database, table prefix and security
 
 Edit or create `.env.local`
 
@@ -83,7 +83,7 @@ edit `.gitignore`
 
 ## Wordpress configuration
 
-When the bundle is installed, a default `wordpress_bundle.yml` is copied to `/config/packages`
+When the bundle is installed, a default `wordpress.yml` is copied to `/config/packages`
 
 This file allows you to manage :
  * Image options
@@ -108,11 +108,11 @@ This file allows you to manage :
 
 ### Multisite
 
-in the wordpress_bundle.yml, you can allow multisite installation, `install-multisite: true`
+in the wordpress.yml, you can allow multisite installation, `install-multisite: true`
 
 After running Tools > Network setup, add `WP_MULTISITE=1` in you .env.local file
 
-You can change multisite configuration in the wordpress_bundle.yml
+You can change multisite configuration in the wordpress.yml
 
 ```yml
 multisite:

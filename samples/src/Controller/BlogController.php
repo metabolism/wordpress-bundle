@@ -2,19 +2,18 @@
 
 namespace App\Controller;
 
-use App\Service\Context;
-
+use Metabolism\WordpressBundle\Service\ContextService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class BlogController extends AbstractController
 {
-	public function frontAction(Context $context)
+	public function frontAction(ContextService $context)
 	{
 		$context->add('section', 'Homepage');
 		return $this->render('generic.html.twig', $context->toArray());
 	}
 
-	public function pageAction(Context $context)
+	public function pageAction(ContextService $context)
 	{
 		$post = $context->getPost();
 
@@ -31,19 +30,19 @@ class BlogController extends AbstractController
 		return $this->render('generic.html.twig', $context->toArray());
 	}
 
-	public function guideAction(Context $context)
+	public function guideAction(ContextService $context)
 	{
 		$context->add('section', 'Single guide');
 		return $this->render('generic.html.twig', $context->toArray());
 	}
 
-	public function guideArchiveAction(Context $context)
+	public function guideArchiveAction(ContextService $context)
 	{
 		$context->add('section', 'Guide Archive');
 		return $this->render('generic.html.twig', $context->toArray());
 	}
 
-	public function categoryAction(Context $context)
+	public function categoryAction(ContextService $context)
 	{
 		$category = $context->getTerm();
 		$context->add('section', 'Single category : '.$category->title);
