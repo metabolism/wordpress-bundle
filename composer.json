@@ -71,6 +71,16 @@
         "metabolism/wordpress-bundle": {
           "config/packages/wordpress_bundle.yml": "config/packages/wordpress.yml"
         }
+      },
+      "symlink": {
+        "metabolism/wordpress-bundle": {
+          "samples/public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php"
+        }
+      },
+      "copy": {
+        "metabolism/wordpress-bundle": {
+          "samples/public/wp-config.php": "public/wp-config.php"
+        }
       }
     },
     "branch-alias": {
