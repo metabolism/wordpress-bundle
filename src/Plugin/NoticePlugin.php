@@ -26,6 +26,7 @@ class NoticePlugin {
 		global $wpdb, $table_prefix;
 
 		if( ($_GET['fix']??false) == 'database' ){
+
 			$wpdb->update($table_prefix."options", ['option_value' => WP_SITEURL], ['option_name' => 'siteurl']);
 			$wpdb->update($table_prefix."options", ['option_value' => WP_HOME], ['option_name' => 'home']);
 		}
@@ -35,20 +36,10 @@ class NoticePlugin {
             $controller = BASE_URI.'/src/Controller/'.$this->config->get('extra_permastructs.controller', 'BlogController').'.php';
             $template = BASE_URI.'/templates/generic.html.twig';
 
-            if( !file_exists($controller) )
+            if( !file_exists($controller) ){
+
                 copy(__DIR__.'/../../samples/controller/BlogController.php', $controller);
-
-            if( !file_exists($template) )
                 copy(__DIR__.'/../../samples/template/generic.html.twig', $template);
-
-            $context = BASE_URI.'/src/Service/Context.php';
-
-            if( !file_exists($context) ){
-
-                if(!is_dir(BASE_URI.'/src/Service') )
-                    mkdir(BASE_URI.'/src/Service');
-
-                copy(__DIR__.'/../../samples/service/Context.php', $context);
             }
 		}
 

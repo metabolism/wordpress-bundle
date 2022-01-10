@@ -199,7 +199,7 @@ See our sample [controllers](samples/controller) that you might want to copy to 
 
 This is the controller for the homepage
 ```php
-public function frontAction(Context $context)
+public function frontAction(ContextService $context)
 {
     $context->add('section', 'Homepage');
     return $this->render('homepage.html.twig', $context->toArray());
@@ -209,7 +209,7 @@ public function frontAction(Context $context)
 note that Wordpress functions are available directly in the controller
 
 ```php
-public function frontAction(Context $context)
+public function frontAction(ContextService $context)
 {
     if( is_user_logged_in() )
         $context->add('section', 'Homepage for logged in user');
@@ -229,7 +229,7 @@ Critical data are added automatically, such as current post or posts for archive
 ### Usage
 
 ```php
-public function articleAction(Context $context)
+public function articleAction(ContextService $context)
 {
     $context->addPosts(['category__and' => [1,3], 'posts_per_page' => 2, 'orderby' => 'title'], 'portraits');
     $context->addSitemap();
@@ -395,7 +395,7 @@ Create new Wordpress bundle image entity
 ```php
 //BlogController.php
 
-public function articleAction(Context $context)
+public function articleAction(ContextService $context)
 {
     $article = $context->addPost(12, 'article');
     return $this->render( 'page/article.twig', $context->toArray() );

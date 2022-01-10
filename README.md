@@ -44,7 +44,7 @@ From the bundle itself :
 * SVG Support
 * Edit posts button in toolbar on custom post type archive page
 * Wordpress predefined routes via permastruct
-* Context helpers
+* Context service
 * Relative urls
 * Terms bugfix ( sort )
 * Form helpers ( get / validate / send )
