@@ -2,17 +2,14 @@
 
 namespace Metabolism\WordpressBundle;
 
-use Metabolism\WordpressBundle\DependencyInjection\WordpressBundleExtension;
 use Metabolism\WordpressBundle\Extension\TwigExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use function Env\env;
 
 class WordpressBundle extends Bundle
 {
     private $root_dir;
     private $public_dir;
+    private $log_dir;
 
     private $wp_path = "public/edition/";
 
@@ -26,22 +23,11 @@ class WordpressBundle extends Bundle
 	    if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
 	        return;
 
-	    if( !isset($_SERVER['REQUEST_METHOD']) )
-            $_SERVER['REQUEST_METHOD'] = 'GET';
-
-        if( !isset($_SERVER['HTTP_HOST']) ) {
-
-            if( isset($_SERVER['SERVER_NAME']) )
-                $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'];
-            elseif( $multisite = env('WP_MULTISITE') )
-                $_SERVER['HTTP_HOST'] = $multisite;
-            else
-                $_SERVER['HTTP_HOST'] = 'localhost';
-        }
-
+		$this->log_dir = $this->container->get('kernel')->getLogDir();
 		$this->root_dir = $this->container->get('kernel')->getProjectDir();
 		$this->public_dir = $this->root_dir.(is_dir($this->root_dir.'/public') ? '/public' : '/web');
 
+        $this->resolveServer();
         $this->loadWordpress();
 
         //todo: use dependency injection
@@ -54,6 +40,30 @@ class WordpressBundle extends Bundle
 		}
 	}
 
+
+    private function resolveServer(){
+
+        if( !isset($_SERVER['REQUEST_METHOD']) )
+            $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        if( !isset($_SERVER['HTTP_HOST']) ) {
+
+            if( $host = ($_SERVER['WP_MULTISITE']??false) ){
+
+                $_SERVER['HTTP_HOST'] = $host;
+            }
+            elseif( $host = ($_SERVER['SERVER_NAME']??false) ){
+
+                $_SERVER['HTTP_HOST'] = $host;
+            }
+            else{
+
+                $_SERVER['HTTP_HOST'] = '127.0.0.1:8000';
+                $_SERVER['SERVER_PORT'] = '8000';
+            }
+        }
+    }
+
     /**
      * 	@see wp-includes/class-wp.php, main function
      */
@@ -61,6 +71,14 @@ class WordpressBundle extends Bundle
 
         if( !file_exists($this->public_dir.'/wp-config.php') )
             return;
+
+        global $request;
+
+        if( is_object($request) && get_class($request) == 'Symfony\Component\HttpFoundation\Request' )
+            trigger_error('$request must be renamed in "'.$this->public_dir.'/index.php" : $httpRequest = Request::createFromGlobals();', E_USER_WARNING);
+
+        if( !defined('WP_DEBUG_LOG') )
+            define('WP_DEBUG_LOG', $this->log_dir);
 
         $composer = $this->root_dir.'/composer.json';
 

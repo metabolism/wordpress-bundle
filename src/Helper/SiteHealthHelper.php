@@ -17,17 +17,17 @@ class SiteHealthHelper {
 		'language' => ''
 	];
 
-	private $has_error = false;
-	private $base_url = '';
-	private $output = false;
-	private $full = false;
+	private $base_url;
+	private $output;
+	private $full;
+	private $password;
 
 	public function __construct(){
 
 		$this->base_url = get_home_url();
-		$this->output   = isset($_REQUEST['output'])?$_REQUEST['output']:false;
-		$this->full     = isset($_REQUEST['full'])?$_REQUEST['full']:false;
-		$this->password = isset($_SERVER['APP_PASSWORD'])?$_SERVER['APP_PASSWORD']:false;
+		$this->output   = $_REQUEST['output'] ?? false;
+		$this->full     = $_REQUEST['full'] ?? false;
+		$this->password = $_SERVER['APP_PASSWORD'] ?? false;
 
 		$this->status['title']    = get_bloginfo('name');
 		$this->status['language'] = get_bloginfo('language');
@@ -117,7 +117,6 @@ class SiteHealthHelper {
 
 		$response_code    = wp_remote_retrieve_response_code( $response );
 		$response_body    = wp_remote_retrieve_body( $response );
-		$response_headers = wp_remote_retrieve_headers( $response );
 
 		$page = [
 			'label'         => $label,
@@ -136,7 +135,7 @@ class SiteHealthHelper {
 
 	private function checkPosts(){
 
-		global $wp_post_types, $wp_rewrite;
+		global $wp_post_types;
 
 		$home = get_option('page_on_front');
 
@@ -183,7 +182,7 @@ class SiteHealthHelper {
 
 	private function checkTaxonomies(){
 
-		global $wp_taxonomies, $wp_rewrite;
+		global $wp_taxonomies;
 
 		foreach ($wp_taxonomies as $taxonomy){
 
