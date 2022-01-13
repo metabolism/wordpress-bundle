@@ -23,9 +23,9 @@ class Menu extends Entity
 
     public static $locations;
 
-    public function __toString()
+    public function __toString(): ?string
     {
-        return $this->title;
+        return $this->title ? $this->title : '';
     }
 
     /**
