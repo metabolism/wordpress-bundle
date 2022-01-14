@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class BlogController extends AbstractController
 {
-	public function frontAction(ContextService $context)
+	public function homeAction(ContextService $context)
 	{
 		$context->add('section', 'Homepage');
 		return $this->render('generic.html.twig', $context->toArray());
