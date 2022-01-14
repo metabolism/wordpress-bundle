@@ -117,7 +117,7 @@ class WPSEOProvider
 	 */
 	public static function hasTitle($postID){
 
-		return strlen(get_post_meta($postID, '_yoast_wpseo_title', true)) > 1 ? true : false;
+		return strlen(get_post_meta($postID, '_yoast_wpseo_title', true)) > 1;
 	}
 
 
@@ -128,7 +128,7 @@ class WPSEOProvider
 	 */
 	public static function hasDescription($postID){
 
-		return strlen(get_post_meta($postID, '_yoast_wpseo_metadesc', true)) > 1 ? true : false;
+		return strlen(get_post_meta($postID, '_yoast_wpseo_metadesc', true)) > 1;
 	}
 
 
@@ -139,12 +139,25 @@ class WPSEOProvider
 	 */
 	public static function sitemapToRobots( $output ) {
 
-		$options = get_option( 'wpseo_xml' );
+		$options = get_option( 'wpseo' );
 
-		if ( class_exists( 'WPSEO_Sitemaps' ) && $options['enablexmlsitemap'] == true ) {
+        if ( class_exists( 'WPSEO_Sitemaps' ) && $options['enable_xml_sitemap'] == true ) {
 
-			$homeURL = get_home_url();
-			$output .= "Sitemap: $homeURL/sitemap_index.xml\n";
+            if( is_multisite() ){
+
+                $sites = get_sites(['public'=>1]);
+
+                foreach ($sites as $site){
+
+                    $base_url = get_home_url($site->blog_id);
+                    $output .= "Sitemap: $base_url/sitemap_index.xml\n";
+                }
+            }
+            else{
+
+                $base_url = get_home_url();
+                $output .= "Sitemap: $base_url/sitemap_index.xml\n";
+            }
 		}
 
 		return $output;
@@ -157,32 +170,30 @@ class WPSEOProvider
 	 */
 	public function __construct()
 	{
-		add_action( 'admin_init', [$this, 'init'] );
-		add_filter( 'get_the_terms', [$this, 'changeTermsOrder'], 10, 3);
+		add_action('admin_init', [$this, 'init'] );
+		add_filter('get_the_terms', [$this, 'changeTermsOrder'], 10, 3);
 
 		if( is_admin() ) {
 
-			add_filter( 'wp_editor_settings', [$this, 'editorSettings'], 10, 2);
+			add_filter('wp_editor_settings', [$this, 'editorSettings'], 10, 2);
 		}
-		else{
-			add_action('init', function() {
+        else{
 
-                add_filter( 'wpseo_debug_markers', '__return_false' );
-                add_filter('wpseo_canonical', [$this, 'filterCanonical']);
+            add_filter('wpseo_debug_markers', '__return_false' );
+            add_filter('wpseo_canonical', [$this, 'filterCanonical']);
 
-				add_filter('wp-bundle/make_link_relative', function($make){
+            add_filter('wp-bundle/make_post_link_relative', function($make){
 
-					global $wp_query;
-					return $make && empty($wp_query->query_vars["sitemap"]) && empty($wp_query->query_vars["yoast-sitemap-xsl"]);
-				});
+                global $wp_query;
+                return $make && empty($wp_query->query_vars["sitemap"]) && empty($wp_query->query_vars["yoast-sitemap-xsl"]);
+            });
 
-				add_filter('wpseo_opengraph_url', function($url){
+            add_filter('wpseo_opengraph_url', function($url){
 
-					return trim(home_url('/'), '/').$url;
-				});
+                return trim(home_url('/'), '/').$url;
+            });
 
-				add_filter('robots_txt', [$this, 'sitemapToRobots'], 9999, 1 );
-			});
+            add_filter('robots_txt', [$this, 'sitemapToRobots'], 9999, 1 );
 		}
 	}
 }

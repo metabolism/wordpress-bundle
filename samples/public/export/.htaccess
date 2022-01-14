@@ -1,0 +1,9 @@
+DirectoryIndex disabled
+DirectorySlash Off
+
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} ^([^.]*?)/?$
+RewriteCond %1.html -f
+RewriteRule ^([^.]*?)/?$ $1.html [L]

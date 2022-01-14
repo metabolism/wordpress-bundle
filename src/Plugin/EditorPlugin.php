@@ -137,8 +137,8 @@ class EditorPlugin {
 	 */
 	function addCustomHeader()
 	{
-		echo '<style type="text/css">'.file_get_contents(__DIR__ . '/../../wordpress/admin.css').'</style>';
-		echo '<script type="text/javascript">'.file_get_contents(__DIR__ . '/../../wordpress/admin.js').'</script>';
+		echo '<link rel="stylesheet" href="'.get_home_url().'/bundles/wordpress/admin.css"/>';
+		echo '<script type="text/javascript" src="'.get_home_url().'/bundles/wordpress/admin.js"></script>';
 	}
 
 
@@ -147,7 +147,7 @@ class EditorPlugin {
 	 */
 	function addCustomLoginHeader()
 	{
-		echo '<style type="text/css">'.file_get_contents(__DIR__ . '/../../wordpress/login.css').'</style>';
+		echo '<link rel="stylesheet" href="'.get_home_url().'/bundles/wordpress/login.css"/>';
 	}
 
 	/**

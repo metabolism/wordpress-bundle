@@ -3,8 +3,10 @@
 namespace Metabolism\WordpressBundle\Command;
 
 use Psr\Log\LoggerInterface;
+use SimpleXMLElement;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,22 +22,25 @@ class ExportCommand  extends Command{
     private $export_dir;
     private $container;
     private $output;
+    private $input;
     private $filesystem;
-    private $client;
+    private $errors;
 
-    public function __construct(ContainerInterface $container, HttpClientInterface $client)
+    public function __construct(ContainerInterface $container)
     {
         parent::__construct();
 
         $this->container = $container;
-        $this->client = $client;
+        $this->errors = [];
 
         $this->export_dir = $this->container->get('kernel')->getCacheDir().'/export';
         $this->base_url  = get_home_url();
         $this->filesystem = new Filesystem();
 
-        if( !$this->filesystem->exists($this->export_dir) )
-            $this->filesystem->mkdir($this->export_dir, 0755);
+        if( $this->filesystem->exists($this->export_dir) )
+            $this->filesystem->remove($this->export_dir);
+
+        $this->filesystem->mkdir($this->export_dir, 0755);
     }
 
     /**
@@ -47,36 +52,299 @@ class ExportCommand  extends Command{
     public function execute (InputInterface $input, OutputInterface $output) {
 
         $this->output = $output;
+        $this->input = $input;
 
-        $output->writeln("<comment>Exporting posts</comment>");
-        $this->exportPosts();
+        $time_start = microtime(true);
 
-        $output->writeln("<comment>Exporting terms</comment>");
-        $this->exportTerms();
+        $output->writeln("<comment>Loading sitemaps</comment>");
+        $this->loadUrlsFromSitemap($this->base_url);
 
-        $output->writeln("<comment>Exporting theme</comment>");
-        $this->exportTheme();
+        $output->writeln("<comment>Copying files and folders</comment>");
+        $this->copyFilesFolders();
+
+        if( $input->getArgument('zip') && $input->getArgument('write') ){
+
+            $output->writeln("<comment>Creating zip file</comment>");
+            $this->createZip();
+        }
+
+        $time_end = microtime(true);
+        $this->output->writeln("<question>==> Export completed in ".round($time_end-$time_start)."s with ".count($this->errors)." error(s)</question>");
 
         return 1;
     }
 
+
+    /**
+     * @param $base_url
+     * @return void
+     */
+    public function loadUrlsFromSitemap($base_url) {
+
+        $urls = $this->getSitemapUrls($base_url);
+
+        $this->output->writeln("<comment>Loading urls</comment>");
+
+        foreach ($urls as $url)
+            $this->store($url);
+
+        $this->output->writeln("<comment>Writing sitemap</comment>");
+
+    }
+
+    /**
+     * @param $filename
+     * @param $content
+     * @return void
+     */
+    private function dumpFile($filename, $content){
+
+        if( $this->input->getArgument('write') )
+            $this->filesystem->dumpFile($filename, $content);
+    }
+
+
+    /**
+     * @param $origin_path
+     * @param $target_path
+     * @return void
+     */
+    private function mirror($origin_path, $target_path){
+
+        if( $this->input->getArgument('write') )
+            $this->filesystem->mirror($origin_path, $target_path);
+    }
+
+
+    /**
+     * @return array|\WP_Error
+     */
+    private function getSitemapUrls($base_url) {
+
+        $robots = $this->getRobots($base_url);
+
+        if( !$robots || !isset($robots['Sitemap']) )
+            return new \WP_Error('export', 'Sitemap not found');
+
+        $sitemaps = (array)$robots['Sitemap'];
+
+        $urls = [];
+
+        foreach ($sitemaps as $sitemap_url){
+
+            $sitemap = $this->loadSitemap($sitemap_url);
+            $urls = array_merge($urls, $this->parseSitemap($sitemap));
+        }
+
+        if( count($urls) )
+            $this->output->writeln("<info>=> Found ".count($urls)." urls</info>");
+        else
+            $this->output->writeln("<error>=> No urls found</error>");
+
+        return $urls;
+    }
+
+    /**
+     * @param $url
+     * @return string|void|\WP_Error
+     */
+    private function loadSitemap($url){
+
+        $this->output->writeln("<info>- ".$url."</info>");
+
+        $sitemap = $this->remoteGet($url);
+
+        if( is_wp_error($sitemap) )
+            return $sitemap;
+
+        $sitemap_xml = simplexml_load_string($sitemap);
+
+        if( !$sitemap_xml )
+            return new \WP_Error('export', 'Error: Cannot create object');
+
+        $filename = str_replace($this->base_url, '', $url);
+        $this->dumpFile($this->export_dir.'/'.$filename, $this->process($sitemap));
+
+        return json_decode(json_encode($sitemap_xml),1);
+    }
+
+    /**
+     * @param $sitemap
+     * @return array
+     */
+    private function parseSitemap($sitemap){
+
+        $urls = [];
+
+        if( isset($sitemap['sitemap']) ){
+
+            foreach( $sitemap['sitemap'] as $_sitemap ){
+
+                $_sitemap = $this->loadSitemap($_sitemap['loc']);
+                $urls = array_merge($urls, $this->parseSitemap($_sitemap));
+            }
+        }
+        elseif( isset($sitemap['url']) ){
+
+            if( isset($sitemap['url']['loc']) ){
+
+                $urls[] = $sitemap['url']['loc'];
+            }
+            else{
+
+                foreach( $sitemap['url'] as $url )
+                    $urls[] = $url['loc']??'';
+            }
+        }
+
+        return $urls;
+    }
+
+    /**
+     * @return array|false
+     */
+    private function getRobots($base_url) {
+
+        $robots = $this->remoteGet($base_url.'/robots.txt');
+
+        if( is_wp_error($robots) ){
+
+            $this->output->writeln("<error>Can't get robots.txt ->".$robots->get_error_message()."</error>");
+            return false;
+        }
+
+        $this->dumpFile($this->export_dir.'/robots.txt', $this->process($robots));
+
+        $robots_lines = explode("\n", $robots);
+        $robots = [];
+
+        foreach ($robots_lines as $robots_line){
+
+            $robots_line = explode(': ', $robots_line);
+
+            if( count($robots_line) == 2 ){
+
+                if( isset($robots[$robots_line[0]]) ){
+
+                    if( is_string($robots[$robots_line[0]]) )
+                        $robots[$robots_line[0]] = [$robots[$robots_line[0]]];
+
+                    $robots[$robots_line[0]][] = trim($robots_line[1]);
+                }
+                else{
+
+                    $robots[$robots_line[0]] = trim($robots_line[1]);
+                }
+            }
+        }
+
+        return $robots;
+    }
+
+
+    /**
+     * @param $file
+     * @param $unit
+     * @return string
+     */
+    private function getFileSize($file, $unit="") {
+
+        $size = filesize($file);
+
+        if( (!$unit && $size >= 1<<30) || $unit == "GB")
+            return number_format($size/(1<<30),2)."GB";
+        if( (!$unit && $size >= 1<<20) || $unit == "MB")
+            return number_format($size/(1<<20),2)."MB";
+        if( (!$unit && $size >= 1<<10) || $unit == "KB")
+            return number_format($size/(1<<10),2)."KB";
+        return number_format($size)." bytes";
+    }
+
+
+    /**
+     * @return void
+     */
+    private function createZip(){
+
+        $filename = "export-".(new \DateTime())->getTimestamp().".zip";
+        $file_path = $this->export_dir.'/'.$filename;
+
+        $status = wp_backup($this->export_dir, $file_path);
+
+        if( !is_wp_error($status) )
+            $this->output->writeln("<info>Zip created (".$this->getFileSize($file_path).")</info>");
+        else
+            $this->output->writeln("<error>".$status->get_error_message()."</error>");
+    }
+
+
+    /**
+     * @param $html
+     * @return array|mixed|string|string[]
+     */
+    private function process($html){
+
+        $ssl = substr($this->input->getArgument('domain'), 0, 5) == 'https';
+
+        $domain = strtok(preg_replace('/https?:\/\//', '', $this->input->getArgument('domain')),':');
+        $current_domain = strtok(preg_replace('/https?:\/\//', '', home_url('')),':');
+
+        if( $ssl && !is_ssl() ) {
+
+            $html = str_replace('http://'.$current_domain, 'https://'.$current_domain, $html);
+            $html = str_replace(json_encode('http://'.$current_domain), json_encode('https://'.$current_domain), $html);
+        }
+
+        if( $domain ){
+
+            $html = str_replace($current_domain, $domain, $html);
+            $html = str_replace(json_encode($current_domain), json_encode($domain), $html);
+        }
+
+        return $html;
+    }
+
+
+    /**
+     * @param $url
+     * @return string|\WP_Error
+     */
+    private function remoteGet($url){
+
+        $response = wp_remote_get($url.(isset($_SERVER['APP_PASSWORD'])?'?APP_PASSWORD='.$_SERVER['APP_PASSWORD']:''), ['timeout'=>30]);
+        $response_code = wp_remote_retrieve_response_code( $response );
+        $response_body = wp_remote_retrieve_body( $response );
+
+        if( $response_code == 200  && !empty($response_body) )
+            return $response_body;
+
+        $this->errors[] = $url;
+
+        return new \WP_Error('remove_get', $response_code);
+    }
+
+
+    /**
+     * @param $url
+     * @return void
+     */
     private function store($url){
 
         if( is_wp_error($url) )
             return;
 
+        $url = str_replace($this->base_url, '', $url);
+
         $this->output->writeln("<comment>- $url</comment>");
 
         $time_start = microtime(true);
-        $response = wp_remote_get($this->base_url.$url.(isset($_SERVER['APP_PASSWORD'])?'?APP_PASSWORD='.$_SERVER['APP_PASSWORD']:''), ['timeout'=>30]);
-        $response_code = wp_remote_retrieve_response_code( $response );
-        $response_body = wp_remote_retrieve_body( $response );
+        $response = $this->remoteGet($this->base_url.$url);
         $time_end = microtime(true);
 
-        if( $response_code == 200  && !empty($response_body) ){
+        if( !is_wp_error($response) ){
 
-            if( $url == '/' )
-                $url = '/index';
+            if( substr($url, -1) == '/' )
+                $url .= 'index';
 
             $filepath = $this->export_dir.$url.'.html';
             $path = dirname($filepath);
@@ -84,72 +352,51 @@ class ExportCommand  extends Command{
             if( !$this->filesystem->exists($path) )
                 $this->filesystem->mkdir($path, 0755);
 
-            $this->filesystem->dumpFile($filepath, $response_body);
+            $this->dumpFile($filepath, $this->process($response));
 
-            $this->output->writeln("<info>-> Ok in ".round($time_end*1000-$time_start*1000)."ms</info>");
+            $this->output->writeln("<info>-> rendered in ".round($time_end*1000-$time_start*1000)."ms</info>");
         }
         else{
 
-            $this->output->writeln("<error>-> ".$response_code."</error>");
+            $this->output->writeln("<error>-> ".$response->get_error_message()."</error>");
         }
     }
 
-    private function exportTheme(){
+
+    /**
+     * @return void
+     */
+    private function copyFilesFolders(){
+
+        global $_config;
+        $export_options = $_config->get('export', []);
+
 
         $root_dir = $this->container->get('kernel')->getProjectDir();
-        $public_dir = $root_dir.(is_dir($root_dir.'/public') ? '/public' : '/web');
-        $theme_dir = $public_dir.'/theme';
 
-        $this->filesystem->mirror($theme_dir, $this->export_dir.'/theme');
-    }
+        if( !isset($export_options['copy']) )
+            return;
 
-    private function exportPosts(){
+        foreach ($export_options['copy'] as $origin=>$target){
 
-        global $wp_post_types;
+            $origin_path = $root_dir.$origin;
+            $target_path = $this->export_dir.$target;
 
-        $home = get_option('page_on_front');
+            if( $this->filesystem->exists($origin_path) ){
 
-        $this->store('/');
+                $this->mirror($origin_path, $target_path);
+                $this->output->writeln("<info>- ".$origin." -> ".$target."</info>");
+            }
+            else{
 
-        foreach ($wp_post_types as $post_type)
-        {
-            if( $post_type->public && ($post_type->publicly_queryable || $post_type->name == 'page') && !in_array($post_type->name, ['attachment']) ){
-
-                $posts = get_posts(['post_type'=>$post_type->name, 'exclude'=>$home, 'posts_per_page'=>-1]);
-
-                foreach ($posts as $post){
-
-                    $url = get_permalink($post);
-                    $this->store($url);
-                }
-
-                if( $post_type->has_archive ){
-
-                    $url = get_post_type_archive_link($post_type->name);
-                    $this->store($url);
-                }
+                $this->output->writeln("<error>".$origin_path." does not exists</error>");
             }
         }
-    }
 
-    private function exportTerms(){
+        $export_dir = $this->container->get('kernel')->locateResource('@WordpressBundle/samples/public/export');
 
-        global $wp_taxonomies;
-
-        foreach ($wp_taxonomies as $taxonomy){
-
-            //todo: better category handle
-            if( $taxonomy->public && $taxonomy->publicly_queryable && !in_array($taxonomy->name, ['post_tag','post_format','category']) ){
-
-                $terms = get_terms(['taxonomy'=>$taxonomy->name, 'number'=>0]);
-
-                foreach ($terms as $term){
-
-                    $url = get_term_link($term, $taxonomy->name);
-                    $this->store($url);
-                }
-            }
-        }
+        $this->filesystem->copy($export_dir.'/.htaccess', $this->export_dir.'/.htaccess');
+        $this->output->writeln("<info>- .htaccess</info>");
     }
 
 
@@ -158,7 +405,11 @@ class ExportCommand  extends Command{
      */
     protected function configure () {
 
-        $this->setName('wordpress:export');
+        $this->setName('site:export');
         $this->setDescription("Export static site");
+
+        $this->addArgument('write', InputArgument::OPTIONAL, 'Write file to disk, set false to use as warmup');
+        $this->addArgument('domain', InputArgument::OPTIONAL, 'Target domain');
+        $this->addArgument('zip', InputArgument::OPTIONAL, 'Create zip from export folder');
     }
 }
