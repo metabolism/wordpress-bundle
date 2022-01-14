@@ -28,7 +28,7 @@ class User extends Entity
 
     public function __toString()
     {
-        return $this->display_name;
+        return $this->display_name??'Invalid user';
     }
 
 	/**

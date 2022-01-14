@@ -34,7 +34,7 @@ class File extends Entity
 
     public function __toString()
     {
-        return $this->link;
+        return $this->link??'';
     }
 
 	/**

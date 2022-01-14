@@ -25,7 +25,7 @@ class Menu extends Entity
 
     public function __toString(): ?string
     {
-        return $this->title ? $this->title : '';
+        return $this->title??'';
     }
 
     /**

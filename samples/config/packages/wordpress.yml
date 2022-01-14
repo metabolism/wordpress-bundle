@@ -380,6 +380,16 @@ security:
   xmlrpc: false
   pings: false
 
+###################
+##    Export    ##
+##################
+
+export:
+  copy:
+    /public/theme : /theme
+    /public/favicon : /favicon
+    /public/uploads : /uploads
+
 ################
 ##    Misc    ##
 ################
