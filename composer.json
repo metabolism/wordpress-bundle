@@ -52,7 +52,8 @@
       "copy": {
         "metabolism/wordpress-bundle": {
           "samples/public/wp-config.php": "public/wp-config.php",
-          "samples/config/packages/wordpress.yml": "config/packages/wordpress.yml"
+          "samples/config/packages/wordpress.yml": "config/packages/wordpress.yml",
+          "samples/public/wp-bundle/themes/": "public/wp-bundle/themes"
         }
       },
       "symlink": {
