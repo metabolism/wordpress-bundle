@@ -30,6 +30,10 @@ class ExportCommand  extends Command{
     {
         parent::__construct();
 
+        if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) ){
+            return 1;
+        }
+
         $this->container = $container;
         $this->errors = [];
 
