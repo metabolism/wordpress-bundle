@@ -36,6 +36,7 @@ class Site extends Entity
     protected $network_home_url;
     protected $search_url;
     protected $privacy_policy_url;
+    protected $privacy_policy_title;
     protected $posts_per_page;
     protected $bloginfo;
     protected $title;
@@ -159,6 +160,17 @@ class Site extends Entity
             $this->privacy_policy_url = get_privacy_policy_url();
 
         return $this->privacy_policy_url;
+    }
+
+    public function getPrivacyPolicyTitle(){
+
+        if(is_null($this->privacy_policy_title) ){
+
+	        $policy_page_id = (int) get_option( 'wp_page_for_privacy_policy' );
+	        $this->privacy_policy_title = ( $policy_page_id ) ? get_the_title( $policy_page_id ) : '';
+        }
+
+        return $this->privacy_policy_title;
     }
 
     public function getNetworkHomeUrl(){

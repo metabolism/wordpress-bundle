@@ -37,7 +37,10 @@
     "wpackagist-plugin/wp-smartcrop": "Set the 'focal point' of any image, right from the media library",
     "wpackagist-plugin/multisite-language-switcher": "Add multilingual support using a WordPress multisite",
     "wpackagist-plugin/wordpress-seo": "The favorite WordPress SEO plugin of millions of users worldwide!",
-    "wpackagist-plugin/query-monitor": "Query Monitor is the developer tools panel for WordPress."
+    "wpackagist-plugin/query-monitor": "Query Monitor is the developer tools panel for WordPress.",
+    "wpackagist-plugin/redirection" : "Easily manage 301 redirections, keep track of 404 errors",
+    "wpackagist-plugin/contact-form-7" : "Manage multiple contact forms, plus you can customize the form and the mail contents"
+
   },
   "extra": {
     "post-package-install": {

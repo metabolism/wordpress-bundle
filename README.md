@@ -1,4 +1,4 @@
-# Wordpress & Symfony, with ♥
+# Wordpress x Symfony
 
 ## Introduction
 
@@ -11,22 +11,25 @@ The main idea is to use the power of Symfony for the front / webservices with th
 When the Wordpress bundle is loaded, it loads a small amount of Wordpress Core files to allow usage of Wordpress functions 
 inside Symfony Controllers.
 
-Wordpress is then linked to the bundle via a plugin located in the mu folder.
+Wordpress is then linked to the bundle via a must use plugin.
 
 Because it's a Symfony bundle, there is no theme management in Wordpress and the entire routing is powered by Symfony.
+
+## Migrating from 1.4 to 1.5 ? 
+
+Check the [migration guide](docs/migration.md)
 
 ## Features
 
 From Composer :
 * Install/update Wordpress via composer
-* Install/update plugin via composer
+* Install/update plugins via composer
 
 From Symfony :
 * Template engine
 * Folder structure
 * Http Cache
 * Routing
-* Installation via Composer for Wordpress Core and plugins
 * YML configuration ( even for Wordpress )
 * DotEnv
 * Enhanced Security ( Wordpress is 'hidden' )
@@ -49,17 +52,29 @@ From the bundle itself :
 * Terms bugfix ( sort )
 * Form helpers ( get / validate / send )
 * Multisite post deep copy ( with multisite-language-switcher plugin )
-* Image filename clean on upload
+* Image filename cleaning on upload
 * Custom datatable support with view and delete actions in admin
 * Extensible, entities, controller and bundle plugins can be extended in the app
 * Site health checker
+* Static site export from sitemap
  
 ## Drawbacks
 
-Because of Wordpress design, functions are available in the global namespace, 
-it's not perfect but Wordpress will surely change this soon.
+Because of Wordpress design, functions are available in the global namespace.
 
-Some plugins may not work directly, Woocommerce provider needs some rework
+Some plugins may not work directly.
+
+## Recommended / tested plugins
+
+- [Advanced custom fields](https://wordpress.org/plugins/advanced-custom-fields) Customise WordPress with powerful, professional and intuitive fields.
+- [ACF extensions](https://github.com/wearemetabolism/acf-extensions) Extensions for ACF
+- [Classic editor](https://wordpress.org/plugins/classic-editor) Restores the previous (« classic ») WordPress editor and the « Edit Post » screen.
+- [WP smartcrop](https://wordpress.org/plugins/wp-smartcrop) Set the 'focal point' of any image, right from the media library
+- [Multisite language switcher](https://wordpress.org/plugins/multisite-language-switcher) Add multilingual support using a WordPress multisite
+- [Wordpress seo](https://wordpress.org/plugins/wordpress-seo) The favorite WordPress SEO plugin of millions of users worldwide!
+- [Query monitor](https://wordpress.org/plugins/query-monitor) Query Monitor is the developer tools panel for WordPress
+- [Redirection](https://wordpress.org/plugins/redirection) Easily manage 301 redirections, keep track of 404 errors
+- [Contact form 7](https://wordpress.org/plugins/contact-form-7)  Manage multiple contact forms, plus you can customize the form and the mail contents
 
 ## Demo
 

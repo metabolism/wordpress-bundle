@@ -20,10 +20,11 @@ class User extends Entity
 	public $nicename;
 	public $registered;
 	public $status;
-    public $link;
 
+    protected $link;
     protected $avatar;
 
+	/** @var \WP_User */
     private $user;
 
     public function __toString()
@@ -41,7 +42,7 @@ class User extends Entity
 	{
 		if( $user = $this->get($id) ) {
 
-            $this->ID = $id;
+            $this->ID = $user->ID;
             $this->firstname = $user->first_name;
             $this->lastname = $user->last_name;
             $this->description = $user->description;
@@ -51,7 +52,6 @@ class User extends Entity
             $this->nicename = $user->user_nicename;
             $this->registered = $user->user_registered;
             $this->status = $user->user_status;
-            $this->link = $user->user_url;
 
 			$this->loadMetafields($id, 'user');
 		}
@@ -93,5 +93,20 @@ class User extends Entity
         }
 
         return $this->avatar;
+    }
+
+
+    /**
+     * Get author url
+     *
+     * @param array $args
+     * @return string
+     */
+	public function getLink(){
+
+        if( is_null($this->link))
+	        $this->link = get_author_posts_url($this->ID);
+
+        return $this->link;
     }
 }

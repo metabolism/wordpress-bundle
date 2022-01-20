@@ -3,6 +3,8 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 
+use Metabolism\WordpressBundle\Factory\Factory;
+
 /**
  * Class Comment
  *
@@ -14,17 +16,22 @@ class Comment extends Entity
 
 	public $post_ID;
 	public $author;
+	public $agent;
 	public $author_email;
 	public $author_url;
 	public $author_IP;
-	public $date;
-	public $date_gmt;
 	public $content;
 	public $karma;
 	public $approved;
 	public $parent;
 	public $user_id;
-	public $replies=[];
+
+	protected $replies;
+	protected $date;
+	protected $date_gmt;
+
+	/** @var \WP_Comment */
+	private $comment;
 
     public function __toString()
     {
@@ -40,7 +47,14 @@ class Comment extends Entity
 		if( $comment = $this->get($id) )
 		{
             $this->ID = intval($comment->comment_ID);
-            //todo: bind
+			$this->approved = $comment->comment_approved;
+			$this->agent = $comment->comment_agent;
+			$this->author = $comment->comment_author;
+			$this->author_email = $comment->comment_author_email;
+			$this->author_IP = $comment->comment_author_IP;
+			$this->author_url = $comment->comment_author_url;
+			$this->content = $comment->comment_content;
+			$this->karma = $comment->comment_karma;
 		}
     }
 
@@ -51,7 +65,63 @@ class Comment extends Entity
 	 */
 	protected function get($pid ) {
 
-		return get_comment($pid);
+		if( $comment = get_comment($pid) ){
+
+			if( is_wp_error($comment) || !$comment )
+				return false;
+
+			$this->comment = $comment;
+		}
+
+		return $comment;
+	}
+
+	public function getDate(){
+
+		if( is_null($this->date) )
+			$this->date = $this->formatDate($this->comment->comment_date);
+
+		return $this->date;
+	}
+
+	public function getDateGmt(){
+
+		if( is_null($this->date_gmt) )
+			$this->date_gmt = $this->formatDate($this->comment->comment_date_gmt);
+
+		return $this->date_gmt;
+	}
+
+	public function getReplies($args=[]){
+
+		if( is_null($this->replies) ){
+
+			$default_args = [
+				'status' => 'approve',
+				'number' => '3'
+			];
+
+			$args = array_merge($default_args, $args);
+
+			$args['parent'] = $this->ID;
+			$args['type'] = 'comment';
+			$args['fields'] = 'ids';
+
+			$comments_id = get_comments($args);
+
+			$replies = [];
+
+			foreach ($comments_id as $comment_id)
+			{
+				/** @var Comment $comment */
+				$comment = Factory::create($comment_id, 'comment');
+				$replies[$comment_id] = $comment;
+			}
+
+			$this->replies = $replies;
+		}
+
+		return $this->replies;
 	}
 
 

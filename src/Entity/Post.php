@@ -328,14 +328,16 @@ class Post extends Entity
 	public function getComments($args=[]) {
 
 		$default_args = [
-			'post_id'=> $this->ID,
 			'status'=> 'approve',
-			'type'=> 'comment',
-			'fields'=> 'ids'
+			'number' => '5'
 		];
 
-
 		$args = array_merge($default_args, $args);
+
+		$args['post_id'] = $this->ID;
+		$args['type'] = 'comment';
+		$args['parent'] = 0;
+		$args['fields'] = 'ids';
 
 		$comments_id = get_comments($args);
 
@@ -346,15 +348,6 @@ class Post extends Entity
             /** @var Comment $comment */
             $comment = Factory::create($comment_id, 'comment');
 			$comments[$comment_id] = $comment;
-		}
-
-		foreach ($comments as $comment)
-		{
-			if( $comment && $comment->parent )
-			{
-				$comments[$comment->parent]->replies[] = $comment;
-				unset($comments[$comment->ID]);
-			}
 		}
 
 		return $comments;
