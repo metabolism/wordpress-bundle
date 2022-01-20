@@ -30,9 +30,8 @@ class ExportCommand  extends Command{
     {
         parent::__construct();
 
-        if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) ){
-            return 1;
-        }
+        if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
+            return;
 
         $this->container = $container;
         $this->errors = [];
@@ -50,7 +49,7 @@ class ExportCommand  extends Command{
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return bool
+     * @return int
      * @throws Exception
      */
     public function execute (InputInterface $input, OutputInterface $output) {
@@ -147,6 +146,7 @@ class ExportCommand  extends Command{
 
         return $urls;
     }
+
 
     /**
      * @param $url
@@ -315,7 +315,7 @@ class ExportCommand  extends Command{
      */
     private function remoteGet($url){
 
-        $response = wp_remote_get($url.(isset($_SERVER['APP_PASSWORD'])?'?APP_PASSWORD='.$_SERVER['APP_PASSWORD']:''), ['timeout'=>30]);
+        $response = wp_remote_get($url, ['timeout'=>30]);
         $response_code = wp_remote_retrieve_response_code( $response );
         $response_body = wp_remote_retrieve_body( $response );
 
@@ -415,5 +415,6 @@ class ExportCommand  extends Command{
         $this->addArgument('write', InputArgument::OPTIONAL, 'Write file to disk, set false to use as warmup');
         $this->addArgument('domain', InputArgument::OPTIONAL, 'Target domain');
         $this->addArgument('zip', InputArgument::OPTIONAL, 'Create zip from export folder');
+        $this->addArgument('compare', InputArgument::OPTIONAL, 'Compare with other domain');
     }
 }

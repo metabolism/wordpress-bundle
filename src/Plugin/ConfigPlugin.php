@@ -773,6 +773,21 @@ class ConfigPlugin {
 
 
     /**
+     * Update theme and stylesheet
+     */
+    public function checkTheme()
+    {
+        $template = get_option('template');
+
+        if( !is_dir(WP_CONTENT_DIR.'/themes/'.$template) && $template != 'empty'){
+
+            update_option('template', 'empty');
+            update_option('stylesheet', 'empty');
+        }
+    }
+
+
+    /**
      * Add theme support
      */
     public function addThemeSupport()
@@ -790,7 +805,7 @@ class ConfigPlugin {
                 $params = $feature[$key];
 
                 if( !in_array($key, $excluded) )
-                    add_theme_support( $key, $params);
+                    @add_theme_support( $key, $params);
             }
             elseif( !in_array($feature, $excluded) ){
 
@@ -824,6 +839,7 @@ class ConfigPlugin {
             $this->addMenus();
             $this->addSidebars();
             $this->addRoles();
+            $this->checkTheme();
             $this->addThemeSupport();
 
             load_theme_textdomain( $this->config->get('domain_name', 'app'), BASE_URI. '/translations' );

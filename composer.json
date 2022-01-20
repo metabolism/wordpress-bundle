@@ -56,7 +56,7 @@
         "metabolism/wordpress-bundle": {
           "samples/public/wp-config.php": "public/wp-config.php",
           "samples/config/packages/wordpress.yml": "config/packages/wordpress.yml",
-          "samples/public/wp-bundle/themes/": "public/wp-bundle/themes"
+          "samples/public/wp-bundle/themes/empty": "public/wp-bundle/themes/empty"
         }
       },
       "symlink": {
@@ -74,7 +74,8 @@
       },
       "symlink": {
         "metabolism/wordpress-bundle": {
-          "samples/public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php"
+          "samples/public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php",
+          "samples/public/wp-bundle/themes/empty": "public/wp-bundle/themes/empty"
         }
       },
       "copy": {
