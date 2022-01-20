@@ -599,14 +599,15 @@ class ContextService
 	}
 
 
-	/**
-	 * Get entry using dot notation
-	 *
-	 * @see Post
-	 * @internal param null $id
-	 * @param $key
-	 * @return array|bool
-	 */
+    /**
+     * Get entry using dot notation
+     *
+     * @param $key
+     * @param bool $fallback
+     * @return array|bool
+     * @internal param null $id
+     * @see Post
+     */
 	public function get($key, $fallback=false)
 	{
 		$keys = explode('.', $key);
@@ -631,12 +632,9 @@ class ContextService
 	{
 		header('Content-Type: application/json');
 
-		if( isset($this->data['system']))
-			$this->data['system'] = '-- Removed from debug --';
+		echo json_encode($this->data, JSON_PRETTY_PRINT);
 
-		echo json_encode($this->data);
-
-		exit(0);
+		exit;
 	}
 
 
