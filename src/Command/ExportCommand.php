@@ -8,6 +8,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -18,7 +19,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class ExportCommand  extends Command{
 
-    private $base_url;
     private $export_dir;
     private $container;
     private $output;
@@ -35,10 +35,22 @@ class ExportCommand  extends Command{
 
         $this->container = $container;
         $this->errors = [];
-
-        $this->export_dir = $this->container->get('kernel')->getCacheDir().'/export';
-        $this->base_url  = get_home_url();
         $this->filesystem = new Filesystem();
+
+        $this->setExportDir('/export');
+    }
+
+    private function error($msg){
+
+        $this->errors[] = $msg;
+        $this->output->writeln("<error>".$msg."</error>");
+
+        return false;
+    }
+
+    public function setExportDir($folder){
+
+        $this->export_dir = $this->container->get('kernel')->getCacheDir().'/command/'.$folder;
 
         if( $this->filesystem->exists($this->export_dir) )
             $this->filesystem->remove($this->export_dir);
@@ -60,15 +72,25 @@ class ExportCommand  extends Command{
         $time_start = microtime(true);
 
         $output->writeln("<comment>Loading sitemaps</comment>");
-        $this->loadUrlsFromSitemap($this->base_url);
+        $this->loadUrlsFromSitemap(get_home_url());
 
-        $output->writeln("<comment>Copying files and folders</comment>");
-        $this->copyFilesFolders();
+        if( $compare_url = $input->getOption('compare') ){
 
-        if( $input->getArgument('zip') && $input->getArgument('write') ){
+            $this->setExportDir('/compare');
 
-            $output->writeln("<comment>Creating zip file</comment>");
-            $this->createZip();
+            $output->writeln("<comment>Loading sitemaps</comment>");
+            $this->loadUrlsFromSitemap($compare_url);
+        }
+        else{
+
+            $output->writeln("<comment>Copying files and folders</comment>");
+            $this->copyFilesFolders();
+
+            if( $input->getOption('zip') && $input->getOption('write') ){
+
+                $output->writeln("<comment>Creating zip file</comment>");
+                $this->createZip();
+            }
         }
 
         $time_end = microtime(true);
@@ -80,19 +102,28 @@ class ExportCommand  extends Command{
 
     /**
      * @param $base_url
-     * @return void
+     * @return bool
      */
     public function loadUrlsFromSitemap($base_url) {
 
-        $urls = $this->getSitemapUrls($base_url);
+        $base_url = trim($base_url, '/');
+
+        $time_start = microtime(true);
+
+        if( !$urls = $this->getSitemapUrls($base_url) )
+            return false;
 
         $this->output->writeln("<comment>Loading urls</comment>");
 
         foreach ($urls as $url)
-            $this->store($url);
+            $this->store($base_url, $url);
 
         $this->output->writeln("<comment>Writing sitemap</comment>");
 
+        $time_end = microtime(true);
+        $this->output->writeln("<question>=> All urls loaded in ".round($time_end-$time_start)."s with ".count($this->errors)." error(s)</question>");
+
+        return true;
     }
 
     /**
@@ -102,7 +133,7 @@ class ExportCommand  extends Command{
      */
     private function dumpFile($filename, $content){
 
-        if( $this->input->getArgument('write') )
+        if( $this->input->getOption('write') )
             $this->filesystem->dumpFile($filename, $content);
     }
 
@@ -114,20 +145,23 @@ class ExportCommand  extends Command{
      */
     private function mirror($origin_path, $target_path){
 
-        if( $this->input->getArgument('write') )
+        if( $this->input->getOption('write') )
             $this->filesystem->mirror($origin_path, $target_path);
     }
 
 
     /**
-     * @return array|\WP_Error
+     * @return array|false
      */
     private function getSitemapUrls($base_url) {
 
         $robots = $this->getRobots($base_url);
 
-        if( !$robots || !isset($robots['Sitemap']) )
-            return new \WP_Error('export', 'Sitemap not found');
+        if( !$robots )
+            return $this->error("Robots not found");
+
+        if( !isset($robots['Sitemap']) )
+            return $this->error("Sitemap not found");
 
         $sitemaps = (array)$robots['Sitemap'];
 
@@ -135,14 +169,14 @@ class ExportCommand  extends Command{
 
         foreach ($sitemaps as $sitemap_url){
 
-            $sitemap = $this->loadSitemap($sitemap_url);
-            $urls = array_merge($urls, $this->parseSitemap($sitemap));
+            if( $sitemap = $this->loadSitemap($base_url, $sitemap_url) )
+                $urls = array_merge($urls, $this->parseSitemap($base_url, $sitemap));
         }
 
         if( count($urls) )
             $this->output->writeln("<info>=> Found ".count($urls)." urls</info>");
         else
-            $this->output->writeln("<error>=> No urls found</error>");
+            return $this->error("=> No url found");
 
         return $urls;
     }
@@ -152,22 +186,20 @@ class ExportCommand  extends Command{
      * @param $url
      * @return string|void|\WP_Error
      */
-    private function loadSitemap($url){
+    private function loadSitemap($base_url, $url){
 
         $this->output->writeln("<info>- ".$url."</info>");
 
-        $sitemap = $this->remoteGet($url);
-
-        if( is_wp_error($sitemap) )
-            return $sitemap;
+        if( !$sitemap = $this->remoteGet($url) )
+            return;
 
         $sitemap_xml = simplexml_load_string($sitemap);
 
         if( !$sitemap_xml )
-            return new \WP_Error('export', 'Error: Cannot create object');
+            return $this->error('Cannot create xml object');
 
-        $filename = str_replace($this->base_url, '', $url);
-        $this->dumpFile($this->export_dir.'/'.$filename, $this->process($sitemap));
+        $filename = str_replace($base_url, '', $url);
+        $this->dumpFile($this->export_dir.'/'.$filename, $this->process($base_url, $sitemap));
 
         return json_decode(json_encode($sitemap_xml),1);
     }
@@ -176,7 +208,7 @@ class ExportCommand  extends Command{
      * @param $sitemap
      * @return array
      */
-    private function parseSitemap($sitemap){
+    private function parseSitemap($base_url, $sitemap){
 
         $urls = [];
 
@@ -184,8 +216,8 @@ class ExportCommand  extends Command{
 
             foreach( $sitemap['sitemap'] as $_sitemap ){
 
-                $_sitemap = $this->loadSitemap($_sitemap['loc']);
-                $urls = array_merge($urls, $this->parseSitemap($_sitemap));
+                $_sitemap = $this->loadSitemap($base_url, $_sitemap['loc']);
+                $urls = array_merge($urls, $this->parseSitemap($base_url, $_sitemap));
             }
         }
         elseif( isset($sitemap['url']) ){
@@ -211,13 +243,10 @@ class ExportCommand  extends Command{
 
         $robots = $this->remoteGet($base_url.'/robots.txt');
 
-        if( is_wp_error($robots) ){
+        if( is_wp_error($robots) )
+            return $this->error("Can't get robots.txt ->".$robots->get_error_message());
 
-            $this->output->writeln("<error>Can't get robots.txt ->".$robots->get_error_message()."</error>");
-            return false;
-        }
-
-        $this->dumpFile($this->export_dir.'/robots.txt', $this->process($robots));
+        $this->dumpFile($this->export_dir.'/robots.txt', $this->process($base_url, $robots));
 
         $robots_lines = explode("\n", $robots);
         $robots = [];
@@ -266,7 +295,7 @@ class ExportCommand  extends Command{
 
 
     /**
-     * @return void
+     * @return bool
      */
     private function createZip(){
 
@@ -278,31 +307,50 @@ class ExportCommand  extends Command{
         if( !is_wp_error($status) )
             $this->output->writeln("<info>Zip created (".$this->getFileSize($file_path).")</info>");
         else
-            $this->output->writeln("<error>".$status->get_error_message()."</error>");
+            return $this->error($status->get_error_message());
+
+        return true;
     }
 
 
     /**
+     * @param $base_url
      * @param $html
      * @return array|mixed|string|string[]
      */
-    private function process($html){
+    private function process($base_url, $html){
 
-        $ssl = substr($this->input->getArgument('domain'), 0, 5) == 'https';
+        if( $this->input->getOption('compare') ){
 
-        $domain = strtok(preg_replace('/https?:\/\//', '', $this->input->getArgument('domain')),':');
-        $current_domain = strtok(preg_replace('/https?:\/\//', '', home_url('')),':');
+            $domain = strtok(preg_replace('/https?:\/\//', '', $base_url),':');
 
-        if( $ssl && !is_ssl() ) {
+            $html = str_replace($base_url, '', $html);
+            $html = str_replace(json_encode($base_url), '', $html);
 
-            $html = str_replace('http://'.$current_domain, 'https://'.$current_domain, $html);
-            $html = str_replace(json_encode('http://'.$current_domain), json_encode('https://'.$current_domain), $html);
+            if( $domain ){
+
+                $html = str_replace($domain, '', $html);
+                $html = str_replace(json_encode($domain), '', $html);
+            }
         }
+        else{
 
-        if( $domain ){
+            $ssl = substr($this->input->getOption('domain'), 0, 5) == 'https';
 
-            $html = str_replace($current_domain, $domain, $html);
-            $html = str_replace(json_encode($current_domain), json_encode($domain), $html);
+            $domain = strtok(preg_replace('/https?:\/\//', '', $this->input->getOption('domain')),':');
+            $current_domain = strtok(preg_replace('/https?:\/\//', '', $base_url),':');
+
+            if( $ssl && !is_ssl() ) {
+
+                $html = str_replace('http://'.$current_domain, 'https://'.$current_domain, $html);
+                $html = str_replace(json_encode('http://'.$current_domain), json_encode('https://'.$current_domain), $html);
+            }
+
+            if( $domain ){
+
+                $html = str_replace($current_domain, $domain, $html);
+                $html = str_replace(json_encode($current_domain), json_encode($domain), $html);
+            }
         }
 
         return $html;
@@ -311,7 +359,7 @@ class ExportCommand  extends Command{
 
     /**
      * @param $url
-     * @return string|\WP_Error
+     * @return string|bool
      */
     private function remoteGet($url){
 
@@ -322,48 +370,45 @@ class ExportCommand  extends Command{
         if( $response_code == 200  && !empty($response_body) )
             return $response_body;
 
-        $this->errors[] = $url;
-
-        return new \WP_Error('remove_get', $response_code);
+        return $this->error('-> Error '.$response_code);
     }
 
 
     /**
+     * @param $base_url
      * @param $url
-     * @return void
+     * @return bool
      */
-    private function store($url){
+    private function store($base_url, $url){
 
         if( is_wp_error($url) )
-            return;
-
-        $url = str_replace($this->base_url, '', $url);
+            $this->error($url->get_error_message());
 
         $this->output->writeln("<comment>- $url</comment>");
 
+        $url = str_replace($base_url, '', $url);
+
         $time_start = microtime(true);
-        $response = $this->remoteGet($this->base_url.$url);
+
+        if( !$response = $this->remoteGet($base_url.$url) )
+            return false;
+
         $time_end = microtime(true);
 
-        if( !is_wp_error($response) ){
+        if( substr($url, -1) == '/' )
+            $url .= 'index';
 
-            if( substr($url, -1) == '/' )
-                $url .= 'index';
+        $filepath = $this->export_dir.$url.'.html';
+        $path = dirname($filepath);
 
-            $filepath = $this->export_dir.$url.'.html';
-            $path = dirname($filepath);
+        if( !$this->filesystem->exists($path) )
+            $this->filesystem->mkdir($path, 0755);
 
-            if( !$this->filesystem->exists($path) )
-                $this->filesystem->mkdir($path, 0755);
+        $this->dumpFile($filepath, $this->process($base_url, $response));
 
-            $this->dumpFile($filepath, $this->process($response));
+        $this->output->writeln("<info>-> rendered in ".round($time_end*1000-$time_start*1000)."ms</info>");
 
-            $this->output->writeln("<info>-> rendered in ".round($time_end*1000-$time_start*1000)."ms</info>");
-        }
-        else{
-
-            $this->output->writeln("<error>-> ".$response->get_error_message()."</error>");
-        }
+        return true;
     }
 
 
@@ -393,7 +438,7 @@ class ExportCommand  extends Command{
             }
             else{
 
-                $this->output->writeln("<error>".$origin_path." does not exists</error>");
+                $this->error($origin_path." does not exists");
             }
         }
 
@@ -412,9 +457,9 @@ class ExportCommand  extends Command{
         $this->setName('site:export');
         $this->setDescription("Export static site");
 
-        $this->addArgument('write', InputArgument::OPTIONAL, 'Write file to disk, set false to use as warmup');
-        $this->addArgument('domain', InputArgument::OPTIONAL, 'Target domain');
-        $this->addArgument('zip', InputArgument::OPTIONAL, 'Create zip from export folder');
-        $this->addArgument('compare', InputArgument::OPTIONAL, 'Compare with other domain');
+        $this->addOption('domain', null, InputOption::VALUE_OPTIONAL, 'Target domain', false);
+        $this->addOption('write', null, InputOption::VALUE_OPTIONAL, 'Write file to disk, set false to use as warmup', true);
+        $this->addOption('zip', null, InputOption::VALUE_OPTIONAL, 'Create zip from export folder', true);
+        $this->addOption('compare', null, InputOption::VALUE_OPTIONAL, 'Compare with other domain', false);
     }
 }
