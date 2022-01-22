@@ -3,10 +3,10 @@
 namespace Metabolism\WordpressBundle\Loader;
 
 use Dflydev\DotAccessData\Data;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
-use Env\Env;
 use function Env\env;
 
 /**
@@ -20,27 +20,15 @@ class ConfigLoader {
         return $_config->get($resource, $default);
     }
 
-    public function import($resource)
-    {
+    public function import($resource){
+
         /**
          * Wordpress configuration file
          */
 
-        if (!defined('BASE_URI'))
-        {
-            $base_uri = dirname( __DIR__ );
+        if (!defined('BASE_URI')) {
 
-            if( '\\' === \DIRECTORY_SEPARATOR ){
-                // windows
-                $base_uri = preg_replace( "/\\\public$/", '', $base_uri );
-                $base_uri = preg_replace( "/\\\\vendor\\\\metabolism\\\\wordpress-bundle\\\\src$/", '', $base_uri );
-            }
-            else{
-                // unix
-                $base_uri = preg_replace( "/\/public$/", '', $base_uri );
-                $base_uri = preg_replace( "/\/vendor\/metabolism\/wordpress-bundle\/src$/", '', $base_uri );
-            }
-
+            $base_uri = realpath(dirname( __DIR__ ).'/../../../../');
             define( 'BASE_URI', $base_uri);
         }
 
@@ -51,11 +39,9 @@ class ConfigLoader {
         $composer = BASE_URI.'/composer.json';
 
         $wp_path = 'pubic/edition/';
-        $wp_muplugin_path = 'pubic/wp-bundle/mu-plugins/';
-        $wp_plugin_path = 'pubic/wp-bundle/plugins/';
 
         // get Wordpress path
-        if( file_exists($composer) ){
+        if( !is_dir(BASE_URI.'/'.$wp_path) && file_exists($composer) ){
 
             $composer = json_decode(file_get_contents($composer), true);
             $installer_paths= $composer['extra']['installer-paths']??[];
@@ -64,12 +50,6 @@ class ConfigLoader {
 
                 if( in_array("type:wordpress-core", $types) )
                     $wp_path = $installer_path;
-
-                if( in_array("type:wordpress-muplugin", $types) )
-                    $wp_muplugin_path = str_replace('{$name}/', '', $installer_path);
-
-                if( in_array("type:wordpress-plugin", $types) )
-                    $wp_plugin_path = str_replace('{$name}/', '', $installer_path);
             }
         }
 
@@ -112,6 +92,7 @@ class ConfigLoader {
         define( 'WP_ENV', $env);
         define( 'WP_DEBUG', $env === 'dev');
         define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
+        define( 'SCRIPT_DEBUG', WP_DEBUG);
 
         define( 'HEADLESS', $_config->get('headless', false) );
         define( 'URL_MAPPING', $_config->get('headless.mapping', false)?env('MAPPED_URL'):false );
@@ -136,19 +117,10 @@ class ConfigLoader {
          * Configure URLs
          */
 
-        if( !$wp_home = env('WP_HOME') ){
+        if( !$wp_home = env('WP_HOME') ) {
 
-            $isSecure = false;
-
-            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'){
-                $isSecure = true;
-            }
-            elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on'){
-                $isSecure = true;
-                $_SERVER['HTTPS']='on';
-            }
-
-            $wp_home = ( $isSecure ? 'https' : 'http' ) . '://'.trim($_SERVER['HTTP_HOST'], '/');
+            $request = Request::createFromGlobals();
+            $wp_home = $request->getSchemeAndHttpHost();
         }
 
         define( 'WP_FOLDER', '/'.$wp_folder);
@@ -172,7 +144,7 @@ class ConfigLoader {
         if( !env('DATABASE_URL') && !env('DB_NAME') )
             die('<code>Database configuration is missing, please add <b>DATABASE_URL=mysql://user:pwd@localhost:3306/dbname</b> to your environment or DB_NAME, DB_USER, DB_PASSWORD, DB_HOST separately.</code>');
 
-        if(env('DB_NAME')){
+        if( env('DB_NAME') ){
 
             define( 'DB_NAME', env('DB_NAME'));
             define( 'DB_USER', env('DB_USER'));
@@ -184,18 +156,14 @@ class ConfigLoader {
 
             $database_url = env('DATABASE_URL');
 
-            $mysql = explode('@', strtok(str_replace('mysql://', '', str_replace('mariadb://', '', $database_url)), '?'));
-            $mysql[0] = explode(':', $mysql[0]);
-            $mysql[1] = explode('/', $mysql[1]);
-
-            define( 'DB_NAME', $mysql[1][1]);
-            define( 'DB_USER', $mysql[0][0]);
-            define( 'DB_PASSWORD', $mysql[0][1]);
-            define( 'DB_HOST', $mysql[1][0]);
+            define( 'DB_NAME', trim(parse_url($database_url,PHP_URL_PATH), '/'));
+            define( 'DB_USER', parse_url($database_url,PHP_URL_USER));
+            define( 'DB_PASSWORD', parse_url($database_url,PHP_URL_PASS));
+            define( 'DB_HOST',  parse_url($database_url,PHP_URL_HOST));
         }
 
-        define( 'DB_CHARSET', $_config->get('database.charset', 'utf8mb4'));
-        define( 'DB_COLLATE', $_config->get('database.collate', ''));
+        define( 'DB_CHARSET', env('DB_CHARSET')?:'utf8mb4');
+        define( 'DB_COLLATE', env('DB_COLLATE')?:'utf8mb4_unicode_ci');
 
 
         /**
@@ -258,6 +226,9 @@ class ConfigLoader {
         if (!defined('DISALLOW_FILE_EDIT'))
             define( 'DISALLOW_FILE_EDIT', true);
 
+        if (!defined('EMPTY_TRASH_DAYS'))
+            define('EMPTY_TRASH_DAYS', env('EMPTY_TRASH_DAYS', 7));
+
         if (!defined('WP_POST_REVISIONS'))
             define( 'WP_POST_REVISIONS', 3);
 
@@ -266,6 +237,9 @@ class ConfigLoader {
 
         if (!defined('WP_DISABLE_FATAL_ERROR_HANDLER'))
             define( 'WP_DISABLE_FATAL_ERROR_HANDLER', true );
+
+        if (!defined('WP_DEFAULT_THEME'))
+            define('WP_DEFAULT_THEME', 'empty');
 
         /**
          * Bootstrap WordPress
