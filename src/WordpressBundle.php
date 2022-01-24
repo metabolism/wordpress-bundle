@@ -77,8 +77,9 @@ class WordpressBundle extends Bundle
         if( is_object($request) && get_class($request) == 'Symfony\Component\HttpFoundation\Request' )
             trigger_error('$request must be renamed in "'.$this->public_dir.'/index.php" : $httpRequest = Request::createFromGlobals();', E_USER_WARNING);
 
-        if( !defined('WP_DEBUG_LOG') )
-            define('WP_DEBUG_LOG', $this->log_dir);
+        if (!defined('WP_DEBUG_LOG')){
+            define('WP_DEBUG_LOG', realpath($this->log_dir . '/wp.log'));
+        }
 
         $composer = $this->root_dir.'/composer.json';
 
