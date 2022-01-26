@@ -3,7 +3,6 @@
 namespace Metabolism\WordpressBundle\Provider;
 
 use Dflydev\DotAccessData\Data;
-use function Env\env;
 
 /**
  * Class Metabolism\WordpressBundle Framework

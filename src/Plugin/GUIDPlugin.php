@@ -26,7 +26,7 @@ class GUIDPlugin {
 		$hash = sha1( $ns_uuid . $name );
 
 		// Intialize the octets with the 16 first octets of the hash, and adjust specific bits later.
-		$octets = str_split( substr( $hash, 0, 16 ), 1 );
+		$octets = str_split( substr( $hash, 0, 16 ) );
 
 		/*
 		 * Set version to 0101 (UUID version 5).

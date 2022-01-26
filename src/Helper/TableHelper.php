@@ -25,9 +25,9 @@ class TableHelper extends \WP_List_Table {
 		global $wpdb;
 
 		$this->table = $table;
-		$this->column_title = isset($args['columns']['title'])?$args['columns']['title']:'Title';
+		$this->column_title = $args['columns']['title'] ?? 'Title';
 
-		$structure = $wpdb->get_col( "DESCRIBE {$wpdb->prefix}{$this->table}", 0 );
+		$structure = $wpdb->get_col( "DESCRIBE {$wpdb->prefix}{$this->table}" );
 
 		if(!$structure || !is_array($structure) )
 			wp_die("TableHelper {$wpdb->prefix}{$this->table} is missing");

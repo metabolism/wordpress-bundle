@@ -227,7 +227,7 @@ class ConfigLoader {
             define( 'DISALLOW_FILE_EDIT', true);
 
         if (!defined('EMPTY_TRASH_DAYS'))
-            define('EMPTY_TRASH_DAYS', env('EMPTY_TRASH_DAYS', 7));
+            define('EMPTY_TRASH_DAYS', 7);
 
         if (!defined('WP_POST_REVISIONS'))
             define( 'WP_POST_REVISIONS', 3);

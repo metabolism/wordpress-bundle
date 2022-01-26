@@ -30,22 +30,18 @@ class File extends Entity
     protected $src;
 
     private $post;
-    private $args = [];
 
     public function __toString()
     {
         return $this->link??'';
     }
 
-	/**
-	 * Post constructor.
-	 *
-	 * @param int|string $id
-	 * @param array $args
-	 */
-	public function __construct($id=null, $args=[]) {
-
-		$this->args = $args;
+    /**
+     * Post constructor.
+     *
+     * @param null $id
+     */
+	public function __construct($id=null) {
 
 		$this->get($id);
     }

@@ -3,6 +3,17 @@ services:
     autowire: true      # Automatically injects dependencies in your services.
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+  Metabolism\WordpressBundle\ArgumentResolver\PostsValueResolver:
+    tags:
+      - { name: controller.argument_value_resolver, priority: 50 }
+
+  Metabolism\WordpressBundle\ArgumentResolver\PostValueResolver:
+    tags:
+      - { name: controller.argument_value_resolver, priority: 50 }
+
+  Metabolism\WordpressBundle\ArgumentResolver\TermValueResolver:
+    tags:
+      - { name: controller.argument_value_resolver, priority: 50 }
 
   Metabolism\WordpressBundle\:
     resource: '../src/'

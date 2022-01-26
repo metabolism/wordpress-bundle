@@ -31,7 +31,7 @@ class MediaPlugin {
 	 */
 	public static function upload($file='file', $allowed_type = ['image/jpeg', 'image/jpg', 'image/gif', 'image/png'], $path='/user', $max_size=1048576){
 
-		if( !isset($_FILES[$file]) || empty($_FILES[$file]) )
+		if(empty($_FILES[$file]))
 			return new \WP_Error('empty', 'File '.$file.' is empty');
 
 		$file = $_FILES[$file];

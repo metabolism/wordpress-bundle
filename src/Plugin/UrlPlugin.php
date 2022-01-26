@@ -73,7 +73,7 @@ class UrlPlugin {
 			return get_permalink($post);
 		}
 
-		$filter = isset($post->filter) ? $post->filter : false;
+		$filter = $post->filter ?? false;
 
 		list($permalink, $post_name) = get_sample_permalink($post);
 		$preview_permalink = str_replace( array( '%pagename%', '%postname%' ), $post_name, esc_html( urldecode( $permalink ) ) );
@@ -94,8 +94,8 @@ class UrlPlugin {
 	/**
 	 * Get search url
 	 * @param $s
-	 * @return mixed
-	 */
+	 * @return string
+     */
 	public function getSearchLink($s){
 
 	    global $wp_rewrite;
@@ -119,7 +119,7 @@ class UrlPlugin {
         }
 		else{
 
-            $id = isset($_GET['p'])?$_GET['p']:$_GET['page_id'];
+            $id = $_GET['p'] ?? $_GET['page_id'];
             $permalink = $this->getPreviewPermalink($id);
 
             $query_args['preview'] = 'true';

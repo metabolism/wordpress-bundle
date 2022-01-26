@@ -19,7 +19,7 @@ class MailPlugin {
 	{
 		$mailer_url = getenv('MAILER_URL');
 
-		if( $mailer_url && !empty($mailer_url) ){
+		if(!empty($mailer_url)){
 
 			$this->setSMTPConfig($mailer_url);
 
@@ -92,12 +92,12 @@ class MailPlugin {
 
 		$phpmailer->SMTPAuth = $SMTPAuth;
 
-		if((bool) $SMTPAuth){
-			$phpmailer->Port = isset($this->_smtp_config['port'])?$this->_smtp_config['port']:25;
+		if($SMTPAuth){
+			$phpmailer->Port = $this->_smtp_config['port'] ?? 25;
 			$phpmailer->Username = $this->_smtp_config['user'];
 			$phpmailer->Password = urldecode($this->_smtp_config['pass']);
 		}
 
-		$phpmailer->SMTPSecure = isset($this->_smtp_config['encryption'])?$this->_smtp_config['encryption']:null;
+		$phpmailer->SMTPSecure = $this->_smtp_config['encryption'] ?? null;
 	}
 }

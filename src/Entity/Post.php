@@ -5,7 +5,6 @@ namespace Metabolism\WordpressBundle\Entity;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TermFactory;
-use Metabolism\WordpressBundle\Helper\QueryHelper;
 
 /**
  * Class Post
@@ -51,7 +50,6 @@ class Post extends Entity
 
 	/** @var \WP_Post|bool */
 	private $post;
-	private $args = [];
 
     public function __toString(){
 
@@ -62,11 +60,8 @@ class Post extends Entity
 	 * Post constructor.
 	 *
 	 * @param null $id
-	 * @param array $args
 	 */
-	public function __construct($id = null, $args = []) {
-
-		$this->args = $args;
+	public function __construct($id = null) {
 
 		if( $post = $this->get($id) ) {
 
@@ -213,7 +208,7 @@ class Post extends Entity
 
 
 	/**
-	 * Get sibling post using wordpress natural order
+	 * Get sibling post using Wordpress natural order
 	 * @param $args
 	 * @param $loop
 	 * @return array[
@@ -223,7 +218,38 @@ class Post extends Entity
 	 */
 	public function adjacents($args=[], $loop=false){
 
-		return QueryHelper::get_adjacent_posts($this->ID, $args, $loop);
+        $default_args = [
+            'orderby' => 'menu_order',
+            'order' => 'ASC',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'post_type' => $this->type
+        ];
+
+        $args = array_merge($default_args, $args);
+
+        $query = new \WP_Query($args);
+
+        $next_id = $prev_id = false;
+
+        foreach($query->posts as $key => $_post_id) {
+            if($_post_id == $this->ID){
+                $next_id = $query->posts[$key + 1] ?? false;
+                $prev_id = $query->posts[$key - 1] ?? false;
+                break;
+            }
+        }
+
+        if( !$next_id && $loop )
+            $next_id = $query->posts[0];
+
+        if( !$prev_id && $loop )
+            $prev_id = $query->posts[ count($query->posts) - 1 ];
+
+        return [
+            'next' => $next_id ? PostFactory::create($next_id) : false,
+            'prev' => $prev_id ? PostFactory::create($prev_id) : false
+        ];
 	}
 
 

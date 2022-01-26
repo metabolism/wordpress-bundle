@@ -1,19 +1,62 @@
 # Wordpress x Symfony
 
-## Introduction
-
-Use Wordpress 5 as a backend for a Symfony application
-
-The main idea is to use the power of Symfony for the front / webservices with the ease of Wordpress for the backend.
+Use Wordpress as a backend for a Symfony application
 
 ## How does it work ?
 
-When the Wordpress bundle is loaded, it loads a small amount of Wordpress Core files to allow usage of Wordpress functions 
-inside Symfony Controllers.
+When the Wordpress bundle is loaded, it includes the minimal amount of Wordpress Core files to allow usage of Wordpress functions and plugins
+inside Symfony.
 
-Wordpress is then linked to the bundle via a must use plugin.
+__Controller example :__
 
-Because it's a Symfony bundle, there is no theme management in Wordpress and the entire routing is powered by Symfony.
+```php
+// src/Controller/BlogController.php
+
+/**
+ * @param Post $post
+ * @param PostRepository $postRepository
+ * @param BreadcrumbService $breadcrumbService
+ * @return Response
+ */
+public function pageAction(Post $post, PostRepository $postRepository)
+{
+    $context = [];
+    
+    // get current post
+    $context['post'] = $post;
+    
+    // find 10 "brands" ordered by title
+    $context['brands'] = $postRepository->findBy(['post_type'=>'brand'], ['title'=>'ASC'], 10);
+
+    return $this->render('page.twig', $context);
+}
+```
+
+```twig
+{# page.twig #}
+
+{% extends 'layout.twig' %}
+
+{% block body %}
+<article id="post-{{ post.ID }}" class="{{ post.class }}">
+
+    {% if post.thumbnail %}
+        <img src="{{ post.thumbnail.resize(800, 600) }}" alt="{{ post.thumbnail.alt }}"/>
+    {% endif %}
+
+    <div class="entry-content">
+        {{ post.content|raw }}
+    </div>
+    
+    <small>{{ post.metafields.mention }}</small>
+    
+    {% for brand in brands %}
+        {% include 'brand.twig' %}
+    {% endfor %}
+
+</article>
+{% endblock body %}
+```
 
 ## Migrating from 1.4 to 1.5 ? 
 
@@ -30,39 +73,34 @@ From Symfony :
 * Folder structure
 * Http Cache
 * Routing
-* YML configuration ( even for Wordpress )
+* YML configuration
 * DotEnv
 * Enhanced Security ( Wordpress is 'hidden' )
 * Dynamic image resize
+* MVC
 
 From the bundle itself :
-* YML configuration for Wordpress (see bellow )
+* Wordpress YML configuration ( [view sample](samples/config/packages/wordpress.yml) )
+* Post/Term Repository
+* Controller argument resolver for post(s) and term
 * Permalink configuration for custom post type and taxonomy
-* ACF data cleaning
-* SF Cache invalidation ( Varnish compatible )
-* Post/Image/Menu/Term/User/Comment/Query entities
-* Download backup ( uploads + bdd ) from the admin
+* Symfony Cache invalidation on edit ( Varnish compatible )
+* Post/Image/Menu/Term/User/Comment/Site entities
 * Maintenance mode
 * Multisite images sync ( for multisite as multilangue )
 * SVG Support
-* Edit posts button in toolbar on custom post type archive page
-* Wordpress predefined routes via permastruct
-* Context service
+* Wordpress predefined routes
 * Relative urls
-* Terms bugfix ( sort )
-* Form helpers ( get / validate / send )
 * Multisite post deep copy ( with multisite-language-switcher plugin )
-* Image filename cleaning on upload
 * Custom datatable support with view and delete actions in admin
-* Extensible, entities, controller and bundle plugins can be extended in the app
 * Site health checker
-* Static site export from sitemap
+* Static site export ( using sitemap )
  
 ## Drawbacks
 
-Because of Wordpress design, functions are available in the global namespace.
+Wordpress functions are available in the global namespace.
 
-Some plugins may not work directly.
+Some plugins may not work ( ex : Woocommerce ).
 
 ## Recommended / tested plugins
 
@@ -158,8 +196,8 @@ Please read the [bundle documentation](docs/index.md) to continue
 ## Why not Bedrock
 
 Because Bedrock "only" provides a folder organisation with composer dependencies management.
-Btw this Bundle comes from years of Bedrock usage + Timber plugin...
-       
+This bundle comes from years of Bedrock usage + Timber plugin...
+
 ## Why not Ekino Wordpress Bundle
 
 The philosophy is not the same, Ekino use Symfony to manipulate Wordpress database.
@@ -174,7 +212,7 @@ Plus the security is a requirement for us and Wordpress failed to provide someth
 ## Roadmap
 
 * More samples
-* Woo-commerce Provider rewrite
+* Better documentation
 * Global maintenance mode for multi-site
 * Unit tests
 

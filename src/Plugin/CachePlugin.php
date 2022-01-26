@@ -20,7 +20,7 @@ class CachePlugin
 	/**
 	 * Add maintenance button and checkbox
 	 * @param bool $pid
-	 * @return bool|void
+	 * @return void
 	 */
 	public function purgeCache($pid=false)
 	{
@@ -31,7 +31,7 @@ class CachePlugin
 
 			if( $post && $post->post_status === 'publish' && $post_type_object->publicly_queryable ){
 
-				$home_url = get_home_url(null);
+				$home_url = get_home_url();
 				$url = $home_url.get_permalink($pid);
 
 				$this->purge($url);
@@ -152,8 +152,8 @@ class CachePlugin
 	 */
 	public function __construct($config)
 	{
-		$env = isset($_SERVER['APP_ENV'])?$_SERVER['APP_ENV']:'dev';
-		$debug = (bool) ( isset($_SERVER['APP_DEBUG'])?$_SERVER['APP_DEBUG']:('prod' !== $env));
+		$env = $_SERVER['APP_ENV'] ?? 'dev';
+		$debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env));
 
 		$this->cacheHelper = new CacheHelper();
 

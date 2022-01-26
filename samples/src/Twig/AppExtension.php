@@ -9,8 +9,6 @@
 
 namespace App\Twig;
 
-use Metabolism\WordpressBundle\Helper\ACFHelper;
-
 use Twig\Extension\AbstractExtension,
 	Twig\TwigFilter,
 	Twig\TwigFunction;
@@ -186,8 +184,8 @@ class AppExtension extends AbstractExtension{
 
 	/**
 	 * @param $string
-	 * @return mixed
-	 */
+	 * @return string
+     */
 	public function removeBr($string)
 	{
 		return str_replace('<br/>', ' ', str_replace('<br>', ' ', str_replace('<br />', ' ', $string)));
@@ -236,44 +234,34 @@ class AppExtension extends AbstractExtension{
 		{
 			default:
 				return false;
-				break;
 
 			case 'array':
 				return is_array( $var );
-				break;
 
 			case 'bool':
 				return is_bool( $var );
-				break;
 
 			case 'float':
 				return is_float( $var );
-				break;
 
 			case 'int':
 				return is_int( $var );
-				break;
 
 			case 'numeric':
 				return is_numeric( $var );
-				break;
 
 			case 'object':
 				if ( !is_array($var) ) return false;
 				return array_keys($var) !== range(0, count($var) - 1);
-				break;
 
 			case 'scalar':
 				return is_scalar( $var );
-				break;
 
 			case 'string':
 				return is_string( $var );
-				break;
 
 			case 'datetime':
 				return ( $var instanceof \DateTime );
-				break;
 		}
 	}
 
@@ -363,7 +351,7 @@ class AppExtension extends AbstractExtension{
 	/**
 	 * @param $objects
 	 * @param $attrs
-	 * @return mixed
+	 * @return array
 	 * @internal param $text
 	 */
 	public function bind($objects, $attrs)
@@ -380,14 +368,14 @@ class AppExtension extends AbstractExtension{
 				$binded_object = [];
 				foreach ($attrs as $dest=>$source)
 				{
-					$binded_object[$dest] = isset($object[$source]) ? $object[$source] : false;
+					$binded_object[$dest] = $object[$source] ?? false;
 				}
 
 				$binded_objects[] = $binded_object;
 			}
 			else
 			{
-				$binded_objects[] = isset($object[$attrs]) ? $object[$attrs] : false;
+				$binded_objects[] = $object[$attrs] ?? false;
 			}
 		}
 
@@ -396,7 +384,7 @@ class AppExtension extends AbstractExtension{
 
 	/**
 	 * @param $text
-	 * @return mixed
+	 * @return string
 	 */
 	public function cleanSpace($text)
 	{
@@ -406,7 +394,7 @@ class AppExtension extends AbstractExtension{
 	/**
 	 * @param        $text
 	 * @param string $charset
-	 * @return mixed|string
+	 * @return string
 	 */
 	public function removeAccent($text, $charset = 'utf-8')
 	{

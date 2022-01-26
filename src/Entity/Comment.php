@@ -61,7 +61,7 @@ class Comment extends Entity
 
 	/**
 	 * @param $pid
-	 * @return array|\WP_Comment|null
+	 * @return array|\WP_Comment|false
 	 */
 	protected function get($pid ) {
 

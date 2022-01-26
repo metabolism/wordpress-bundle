@@ -179,6 +179,7 @@ class ExportCommand  extends Command{
 
 
     /**
+     * @param $base_url
      * @param $url
      * @return string|void|\WP_Error
      */
@@ -201,6 +202,7 @@ class ExportCommand  extends Command{
     }
 
     /**
+     * @param $base_url
      * @param $sitemap
      * @return array
      */

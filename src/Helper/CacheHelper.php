@@ -95,14 +95,14 @@ class CacheHelper {
 	/**
 	 * Purge cache
 	 * @param bool $url
-	 * @return array|\WP_Error
-	 */
+	 * @return array
+     */
 	public function purgeUrl($url=false){
 
 		if( !$url )
 			$url = get_home_url(null, '.*');
 
-		$varnish_ssl = isset($_SERVER['VARNISH_SSL'])?$_SERVER['VARNISH_SSL']:false;
+		$varnish_ssl = $_SERVER['VARNISH_SSL'] ?? false;
         $result = [];
 
         $args = [

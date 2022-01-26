@@ -31,7 +31,7 @@ class PerformancePlugin
             add_action('wp_footer', function (){
 
                 if( WP_DEBUG )
-                    echo '<!-- '.get_num_queries().' queries in '.timer_stop(0).' seconds. -->'.PHP_EOL;
+                    echo '<!-- '.get_num_queries().' queries in '.timer_stop().' seconds. -->'.PHP_EOL;
             });
         }
     }

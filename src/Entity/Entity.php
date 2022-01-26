@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
+use ArrayAccess;
 use Metabolism\WordpressBundle\Helper\ACFHelper;
 use Metabolism\WordpressBundle\Helper\DataHelper;
 use ReflectionObject;
@@ -13,7 +14,7 @@ use ReflectionMethod;
  *
  * @package Metabolism\WordpressBundle\Entity
  */
-class Entity
+abstract class Entity implements ArrayAccess
 {
 	public $ID;
 	public $entity;
@@ -108,8 +109,8 @@ class Entity
      * todo: to be deprecated
 	 *
 	 * @param $id
-	 * @return string
-	 */
+	 * @return bool
+     */
 	public function __isset($id) {
 
         $method = $this->getMethodName($id);
@@ -154,4 +155,17 @@ class Entity
 		$date = (string) mysql2date( self::$date_format, $date);
         return apply_filters('get_the_date', $date, self::$date_format);
 	}
+
+    public function offsetExists($offset)
+    {
+        return $this->__isset($offset);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->__get($offset);
+    }
+
+    public function offsetSet($offset, $value){}
+    public function offsetUnset($offset){}
 }

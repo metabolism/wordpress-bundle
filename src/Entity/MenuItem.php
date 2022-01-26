@@ -30,7 +30,7 @@ class MenuItem extends Entity
 	public $current_item_ancestor;
 	public $current_item_parent;
 
-    private $post;
+    private $menu_item;
 
     public function __toString()
     {
@@ -39,30 +39,29 @@ class MenuItem extends Entity
 
 	/**
 	 * MenuItem constructor.
-	 * @param \WP_Post $post
-	 * @param array $args
+	 * @param object $menu_item
 	 */
-	public function __construct($post, $args = [] ) {
+	public function __construct($menu_item) {
 		
-		if ( $post ){
+		if ( $menu_item ){
 
-			$this->post = $post;
+			$this->menu_item = $menu_item;
 
-			$this->ID = $post->ID;
-			$this->object_id = intval($post->object_id);
-			$this->menu_item_parent = $post->menu_item_parent;
-            $this->menu_order = $post->menu_order;
-            $this->link = $post->url;
-			$this->title = $post->title;
-			$this->target = $post->target;
-			$this->class = implode(' ', $post->classes);
-			$this->classes = $post->classes;
-			$this->object = $post->object;
-			$this->type = $post->type;
-			$this->description = $post->description;
-            $this->current = $post->current;
-            $this->current_item_ancestor = $post->current_item_ancestor;
-            $this->current_item_parent = $post->current_item_parent;
+			$this->ID = $menu_item->ID;
+			$this->object_id = intval($menu_item->object_id);
+			$this->menu_item_parent = $menu_item->menu_item_parent;
+            $this->menu_order = $menu_item->menu_order;
+            $this->link = $menu_item->url;
+			$this->title = $menu_item->title;
+			$this->target = $menu_item->target;
+			$this->class = trim(implode(' ', $menu_item->classes));
+			$this->classes = $menu_item->classes;
+			$this->object = $menu_item->object;
+			$this->type = $menu_item->type;
+			$this->description = $menu_item->description;
+            $this->current = $menu_item->current;
+            $this->current_item_ancestor = $menu_item->current_item_ancestor;
+            $this->current_item_parent = $menu_item->current_item_parent;
 
 			$this->loadMetafields($this->ID, 'menuItem');
 		}

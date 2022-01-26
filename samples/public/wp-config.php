@@ -35,7 +35,7 @@ if( !class_exists('App') )
 if (!env('APP_ENV') ) {
 
     if (!class_exists(Dotenv::class))
-        throw new \RuntimeException('<code>APP_ENV environment variable is not defined. You need to define environment variables for configuration or add "symfony/dotenv" as a Composer dependency to load variables from a .env file.</code>');
+        throw new RuntimeException('<code>APP_ENV environment variable is not defined. You need to define environment variables for configuration or add "symfony/dotenv" as a Composer dependency to load variables from a .env file.</code>');
 
     (new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
 }

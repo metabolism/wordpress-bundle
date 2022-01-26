@@ -62,15 +62,14 @@ class Factory {
 	 * @param $id
 	 * @param $class
 	 * @param bool $default_class
-	 * @param array $args
 	 * @return Entity|mixed
 	 */
-	public static function create($id, $class, $default_class=false, $args = []){
+	public static function create($id, $class, $default_class=false){
 
-		if( is_null($id) || empty($id) )
+		if(empty($id))
 			return false;
 
-		$item = self::loadFromCache($id, $class, $args);
+		$item = self::loadFromCache($id, $class);
 
 		if( $item )
 			return $item;
@@ -80,7 +79,7 @@ class Factory {
 
 		if( class_exists($app_classname) ){
 
-			$item = new $app_classname($id, $args);
+			$item = new $app_classname($id);
 		}
 		else{
 
@@ -88,11 +87,11 @@ class Factory {
 
 			if( class_exists($bundle_classname) ){
 
-				$item = new $bundle_classname($id, $args);
+				$item = new $bundle_classname($id);
             }
 			elseif( $default_class ){
 
-				$item = self::create($id, $default_class, false, $args);
+				$item = self::create($id, $default_class);
 			}
 		}
 
@@ -100,7 +99,7 @@ class Factory {
 			$item = false;
 
 		if( !$item )
-			self::saveToCache($id, $item, $class, $args);
+			self::saveToCache($id, $item, $class);
 
 		return $item;
 	}

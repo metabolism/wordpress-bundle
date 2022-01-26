@@ -3,14 +3,18 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use lloc\Msls\MslsOptions;
+use Metabolism\WordpressBundle\Traits\SingletonTrait;
+use Twig\Environment;
 
 /**
- * Class User
+ * Class Site
  *
  * @package Metabolism\WordpressBundle\Entity
  */
 class Site extends Entity
 {
+    use SingletonTrait;
+
 	public $entity = 'site';
 
     public $debug;
@@ -63,13 +67,13 @@ class Site extends Entity
         $this->debug = WP_DEBUG;
         $this->environment = WP_ENV;
         $this->paged = max(1, get_query_var('paged', 0));
-        $this->maintenance_mode = function_exists('wp_maintenance_mode') ? wp_maintenance_mode() : false;
+        $this->maintenance_mode = function_exists('wp_maintenance_mode') && wp_maintenance_mode();
 
         $this->is_admin = current_user_can('manage_options');
         $this->is_customize_preview = is_customize_preview();
         $this->is_front_page = is_front_page();
-        $this->is_single = isset($this->queried_object->post_type)??false;
-        $this->is_tax = isset($this->queried_object->taxonomy)??false;
+        $this->is_single = $this->queried_object->post_type??false;
+        $this->is_tax = $this->queried_object->taxonomy??false;
         $this->is_archive = is_object($this->queried_object) && get_class($this->queried_object) == 'WP_Post_Type' ? $this->queried_object->name : false;
 
         $this->languages = $this->getLanguages();
@@ -110,8 +114,6 @@ class Site extends Entity
      * @return string
      */
     public function getWpTitle(){
-
-        trigger_error('Method ' . __METHOD__ . ' is deprecated use getTitle instead', E_USER_DEPRECATED);
 
         return $this->getTitle();
     }
@@ -274,5 +276,17 @@ class Site extends Entity
         restore_current_blog();
 
         return $alternate;
+    }
+
+    /**
+     * @param Environment $twig
+     * @return void
+     */
+    public function setGlobals($twig){
+
+        $data = $this->__toArray();
+
+        foreach ($data as $key=>$value)
+            $twig->addGlobal($key, $value);
     }
 }

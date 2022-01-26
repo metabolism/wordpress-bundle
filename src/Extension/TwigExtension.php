@@ -56,7 +56,7 @@ class TwigExtension extends AbstractExtension{
 			new TwigFunction( 'Post', function($id){ return PostFactory::create($id); } ),
 			new TwigFunction( 'User', function($id){ return Factory::create($id, 'user'); } ),
 			new TwigFunction( 'Term', function($id){ return TermFactory::create($id); } ),
-			new TwigFunction( 'Image', function($id, $path=false){ return Factory::create($id, 'image', false, ['path'=>$path]); } )
+			new TwigFunction( 'Image', function($id){ return Factory::create($id, 'image'); } )
 		];
 	}
 
@@ -82,8 +82,8 @@ class TwigExtension extends AbstractExtension{
 	 * @param object|int|string $term
 	 * @param string $taxonomy
 	 * @param bool|string $meta
-	 * @return mixed
-	 */
+	 * @return false|string
+     */
 	public function getTermLink( $term, $taxonomy = 'category', $meta=false )
 	{
 
@@ -119,8 +119,8 @@ class TwigExtension extends AbstractExtension{
 
 	/**
 	 * @param $content
-	 * @return mixed
-	 */
+	 * @return array
+     */
 	public function more( $content )
 	{
         if ( preg_match( '/<!--more(.*?)?-->/', $content, $matches ) ) {
@@ -161,8 +161,8 @@ class TwigExtension extends AbstractExtension{
 	/**
 	 * @param $page
 	 * @param bool $by
-	 * @return mixed
-	 */
+	 * @return false|string
+     */
 	public function getPermalink( $page, $by=false )
 	{
 		switch ( $by ){
@@ -204,7 +204,7 @@ class TwigExtension extends AbstractExtension{
 	 */
 	public function placeholder($image, $params=false)
 	{
-		if( !$image || !$image instanceof Image )
+		if(!$image instanceof Image)
 			return new Image();
 
 		return $image;

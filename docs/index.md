@@ -199,29 +199,75 @@ See our sample [controllers](samples/controller) that you might want to copy to 
 
 This is the controller for the homepage
 ```php
-public function frontAction(ContextService $context)
+public function frontAction()
 {
-    $context->add('section', 'Homepage');
-    return $this->render('homepage.html.twig', $context->toArray());
+    return $this->render('homepage.html.twig', ['section'=> 'Homepage']);
 }
 ```
 
 note that Wordpress functions are available directly in the controller
 
 ```php
-public function frontAction(ContextService $context)
+public function frontAction()
 {
+    $context = [];
+
     if( is_user_logged_in() )
-        $context->add('section', 'Homepage for logged in user');
+        $context['section'] = 'Homepage for logged in user';
     else
-        $context->add('section', 'Homepage');
+        $context['section'] = 'Homepage';
 	    
-    return $this->render('homepage.html.twig', $context->toArray());
+    return $this->render('homepage.html.twig', $context);
+}
+```
+
+###Using Argument resolver, repositories and services
+
+```php
+/**
+ * @param Post $post
+ * @param PostRepository $postRepository
+ * @param BreadcrumbService $breadcrumbService
+ * @return Response
+ */
+public function pageAction(Post $post, PostRepository $postRepository, BreadcrumbService $breadcrumbService)
+{
+    $context = [
+        'post' => $post,
+        'subsidiaries' => $postRepository->findBy(['post_type'=>'subsidiary'], null,-1)
+    ];
+
+    $context['related'] = $postRepository->findBy(['post_type'=>'page', 'post_parent' => $post->getParent(), 'post__not_in' => [$post->ID]], null, 4);
+
+    $context['breadcrumb'] = $breadcrumbService->build();
+
+    $template = $post->getTemplate() != '' ? $post->getTemplate() : 'edito';
+
+    return $this->render('page/' . $template . '.twig', $context);
+}
+```
+```php
+/**
+ * @param PostRepository $postRepository
+ * @param PaginationService $paginationService
+ * @param BreadcrumbService $breadcrumbService
+ * @return Response
+ */
+public function articleArchiveAction(PostRepository $postRepository, PaginationService $paginationService, BreadcrumbService $breadcrumbService, array $posts)
+{
+    return $this->render('page/term.twig', [
+        'posts'=>$posts,
+        'breadcrumb'=>$breadcrumbService->build(),
+        'pagination'=>$paginationService->build(),
+        'subsidiaries' => $postRepository->findBy(['post_type'=>'subsidiary'], null,-1)
+    ]);
 }
 ```
 
 ## Context service
     
+__Deprecated__
+
 The Context service is a Wordpress data wrapper, it allows to query post, term, pagination, breadcrumb, comments and sitemap.
 
 Critical data are added automatically, such as current post or posts for archive, locale, home url, search url, ...
@@ -237,62 +283,6 @@ public function articleAction(ContextService $context)
     return $this->render( 'page/article.twig', $context->toArray() );
 }
 ```
-
-### Preview
-
-To preview/debug context, just add `?debug=context` to any url, it will output a json representation of itself.
-
-```json
-{
-  "debug": false,
-  "environment": "prod",
-  "locale": "fr",
-  "language": "fr-FR",
-  "languages": [],
-  "is_admin": false,
-  "home_url": "http://brilliant-wordpress-site.fr/",
-  "search_url": "/search",
-  "privacy_policy_url": "",
-  "maintenance_mode": false,
-  "tagline": "Un site utilisant WordPress",
-  "posts_per_page": "10",
-  "body_class": "fr-FR home page-template-default page page-id-38",
-  "page_title": "Home",
-  "system": "-- Removed from debug --",
-  "menu": [/*...*/],
-  "post": {
-    "excerpt": "",
-    "thumbnail": "",
-    "link": "/",
-    "template": "",
-    "ID": 38,
-    "comment_status": "closed",
-    "menu_order": 0,
-    "comment_count": "0",
-    "author": "1",
-    "date": "15 January 2019",
-    "date_gmt": "2019-01-15 11:45:59",
-    "content": "",
-    "title": "Home",
-    "status": "publish",
-    "password": "",
-    "name": "home",
-    "modified": "17 January 2019",
-    "modified_gmt": "2019-01-17 14:07:13",
-    "parent": 0,
-    "type": "page",
-    "splashscreen": {
-      "text": "La France et le Japon partagent les valeurs ...",
-      "partner": {
-        "link": "http://www.japon.fr"
-      }
-    }
-  },
-  "portraits": [/*...*/],
-  "sitemap": [/*...*/],
-  "layout": "default"
-}
-```   
 
 ## Twig extension
 
@@ -335,10 +325,6 @@ Get post permalink by value, available options are : id, state, path, title
 Get term permalink, see https://developer.wordpress.org/reference/functions/get_term_link/
 
 ``{{ term_url(10, 'item') }}``
-
-Retrieves information about the current site, see https://developer.wordpress.org/reference/functions/get_bloginfo/
-
-``{{ bloginfo('name') }}``
 
 Display dynamic sidebar, see https://developer.wordpress.org/reference/functions/dynamic_sidebar/
 
@@ -394,37 +380,27 @@ Create new Wordpress bundle image entity
 
 ```php
 //BlogController.php
-
-public function articleAction(ContextService $context)
+public function articleAction(Post $post)
 {
-    $article = $context->addPost(12, 'article');
-    return $this->render( 'page/article.twig', $context->toArray() );
+    return $this->render('page/article.twig', ['post' => $post]);
 }
 ```
 
 ```twig
 {# page/article.twig #}
 
-<h1>{{ article.title }}</h1>
-{% set next_article = article.next() %}
-{% if next_article %}
-    <a href="{{ next_article.link }}">next</a>
+<h1>{{ post.title }}</h1>
+{% if post.next %}
+    <a href="{{ post.next.link }}">next</a>
 {% endif %}
 ```
 
-ACF fields are directly available :
+ACF fields are available as metafields :
 
 ```twig
 <h1>{{ post.title }}</h1>
-<small>{{ post.copyright }}</small>
+<small>{{ post.metafields.copyright }}</small>
 ```
-
-Available functions :
-- next($in_same_term = false, $excluded_terms = '', $taxonomy = 'category')
-- prev($in_same_term = false, $excluded_terms = '', $taxonomy = 'category')
-- getTerm( $tax='' )
-- getTerms( $tax='' )
-- getParent()
 
 ### Image
 
@@ -443,7 +419,7 @@ To debug images, just add `?debug=image` to any url, it will replace images with
 
 Generate picture element ( width, height, media queries ), it use wepb if enabled in PHP
 ```twig
-data.image.toHTML(664, 443, {'max-width: 1023px':[438,246]})|raw 
+{{ data.image.toHTML(664, 443, {'max-width: 1023px':[438,246]})|raw }}
 ```
 
 Edit image : 
@@ -452,7 +428,7 @@ resize / insert / colorize / blur / brightness / gamma / pixelate / greyscale / 
 See : http://image.intervention.io/
 
 ```twig
-data.image.edit({resize:[260,224], insert:['/newsletter/dots.png','bottom-right', 10, 10]})
+{{ data.image.edit({resize:[260,224], insert:['/newsletter/dots.png','bottom-right', 10, 10]}) }}
 ```
 
 Use a placeholder if the image doesn't exists
@@ -463,22 +439,23 @@ Use a placeholder if the image doesn't exists
 ### Custom posts
 
 Custom posts can extend the `Post` entity to add some preprocess or new functions,
+
 in the `/src` folder, add an `Entity` folder, then create a new class for the post_type using Pascal case
 
 ```php
 namespace App\Entity;
 
 use Metabolism\WordpressBundle\Entity\Post;
-use Metabolism\WordpressBundle\Entity\Image;
 
 class Guide extends Post
 {
+    public $is_new;
+    
 	public function __construct($id = null)
 	{
 		parent::__construct($id);
 
-		if( isset($this->picto) && $this->picto instanceof Image)
-			$this->picto = $this->picto->getFileContent();
+		$this->is_new = true;
 	}
 }
 ```

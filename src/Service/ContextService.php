@@ -4,27 +4,35 @@ namespace Metabolism\WordpressBundle\Service;
 
 use Metabolism\WordpressBundle\Entity\Menu;
 use Metabolism\WordpressBundle\Entity\Post;
-use Metabolism\WordpressBundle\Entity\Site;
 use Metabolism\WordpressBundle\Entity\Term;
 use Metabolism\WordpressBundle\Entity\User;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TermFactory;
-use Metabolism\WordpressBundle\Helper\QueryHelper;
-use Metabolism\WordpressBundle\Plugin\TermsPlugin;
+use Metabolism\WordpressBundle\Repository\PostRepository;
+use Metabolism\WordpressBundle\Repository\TermRepository;
 
 class ContextService
 {
 	protected $data;
 
-    private $site;
     private $current_user;
+
+    private $postRepository;
+    private $termRepository;
+
+    private $paginationService;
+    private $breadcrumbService;
 
     /**
      * Context constructor.
      */
-    public function __construct(){
+    public function __construct(PostRepository $postRepository, TermRepository $termRepository, PaginationService $paginationService, BreadcrumbService $breadcrumbService){
 
-        $this->addSite();
+        $this->postRepository = $postRepository;
+        $this->termRepository = $termRepository;
+        $this->paginationService = $paginationService;
+        $this->breadcrumbService = $breadcrumbService;
+
         $this->addCurrentUser();
         $this->addContent();
     }
@@ -162,20 +170,6 @@ class ContextService
 
     /**
      * Get default wordpress data
-     * @return Site
-     */
-    protected function addSite(){
-
-        $this->site = new Site();
-
-        $this->data = $this->site->__toArray();
-
-        return $this->site;
-    }
-
-
-    /**
-     * Get default wordpress data
      * @return Post|array|bool
      */
     protected function addContent(){
@@ -282,16 +276,20 @@ class ContextService
      */
     public function addPosts($args=[], $key='posts', $callback=false){
 
-        $wp_query = QueryHelper::wp_query($args);
-        $raw_posts = $wp_query->posts;
+        global $wp_query;
+
+        if( !isset($args['post_type']) )
+            $args = array_merge($wp_query->query, $args);
+
+        $raw_posts = $this->postRepository->findBy($args);
         $posts = [];
 
         if( isset($args['found_posts']) && $args['found_posts']) {
 
             if( !isset($this->data['found_'.$key]) )
-                $this->data['found_'.$key] = $wp_query->found_posts;
+                $this->data['found_'.$key] = $this->postRepository->count($args);
             else
-                $this->data['found_'.$key] += $wp_query->found_posts;
+                $this->data['found_'.$key] += $this->postRepository->count($args);
         }
 
         if( $callback && is_callable($callback) )
@@ -324,121 +322,9 @@ class ContextService
      */
     public function addPagination($args=[], $key='pagination')
     {
-        global $wp_query, $wp_rewrite;
+        $this->data[$key] = $this->paginationService->build($args);
 
-        $pagenum_link = html_entity_decode( get_pagenum_link() );
-        $url_parts    = explode( '?', $pagenum_link );
-
-        $total   = isset( $wp_query->max_num_pages ) ? $wp_query->max_num_pages : 1;
-        $current = get_query_var( 'paged' ) ? intval( get_query_var( 'paged' ) ) : 1;
-
-        $pagenum_link = trailingslashit( $url_parts[0] ) . '%_%';
-
-        $format  = $wp_rewrite->using_index_permalinks() && ! strpos( $pagenum_link, 'index.php' ) ? 'index.php/' : '';
-        $format .= $wp_rewrite->using_permalinks() ? user_trailingslashit( $wp_rewrite->pagination_base . '/%#%', 'paged' ) : '?paged=%#%';
-
-        $defaults = array(
-            'base'               => $pagenum_link,
-            'format'             => $format,
-            'total'              => $total,
-            'current'            => $current,
-            'show_all'           => false,
-            'prev_text'          => __( 'Previous' ),
-            'next_text'          => __( 'Next' ),
-            'end_size'           => 1,
-            'mid_size'           => 2,
-            'add_args'           => array(),
-            'add_fragment'       => '',
-            'before_page_number' => '',
-            'after_page_number'  => '',
-        );
-
-        $args = wp_parse_args( $args, $defaults );
-
-        if ( ! is_array( $args['add_args'] ) )
-            $args['add_args'] = array();
-
-        if ( isset( $url_parts[1] ) ) {
-
-            $format = explode( '?', str_replace( '%_%', $args['format'], $args['base'] ) );
-            $format_query = isset( $format[1] ) ? $format[1] : '';
-            wp_parse_str( $format_query, $format_args );
-
-            wp_parse_str( $url_parts[1], $url_query_args );
-
-            foreach ( $format_args as $format_arg => $format_arg_value )
-                unset( $url_query_args[ $format_arg ] );
-
-            $args['add_args'] = array_merge( $args['add_args'], urlencode_deep( $url_query_args ) );
-        }
-
-        $total = (int) $args['total'];
-
-        if ( $total < 2 ){
-            $this->data[$key] = false;
-            return [];
-        }
-
-        $current  = (int) $args['current'];
-        $end_size = (int) $args['end_size'];
-        if ( $end_size < 1 )
-            $end_size = 1;
-
-        $mid_size = (int) $args['mid_size'];
-        if ( $mid_size < 0 )
-            $mid_size = 2;
-
-        $add_args = $args['add_args'];
-        $r = '';
-        $pagination = [];
-        $dots = false;
-
-        if ( $current && 1 < $current ):
-            $link = str_replace('%_%', 2 == $current ? '' : $args['format'], $args['base']);
-            $link = str_replace('%#%', $current - 1, $link);
-            if ($add_args)
-                $link = add_query_arg($add_args, $link);
-            $link .= $args['add_fragment'];
-
-            $pagination['prev'] = ['link' => esc_url(apply_filters('paginate_links', $link)), 'text' => $args['prev_text']];
-        endif;
-
-        $pagination['pages'] = [];
-
-        for ( $n = 1; $n <= $total; $n++ ) :
-            if ( $n == $current ) :
-                $pagination['pages'][] = ['current'=>true, 'text'=> $args['before_page_number'] . number_format_i18n( $n ) . $args['after_page_number']];
-                $dots = true;
-            else :
-                if ( $args['show_all'] || ( $n <= $end_size || ( $current && $n >= $current - $mid_size && $n <= $current + $mid_size ) || $n > $total - $end_size ) ) :
-                    $link = str_replace( '%_%', 1 == $n ? '' : $args['format'], $args['base'] );
-                    $link = str_replace( '%#%', $n, $link );
-                    if ( $add_args )
-                        $link = add_query_arg( $add_args, $link );
-                    $link .= $args['add_fragment'];
-
-                    $pagination['pages'][] = ['current'=>false, 'link'=> esc_url( apply_filters( 'paginate_links', $link ) ), 'text'=> $args['before_page_number'] . number_format_i18n( $n ) . $args['after_page_number']];
-                    $dots = true;
-                elseif ( $dots && ! $args['show_all'] ) :
-                    $pagination['pages'][] = ['current'=>false, 'link'=>false, 'text'=> __( '&hellip;' ) ];
-                    $dots = false;
-                endif;
-            endif;
-        endfor;
-
-        if ( $current && $current < $total ) :
-            $link = str_replace( '%_%', $args['format'], $args['base'] );
-            $link = str_replace( '%#%', $current + 1, $link );
-            if ( $add_args )
-                $link = add_query_arg( $add_args, $link );
-            $link .= $args['add_fragment'];
-
-            $pagination['next'] = ['link'=> esc_url( apply_filters( 'paginate_links', $link ) ), 'text'=> $args['next_text'] ];
-        endif;
-
-        $this->data[$key] = $pagination;
-
-        return $this->data[$key];
+        return  $this->data[$key];
     }
 
 
@@ -452,18 +338,18 @@ class ContextService
      */
     public function addTerms($args=[], $key='terms', $callback=false){
 
-        $raw_terms = QueryHelper::get_terms($args);
+        $raw_terms = $this->termRepository->findBy($args);
         $terms = [];
 
         if( isset($args['taxonomy'], $args['group']) && is_array($args['taxonomy']) && $args['group']) {
 
             foreach ($raw_terms as $term)
-                $terms[$term->taxonomy][$term->term_id] = is_wp_error($term) ? false : $term;
+                $terms[$term->taxonomy][$term->ID] = is_wp_error($term) ? false : $term;
 
             if( !isset($args['child_of']) && (!isset($args['sort']) || $args['sort']) ){
 
                 foreach ($terms as &$term_group)
-                    $term_group = TermsPlugin::sortHierarchically( $term_group );
+                    $term_group = $this->termRepository->sortHierarchically( $term_group );
             }
 
             $ordered_terms =[];
@@ -479,7 +365,7 @@ class ContextService
         else {
 
             if( !isset($args['child_of']) && (!isset($args['sort']) || $args['sort'])  )
-                $raw_terms = TermsPlugin::sortHierarchically( $raw_terms );
+                $raw_terms = $this->termRepository->sortHierarchically( $raw_terms );
 
             foreach ($raw_terms as $term)
                 $terms[$term->ID] = is_wp_error($term) ? false : $term;
@@ -510,48 +396,11 @@ class ContextService
      */
     public function addBreadcrumb($data=[], $add_current=true, $add_home=true)
     {
-        $breadcrumb = [];
-
-        if( $add_home )
-            $breadcrumb[] = ['title' => __('Home'), 'link' => home_url('/')];
-
-        $breadcrumb = array_merge($breadcrumb, $data);
-
-        if( $add_current ){
-
-            if( (is_single() || is_page()) && !is_attachment() )
-            {
-                /** @var Post $post */
-                $post = $this->get('post');
-
-                if( $post ){
-
-                    if( $post->hasParent() ){
-
-                        $parents = $post->getAncestors();
-
-                        foreach ($parents as $parent)
-                            $breadcrumb[] = ['title' => $parent->title, 'link' => $parent->getLink()];
-                    }
-
-                    $breadcrumb[] = ['title' => $post->title];
-                }
-            }
-            elseif( is_archive() )
-            {
-                /** @var Term $term */
-                $term = $this->get('term');
-
-                if( $term )
-                    $breadcrumb[] = ['title' => $term->title];
-            }
-        }
-
-        $this->data['breadcrumb'] = $breadcrumb;
+        $this->data['breadcrumb'] = $this->breadcrumbService->build(['add_current'=>$add_current, 'add_home'=>$add_home, 'data'=>$data]);
 
         if( !empty($data) ){
 
-            foreach (($this->data['menu']??[]) as &$menu){
+            foreach (($this->data['menu']??[]) as $menu){
 
                 foreach(($menu['items']??[]) as &$item){
 

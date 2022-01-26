@@ -44,8 +44,8 @@ class FrontController {
 	/**
 	 * Add custom post type for taxonomy archive page
 	 * @param \WP_Query $query
-	 * @return mixed
-	 */
+	 * @return \WP_Query
+     */
 	public function preGetPosts( $query )
 	{
 		if( !$query->is_main_query() || is_admin() )

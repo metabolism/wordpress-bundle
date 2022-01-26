@@ -157,7 +157,7 @@ class SecurityPlugin {
 			return;
 
 		if( isset($_GET['permissions']) )
-			$this->permissions(isset($_GET['type'])?$_GET['type']:'all');
+			$this->permissions($_GET['type'] ?? 'all');
 
 		add_settings_field('fix_permissions', __('Permissions'), function(){
 

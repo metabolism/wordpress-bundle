@@ -16,13 +16,17 @@ class QueryHelper
 {
 	
 	/**
+     * @deprecated
+     *
 	 * QueryHelper terms
 	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
 	 * @return Term[]
 	 */
 	public static function get_terms($args=[])
 	{
-		if( !isset($args['depth']) || !is_int($args['depth']))
+        trigger_error('Method ' . __METHOD__ . ' is deprecated use $postRepository->findBy($args) instead', E_USER_DEPRECATED);
+
+        if( !isset($args['depth']) || !is_int($args['depth']))
 			$args['depth'] = 1;
 
 		$args['fields'] = 'ids';
@@ -37,6 +41,8 @@ class QueryHelper
 	}
 
 	/**
+     * @deprecated
+     *
 	 * @param $pid
 	 * @param array $args
 	 * @param bool $loop
@@ -44,7 +50,9 @@ class QueryHelper
 	 */
 	public static function get_adjacent_posts($pid, $args=[], $loop=false)
 	{
-		if( !$post = get_post($pid) )
+        trigger_error('Method ' . __METHOD__ . ' is deprecated use $post->adjacents($args, $loop) instead', E_USER_DEPRECATED);
+
+        if( !$post = get_post($pid) )
 			return false;
 
 		$default_args = [
@@ -63,8 +71,8 @@ class QueryHelper
 
 		foreach($query->posts as $key => $_post_id) {
 			if($_post_id == $post->ID){
-				$next_id = isset($query->posts[$key + 1]) ? $query->posts[$key + 1] : false;
-				$prev_id = isset($query->posts[$key - 1]) ? $query->posts[$key - 1] : false;
+				$next_id = $query->posts[$key + 1] ?? false;
+				$prev_id = $query->posts[$key - 1] ?? false;
 				break;
 			}
 		}
@@ -83,6 +91,8 @@ class QueryHelper
 
 
 	/**
+     * @deprecated
+     *
 	 * @param $field
 	 * @param $value
 	 * @param $taxonomy
@@ -90,6 +100,8 @@ class QueryHelper
 	 */
 	public static function get_term_by($field, $value, $taxonomy)
 	{
+        trigger_error('Method ' . __METHOD__ . ' is deprecated use $termRepository->findOneBy($args) instead', E_USER_DEPRECATED);
+
 		$term = get_term_by( $field, $value, $taxonomy );
 
 		if( $term )
@@ -100,12 +112,16 @@ class QueryHelper
 
 
 	/**
+     * @deprecated
+     *
 	 * @param array $args
-	 * @return array|bool|Post|\WP_Error
+	 * @return Post|bool|\WP_Error
 	 */
 	public static function get_post($args=[])
 	{
-		if( empty($args) )
+        trigger_error('Method ' . __METHOD__ . ' is deprecated use $postRepository->findOneBy($args) instead', E_USER_DEPRECATED);
+
+        if( empty($args) )
 			return PostFactory::create();
 
 		if( !is_array($args) )
@@ -123,24 +139,32 @@ class QueryHelper
 
 
 	/**
+     * @deprecated
+     *
 	 * @param array $args
 	 * @return Post[]
 	 */
 	public static function get_posts($args=[])
 	{
-		$query = self::wp_query($args);
+        trigger_error('Method ' . __METHOD__ . ' is deprecated use $postRepository->findBy($args) instead', E_USER_DEPRECATED);
+
+        $query = self::wp_query($args);
 
 		return $query ? array_filter($query->posts) : [];
 	}
 
 
 	/**
+     * @deprecated
+     *
 	 * @param array $args
 	 * @return bool|mixed
 	 */
 	public static function wp_query($args=[])
 	{
-		global $wp_query;
+        trigger_error('Method ' . __METHOD__ . ' is deprecated use $postRepository->findBy($args) instead', E_USER_DEPRECATED);
+
+        global $wp_query;
 
 		if( empty($args) ) {
 			$query = $wp_query;
@@ -152,9 +176,6 @@ class QueryHelper
 			if( !isset($args['posts_per_page']) && !isset($args['numberposts']))
 				$args['posts_per_page'] = get_option( 'posts_per_page' );
 
-			if( !isset($args['depth']) || !is_int($args['depth']))
-				$args['depth'] = 1;
-
 			$args['fields'] = 'ids';
 
 			$query = new \WP_Query( $args );
@@ -164,7 +185,7 @@ class QueryHelper
 			return false;
 
 		foreach ($query->posts as &$post) {
-			$post = PostFactory::create( $post, false, $args );
+			$post = PostFactory::create( $post );
 		}
 
 		return $query;

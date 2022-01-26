@@ -69,15 +69,15 @@ class ACFProvider {
 
 		$custom_toolbars = $this->config->get('acf.toolbars', false);
 
-		return $custom_toolbars ? $custom_toolbars : $toolbars;
+		return $custom_toolbars ?: $toolbars;
 	}
 
 
 	/**
 	 * Add theme to field selection
 	 * @param $field
-	 * @return mixed
-	 */
+	 * @return array
+     */
 	public function addTaxonomyTemplates($field){
 
 		if( $field['type'] == 'select' && $field['_name'] == 'taxonomy'){

@@ -35,7 +35,9 @@ namespace Metabolism\WordpressBundle\Helper{
 
 namespace {
 
-	function wp_stream($file){
-		return Stream::send($file);
+    use Metabolism\WordpressBundle\Helper\StreamHelper;
+
+    function wp_stream($file){
+		return StreamHelper::send($file);
 	}
 }

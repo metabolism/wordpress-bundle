@@ -2,7 +2,6 @@
 
 namespace Metabolism\WordpressBundle\Provider;
 
-use lloc\Msls\MslsOptions;
 
 /**
  * Class MSLSProvider
@@ -18,8 +17,8 @@ class MSLSProvider {
 		// add blog and post origin
 		add_filter( 'msls_admin_icon_get_edit_new', function($path){
 
-			global $current_blog, $wp_query;
-			$current_id = isset($_GET['post'])?$_GET['post']:get_the_ID();
+			global $current_blog;
+			$current_id = $_GET['post'] ?? get_the_ID();
 
 			if( $current_id ) {
 				$path = add_query_arg([

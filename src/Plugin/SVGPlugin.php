@@ -58,7 +58,7 @@ class SVGPlugin {
 	 */
 	public function fixMimeTypeSvg($data = null, $file = null, $filename = null, $mimes = null )
 	{
-		$ext = isset( $data['ext'] ) ? $data['ext'] : '';
+		$ext = $data['ext'] ?? '';
 		if ( strlen( $ext ) < 1 ) {
 			$exploded = explode( '.', $filename );
 			$ext      = strtolower( end( $exploded ) );
@@ -189,8 +189,6 @@ class SVGPlugin {
 	 */
 	public function __construct($config)
 	{
-		$this->config = $config;
-
 		if( !is_admin() )
 			return;
 

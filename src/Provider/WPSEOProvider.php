@@ -65,7 +65,7 @@ class WPSEOProvider
 	public function filterCanonical($canonical) {
 
 		if( is_archive() ){
-			$canon_page = get_pagenum_link(1);
+			$canon_page = get_pagenum_link();
 			$canonical = explode('?', $canon_page);
 			return $canonical[0];
 		}

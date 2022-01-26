@@ -45,50 +45,6 @@ class TermsPlugin{
 
 
 	/**
-	 * @param $raw_cats
-	 * @return array
-	 */
-	public static function sortHierarchically($raw_cats){
-
-		$cats = [];
-
-		if( is_object($raw_cats) )
-			$raw_cats = (Array)$raw_cats;
-
-		self::sort($raw_cats, $cats);
-
-		return $cats;
-	}
-
-
-	/**
-	 * @param $cats
-	 * @param $into
-	 * @param int $parentId
-	 */
-	public static function sort(&$cats, &$into, $parentId = 0)
-	{
-		foreach ($cats as $i => $cat)
-		{
-			if (!is_wp_error($cat) && $cat->parent == $parentId)
-			{
-				$into[$cat->ID] = $cat;
-				unset($cats[$i]);
-			}
-		}
-
-		foreach ($into as $topCat)
-		{
-			$topCat->children = array();
-			self::sort($cats, $topCat->children, $topCat->ID);
-
-			if( empty($topCat->children) )
-				unset($topCat->children);
-		}
-	}
-
-
-	/**
 	 * TermsPlugin constructor.
 	 * @param $config
 	 */

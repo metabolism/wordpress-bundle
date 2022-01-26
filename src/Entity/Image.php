@@ -23,10 +23,10 @@ class Image extends Entity
 	public $mime_type;
     public $sizes = [];
     public $title;
+    public $alt;
 
     protected $link;
     protected $extension;
-    protected $alt;
     protected $size;
     protected $focus_point;
     protected $metadata;
@@ -36,9 +36,9 @@ class Image extends Entity
     protected $modified_gmt;
     protected $src;
 
-	private $compression = 90;
+	private $compression;
 	private $post;
-	private $args = [];
+	private $args;
 
     public function __toString()
     {
@@ -129,6 +129,7 @@ class Image extends Entity
 				if( !file_exists( $filename) )
 					return;
 
+
 				$this->ID = $post->ID;
 				$this->caption = $post->post_excerpt;
 				$this->description = $post->post_content;
@@ -137,6 +138,7 @@ class Image extends Entity
 				$this->post = $post;
 
 				$this->title = $post->post_title;
+                $this->alt = trim(strip_tags($post_meta['_wp_attachment_image_alt'][0]??''));
 
 				$this->width = $attachment_metadata['width'];
 				$this->height = $attachment_metadata['height'];
@@ -268,14 +270,6 @@ class Image extends Entity
 		return $this->metadata;
 	}
 
-	public function getAlt(){
-
-		if( is_null($this->alt) && $this->ID )
-			$this->alt = trim(strip_tags(get_post_meta($this->ID, '_wp_attachment_image_alt', true)));
-
-		return $this->alt;
-	}
-
 
 	public function getSrc(){
 
@@ -337,7 +331,7 @@ class Image extends Entity
 	/**
 	 * @param array $params
 	 * @param null $ext
-	 * @return mixed
+	 * @return string
 	 */
 	public function edit($params, $ext=null){
 
@@ -671,7 +665,7 @@ class Image extends Entity
 	 * @param int $h
 	 * @return void
 	 */
-	protected function crop(&$image, $w, $h=0){
+	protected function crop($image, $w, $h=0){
 
 		if(!$w){
 

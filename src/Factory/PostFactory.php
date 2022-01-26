@@ -2,18 +2,19 @@
 
 namespace Metabolism\WordpressBundle\Factory;
 
+use Metabolism\WordpressBundle\Entity\Post;
+
 class PostFactory {
 
 	/**
 	 * Create entity from post_type
 	 * @param null $id
 	 * @param bool $post_type
-	 * @param array $args
-	 * @return bool|mixed|\WP_Error
+	 * @return bool|Post|\WP_Error
 	 */
-	public static function create($id=null, $post_type = false, $args = []){
+	public static function create($id=null, $post_type = false){
 
-		if( is_null($id) || empty($id) || !$id ){
+		if(empty($id)){
 
 			return false;
 		}
@@ -62,11 +63,8 @@ class PostFactory {
 			case false:
 			case 'trash':
 			case 'auto-draft':
-
-			if( !in_array($post_status, $args['post_status']??[]) )
 				return false;
-			break;
-			
+
 			case 'private':
 
 				if( (!is_user_logged_in() || !current_user_can( 'read_private_posts' )) && !in_array($post_status, $args['post_status']??[]) )
@@ -83,6 +81,6 @@ class PostFactory {
 			break;
 		}
 
-		return Factory::create($id, $post_type, 'post', $args);
+		return Factory::create($id, $post_type, 'post');
 	}
 }

@@ -46,8 +46,7 @@ class ACFHelper
      * Magic method to check properties
      *
      * @param $id
-     * @param $args
-     * @return null|string|array|object
+     * @return bool
      */
 	public function __isset($id) {
 
@@ -59,7 +58,6 @@ class ACFHelper
      * Magic method to load properties
      *
      * @param $id
-     * @param $args
      * @return null|string|array|object
      */
 	public function __get($id) {
@@ -282,11 +280,11 @@ class ACFHelper
 		switch ($type)
 		{
 			case 'image':
-				$value = Factory::create($id, 'image', false, $object);
+				$value = Factory::create($id, 'image');
 				break;
 
 			case 'file':
-				$value = Factory::create($id, 'file', false, $object);
+				$value = Factory::create($id, 'file');
 				break;
 
 			case 'post':

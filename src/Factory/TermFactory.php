@@ -2,18 +2,19 @@
 
 namespace Metabolism\WordpressBundle\Factory;
 
+use Metabolism\WordpressBundle\Entity\Term;
+
 class TermFactory {
 
 	/**
 	 * Create entity from taxonomy name
 	 * @param null $id
 	 * @param bool $taxonomy_name
-	 * @param array $args
-	 * @return bool|mixed|\WP_Error
+	 * @return bool|Term|\WP_Error
 	 */
-	public static function create($id=null, $taxonomy_name = false, $args = []){
+	public static function create($id=null, $taxonomy_name = false){
 
-		if( is_null($id) || empty($id) ){
+		if(empty($id)){
 
 			return false;
 		}
@@ -58,6 +59,6 @@ class TermFactory {
 		if( !$taxonomy_name )
 			return false;
 
-		return Factory::create($id, $taxonomy_name, 'term', $args);
+		return Factory::create($id, $taxonomy_name, 'term');
 	}
 }

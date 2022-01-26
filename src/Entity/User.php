@@ -36,9 +36,8 @@ class User extends Entity
 	 * User constructor.
 	 *
 	 * @param $id
-	 * @param array $args
 	 */
-	public function __construct($id, $args = [])
+	public function __construct($id)
 	{
 		if( $user = $this->get($id) ) {
 
@@ -99,7 +98,6 @@ class User extends Entity
     /**
      * Get author url
      *
-     * @param array $args
      * @return string
      */
 	public function getLink(){

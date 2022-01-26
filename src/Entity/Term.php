@@ -19,6 +19,7 @@ class Term extends Entity
     public $taxonomy;
     public $slug;
     public $title;
+    public $children;
 
     protected $depth;
     protected $excerpt;
@@ -40,11 +41,10 @@ class Term extends Entity
 	 * Post constructor.
 	 *
 	 * @param null $id
-	 * @param array $args
 	 */
-	public function __construct($id, $args = []){
+	public function __construct($id){
 
-		if( is_array($id) ) {
+        if( is_array($id) ) {
 
 			if( empty($id) || isset($id['invalid_taxonomy']) )
 				return;
@@ -98,7 +98,7 @@ class Term extends Entity
     /**
      * Get parent term
      *
-     * @return Post|false
+     * @return Term|false
      */
     public function getParent() {
 
@@ -150,7 +150,7 @@ class Term extends Entity
             if( $object && $object['value'] ){
 
                 $id = $object['return_format'] == 'array' ? $object['value']['id'] : $object['value'];
-                $this->thumbnail = Factory::create( $id, 'image', false, $object);
+                $this->thumbnail = Factory::create( $id, 'image');
             }
         }
 

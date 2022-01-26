@@ -94,14 +94,14 @@ class ConfigPlugin {
 
                 $slug = $this->getSlug( $post_type );
 
-                if( !is_null($slug) && !empty($slug) )
+                if(!empty($slug))
                     $args['rewrite'] = ['slug'=>$slug];
 
                 if( $args['has_archive'] ){
 
                     $archive = get_option( $post_type. '_rewrite_archive' );
 
-                    if( !is_null($archive) && !empty($archive) )
+                    if(!empty($archive))
                         $args['has_archive'] = $archive;
                 }
 
@@ -176,7 +176,7 @@ class ConfigPlugin {
                                     else{
 
                                         $thumbnail_id = get_post_meta( $post_id, 'thumbnail', true );
-                                        $image = wp_get_attachment_image_src($thumbnail_id, 'thumbnail');
+                                        $image = wp_get_attachment_image_src($thumbnail_id);
 
                                         if( $image && count($image) )
                                             echo '<a class="attachment-thumbnail-container"><img class="attachment-thumbnail size-thumbnail wp-post-image" src="'.$image[0].'"><img class="attachment-thumbnail size-thumbnail wp-post-image" src="'.$image[0].'"></a>';
@@ -267,6 +267,7 @@ class ConfigPlugin {
 
         foreach ($this->config->get($config, []) as $location => $description)
         {
+            $location = str_replace('-', '_', sanitize_title($location));
             register_nav_menu($location, __($description, 'wordpress-bundle'));
         }
     }
@@ -322,7 +323,7 @@ class ConfigPlugin {
             if( !in_array($taxonomy, ['category', 'tag', 'edition', 'theme']) ) {
 
                 $args = array_merge($default_args, $args);
-                $name = str_replace('_', ' ', isset($args['name']) ? $args['name'] : $taxonomy);
+                $name = str_replace('_', ' ', $args['name'] ?? $taxonomy);
 
                 $labels = [
                     'name' => ucfirst($this->plural($name)),
@@ -336,7 +337,7 @@ class ConfigPlugin {
 
                 $slug = $this->getSlug( $taxonomy );
 
-                if( !is_null($slug) && !empty($slug) )
+                if(!empty($slug))
                     $args['rewrite'] = ['slug'=>$slug];
 
                 if (isset($args['labels']))
@@ -537,7 +538,7 @@ class ConfigPlugin {
     {
         $updated = false;
 
-        add_settings_section('search_rewrite', '', false,'permalink');
+        add_settings_section('search_rewrite', '', null,'permalink');
 
         if( isset( $_POST['search_rewrite_slug'] ) && !empty($_POST['search_rewrite_slug']) )
         {
@@ -552,7 +553,7 @@ class ConfigPlugin {
 
         }, 'permalink', 'search_rewrite' );
 
-        add_settings_section('custom_post_type_rewrite', 'Custom post type', false,'permalink');
+        add_settings_section('custom_post_type_rewrite', 'Custom post type', null,'permalink');
 
         foreach ( get_post_types(['public'=> true, '_builtin' => false], 'objects') as $post_type=>$args )
         {
@@ -569,7 +570,7 @@ class ConfigPlugin {
                     add_settings_field( $post_type. '_rewrite_'.$type, __( ucfirst(str_replace('_', ' ', $post_type)).' '.$type ),function () use($post_type, $type)
                     {
                         $value = get_option( $post_type. '_rewrite_'.$type );
-                        if( is_null($value) || empty($value))
+                        if(empty($value))
                             $value = $this->config->get('post_type.'.$post_type.($type=='slug'?'.rewrite.slug':'has_archive'), $post_type);
 
                         echo '<input type="text" value="' . esc_attr( $value ) . '" name="'.$post_type.'_rewrite_'.$type.'" placeholder="'.$post_type.'" id="'.$post_type.'_rewrite_'.$type.'" class="regular-text" />';
@@ -586,7 +587,7 @@ class ConfigPlugin {
             }
         }
 
-        add_settings_section('custom_taxonomy_rewrite', 'Custom taxonomy', false,'permalink');
+        add_settings_section('custom_taxonomy_rewrite', 'Custom taxonomy', null,'permalink');
 
         foreach ( get_taxonomies(['public'=> true, '_builtin' => false], 'objects') as $taxonomy=>$args )
         {
@@ -599,7 +600,7 @@ class ConfigPlugin {
             add_settings_field( $taxonomy. '_rewrite_slug', __( ucfirst(str_replace('_', ' ', $taxonomy)) ),function () use($taxonomy)
             {
                 $value = get_option( $taxonomy. '_rewrite_slug' );
-                if( is_null($value) || empty($value))
+                if(empty($value))
                     $value = $this->config->get('taxonomy.'.$taxonomy.'.rewrite.slug', $taxonomy);
 
                 echo '<input type="text" value="' . esc_attr( $value ) . '" name="'.$taxonomy.'_rewrite_slug" placeholder="'.$taxonomy.'" id="'.$taxonomy.'_rewrite_slug" class="regular-text" />';

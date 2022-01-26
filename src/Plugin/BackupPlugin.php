@@ -3,7 +3,8 @@
 namespace Metabolism\WordpressBundle\Plugin{
 	
 	use Dflydev\DotAccessData\Data;
-	use Ifsnop\Mysqldump as IMysqldump;
+    use FilesystemIterator;
+    use Ifsnop\Mysqldump as IMysqldump;
 	use Metabolism\WordpressBundle\Helper\DirFilterHelper;
 	use Metabolism\WordpressBundle\Helper\StreamHelper;
 	use Metabolism\WordpressBundle\Traits\SingletonTrait;
@@ -46,7 +47,7 @@ namespace Metabolism\WordpressBundle\Plugin{
 				
 				if ( is_dir( $source ) === true ) {
 					
-					$directory = new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS);
+					$directory = new \RecursiveDirectoryIterator($source, FilesystemIterator::SKIP_DOTS);
 					$filtered = new DirFilterHelper($directory, $exclude);
 					$iterator = new \RecursiveIteratorIterator($filtered, \RecursiveIteratorIterator::SELF_FIRST);
 					
@@ -272,10 +273,10 @@ namespace Metabolism\WordpressBundle\Plugin{
 				return;
 
 			if( isset($_GET['download_backup']) )
-				$this->download(false, isset($_GET['type'])?$_GET['type']:'all');
+				$this->download(false, $_GET['type'] ?? 'all');
 			
 			if( isset($_GET['download_mu_backup']) )
-				$this->download(true, isset($_GET['type'])?$_GET['type']:'all');
+				$this->download(true, $_GET['type'] ?? 'all');
 			
 			add_settings_field('download_backup', __('Database'), function(){
 				
@@ -311,7 +312,6 @@ namespace Metabolism\WordpressBundle\Plugin{
 
 namespace {
 	
-	use Metabolism\WordpressBundle\Helper\StreamHelper;
 	use Metabolism\WordpressBundle\Plugin\BackupPlugin;
 
 	/**

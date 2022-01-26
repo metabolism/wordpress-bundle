@@ -15,6 +15,7 @@ class Permastruct{
      * @param $collection
      * @param $locale
      * @param $controller_name
+     * @param $_config
      */
     public function __construct($collection, $locale, $controller_name, $_config)
     {
@@ -231,23 +232,26 @@ class Permastruct{
     {
         $name = str_replace('_structure', '', $name);
 
-        $controller = $controllerName ? $controllerName : $this->getControllerName($name);
+        $controller = $controllerName ?: $this->getControllerName($name);
         $paths = $this->getPaths($struct);
         $locale = $this->locale?'.'.$this->locale:'';
 
         $route = new Route( $paths['singular'], ['_controller'=>$controller], $requirements);
+        $route->setMethods('GET');
+
         $this->collection->add($name.$locale, $route);
 
         if( $paginate && !empty($paths['archive']) )
         {
             $route = new Route( $paths['archive'], ['_controller'=>$controller], $requirements);
+            $route->setMethods('GET');
+
             $this->collection->add($name.'_paged'.$locale, $route);
         }
     }
 }
 
 
-/** @var Data $_config */
 global $_config;
 $collection = new RouteCollection();
 

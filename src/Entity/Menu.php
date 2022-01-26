@@ -19,7 +19,6 @@ class Menu extends Entity
 	public $title;
 
 	private $menuItemClass;
-	private $args;
 
     public static $locations;
 
@@ -31,11 +30,8 @@ class Menu extends Entity
     /**
      * Menu constructor.
      * @param int $id
-     * @param array $args
      */
-	public function __construct($id, $args = [] ) {
-
-		$this->args = $args;
+	public function __construct($id) {
 
 		$app_classname = 'App\Entity\MenuItem';
 
@@ -73,7 +69,7 @@ class Menu extends Entity
 		_wp_menu_item_classes_by_context($menu_items);
 
 		foreach ($menu_items as $item)
-			$this->items[] = new $this->menuItemClass($item, $this->args);
+			$this->items[] = new $this->menuItemClass($item);
 
 		global $_config;
 
