@@ -28,14 +28,15 @@ class PostRepository
      *
      * @return Post[]
      */
-    public function findAll()
+    public function findAll(array $orderBy = null)
     {
-        $criteria = [];
-
         $post_types = get_post_types(['public'=> true]);
-        $criteria['post_type'] = array_diff($post_types, ['attachment', 'revision', 'nav_menu_item']);
 
-        return $this->findBy($criteria, null, -1);
+        $criteria = [
+            'post_type' => array_diff($post_types, ['attachment', 'revision', 'nav_menu_item'])
+        ];
+
+        return $this->findBy($criteria, $orderBy, -1);
     }
 
 
@@ -45,7 +46,7 @@ class PostRepository
      */
     public function findQueried()
     {
-        if( is_archive() ){
+        if( is_archive() || (is_home() && get_option('show_on_front') == 'posts') ){
 
             global $wp_query;
             return $this->findBy($wp_query->query);

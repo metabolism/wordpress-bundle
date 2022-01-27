@@ -1,0 +1,32 @@
+<?php
+
+namespace Metabolism\WordpressBundle\ArgumentResolver;
+
+use Metabolism\WordpressBundle\Entity\User;
+use Metabolism\WordpressBundle\Repository\UserRepository;
+use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+
+/**
+ * Class Metabolism\WordpressBundle Framework
+ */
+class UserValueResolver implements ArgumentValueResolverInterface {
+
+    private $userRepository;
+
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
+    public function supports(Request $request, ArgumentMetadata $argument)
+    {
+        return User::class === $argument->getType();
+    }
+
+    public function resolve(Request $request, ArgumentMetadata $argument)
+    {
+        yield $this->userRepository->findQueried();
+    }
+}

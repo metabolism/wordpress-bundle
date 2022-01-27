@@ -44,12 +44,13 @@ class TermRepository
     /**
      * @return Term[]
      */
-    public function findAll()
+    public function findAll(array $orderBy = null)
     {
-        $criteria = [];
-        $criteria['taxonomy'] = get_taxonomies(['public'=> true]);
+        $criteria = [
+            'taxonomy' => get_taxonomies(['public'=> true])
+        ];
 
-        return $this->findBy($criteria, null, -1);
+        return $this->findBy($criteria, $orderBy, -1);
     }
 
 

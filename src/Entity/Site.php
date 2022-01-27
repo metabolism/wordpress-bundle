@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use lloc\Msls\MslsOptions;
+use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Traits\SingletonTrait;
 use Twig\Environment;
 
@@ -41,6 +42,7 @@ class Site extends Entity
     protected $search_url;
     protected $privacy_policy_url;
     protected $privacy_policy_title;
+    protected $current_user;
     protected $posts_per_page;
     protected $bloginfo;
     protected $title;
@@ -97,6 +99,19 @@ class Site extends Entity
         return $this->version;
     }
 
+    public function getCurrentUser(){
+
+        if( is_null($this->current_user) ){
+
+            if( $user_id = get_current_user_id() )
+                $this->current_user = Factory::create($user_id, 'user');
+            else
+                $this->current_user = false;
+        }
+
+        return $this->current_user;
+    }
+
     public function getMenu($location=false){
 
         if( !$location )
@@ -133,8 +148,8 @@ class Site extends Entity
 
         if(is_null($this->body_class) ){
 
-            $body_class = $this->queried_object ? implode(' ', get_body_class()) : '';
-            $this->body_class = $this->language . ' ' . $body_class;
+            $body_class = !is_404() ? implode(' ', @get_body_class()) : '';
+            $this->body_class = $this->language . ' ' . preg_replace('/^-template-default/', 'template-default', $body_class);
         }
 
         return $this->body_class;

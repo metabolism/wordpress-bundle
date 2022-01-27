@@ -15,6 +15,10 @@ services:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
 
+  Metabolism\WordpressBundle\ArgumentResolver\UserValueResolver:
+    tags:
+      - { name: controller.argument_value_resolver, priority: 50 }
+
   Metabolism\WordpressBundle\:
     resource: '../src/'
     exclude:
