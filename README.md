@@ -58,7 +58,7 @@ public function pageAction(Post $post, PostRepository $postRepository)
 {% endblock body %}
 ```
 
-## Migrating from 1.4 to 1.5 ? 
+## Migrating from 1.x to 2.0 ? 
 
 Check the [migration guide](docs/migration.md)
 

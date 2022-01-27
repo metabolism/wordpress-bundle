@@ -1,8 +1,8 @@
 # Migration
 
-## From 1.4 to 1.5
+## From 1.x to 2.0
 
-In `composer.json` change `"metabolism/wordpress-bundle": "1.4.*"` to `"metabolism/wordpress-bundle": "1.5.*"` then run `composer update`
+In `composer.json` change `"metabolism/wordpress-bundle": "1.4.*"` to `"metabolism/wordpress-bundle": "2.0.*"` then run `composer update`
 
 After update
 
