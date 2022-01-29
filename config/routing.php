@@ -35,12 +35,6 @@ class Permastruct{
 
             $this->addRoute('cache-purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::purge');
             $this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::clear');
-
-            if( function_exists('wp_maintenance_mode') && wp_maintenance_mode() ){
-
-                $this->addMaintenanceRoute();
-                return;
-            }
         }
 
         $remove_rewrite_rules = $_config->get('rewrite_rules.remove', []);
@@ -49,15 +43,6 @@ class Permastruct{
             $this->addRoute('feed', '{feed}', ['feed'=>'feed|rdf|rss|rss2|atom'], false, 'Metabolism\WordpressBundle\Helper\FeedHelper::doAction');
 
         $this->addRoutes();
-    }
-
-    /**
-     * Catch all url to display maintenance
-     */
-    public function addMaintenanceRoute(){
-
-        $maintenanceController = $this->getControllerName('maintenance');
-        $this->addRoute('maintenance', '{req}', ['req'=>".*"], false, $maintenanceController);
     }
 
 

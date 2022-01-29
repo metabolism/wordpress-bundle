@@ -5,7 +5,6 @@ namespace Metabolism\WordpressBundle\Repository;
 
 use Metabolism\WordpressBundle\Entity\Post;
 use Metabolism\WordpressBundle\Factory\PostFactory;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PostRepository
 {
@@ -54,7 +53,7 @@ class PostRepository
         elseif( is_single() || is_page() ){
 
             if( !$id = get_the_ID() )
-                throw new NotFoundHttpException();
+                throw new \Exception('Post not found', 404);
 
             return $this->find($id);
         }

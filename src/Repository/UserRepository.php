@@ -2,16 +2,14 @@
 
 namespace Metabolism\WordpressBundle\Repository;
 
-use Metabolism\WordpressBundle\Entity\Post;
+use Metabolism\WordpressBundle\Entity\User;
 use Metabolism\WordpressBundle\Factory\Factory;
-use Metabolism\WordpressBundle\Factory\PostFactory;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserRepository
 {
     /**
      * @param $id
-     * @return bool|Post|null
+     * @return bool|User|null
      */
     public function find($id)
     {
@@ -25,8 +23,8 @@ class UserRepository
 
 
     /**
-     * @param $id
-     * @return bool|Post|null
+     * @return bool|User|null
+     * @throws \Exception
      */
     public function findQueried()
     {
@@ -35,7 +33,7 @@ class UserRepository
             global $wp_query;
             
             if( !$id = $wp_query->query_vars['author'] )
-                throw new NotFoundHttpException();
+                throw new \Exception('Author not found', 404);
 
             return $this->find($id);
         }
@@ -46,7 +44,7 @@ class UserRepository
 
     /**
      *
-     * @return Post[]
+     * @return User[]
      */
     public function findAll(array $orderBy = null)
     {
@@ -59,7 +57,7 @@ class UserRepository
      * @param array|null $orderBy
      * @param $limit
      * @param $offset
-     * @return Post[]
+     * @return User[]
      */
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
@@ -101,7 +99,7 @@ class UserRepository
     /**
      * @param array $criteria
      * @param array|null $orderBy
-     * @return Post|null
+     * @return User|null
      */
     public function findOneBy(array $criteria, array $orderBy = null)
     {

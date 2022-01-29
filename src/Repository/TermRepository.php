@@ -2,11 +2,8 @@
 
 namespace Metabolism\WordpressBundle\Repository;
 
-
-use Metabolism\WordpressBundle\Entity\Post;
 use Metabolism\WordpressBundle\Entity\Term;
 use Metabolism\WordpressBundle\Factory\TermFactory;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TermRepository
 {
@@ -26,14 +23,15 @@ class TermRepository
 
     /**
      *
-     * @return Post|Post[]|null
+     * @return bool|Term|null
+     * @throws \Exception
      */
     public function findQueried()
     {
         if( is_archive() ){
 
             if( !$id = get_queried_object_id() )
-                throw new NotFoundHttpException();
+                throw new \Exception('Term not found', 404);
 
             return $this->find($id);
         }

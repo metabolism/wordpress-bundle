@@ -185,8 +185,10 @@ class EditorPlugin {
 			add_action('admin_init', [$this, 'adminInit'] );
 
 			add_filter('admin_body_class', function ( $classes ) {
+
 				$data = get_userdata( get_current_user_id() );
 				$caps = [];
+                
 				foreach($data->allcaps as $cap=>$value)
 					$caps[] = $value ? $cap : 'no-'.$cap;
 

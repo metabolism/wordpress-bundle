@@ -102,12 +102,13 @@ class NoticePlugin {
 		{
 			$args = [
 				'id'    => 'debug',
-				'title' => __('Debug').' : '.( WP_DEBUG ? __('On') : __('Off'))
+				'title' => '<span style="position: fixed; left: 0; top: 0; width: 100%; background: #df0f0f; height: 2px; z-index: 99999"></span>'.__('Debug'),
+				'href' => '#'
 			];
 
 			$wp_admin_bar->add_node( $args );
 
-		}, 999 );
+		}, 9999 );
 	}
 
 

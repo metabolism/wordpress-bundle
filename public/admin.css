@@ -101,17 +101,21 @@ div.mce-toolbar-grp, .html-active .switch-html, .tmce-active .switch-tmce { back
 input.large-text, textarea.large-text { width: 35.7rem }
 .form-table td fieldset label { margin: .35em 0 1em!important }
 
+@keyframes rotating {
+    from { transform: rotate(0deg) }
+    to { transform: rotate(360deg) }
+}
+
+#wp-admin-bar-build .ab-icon:before{ content: "\f111"; top: 2px; display: inline-block }
+#wp-admin-bar-build .loading .ab-icon:before{ animation: rotating 4s linear infinite }
+
 
 /* ACF */
 .acf-field input[type="text"], .acf-field input[type="password"], .acf-field input[type="date"], .acf-field input[type="datetime"],
 .acf-field input[type="datetime-local"], .acf-field input[type="email"], .acf-field input[type="month"], .acf-field input[type="number"],
 .acf-field input[type="search"], .acf-field input[type="tel"], .acf-field input[type="time"], .acf-field input[type="url"],
-.acf-field input[type="week"], .acf-field textarea, .acf-field select{
-    font-size: 13px;
-}
-.acf-field .acf-label label, .post-attributes-label, .acf-flexible-content .layout .acf-fc-layout-handle span, #edittag .form-table th {
-    font-weight: 500;
-}
+.acf-field input[type="week"], .acf-field textarea, .acf-field select{ font-size: 13px; }
+.acf-field .acf-label label, .post-attributes-label, .acf-flexible-content .layout .acf-fc-layout-handle span, #edittag .form-table th { font-weight: 500; }
 .acf-tab-group li a{ font-weight: normal; font-size: 13px }
 .acf-tab-group li.active a{ font-weight: 500 }
 .acf-true-false{ padding: 5px 0 }

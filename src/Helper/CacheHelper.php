@@ -62,33 +62,7 @@ class CacheHelper {
 
 		wp_cache_flush();
 
-		$status = $this->rrmdir(BASE_URI.'/var/cache');
-
-		if( $status )
-			$response = new Response('1');
-		else
-			$response = new Response('0', 500);
-
-		$response->setSharedMaxAge(0);
-
-		return $response;
-	}
-
-
-	/**
-	 * Purge cache
-	 */
-	public function purge(){
-
-		list($url, $status) = $this->purgeUrl();
-
-		if( !is_wp_error($status) )
-			$response = new Response('1');
-		else
-			$response = new Response('0', 500);
-
-		$response->setSharedMaxAge(0);
-		return $response;
+        return $this->rrmdir(BASE_URI.'/var/cache', true);
 	}
 
 
@@ -151,7 +125,7 @@ class CacheHelper {
 	 * @param string $dir
 	 * @return bool
 	 */
-	public function rrmdir($dir) {
+	public function rrmdir($dir, $keep=false) {
 
 		$status = true;
 
@@ -159,13 +133,15 @@ class CacheHelper {
 			$objects = scandir($dir);
 			foreach ($objects as $object) {
 				if ($object != "." && $object != "..") {
-					if (is_dir($dir."/".$object))
+                    if (is_dir($dir."/".$object))
 						$status = $this->rrmdir($dir."/".$object) && $status;
 					else
-						$status = @unlink($dir."/".$object) && $status;
+                        $status = @unlink($dir."/".$object) && $status;
 				}
 			}
-			$status = @rmdir($dir) && $status;
+
+            if( !$keep )
+                $status = @rmdir($dir) && $status;
 		}
 
 		return $status;

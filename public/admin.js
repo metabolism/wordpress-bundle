@@ -32,6 +32,17 @@
 			if( $(this).text().length < 2 )
 				$(this).remove()
 		})
+
+		$('#wp-admin-bar-build a').click(function(e){
+
+			e.preventDefault();
+			$(this).addClass('loading');
+
+			$.get( $(this).attr('href') ).then(function (){
+
+				setTimeout(window.location.reload, 500);
+			})
+		})
 	});
 
 

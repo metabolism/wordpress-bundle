@@ -14,7 +14,7 @@ class CachePlugin
 {
 	use SingletonTrait;
 
-	private $noticeMessage,  $errorMessage, $cacheHelper;
+	private $noticeMessage,  $errorMessage, $cacheHelper, $debug;
 
 
 	/**
@@ -73,8 +73,8 @@ class CachePlugin
 	 */
 	public function reset()
 	{
-		$this->purge();
-		$this->clear();
+        $this->purge();
+        $this->clear();
 	}
 
 
@@ -84,6 +84,9 @@ class CachePlugin
 	 */
 	private function purge($url=false)
 	{
+        if( $this->debug )
+            return;
+
         $results = $this->cacheHelper->purgeUrl($url);
 
         foreach ($results as $result){
@@ -105,9 +108,7 @@ class CachePlugin
 	 */
 	private function clear()
 	{
-		$response = $this->cacheHelper->clear();
-
-		if ( !$response )
+		if ( !$this->cacheHelper->clear() )
 			$this->errorMessage[] = 'Unable to clear cache';
 		else
 			$this->noticeMessage[] = 'Cleared';
@@ -153,17 +154,17 @@ class CachePlugin
 	public function __construct($config)
 	{
 		$env = $_SERVER['APP_ENV'] ?? 'dev';
-		$debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env));
+		$this->debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env));
 
 		$this->cacheHelper = new CacheHelper();
 
-		if( isset($_GET['cache']) && $_GET['cache'] == 'purge' )
-			$this->purge();
+		if( !$this->debug ) {
 
-		if( isset($_GET['cache']) && $_GET['cache'] == 'clear' )
-			$this->clear();
+            if( isset($_GET['cache']) && $_GET['cache'] == 'purge' )
+                $this->purge();
 
-		if( !$debug ) {
+            if( isset($_GET['cache']) && $_GET['cache'] == 'clear' )
+                $this->clear();
 
 			add_action( 'init', function(){
 
