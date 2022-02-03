@@ -2,7 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Helper;
 
-use Metabolism\WordpressBundle\Plugin\MediaPlugin as Media;
+use Metabolism\WordpressBundle\Plugin\MetaSteroidMedia as Media;
 
 
 /**

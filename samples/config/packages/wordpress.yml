@@ -12,12 +12,9 @@ version: 2.0
 
 image:
   compression: 90 #on the fly compression ration
-  show_meta: false #add metadata to Image entity
-  #return_format: url|id|object
   resize: #resize image on upload to save server space
     max_width: 1920
     max_height: 2160
-
 
 ###########################
 ##    Admin interface    ##
@@ -89,12 +86,8 @@ support:
 #headless:
 #  mapping: true
 
-## Allow multisite installation
-install-multisite: true
-
 ## Multisite configuration
 # multisite:
-#  subdomain_install: true
 #  shared_media: true
 #  clone_post: true
 
@@ -394,11 +387,7 @@ export:
 ##    Misc    ##
 ################
 
-domain_name: app # MO/PO traductions
+gutenberg: false
 
 #search: # change search settings
 # posts_per_page: 12
-
-## controller name used when importing @WordpressBundle/config/routing.php
-extra_permastructs:
-  controller: BlogController

@@ -1,8 +1,8 @@
 <?php
 
-use Dflydev\DotAccessData\Data;
 use Symfony\Component\Routing\Route,
     Symfony\Component\Routing\RouteCollection;
+use function Env\env;
 
 class Permastruct{
 
@@ -240,13 +240,12 @@ class Permastruct{
 global $_config;
 $collection = new RouteCollection();
 
-
 if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
     return $collection;
 
-$controller_name = $_config->get('extra_permastructs.controller', 'BlogController');
+$controller_name = 'BlogController';
 
-if( ($_SERVER['WP_MULTISITE']??false) && !$_config->get('multisite.subdomain_install', false) )
+if( env('WP_MULTISITE') && !env('SUBDOMAIN_INSTALL') )
 {
     $current_site_id = get_current_blog_id();
 

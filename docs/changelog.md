@@ -1,7 +1,6 @@
 CHANGELOG
 ---------
-
-## 1.5.0
+## 2.0.0
 #### Bugfix
 - psr-4 for helper
 - replaced usage php7.3 function
@@ -10,14 +9,17 @@ CHANGELOG
 - ACF link return type for term
 - post content not filtered
 #### Changed
-- adopt Symfony 4 folder structure, `web` -> `public`
-- add Symfony 5 compatibility and auto generated recipe  
+- code splitted with [WP Steroids](https://github.com/wearemetabolism/wp-steroids)
 - php7.1 as min version
 - add Worpress 5.2 as min version
+- Lazy loaded entity properties
+- ACF fields now stored under metafields property
 ### Added
-- `wp_make_url_relative` filter
-- Entity implements ArrayAccess
-- Prefix removal for permalinks
+- ArgumentResolver
+- DependencyInjection
+- Repository
+- BeforeActionSubscriber
+- Symfony 5 compatibility
 
 ## 1.4.12
 #### Bugfix

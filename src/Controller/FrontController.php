@@ -15,7 +15,7 @@ class FrontController {
 
 	public static $domain_name = 'default';
 
-	private $config;
+    protected $config;
 
 	/**
 	 * Redirect to admin
@@ -114,7 +114,7 @@ class FrontController {
 	/**
 	 * Load App configuration
 	 */
-	private function loadConfig()
+    public function loadConfig()
 	{
 		global $_config;
 		$this->config = $_config;
@@ -126,10 +126,8 @@ class FrontController {
 		if( defined('WP_INSTALLING') && WP_INSTALLING )
 			return;
 
-		$this->loadConfig();
-
-
-		add_action( 'init', [$this, 'init']);
+        add_action( 'init', [$this, 'loadConfig']);
+        add_action( 'init', [$this, 'init']);
 		add_action( 'init', [$this, 'redirect']);
 		add_action( 'init', '_wp_admin_bar_init', 0 );
 

@@ -34,7 +34,7 @@ class BeforeActionSubscriber implements EventSubscriberInterface
      */
 	public function onKernelController(ControllerEvent $event)
 	{
-        if ( !$event->isMainRequest() )
+        if ( !$event->isMasterRequest() )
 			return;
 
         if( wp_maintenance_mode() )

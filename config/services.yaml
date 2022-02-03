@@ -29,6 +29,4 @@ services:
       - '../src/Factory/'
       - '../src/Helper/'
       - '../src/Loader/'
-      - '../src/Plugin/'
-      - '../src/Provider/'
       - '../src/Traits/'

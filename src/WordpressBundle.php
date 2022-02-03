@@ -2,9 +2,14 @@
 
 namespace Metabolism\WordpressBundle;
 
+use Env\Env;
+use Metabolism\WordpressBundle\Controller\AdminController;
+use Metabolism\WordpressBundle\Controller\FrontController;
+use Metabolism\WordpressBundle\Controller\WordpressController;
 use Metabolism\WordpressBundle\Entity\Site;
 use Metabolism\WordpressBundle\Extension\TwigExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use function Env\env;
 
 class WordpressBundle extends Bundle
 {
@@ -21,7 +26,9 @@ class WordpressBundle extends Bundle
 
 	public function boot()
 	{
-	    if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
+        Env::$options = Env::USE_ENV_ARRAY;
+
+        if( !env('WP_INSTALLED') )
 	        return;
 
 		$this->log_dir = $this->container->get('kernel')->getLogDir();
@@ -52,7 +59,7 @@ class WordpressBundle extends Bundle
 
         if( !isset($_SERVER['HTTP_HOST']) ) {
 
-            if( $host = ($_SERVER['WP_MULTISITE']??false) ){
+            if( $host = env('WP_MULTISITE') ){
 
                 $_SERVER['HTTP_HOST'] = $host;
             }
@@ -64,6 +71,22 @@ class WordpressBundle extends Bundle
 
                 $_SERVER['HTTP_HOST'] = '127.0.0.1:8000';
                 $_SERVER['SERVER_PORT'] = '8000';
+            }
+        }
+    }
+
+    public static function loadPlugins (){
+
+        $plugins = scandir(__DIR__.'/Plugin');
+
+        foreach($plugins as $plugin){
+
+            if( !in_array($plugin, ['.','..']) )
+            {
+                $classname = '\Metabolism\WordpressBundle\Plugin\\'.str_replace('.php', '', $plugin);
+
+                if( class_exists($classname) )
+                    new $classname();
             }
         }
     }

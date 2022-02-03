@@ -58,17 +58,13 @@ public function pageAction(Post $post, PostRepository $postRepository)
 {% endblock body %}
 ```
 
-## Migrating from 1.x to 2.0 ? 
-
-Check the [migration guide](docs/migration.md)
-
 ## Features
 
-From Composer :
+Using Composer :
 * Install/update Wordpress via composer
 * Install/update plugins via composer
 
-From Symfony :
+Using Symfony :
 * Template engine
 * Folder structure
 * Http Cache
@@ -79,23 +75,38 @@ From Symfony :
 * Dynamic image resize
 * MVC
 
-From the bundle itself :
-* Wordpress YML configuration ( [view sample](samples/config/packages/wordpress.yml) )
+Using Wordpress Bundle :
 * Post/Term Repository
-* Controller argument resolver for post(s) and term
+* Controller argument resolver for post(s), term and user
+* Symfony Cache invalidation on update ( Varnish compatible )
+* Post/Image/Menu/Term/User/Comment/Site entity
+* Wordpress predefined routes
+* Site health checker url
+* Static site export command
+
+Using [WP Steroids](https://github.com/wearemetabolism/wp-steroids) Wordpress plugin :
+* Wordpress YML configuration ( [view sample](samples/config/packages/wordpress.yml) )
 * Permalink configuration for custom post type and taxonomy
-* Symfony Cache invalidation on edit ( Varnish compatible )
-* Post/Image/Menu/Term/User/Comment/Site entities
 * Maintenance mode
+* Backup download in dev mode
+* Build hook
+* Disabled automatic update
+* Enhanced Security
+* Better guid using RFC 4122 compliant UUID version 5
 * Multisite images sync ( for multisite as multilangue )
 * SVG Support
-* Wordpress predefined routes
+* Better Performance
+* Wordpress Bugfix
+* CSS Fix
 * Relative urls
 * Multisite post deep copy ( with multisite-language-switcher plugin )
 * Custom datatable support with view and delete actions in admin
-* Site health checker
-* Static site export ( using sitemap )
- 
+
+## Migrating from 1.x to 2.0 ?
+
+Check the [migration guide](docs/migration.md)
+
+
 ## Drawbacks
 
 Wordpress functions are available in the global namespace.

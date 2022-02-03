@@ -7,7 +7,7 @@ namespace Metabolism\WordpressBundle\Controller;
  */
 class AdminController {
 
-	private $config;
+	protected $config;
 
 
 	/**
@@ -30,7 +30,7 @@ class AdminController {
 	/**
 	 * Load App configuration
 	 */
-	private function loadConfig()
+	public function loadConfig()
 	{
 		global $_config;
 		$this->config = $_config;
@@ -68,9 +68,9 @@ class AdminController {
 
 		$this->lock();
 
-		$this->loadConfig();
 		$this->registerFilters();
 
+		add_action( 'init', [$this, 'loadConfig'] );
 		add_action( 'admin_init', [$this, 'init'] );
 	}
 }

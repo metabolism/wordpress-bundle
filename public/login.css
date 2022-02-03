@@ -1,7 +1,0 @@
-#login{ padding-top: 10% }
-#login h1{ display: none }
-.login form{ box-shadow: 0 3px 29px rgb(10 49 78 / 5%); border-radius: 4px; border: 0; margin-top: 0 }
-.login label{ font-size: 13px; opacity: 0.5 }
-.forgetmenot label{ opacity: 1 }
-.login input[type=password], .login input[type=text]{ border-radius: 0; border-top: 0; border-left: 0; border-right: 0; font-size: 14px; background: #f9f9f9 }
-.login input[type=password]:focus, .login input[type=text]:focus{ box-shadow: none }

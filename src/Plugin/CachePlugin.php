@@ -2,19 +2,12 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
-use Dflydev\DotAccessData\Data;
-use Metabolism\WordpressBundle\Helper\CacheHelper;
-use Metabolism\WordpressBundle\Traits\SingletonTrait;
-
-
 /**
- * Class Metabolism\WordpressBundle Framework
+ * Class 
  */
 class CachePlugin
 {
-	use SingletonTrait;
-
-	private $noticeMessage,  $errorMessage, $cacheHelper, $debug;
+	private $noticeMessage,  $errorMessage, $debug;
 
 
 	/**
@@ -87,7 +80,7 @@ class CachePlugin
         if( $this->debug )
             return;
 
-        $results = $this->cacheHelper->purgeUrl($url);
+        $results = WPS_Object_Cache::purgeUrl($url);
 
         foreach ($results as $result){
 
@@ -108,7 +101,7 @@ class CachePlugin
 	 */
 	private function clear()
 	{
-		if ( !$this->cacheHelper->clear() )
+		if ( !WPS_Object_Cache::clear() )
 			$this->errorMessage[] = 'Unable to clear cache';
 		else
 			$this->noticeMessage[] = 'Cleared';
@@ -149,14 +142,11 @@ class CachePlugin
 
 	/**
 	 * CachePlugin constructor.
-	 * @param Data $config
 	 */
-	public function __construct($config)
+	public function __construct()
 	{
 		$env = $_SERVER['APP_ENV'] ?? 'dev';
 		$this->debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env));
-
-		$this->cacheHelper = new CacheHelper();
 
 		if( !$this->debug ) {
 

@@ -2,35 +2,29 @@
 
 namespace Metabolism\WordpressBundle\Loader;
 
-use Dflydev\DotAccessData\Data;
+use Env\Env;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
-
 use function Env\env;
 
-/**
- * Class Metabolism\WordpressBundle Framework
- */
-class ConfigLoader {
+class ConfigLoader{
 
-    public function get($resource, $default=false){
+    public static $loaded=false;
 
-        global $_config;
-        return $_config->get($resource, $default);
-    }
+    public static function import($root_dir, $yaml_filepath='/config/packages/wordpress.yml')
+    {
+        if( self::$loaded )
+            return;
 
-    public function import($resource){
-
-        /**
-         * Wordpress configuration file
-         */
+        Env::$options = Env::USE_ENV_ARRAY;
 
         if (!defined('BASE_URI')) {
 
-            $base_uri = realpath(dirname( __DIR__ ).'/../../../../');
+            $base_uri = realpath($root_dir);
             define( 'BASE_URI', $base_uri);
         }
+
+        if( !defined('WPS_YAML_FILE') )
+            define('WPS_YAML_FILE', BASE_URI.$yaml_filepath);
 
         /**
          * Load Composer
@@ -59,32 +53,9 @@ class ConfigLoader {
         $public_folder = reset($folders);
 
         /**
-         * Load App configuration
-         */
-        global $_config;
-
-        try{
-
-            $config = Yaml::parseFile($resource);
-        }
-        catch (ParseException $e){
-
-            die(basename($resource).' loading error: '.$e->getMessage());
-        }
-
-        $_config = new Data($config);
-
-        /**
          * Set env default
          */
         $env = env('APP_ENV')?:(env('WP_ENV')?:'dev');
-
-
-        /**
-         * Define constant
-         */
-        foreach ($_config->get('define', []) as $constant=>$value)
-            define( strtoupper($constant), $value);
 
         /**
          * Define basic environment
@@ -94,21 +65,18 @@ class ConfigLoader {
         define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
         define( 'SCRIPT_DEBUG', WP_DEBUG);
 
-        define( 'HEADLESS', $_config->get('headless', false) );
-        define( 'URL_MAPPING', $_config->get('headless.mapping', false)?env('MAPPED_URL'):false );
-
         /**
          * Enable multisite
          */
         if( env('WP_MULTISITE') )
         {
             define( 'MULTISITE', true );
-            define( 'SUBDOMAIN_INSTALL', $_config->get('multisite.subdomain_install', false) );
+            define( 'SUBDOMAIN_INSTALL', env('SUBDOMAIN_INSTALL') );
             define( 'DOMAIN_CURRENT_SITE', $_SERVER['HTTP_HOST']);
-            define( 'SITE_ID_CURRENT_SITE', $_config->get('multisite.site_id', 1));
-            define( 'BLOG_ID_CURRENT_SITE', $_config->get('multisite.blog_id', 1));
+            define( 'SITE_ID_CURRENT_SITE', env('SITE_ID_CURRENT_SITE')?:1);
+            define( 'BLOG_ID_CURRENT_SITE', env('BLOG_ID_CURRENT_SITE')?:1);
         }
-        elseif( $_config->get('install-multisite', false) )
+        else
         {
             define( 'WP_ALLOW_MULTISITE', true );
         }
@@ -214,7 +182,6 @@ class ConfigLoader {
         if (!defined('WPMU_PLUGIN_DIR'))
             define('WPMU_PLUGIN_DIR', WP_CONTENT_DIR.'/mu-plugins');
 
-
         if (!defined('WP_CONTENT_URL'))
             define( 'WP_CONTENT_URL', WP_HOME.'/wp-bundle' );
 
@@ -241,6 +208,12 @@ class ConfigLoader {
         if (!defined('WP_DEFAULT_THEME'))
             define('WP_DEFAULT_THEME', 'empty');
 
+        foreach (['HEADLESS', 'URL_MAPPING', 'BUILD_HOOK', 'BUILD_BADGE'] as $key){
+
+            if (!defined($key))
+                define($key, env($key) );
+        }
+
         /**
          * Bootstrap WordPress
          */
@@ -250,5 +223,7 @@ class ConfigLoader {
 
         if (!defined('ABSPATH'))
             define( 'ABSPATH', BASE_URI . PUBLIC_DIR . WP_FOLDER .'/');
+
+        self::$loaded = true;
     }
 }

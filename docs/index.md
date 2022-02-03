@@ -83,6 +83,8 @@ edit `.gitignore`
 
 ## Wordpress configuration
 
+The bundle installs the `WP Steroids` Wordpress plugin, it mimics Symfony behaviour using yaml to configure Wordpress.
+
 When the bundle is installed, a default `wordpress.yml` is copied to `/config/packages`
 
 This file allows you to manage :
@@ -105,10 +107,10 @@ This file allows you to manage :
  * Optimisations
  * Domain name
  * Controller name
+ 
+Please not that this plugin is not mandatory, bundle can be used without this plugin, and this plugin can be used without Symfony.
 
 ### Multisite
-
-in the wordpress.yml, you can allow multisite installation, `install-multisite: true`
 
 After running Tools > Network setup, add `WP_MULTISITE=1` in you .env.local file
 
@@ -116,10 +118,18 @@ You can change multisite configuration in the wordpress.yml
 
 ```yml
 multisite:
- subdomain_install: true
  shared_media: true
  clone_post: true
 ```
+
+You can define other settings in environment 
+
+```dotenv
+SUBDOMAIN_INSTALL = 1
+SITE_ID_CURRENT_SITE = 1
+BLOG_ID_CURRENT_SITE = 1
+```
+
 
 ## Theme
 

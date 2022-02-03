@@ -2,18 +2,13 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
-
-use Metabolism\WordpressBundle\Traits\SingletonTrait;
+use Dflydev\DotAccessData\Data;
+use function Env\env;
 
 /**
- * Class Metabolism\WordpressBundle Framework
+ * Class 
  */
 class NoticePlugin {
-
-	use SingletonTrait;
-
-	protected $config;
-
 
 	/**
 	 * Check symlinks and folders
@@ -33,7 +28,7 @@ class NoticePlugin {
 
 		if( ($_GET['fix']??false) == 'controller' ){
 
-            $controller = BASE_URI.'/src/Controller/'.$this->config->get('extra_permastructs.controller', 'BlogController').'.php';
+            $controller = BASE_URI.'/src/Controller/BlogController.php';
             $template = BASE_URI.'/templates/generic.html.twig';
 
             if( !file_exists($controller) ){
@@ -79,10 +74,10 @@ class NoticePlugin {
 		if( !empty($notices))
 			$notices[] = '<a href="?fix=database">Fix database now</a>';
 
-		if( is_blog_installed() && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
+		if( is_blog_installed() && !env('WP_INSTALLED') )
 			$notices[] = 'Wordpress is now installed, you should add WP_INSTALLED=1 to the <i>.env</i>';
 
-		if( !file_exists(BASE_URI.'/src/Controller/'.$this->config->get('extra_permastructs.controller', 'BlogController').'.php') )
+		if( !file_exists(BASE_URI.'/src/Controller/BlogController.php') )
             $errors[] = 'There is no controller defined : <a href="?fix=controller">Create one</a>';
 
 		if( !empty($errors) )
@@ -124,12 +119,9 @@ class NoticePlugin {
 
 	/**
 	 * NoticePlugin constructor.
-	 * @param $config
 	 */
-	public function __construct($config)
+	public function __construct()
 	{
-		$this->config = $config;
-
 		if( is_admin() )
 		{
 			add_action( 'admin_notices', [$this, 'adminNotices']);

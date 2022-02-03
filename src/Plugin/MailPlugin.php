@@ -2,7 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
-use Metabolism\WordpressBundle\Traits\SingletonTrait;
+use function Env\env;
 
 /**
  * Class MailPlugin
@@ -11,13 +11,11 @@ use Metabolism\WordpressBundle\Traits\SingletonTrait;
  */
 class MailPlugin {
 
-	use SingletonTrait;
-
 	protected $_smtp_config;
 
-	public function __construct( $config )
+	public function __construct()
 	{
-		$mailer_url = getenv('MAILER_URL');
+		$mailer_url = env('MAILER_URL');
 
 		if(!empty($mailer_url)){
 
@@ -26,7 +24,7 @@ class MailPlugin {
 			if($this->_smtp_config['scheme'] != null) {
 
 				add_action( 'phpmailer_init', array( $this, 'configureSmtp' ) );
-				add_filter( 'wp_mail_content_type', function($content_type) { return "text/html"; } );
+				add_filter( 'wp_mail_content_type', function() { return "text/html"; } );
 				add_filter( 'wp_mail_from', array( $this, 'fromEmail' ) );
 				add_filter( 'wp_mail_from_name', array( $this, 'fromName' ) );
 			}
