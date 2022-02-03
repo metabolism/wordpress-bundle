@@ -125,9 +125,10 @@ multisite:
 You can define other settings in environment 
 
 ```dotenv
-SUBDOMAIN_INSTALL = 1
-SITE_ID_CURRENT_SITE = 1
-BLOG_ID_CURRENT_SITE = 1
+WP_MULTISITE=1
+SUBDOMAIN_INSTALL=0
+SITE_ID_CURRENT_SITE=1
+BLOG_ID_CURRENT_SITE=1
 ```
 
 

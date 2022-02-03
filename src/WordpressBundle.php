@@ -91,6 +91,14 @@ class WordpressBundle extends Bundle
         }
     }
 
+    public static function isLoginUrl(){
+
+        $uri = explode('/', $_SERVER['SCRIPT_NAME']);
+        $page = end($uri);
+
+        return in_array( $page, ['wp-login.php', 'wp-signup.php'] );
+    }
+
     /**
      * 	@see wp-includes/class-wp.php, main function
      */

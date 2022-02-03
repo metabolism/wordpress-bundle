@@ -53,6 +53,37 @@ class UrlPlugin {
             return $url;
     }
 
+    /**
+     * Save post name when requesting for preview link
+     * @param $id
+     * @return mixed
+     */
+    public function getPreviewPermalink($id){
+
+        $post = get_post($id);
+
+        if( $post->post_name ){
+            $post->post_status = 'publish';
+            return get_permalink($post);
+        }
+
+        $filter = isset($post->filter) ? $post->filter : false;
+
+        list($permalink, $post_name) = get_sample_permalink($post);
+        $preview_permalink = str_replace( array( '%pagename%', '%postname%' ), $post_name, esc_html( urldecode( $permalink ) ) );
+
+        $post->filter = $filter;
+
+        if($post->post_name != $post_name){
+            wp_update_post([
+                'ID'=> $post->ID,
+                'post_name'=> $post_name
+            ]);
+        }
+
+        return $preview_permalink;
+    }
+
 
     /**
      * Symfony require real url so redirect preview url to real url

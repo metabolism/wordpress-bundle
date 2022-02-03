@@ -22,11 +22,11 @@ class ACFHelper
      * @param bool $type
      * @param bool $load_value
      */
-	public function __construct( $id, $type=false, $load_value=false )
+	public function __construct( $id=false, $type=false, $load_value=false )
 	{
 		global $_config;
 
-		if( !$_config || !class_exists('ACF') )
+		if( !$_config || !class_exists('ACF') || !$id )
 			return;
 
         if( is_null(self::$use_entity) )

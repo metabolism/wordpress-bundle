@@ -133,7 +133,7 @@ class Image extends Entity
 				$this->ID = $post->ID;
 				$this->caption = $post->post_excerpt;
 				$this->description = $post->post_content;
-				$this->file = $attachment_metadata['file'];
+				$this->file = $this->uploadDir('relative').'/'.$attachment_metadata['file'];
 				$this->src = $filename;
 				$this->post = $post;
 
@@ -144,7 +144,7 @@ class Image extends Entity
 				$this->height = $attachment_metadata['height'];
 				$this->metadata = $attachment_metadata['image_meta'];
 				$this->mime_type = $post->post_mime_type;
-			}
+            }
 		}
 		else{
 

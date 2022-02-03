@@ -34,10 +34,10 @@ class BeforeActionSubscriber implements EventSubscriberInterface
      */
 	public function onKernelController(ControllerEvent $event)
 	{
-        if ( !$event->isMasterRequest() )
+        if ( !$event->isMainRequest() )
 			return;
 
-        if( wp_maintenance_mode() )
+        if( wp_is_maintenance_mode() || (function_exists('wp_maintenance_mode') && wp_maintenance_mode()) )
             throw new \Exception('Service Unavailable', 503);
 	}
 }

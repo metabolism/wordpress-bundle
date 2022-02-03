@@ -11,6 +11,9 @@ use Metabolism\WordpressBundle\WordpressBundle;
 
 WordpressBundle::loadPlugins();
 
+if( WordpressBundle::isLoginUrl() )
+    return;
+
 if( is_admin() )
 {
 	//load back only controller
