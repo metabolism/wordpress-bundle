@@ -42,10 +42,11 @@ class PostRepository
     /**
      *
      * @return Post|Post[]|null
+     * @throws \Exception
      */
     public function findQueried()
     {
-        if( is_archive() || (is_home() && get_option('show_on_front') == 'posts') ){
+        if( is_archive() || (is_home() && get_option('show_on_front') == 'posts') || is_search() ){
 
             global $wp_query;
             return $this->findBy($wp_query->query);

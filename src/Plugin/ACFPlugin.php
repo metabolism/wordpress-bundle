@@ -8,6 +8,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Loader\FilesystemLoader;
+use function Env\env;
 
 /**
  * Class Metabolism\WordpressBundle Framework
@@ -31,11 +32,16 @@ class ACFPlugin {
         $acfHelper = new ACFHelper();
         $data = $acfHelper->format([$layout]);
 
-        $loader = new FilesystemLoader(BASE_URI.'/templates/components');
+        $components_path = env('COMPONENTS_PATH')?:(env('COMPONENTS_PATH')?:'/templates/components');
 
-        $twig = new Environment($loader, [
-            // 'cache' => BASE_URI.'/var/cache/dev/twig'
-        ]);
+        $loader = new FilesystemLoader(BASE_URI.$components_path);
+
+        $options = [];
+
+        if( WP_ENV != 'dev' && is_dir( BASE_URI.'/var/cache') )
+            $options['cache'] = BASE_URI.'/var/cache/components';
+
+        $twig = new Environment($loader, $options);
 
         $name = $layout['name'];
         $data = array_values($data)[0];
