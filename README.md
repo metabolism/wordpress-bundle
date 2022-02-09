@@ -2,6 +2,8 @@
 
 Use Wordpress as a backend for a Symfony application
 
+[![Latest Stable Version](http://poser.pugx.org/metabolism/wordpress-bundle/v)](https://packagist.org/packages/metabolism/wordpress-bundle) [![Total Downloads](http://poser.pugx.org/metabolism/wordpress-bundle/downloads)](https://packagist.org/packages/metabolism/wordpress-bundle) [![Latest Unstable Version](http://poser.pugx.org/metabolism/wordpress-bundle/v/unstable)](https://packagist.org/packages/metabolism/wordpress-bundle) [![License](http://poser.pugx.org/metabolism/wordpress-bundle/license)](https://packagist.org/packages/metabolism/wordpress-bundle) 
+
 ## How does it work ?
 
 When the Wordpress bundle is loaded, it includes the minimal amount of Wordpress Core files to allow usage of Wordpress functions and plugins
