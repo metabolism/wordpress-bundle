@@ -141,7 +141,7 @@ class SiteHealthHelper {
 
 		foreach ($wp_post_types as $post_type)
 		{
-			if( $post_type->public && ($post_type->publicly_queryable || $post_type->name == 'page') && !in_array($post_type->name, ['attachment']) ){
+			if( $post_type->public && ($post_type->publicly_queryable || $post_type->name == 'page') && $post_type->name != 'attachment'){
 
 				$posts = get_posts(['post_type'=>$post_type->name, 'exclude'=>$home, 'posts_per_page'=>($this->full?-1:1)]);
 
@@ -162,19 +162,17 @@ class SiteHealthHelper {
 
 	private function checkPagesWithState(){
 
-		global $_config;
+		$options = wp_load_alloptions();
 
-		$page_states = $_config->get('page_states', []);
+		foreach ($options as $option=>$value){
 
-		foreach ($page_states as $state=>$label){
+            if( strpos($option, 'page_on_') !== 0 )
+                continue;
 
-			$page = get_option('page_on_'.$state);
-
-			if( !$page || is_wp_error($page) )
-				continue;
+			$page = str_replace('page_on_', '', $value);
 
 			$url = get_page_link($page);
-			$this->getStatus('State '.$state, $url);
+			$this->getStatus('State '.$page, $url);
 		}
 
 		$this->getStatus( 'Home', '/' );

@@ -32,7 +32,7 @@ class ACFPlugin {
         $acfHelper = new ACFHelper();
         $data = $acfHelper->format([$layout]);
 
-        $components_path = env('COMPONENTS_PATH')?:(env('COMPONENTS_PATH')?:'/templates/components');
+        $components_path = env('COMPONENTS_PATH')?:'/templates/components';
 
         $loader = new FilesystemLoader(BASE_URI.$components_path);
 
@@ -48,7 +48,7 @@ class ACFPlugin {
 
         $template = $twig->load($name.'.html.twig');
 
-        return $template->render(['data'=>$data]);
+        return $template->render(['data'=>$data, 'is_component_preview'=>true]);
     }
 
 

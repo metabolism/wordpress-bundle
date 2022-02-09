@@ -63,23 +63,20 @@ class UrlPlugin {
         $post = get_post($id);
 
         if( $post->post_name ){
+
             $post->post_status = 'publish';
             return get_permalink($post);
         }
 
-        $filter = isset($post->filter) ? $post->filter : false;
+        $filter = $post->filter ?? false;
 
         list($permalink, $post_name) = get_sample_permalink($post);
         $preview_permalink = str_replace( array( '%pagename%', '%postname%' ), $post_name, esc_html( urldecode( $permalink ) ) );
 
         $post->filter = $filter;
 
-        if($post->post_name != $post_name){
-            wp_update_post([
-                'ID'=> $post->ID,
-                'post_name'=> $post_name
-            ]);
-        }
+        if($post->post_name != $post_name)
+            wp_update_post(['ID'=> $post->ID, 'post_name'=> $post_name]);
 
         return $preview_permalink;
     }
@@ -91,37 +88,27 @@ class UrlPlugin {
      */
     public function redirect(){
 
-        require_once(ABSPATH . 'wp-admin/includes/post.php');
-
         if( isset($_GET['s']) ){
 
-            $permalink = $this->getSearchLink($_GET['s']);
+            $permalink = get_search_link($_GET['s']);
+
+            $query_args = $_GET;
+            unset($query_args['s']);
         }
         else{
+
+            require_once(ABSPATH . 'wp-admin/includes/post.php');
 
             $id = $_GET['p'] ?? $_GET['page_id'];
             $permalink = $this->getPreviewPermalink($id);
 
             $query_args['preview'] = 'true';
-            $permalink = add_query_arg( $query_args, $permalink );
         }
+
+        $permalink = add_query_arg( $query_args, $permalink );
 
         wp_redirect($permalink);
         exit;
-    }
-
-
-    /**
-     * Get search url
-     * @param $s
-     * @return string
-     */
-    public function getSearchLink($s){
-
-        global $wp_rewrite;
-
-        $s = remove_accents(sanitize_text_field($s));
-        return $wp_rewrite->search_base.'/'.urlencode($s);
     }
 
 

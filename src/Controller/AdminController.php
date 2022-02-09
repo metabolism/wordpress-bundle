@@ -7,34 +7,10 @@ namespace Metabolism\WordpressBundle\Controller;
  */
 class AdminController {
 
-	protected $config;
-
-
 	/**
 	 * Init placeholder
 	 */
 	public function init(){}
-
-
-	/**
-	 * Allows user to add specific process on Wordpress functions
-	 */
-	public function registerFilters()
-	{
-		add_filter('update_right_now_text', function($text){
-			return substr($text, 0, strpos($text, '%1$s')+4);
-		});
-	}
-
-
-	/**
-	 * Load App configuration
-	 */
-	public function loadConfig()
-	{
-		global $_config;
-		$this->config = $_config;
-	}
 
 
 	/**
@@ -68,9 +44,6 @@ class AdminController {
 
 		$this->lock();
 
-		$this->registerFilters();
-
-		add_action( 'init', [$this, 'loadConfig'] );
 		add_action( 'admin_init', [$this, 'init'] );
 	}
 }

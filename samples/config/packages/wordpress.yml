@@ -383,11 +383,17 @@ export:
     /public/favicon : /favicon
     /public/uploads : /uploads
 
+##################
+##    Search    ##
+##################
+
+#search: # change search settings
+# use_metafields: false
+# posts_per_page: 12
+
 ################
 ##    Misc    ##
 ################
 
 gutenberg: false
-
-#search: # change search settings
-# posts_per_page: 12
+disable_update: true
