@@ -9,7 +9,7 @@ Use Wordpress as a backend for a Symfony application
 When the Wordpress bundle is loaded, it includes the minimal amount of Wordpress Core files to allow usage of Wordpress functions and plugins
 inside Symfony.
 
-__Controller example :__
+__Example :__
 
 ```php
 // src/Controller/BlogController.php
@@ -30,14 +30,14 @@ public function pageAction(Post $post, PostRepository $postRepository)
     // find 10 "brands" ordered by title
     $context['brands'] = $postRepository->findBy(['post_type'=>'brand'], ['title'=>'ASC'], 10);
 
-    return $this->render('page.twig', $context);
+    return $this->render('page.html.twig', $context);
 }
 ```
 
 ```twig
-{# page.twig #}
+{# templates/page.html.twig #}
 
-{% extends 'layout.twig' %}
+{% extends 'layout.html.twig' %}
 
 {% block body %}
 <article id="post-{{ post.ID }}" class="{{ post.class }}">
@@ -53,7 +53,7 @@ public function pageAction(Post $post, PostRepository $postRepository)
     <small>{{ post.metafields.mention }}</small>
     
     {% for brand in brands %}
-        {% include 'brand.twig' %}
+        {% include 'brand.html.twig' %}
     {% endfor %}
 
 </article>
