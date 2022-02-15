@@ -132,6 +132,16 @@ class UrlPlugin {
         return $permalink;
     }
 
+    public function addSearchUrl(){
+
+        global $wp_rewrite;
+
+        $search_slug = get_option( 'search_rewrite_slug' );
+
+        if( !empty($search_slug) )
+            $wp_rewrite->search_base = $search_slug;
+    }
+
 
     /**
      * UrlPlugin constructor.
@@ -145,9 +155,7 @@ class UrlPlugin {
 
         add_action('init', function()
         {
-            // Handle subfolder in url
-            if ( is_feed() )
-                return;
+            $this->addSearchUrl();
 
             if( !is_admin() && (isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id']) || isset($_GET['s']) ) )
                 $this->redirect();
