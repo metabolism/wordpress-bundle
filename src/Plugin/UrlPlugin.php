@@ -132,14 +132,17 @@ class UrlPlugin {
         return $permalink;
     }
 
-    public function addSearchUrl(){
+    public function searchRewriteRules(){
 
         global $wp_rewrite;
 
         $search_slug = get_option( 'search_rewrite_slug' );
 
-        if( !empty($search_slug) )
+        if( !empty($search_slug) ){
+
+            $wp_rewrite->search_structure = str_replace($wp_rewrite->search_base.'/', $search_slug.'/', $wp_rewrite->search_structure);
             $wp_rewrite->search_base = $search_slug;
+        }
     }
 
 
@@ -152,11 +155,10 @@ class UrlPlugin {
         add_filter('option_siteurl', [$this, 'optionSiteURL'] );
         add_filter('network_site_url', [$this, 'networkSiteURL'] );
         add_filter('home_url', [$this, 'homeURL'] );
+        add_filter('search_rewrite_rules', [$this, 'searchRewriteRules']);
 
         add_action('init', function()
         {
-            $this->addSearchUrl();
-
             if( !is_admin() && (isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id']) || isset($_GET['s']) ) )
                 $this->redirect();
         });

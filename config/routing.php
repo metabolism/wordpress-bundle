@@ -67,8 +67,6 @@ class Permastruct{
 
         global $wp_post_types, $wp_taxonomies;
 
-        $registered = [];
-
         foreach ($wp_post_types as $post_type)
         {
             $requirements = [];
@@ -106,8 +104,6 @@ class Permastruct{
 
                     $this->addRoute($post_type->name.'_archive', $struct, [], $this->wp_rewrite->extra_permastructs[$post_type->name]['struct']);
                 }
-
-                $registered[] = $post_type->name;
             }
         }
 
@@ -140,8 +136,6 @@ class Permastruct{
 
                     if( strpos($struct, '/%parent%') !== false )
                         $this->addRoute($taxonomy->name.'_parent', str_replace('/%parent%', '', $struct), $requirements, $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
-
-                    $registered[] = $taxonomy->name;
                 }
             }
         }
@@ -149,34 +143,11 @@ class Permastruct{
         if( isset($this->wp_rewrite->author_structure) )
             $this->addRoute('author', $this->wp_rewrite->author_structure);
 
-        $translated_search_slug = get_option( 'search_rewrite_slug' );
-        $search_post_type_structure = $search_structure = false;
-
-        if( !empty($translated_search_slug) ){
-
-            $search_structure = str_replace($this->wp_rewrite->search_base.'/', $translated_search_slug.'/', $this->wp_rewrite->search_structure);
-
-            if( isset($this->wp_rewrite->search_post_type_structure) )
-                $search_post_type_structure = str_replace($this->wp_rewrite->search_base.'/', $translated_search_slug.'/', $this->wp_rewrite->search_post_type_structure);
-        }
-        else{
-
-            if( isset($this->wp_rewrite->search_structure) )
-                $search_structure = $this->wp_rewrite->search_structure;
-
-            if( isset($this->wp_rewrite->search_post_type_structure) )
-                $search_post_type_structure = $this->wp_rewrite->search_post_type_structure;
-        }
-
-        if( $search_structure )
-            $this->addRoute('search', $search_structure, [], true);
-
-        if( $search_post_type_structure )
-            $this->addRoute('search_post_type', $search_post_type_structure, [], true, $this->getControllerName('search'));
+        if( isset($this->wp_rewrite->search_structure) )
+            $this->addRoute('search', $this->wp_rewrite->search_structure, [], true);
 
         if( isset($this->wp_rewrite->page_structure) )
             $this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
-
     }
 
 
