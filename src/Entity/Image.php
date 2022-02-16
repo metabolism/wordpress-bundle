@@ -186,7 +186,7 @@ class Image extends Entity
 	public function getSize(){
 
         if( is_null($this->size) && $this->src )
-            $this->size = filesize($this->src);
+            $this->size = filesize($this->src)/1024;
 
         return $this->size;
     }
