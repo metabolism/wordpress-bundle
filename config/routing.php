@@ -21,8 +21,6 @@ class Permastruct{
     {
         global $wp_rewrite;
 
-        flush_rewrite_rules();
-
         $this->collection = $collection;
         $this->controller_name = $controller_name;
         $this->locale = $locale;
@@ -223,6 +221,7 @@ if( env('WP_MULTISITE') && !env('SUBDOMAIN_INSTALL') )
     foreach (get_sites() as $site)
     {
         switch_to_blog( $site->blog_id );
+        flush_rewrite_rules();
 
         $locale = trim($site->path, '/');
         new Permastruct($collection, $locale, $controller_name, $_config);
