@@ -8,11 +8,16 @@
 </head>
 <body class="{{ body_class }}">
 
-{% if maintenance_mode|default() %}
+{% if error|default %}
 
-    {% block maintenance %}
-        <h1>Maintenance</h1>
-    {% endblock maintenance %}
+    <h1>Error {{ code }}</h1>
+    {% if exception|default %}
+        <p>{{ exception.message }}</p>
+    {% endif %}
+
+{% elseif maintenance_mode|default %}
+
+    <h1>Maintenance</h1>
 
 {% else %}
 

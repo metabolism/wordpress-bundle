@@ -2,6 +2,7 @@
 
 use Symfony\Component\Routing\Route,
     Symfony\Component\Routing\RouteCollection;
+
 use function Env\env;
 
 class Permastruct{
@@ -35,10 +36,13 @@ class Permastruct{
             $this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::clear');
         }
 
-        $remove_rewrite_rules = $_config->get('rewrite_rules.remove', []);
+        if( $_config ){
 
-        if( !in_array('feed', $remove_rewrite_rules) )
-            $this->addRoute('feed', '{feed}', ['feed'=>'feed|rdf|rss|rss2|atom'], false, 'Metabolism\WordpressBundle\Helper\FeedHelper::doAction');
+            $remove_rewrite_rules = $_config->get('rewrite_rules.remove', []);
+
+            if( !in_array('feed', $remove_rewrite_rules) )
+                $this->addRoute('feed', '{feed}', ['feed'=>'feed|rdf|rss|rss2|atom'], false, 'Metabolism\WordpressBundle\Helper\FeedHelper::doAction');
+        }
 
         $this->addRoutes();
     }

@@ -2,51 +2,81 @@
 
 namespace App\Controller;
 
-use Metabolism\WordpressBundle\Service\ContextService;
+use Metabolism\WordpressBundle\Entity\Post;
+use Metabolism\WordpressBundle\Entity\Term;
+
+use Metabolism\WordpressBundle\Entity\User;
+use Metabolism\WordpressBundle\Service\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class BlogController extends AbstractController
 {
-	public function homeAction(ContextService $context)
-	{
-		$context->add('section', 'Homepage');
-		return $this->render('generic.html.twig', $context->toArray());
-	}
+    public function homeAction(array $posts, PaginationService $paginationService)
+    {
+        return $this->render('generic.html.twig', [
+            'pagination'=>$paginationService->build(),
+            'posts'=>$posts
+        ]);
+    }
 
-	public function pageAction(ContextService $context)
-	{
-		$post = $context->getPost();
+    public function pageAction(Post $post)
+    {
+        return $this->render('generic.html.twig', ['post'=>$post]);
+    }
 
-		if( !$post ){
+    public function guideAction(Post $post)
+    {
+        return $this->render('generic.html.twig', ['post'=>$post]);
+    }
 
-			$context->add('section', '404');
-			$response =  $this->render('generic.html.twig', $context->toArray());
-			$response->setStatusCode(404);
+    public function searchAction(array $posts, PaginationService $paginationService, $search)
+    {
+        return $this->render('generic.html.twig', [
+            'pagination'=>$paginationService->build(),
+            'search_query'=>$search,
+            'posts'=>$posts
+        ]);
+    }
 
-			return $response;
-		}
+    public function guideArchiveAction(array $posts, PaginationService $paginationService)
+    {
+        return $this->render('generic.html.twig', [
+            'pagination'=>$paginationService->build(),
+            'posts'=>$posts
+        ]);
+    }
 
-		$context->add('section', 'Single page');
-		return $this->render('generic.html.twig', $context->toArray());
-	}
+    public function categoryAction(Term $term, array $posts, PaginationService $paginationService)
+    {
+        return $this->render('generic.html.twig', [
+            'pagination'=>$paginationService->build(),
+            'posts'=>$posts,
+            'term'=>$term
+        ]);
+    }
 
-	public function guideAction(ContextService $context)
-	{
-		$context->add('section', 'Single guide');
-		return $this->render('generic.html.twig', $context->toArray());
-	}
+    public function authorAction(User $user, array $posts, PaginationService $paginationService)
+    {
+        return $this->render('generic.html.twig', [
+            'pagination'=>$paginationService->build(),
+            'posts'=>$posts,
+            'author'=>$user
+        ]);
+    }
 
-	public function guideArchiveAction(ContextService $context)
-	{
-		$context->add('section', 'Guide Archive');
-		return $this->render('generic.html.twig', $context->toArray());
-	}
+    public function errorAction(\Throwable $exception)
+    {
+        $code = $exception->getCode();
 
-	public function categoryAction(ContextService $context)
-	{
-		$category = $context->getTerm();
-		$context->add('section', 'Single category : '.$category->title);
+        if( $code == 503 )
+            $response = $this->render( 'generic.html.twig', ['error'=>true, 'code'=>$code] );
+        else if( $code == 404 )
+            $response = $this->render( 'generic.html.twig', ['error'=>true, 'code'=>$code] );
+        else
+            $response = $this->render( 'generic.html.twig', ['error'=>true, 'exception'=>$exception, 'code'=>$code] );
 
-		return $this->render('generic.html.twig', $context->toArray());
-	}
+        $response->setStatusCode($code?:500);
+
+        return $response;
+    }
 }

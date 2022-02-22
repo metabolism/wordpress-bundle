@@ -33,7 +33,7 @@ class NoticePlugin {
 
             if( !file_exists($controller) ){
 
-                copy(__DIR__.'/../../samples/controller/BlogController.php', $controller);
+                copy(__DIR__.'/../../samples/src/Controller/BlogController.php', $controller);
                 copy(__DIR__.'/../../samples/template/generic.html.twig', $template);
             }
 		}
