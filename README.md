@@ -185,7 +185,6 @@ $ composer require metabolism/wordpress-bundle
 
 #### For applications that don't use Symfony Flex
 
-
 Enable the bundle by adding it to the list of registered bundles
 in the `config/bundles.php` file of your project:
 

@@ -28,7 +28,7 @@
     "johnpbloch/wordpress-core": "^5.2",
     "ifsnop/mysqldump-php":"^2.0",
     "dflydev/dot-access-data":"^3.0",
-    "enshrined/svg-sanitize": "0.*",
+    "enshrined/svg-sanitize": "^0.15",
     "intervention/image": "^2.0"
   },
   "suggest": {
