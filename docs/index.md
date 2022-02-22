@@ -38,7 +38,7 @@ symfony serve
 
 ### Install Wordpress
 
-You will not be asked for database credentials
+Load the root url ( https://127.0.0.1:8000 when using SF server ) and start the installation
 
 ### Post Install
 
