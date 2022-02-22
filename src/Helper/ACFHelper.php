@@ -26,10 +26,10 @@ class ACFHelper
 	{
 		global $_config;
 
-		if( !$_config || !class_exists('ACF') || !$id )
+		if( !class_exists('ACF') || !$id )
 			return;
 
-        if( is_null(self::$use_entity) )
+        if( is_null(self::$use_entity) && $_config )
             self::$use_entity = $_config->get('acf.settings.use_entity', false);
 
 		if( !in_array($type, ['menu', 'menuItem', 'post', 'site']) && $type)

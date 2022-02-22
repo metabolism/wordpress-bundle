@@ -28,9 +28,6 @@ class WordpressBundle extends Bundle
 	{
         Env::$options = Env::USE_ENV_ARRAY;
 
-        if( !env('WP_INSTALLED') )
-	        return;
-
 		$this->log_dir = $this->container->get('kernel')->getLogDir();
 		$this->root_dir = $this->container->get('kernel')->getProjectDir();
 		$this->public_dir = $this->root_dir.(is_dir($this->root_dir.'/public') ? '/public' : '/web');

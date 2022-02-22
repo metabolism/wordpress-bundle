@@ -158,6 +158,22 @@ class UrlPlugin {
 
 
     /**
+     * Set permalink structure
+     */
+    public function init()
+    {
+        global $wp_rewrite, $_config;
+        $permalink_structure = $_config ? $_config->get('permalink_structure', '/%postname%') : '/%postname%';
+
+        if( $wp_rewrite->permalink_structure != $permalink_structure ){
+
+            $wp_rewrite->set_permalink_structure($permalink_structure);
+            update_option( 'rewrite_rules', FALSE );
+        }
+    }
+
+
+    /**
      * UrlPlugin constructor.
      */
     public function __construct(){
@@ -167,6 +183,8 @@ class UrlPlugin {
         add_filter('network_site_url', [$this, 'networkSiteURL'] );
         add_filter('home_url', [$this, 'homeURL'] );
         add_filter('root_rewrite_rules', [$this, 'searchRewriteRules']);
+
+        add_action('init', [$this, 'init']);
 
         add_action('generate_rewrite_rules', function()
         {

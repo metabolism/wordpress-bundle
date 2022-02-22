@@ -73,7 +73,7 @@ class Menu extends Entity
 
 		global $_config;
 
-		if( $_config->get('menu.depth',  true) )
+		if( !$_config || $_config->get('menu.depth',  true) )
 			$this->items = $this->addDepth();
 
         return wp_get_nav_menu_object($menu_id);

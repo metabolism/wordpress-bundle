@@ -24,6 +24,11 @@ class BlogController extends AbstractController
         return $this->render('generic.html.twig', ['post'=>$post]);
     }
 
+    public function postAction(Post $post)
+    {
+        return $this->render('generic.html.twig', ['post'=>$post]);
+    }
+
     public function guideAction(Post $post)
     {
         return $this->render('generic.html.twig', ['post'=>$post]);

@@ -36,13 +36,10 @@ class Permastruct{
             $this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::clear');
         }
 
-        if( $_config ){
+        $remove_rewrite_rules = $_config ? $_config->get('rewrite_rules.remove', []) : [];
 
-            $remove_rewrite_rules = $_config->get('rewrite_rules.remove', []);
-
-            if( !in_array('feed', $remove_rewrite_rules) )
-                $this->addRoute('feed', '{feed}', ['feed'=>'feed|rdf|rss|rss2|atom'], false, 'Metabolism\WordpressBundle\Helper\FeedHelper::doAction');
-        }
+        if( !in_array('feed', $remove_rewrite_rules) )
+            $this->addRoute('feed', '{feed}', ['feed'=>'feed|rdf|rss|rss2|atom'], false, 'Metabolism\WordpressBundle\Helper\FeedHelper::doAction');
 
         $this->addRoutes();
     }
@@ -150,6 +147,9 @@ class Permastruct{
 
         if( isset($this->wp_rewrite->page_structure) )
             $this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
+
+        if( isset($this->wp_rewrite->permalink_structure) && (!isset($this->wp_rewrite->page_structure) || $this->wp_rewrite->page_structure != $this->wp_rewrite->permalink_structure) )
+            $this->addRoute('post', $this->wp_rewrite->permalink_structure, ['postname'=>'[a-zA-Z0-9]{2}[^/].*']);
     }
 
 

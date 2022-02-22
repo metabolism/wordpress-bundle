@@ -28,8 +28,6 @@
         {% endfor %}
     </nav>
 
-    <h1>{{ section }}</h1>
-
     {% block body %}
 
         {% if posts|default() %}
@@ -41,7 +39,6 @@
                             <img src="{{ post.thumbnail.resize(120,120) }}" alt="{{ post.thumbnail.alt }}" loading="lazy">
                         {% endif %}
                         <div>{{ post.excerpt|raw }}</div>
-                        <div>{{ post.content|raw }}</div>
                     </section>
                 {% endfor %}
             </article>
