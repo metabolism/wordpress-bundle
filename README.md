@@ -205,7 +205,7 @@ return [
 $ symfony serve
 ```
 
-Please read the [bundle documentation](docs/index.md) to continue
+Please read the full [bundle installation guide](docs/index.md) to continue
   
 ## Why not Bedrock
 
