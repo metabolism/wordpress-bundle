@@ -69,7 +69,7 @@ if output is empty, double check that Wordpress is installed and you have added 
 
 ### Update gitignore
 
-edit `.gitignore`
+Edit `.gitignore`
 
 ```gitignore
 ###> metabolism/wordpress-bundle ###
@@ -83,7 +83,13 @@ edit `.gitignore`
 
 ## Wordpress configuration
 
-The bundle installs the `WP Steroids` Wordpress plugin, it mimics Symfony behaviour using yaml to configure Wordpress.
+### Wordpress on Steroids  plugin
+
+Enable `Wordpress on Steroids` plugin
+
+Please not that this plugin is not mandatory, the bundle can be used without this plugin, and this plugin can be used without Symfony.
+
+### Configuration file
 
 When the bundle is installed, a default `wordpress.yml` is copied to `/config/packages`
 
@@ -106,9 +112,7 @@ This file allows you to manage :
  * Roles
  * Optimisations
  * Domain name
- * Controller name
  
-Please not that this plugin is not mandatory, bundle can be used without this plugin, and this plugin can be used without Symfony.
 
 ### Multisite
 

@@ -75,7 +75,7 @@ class NoticePlugin {
 			$notices[] = '<a href="?fix=database">Fix database now</a>';
 
 		if( is_blog_installed() && !env('WP_INSTALLED') )
-			$notices[] = 'Wordpress is now installed, you should add WP_INSTALLED=1 to the <i>.env</i>';
+			$notices[] = 'Wordpress is now installed, you should add WP_INSTALLED=1 to your environment';
 
 		if( !file_exists(BASE_URI.'/src/Controller/BlogController.php') )
             $errors[] = 'There is no controller defined : <a href="?fix=controller">Create one</a>';

@@ -163,9 +163,11 @@ $ composer create-project symfony/skeleton my_project_name
 
 ### Define installation path for Wordpress core and plugins
 
-Edit composer.json and add :
+Edit composer.json and edit :
 
 ```json
+"minimum-stability": "dev",
+...
 "extra": {
     "installer-paths": {
         "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
@@ -180,7 +182,7 @@ Edit composer.json and add :
 Open a command console, enter your project directory and execute:
 
 ```shell
-$ composer require metabolism/wordpress-bundle
+$ composer require metabolism/wordpress-bundle 2.0.x
 ```
 
 #### For applications that don't use Symfony Flex
