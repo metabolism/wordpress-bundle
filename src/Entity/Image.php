@@ -78,7 +78,7 @@ class Image extends Entity
 		if ( !self::$wp_upload_dir )
 			self::$wp_upload_dir = wp_upload_dir();
 
-		return self::$wp_upload_dir[$field];
+		return self::$wp_upload_dir[$field]??'';
 	}
 
 

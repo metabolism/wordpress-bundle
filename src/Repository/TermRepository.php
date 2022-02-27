@@ -66,7 +66,7 @@ class TermRepository
     {
         $criteria['fields'] = 'ids';
 
-        $criteria['number'] = $limit?:get_option( 'posts_per_page' );
+        $criteria['number'] = $limit?:0;
 
         if( $offset )
             $criteria['offset'] = $offset;

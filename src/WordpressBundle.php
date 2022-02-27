@@ -24,29 +24,29 @@ class WordpressBundle extends Bundle
         return \dirname(__DIR__);
     }
 
-	public function boot()
-	{
+    public function boot()
+    {
         Env::$options = Env::USE_ENV_ARRAY;
 
-		$this->log_dir = $this->container->get('kernel')->getLogDir();
-		$this->root_dir = $this->container->get('kernel')->getProjectDir();
-		$this->public_dir = $this->root_dir.(is_dir($this->root_dir.'/public') ? '/public' : '/web');
+        $this->log_dir = $this->container->get('kernel')->getLogDir();
+        $this->root_dir = $this->container->get('kernel')->getProjectDir();
+        $this->public_dir = $this->root_dir.(is_dir($this->root_dir.'/public') ? '/public' : '/web');
 
         $this->resolveServer();
         $this->loadWordpress();
 
         //todo: use dependency injection
-		if( $this->container->has('twig') ){
+        if( $this->container->has('twig') ){
 
-			$twig = $this->container->get('twig');
+            $twig = $this->container->get('twig');
 
             $site = Site::getInstance();
             $site->setGlobals($twig);
 
-			$twigExtension = new TwigExtension();
-			$twig->addExtension($twigExtension);
-		}
-	}
+            $twigExtension = new TwigExtension();
+            $twig->addExtension($twigExtension);
+        }
+    }
 
 
     private function resolveServer(){
@@ -107,7 +107,7 @@ class WordpressBundle extends Bundle
         global $request;
 
         if( is_object($request) && get_class($request) == 'Symfony\Component\HttpFoundation\Request' )
-            trigger_error('$request must be renamed in "'.$this->public_dir.'/index.php" : $httpRequest = Request::createFromGlobals();', E_USER_WARNING);
+            $httpRequest = $request;
 
         if (!defined('WP_DEBUG_LOG'))
             define('WP_DEBUG_LOG', realpath($this->log_dir . '/wp-errors.log'));
@@ -146,5 +146,8 @@ class WordpressBundle extends Bundle
 
         remove_action( 'template_redirect', 'redirect_canonical' );
         do_action( 'template_redirect' );
+
+        if( isset($httpRequest) )
+            $request = $httpRequest;
     }
 }

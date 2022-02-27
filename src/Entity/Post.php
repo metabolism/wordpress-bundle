@@ -457,7 +457,10 @@ class Post extends Entity
 
 			if( is_wp_error($terms) ){
 
-				$term_array[$taxonomy] = $terms->get_error_messages();
+                if( (!isset($args['hierarchical']) || $args['hierarchical']) && count($taxonomies)>1 )
+                    $term_array[$taxonomy][] = $terms->get_error_message();
+                else
+                    $term_array[] = $terms->get_error_message();
 			}
 			else
 			{
