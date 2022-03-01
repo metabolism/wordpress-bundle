@@ -74,10 +74,10 @@ class TermRepository
         if( $orderBy )
             $criteria = ['orderby' => $orderBy[0], 'order' => $orderBy[1]??'DESC'];
 
-        $_terms = get_terms( $criteria );
+        $query = new \WP_Term_Query($criteria);
         $terms = [];
 
-        foreach ($_terms as $term)
+        foreach ($query->terms as $term)
             $terms[] = TermFactory::create( $term );
 
         return array_filter($terms);

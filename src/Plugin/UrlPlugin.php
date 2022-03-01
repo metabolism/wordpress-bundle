@@ -88,12 +88,20 @@ class UrlPlugin {
      */
     public function redirect(){
 
+        $permalink = $query_args = false;
+
         if( isset($_GET['s']) ){
 
-            $permalink = get_search_link($_GET['s']);
+            global $wp;
+            $wp->parse_request();
 
-            $query_args = $_GET;
-            unset($query_args['s']);
+            if( empty($wp->request) ){
+
+                $permalink = get_search_link($_GET['s']);
+
+                $query_args = $_GET;
+                unset($query_args['s']);
+            }
         }
         else{
 
@@ -105,10 +113,14 @@ class UrlPlugin {
             $query_args['preview'] = 'true';
         }
 
-        $permalink = add_query_arg( $query_args, $permalink );
+        if( $permalink ){
 
-        wp_redirect($permalink);
-        exit;
+            if( $query_args )
+                $permalink = add_query_arg( $query_args, $permalink );
+
+            wp_redirect($permalink);
+            exit;
+        }
     }
 
 
@@ -132,6 +144,10 @@ class UrlPlugin {
         return $permalink;
     }
 
+    /**
+     * @param $rewrite_rules
+     * @return mixed
+     */
     public function searchRewriteRules($rewrite_rules){
 
         global $wp_rewrite, $wp_search_base;
@@ -162,7 +178,11 @@ class UrlPlugin {
      */
     public function init()
     {
+        if( !is_admin() && (isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id']) || isset($_GET['s']) ) )
+            $this->redirect();
+
         global $wp_rewrite, $_config;
+
         $permalink_structure = $_config ? $_config->get('permalink_structure', '/%postname%') : '/%postname%';
 
         if( $wp_rewrite->permalink_structure != $permalink_structure ){
@@ -185,11 +205,5 @@ class UrlPlugin {
         add_filter('root_rewrite_rules', [$this, 'searchRewriteRules']);
 
         add_action('init', [$this, 'init']);
-
-        add_action('generate_rewrite_rules', function()
-        {
-            if( !is_admin() && (isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id']) || isset($_GET['s']) ) )
-                $this->redirect();
-        });
     }
 }

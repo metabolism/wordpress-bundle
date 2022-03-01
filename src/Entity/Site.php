@@ -42,7 +42,7 @@ class Site extends Entity
     protected $search_url;
     protected $privacy_policy_url;
     protected $privacy_policy_title;
-    protected $current_user;
+    protected $user;
     protected $posts_per_page;
     protected $bloginfo;
     protected $title;
@@ -99,17 +99,17 @@ class Site extends Entity
         return $this->version;
     }
 
-    public function getCurrentUser(){
+    public function getUser(){
 
-        if( is_null($this->current_user) ){
+        if( is_null($this->user) ){
 
             if( $user_id = get_current_user_id() )
-                $this->current_user = Factory::create($user_id, 'user');
+                $this->user = Factory::create($user_id, 'user');
             else
-                $this->current_user = false;
+                $this->user = false;
         }
 
-        return $this->current_user;
+        return $this->user;
     }
 
     public function getMenu($location=false){
