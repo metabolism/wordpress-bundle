@@ -6,7 +6,7 @@ use Env\Env;
 use Metabolism\WordpressBundle\Controller\AdminController;
 use Metabolism\WordpressBundle\Controller\FrontController;
 use Metabolism\WordpressBundle\Controller\WordpressController;
-use Metabolism\WordpressBundle\Entity\Site;
+use Metabolism\WordpressBundle\Entity\Blog;
 use Metabolism\WordpressBundle\Extension\TwigExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use function Env\env;
@@ -40,8 +40,8 @@ class WordpressBundle extends Bundle
 
             $twig = $this->container->get('twig');
 
-            $site = Site::getInstance();
-            $site->setGlobals($twig);
+            $blog = Blog::getInstance();
+            $blog->setGlobals($twig);
 
             $twigExtension = new TwigExtension();
             $twig->addExtension($twigExtension);
@@ -115,7 +115,7 @@ class WordpressBundle extends Bundle
         $composer = $this->root_dir.'/composer.json';
 
         // get Wordpress path
-        if( file_exists($composer) ){
+        if( !is_dir($this->root_dir.'/'.$this->wp_path) && file_exists($composer) ){
 
             $composer = json_decode(file_get_contents($composer), true);
             $installer_paths= $composer['extra']['installer-paths']??[];

@@ -81,7 +81,7 @@ Using Wordpress Bundle :
 * Post/Term Repository
 * Controller argument resolver for post(s), term and user
 * Symfony Cache invalidation on update ( Varnish compatible )
-* Post/Image/Menu/Term/User/Comment/Site entity
+* Post/Image/Menu/Term/User/Comment/Blog entity
 * Wordpress predefined routes
 * Site health checker url
 * Static site export command

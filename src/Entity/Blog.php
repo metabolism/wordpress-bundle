@@ -4,19 +4,21 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use lloc\Msls\MslsOptions;
 use Metabolism\WordpressBundle\Factory\Factory;
+use Metabolism\WordpressBundle\Service\BreadcrumbService;
+use Metabolism\WordpressBundle\Service\PaginationService;
 use Metabolism\WordpressBundle\Traits\SingletonTrait;
 use Twig\Environment;
 
 /**
- * Class Site
+ * Class Blog
  *
  * @package Metabolism\WordpressBundle\Entity
  */
-class Site extends Entity
+class Blog extends Entity
 {
     use SingletonTrait;
 
-	public $entity = 'site';
+	public $entity = 'blog';
 
     public $debug;
     public $environment;
@@ -45,6 +47,7 @@ class Site extends Entity
     protected $user;
     protected $posts_per_page;
     protected $bloginfo;
+    protected $info;
     protected $title;
     protected $body_class;
     protected $menus;
@@ -57,7 +60,7 @@ class Site extends Entity
     }
 
 	/**
-	 * Site constructor.
+	 * Blog constructor.
 	 *
 	 */
 	public function __construct()
@@ -83,7 +86,7 @@ class Site extends Entity
         $language  = explode('-', $this->language);
         $this->locale = count($language) ? $language[0] : 'en';
 
-        $this->loadMetafields('options', 'site');
+        $this->loadMetafields('options', 'blog');
 
         $this->options = $this->metafields;
 	}
@@ -97,6 +100,28 @@ class Site extends Entity
         }
 
         return $this->version;
+    }
+
+    public function getBreadcrumb(){
+
+        if(is_null($this->breadcrumb) ){
+
+            $breadcrumbServcie = new BreadcrumbService();
+            $this->breadcrumb = $breadcrumbServcie->build();
+        }
+
+        return $this->breadcrumb;
+    }
+
+    public function getPagination(){
+
+        if(is_null($this->pagination) ){
+
+            $paginationService = new PaginationService();
+            $this->pagination = $paginationService->build();
+        }
+
+        return $this->pagination;
     }
 
     public function getUser(){
@@ -282,6 +307,7 @@ class Site extends Entity
         switch_to_blog($site->blog_id);
 
         if ( MslsOptions::class != get_class( $mslsOptions ) && ( is_null( $mslsOptions ) || ! $mslsOptions->has_value( $locale ) ) ) {
+
             restore_current_blog();
             return false;
         }

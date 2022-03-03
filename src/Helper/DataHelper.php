@@ -20,7 +20,7 @@ class DataHelper {
         if( !method_exists($this->class, $this->method) )
             return trigger_error('Method ' . $this->method . ' do not exist', E_USER_WARNING);
 
-        //trigger_error('Direct access to site data will be removed, please use {{ site.' . $this->key . '(\''.$id.'\') }} instead', E_USER_NOTICE);
+        //trigger_error('Direct access to blog data will be removed, please use {{ blog.' . $this->key . '(\''.$id.'\') }} instead', E_USER_NOTICE);
         return call_user_func_array([$this->class, $this->method], [$id]);
     }
 
@@ -37,7 +37,7 @@ class DataHelper {
             return '';
         }
 
-        //trigger_error('Direct access to site data will be removed, please use {{ site.' . $this->key . ' }} instead', E_USER_NOTICE);
+        //trigger_error('Direct access to blog data will be removed, please use {{ blog.' . $this->key . ' }} instead', E_USER_NOTICE);
 
         return $data;
     }

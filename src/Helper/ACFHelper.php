@@ -32,7 +32,7 @@ class ACFHelper
         if( is_null(self::$use_entity) && $_config )
             self::$use_entity = $_config->get('acf.settings.use_entity', false);
 
-		if( !in_array($type, ['menu', 'menuItem', 'post', 'site']) && $type)
+		if( !in_array($type, ['menu', 'menuItem', 'post', 'blog']) && $type)
 			$id = $type.'_'.$id;
 
 		$this->id = $id;
