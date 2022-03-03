@@ -24,8 +24,8 @@ class Comment extends Entity
 	public $karma;
 	public $approved;
 	public $parent;
-	public $user_id;
 
+    protected $user;
 	protected $replies;
 	protected $date;
 	protected $date_gmt;
@@ -76,20 +76,40 @@ class Comment extends Entity
 		return $comment;
 	}
 
-	public function getDate(){
 
-		if( is_null($this->date) )
-			$this->date = $this->formatDate($this->comment->comment_date);
+	/**
+	 * @return User
+	 */
+	protected function getUser() {
 
-		return $this->date;
+        if( is_null($this->user) )
+            $this->user = Factory::create($this->comment->user_id, 'user');
+
+        return $this->user;
 	}
 
-	public function getDateGmt(){
+	public function getDate($format=true){
 
-		if( is_null($this->date_gmt) )
+		if( is_null($this->date) && $format )
+			$this->date = $this->formatDate($this->comment->comment_date);
+
+		return $format ? $this->date : $this->comment->comment_date;
+	}
+
+	public function getParent(){
+
+		if( is_null($this->parent) )
+			$this->parent = Factory::create($this->comment->comment_parent, 'comment');
+
+		return $this->parent;
+	}
+
+	public function getDateGmt($format=true){
+
+		if( is_null($this->date_gmt) && $format )
 			$this->date_gmt = $this->formatDate($this->comment->comment_date_gmt);
 
-		return $this->date_gmt;
+		return $format ? $this->date_gmt : $this->comment->comment_date_gmt;
 	}
 
 	public function getReplies($args=[]){
@@ -139,7 +159,7 @@ class Comment extends Entity
 	 * }
 	 * @return bool|\WP_Error
 	 */
-	public static function post($data){
+	public static function handleSubmission($data){
 
 		$comment = wp_handle_comment_submission( wp_unslash( $data ) );
 
@@ -161,5 +181,14 @@ class Comment extends Entity
 		do_action( 'set_comment_cookies', $comment, $user, $cookies_consent );
 
 		return true;
+	}
+
+
+    /**
+     * @deprecated
+     */
+    public static function post($data){
+
+		return self::handleSubmission($data);
 	}
 }

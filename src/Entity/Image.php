@@ -210,9 +210,9 @@ class Image extends Entity
 		return $this->focus_point;
 	}
 
-	public function getDate(){
+	public function getDate($format=true){
 
-		if( is_null($this->date) ){
+		if( is_null($this->date) && $format ){
 
 			if( $this->post )
 				$this->date = $this->formatDate($this->post->post_date);
@@ -220,12 +220,15 @@ class Image extends Entity
 				$this->date = $this->formatDate(filemtime($this->src));
 		}
 
-		return $this->date;
+        if( $format )
+            return $this->date;
+        else
+            return $this->post ? $this->post->post_date : filemtime($this->src);
 	}
 
-	public function getModified(){
+	public function getModified($format=true){
 
-		if( is_null($this->modified) ){
+		if( is_null($this->modified) && $format ){
 
 			if( $this->post )
 				$this->modified = $this->formatDate($this->post->post_modified);
@@ -233,12 +236,15 @@ class Image extends Entity
 				$this->modified = $this->formatDate(filectime($this->src));
 		}
 
-		return $this->modified;
+        if( $format )
+            return $this->modified;
+        else
+            return $this->post ? $this->post->post_modified : filectime($this->src);
 	}
 
-	public function getDateGmt(){
+	public function getDateGmt($format=true){
 
-		if( is_null($this->date_gmt) ){
+		if( is_null($this->date_gmt) && $format ){
 
 			if( $this->post )
 				$this->date_gmt = $this->formatDate($this->post->post_date_gmt);
@@ -246,12 +252,15 @@ class Image extends Entity
 				$this->date_gmt = $this->formatDate(filemtime($this->src));
 		}
 
-		return $this->date_gmt;
+        if( $format )
+            return $this->date_gmt;
+        else
+            return $this->post ? $this->post->post_date_gmt : filemtime($this->src);
 	}
 
-	public function getModifiedGmt(){
+	public function getModifiedGmt($format=true){
 
-		if( is_null($this->modified_gmt) ){
+		if( is_null($this->modified_gmt) && $format ){
 
 			if( $this->post )
 				$this->modified_gmt = $this->formatDate($this->post->post_modified_gmt);
@@ -259,7 +268,10 @@ class Image extends Entity
 				$this->modified_gmt = $this->formatDate(filectime($this->src));
 		}
 
-		return $this->modified_gmt;
+        if( $format )
+            return $this->modified_gmt;
+        else
+            return $this->post ? $this->post->post_modified_gmt : filectime($this->src);
 	}
 
 	public function getMetadata(){

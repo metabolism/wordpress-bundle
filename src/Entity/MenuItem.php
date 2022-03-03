@@ -3,6 +3,8 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 
+use Metabolism\WordpressBundle\Factory\Factory;
+
 /**
  * Class Menu
  *
@@ -21,7 +23,6 @@ class MenuItem extends Entity
     public $link;
     public $menu_order;
     public $menu_item_parent;
-    public $object;
     public $object_id;
     public $target;
 	public $title;
@@ -30,6 +31,7 @@ class MenuItem extends Entity
 	public $current_item_ancestor;
 	public $current_item_parent;
 
+    protected $object;
     private $menu_item;
 
     public function __toString()
@@ -56,7 +58,6 @@ class MenuItem extends Entity
 			$this->target = $menu_item->target;
 			$this->class = trim(implode(' ', $menu_item->classes));
 			$this->classes = $menu_item->classes;
-			$this->object = $menu_item->object;
 			$this->type = $menu_item->type;
 			$this->description = $menu_item->description;
             $this->current = $menu_item->current;
@@ -66,4 +67,12 @@ class MenuItem extends Entity
 			$this->loadMetafields($this->ID, 'menuItem');
 		}
 	}
+
+    public function getObject(){
+
+        if( is_null($this->object) )
+            $this->object = Factory::create($this->object_id, $this->menu_item->object);
+
+        return $this->object;
+    }
 }

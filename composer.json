@@ -32,14 +32,15 @@
     "intervention/image": "^2.0"
   },
   "suggest": {
-    "wpackagist-plugin/advanced-custom-fields": "Customise WordPress with powerful, professional and intuitive fields.",
     "metabolism/acf-extensions": "Extensions for ACF",
+    "wpackagist-plugin/advanced-custom-fields": "Customise WordPress with powerful, professional and intuitive fields.",
     "wpackagist-plugin/classic-editor": "Restores the previous (« classic ») WordPress editor and the « Edit Post » screen.",
     "wpackagist-plugin/wp-smartcrop": "Set the 'focal point' of any image, right from the media library",
     "wpackagist-plugin/multisite-language-switcher": "Add multilingual support using a WordPress multisite",
     "wpackagist-plugin/wordpress-seo": "The favorite WordPress SEO plugin of millions of users worldwide!",
     "wpackagist-plugin/query-monitor": "Query Monitor is the developer tools panel for WordPress.",
     "wpackagist-plugin/redirection" : "Easily manage 301 redirections, keep track of 404 errors",
+    "wpackagist-plugin/relevanssi" : "Replaces the standard WordPress search with a better search engine, with lots of features and configurable options.",
     "wpackagist-plugin/contact-form-7" : "Manage multiple contact forms, plus you can customize the form and the mail contents"
 
   },

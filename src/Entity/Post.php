@@ -36,6 +36,7 @@ class Post extends Entity
 	protected $template;
 	protected $content;
 	protected $class;
+	protected $classes;
 	protected $link;
 	protected $sticky;
 	protected $excerpt;
@@ -98,36 +99,36 @@ class Post extends Entity
 		return $post;
 	}
 
-	public function getDate(){
+	public function getDate($format=true){
 
-		if( is_null($this->date) )
+		if( is_null($this->date) && $format )
 			$this->date = $this->formatDate($this->post->post_date);
 
-		return $this->date;
+		return $format ? $this->date : $this->post->post_date;
 	}
 
-	public function getModified(){
+	public function getModified($format=true){
 
-		if( is_null($this->modified) )
+		if( is_null($this->modified) && $format )
 			$this->modified = $this->formatDate($this->post->post_modified);
 
-		return $this->modified;
+		return $format ? $this->modified : $this->post->post_modified;
 	}
 
-	public function getDateGmt(){
+	public function getDateGmt($format=true){
 
-		if( is_null($this->date_gmt) )
+		if( is_null($this->date_gmt) && $format )
 			$this->date_gmt = $this->formatDate($this->post->post_date_gmt);
 
-		return $this->date_gmt;
+		return $format ? $this->date_gmt : $this->post->post_date_gmt;
 	}
 
-	public function getModifiedGmt(){
+	public function getModifiedGmt($format=true){
 
-		if( is_null($this->modified_gmt) )
+		if( is_null($this->modified_gmt) && $format )
 			$this->modified_gmt = $this->formatDate($this->post->post_modified_gmt);
 
-		return $this->modified_gmt;
+		return $format ? $this->modified_gmt : $this->post->post_modified_gmt;
 	}
 
 	public function getExcerpt(){
@@ -149,9 +150,17 @@ class Post extends Entity
 	public function getClass(){
 
 		if( is_null($this->class) )
-			$this->class = implode(' ', get_post_class('', $this->post));
+			$this->class = implode(' ', $this->getClasses());
 
 		return $this->class;
+	}
+
+	public function getClasses(){
+
+		if( is_null($this->classes) )
+			$this->classes = get_post_class('', $this->post);
+
+		return $this->classes;
 	}
 
 	public function getSticky(){
@@ -204,52 +213,6 @@ class Post extends Entity
 		}
 
 		return $this->thumbnail;
-	}
-
-
-	/**
-	 * Get sibling post using Wordpress natural order
-	 * @param $args
-	 * @param $loop
-	 * @return array[
-	 *  'prev' => Post,
-	 *  'next' => Post
-	 * ]|false
-	 */
-	public function adjacents($args=[], $loop=false){
-
-        $default_args = [
-            'orderby' => 'menu_order',
-            'order' => 'ASC',
-            'posts_per_page' => -1,
-            'fields' => 'ids',
-            'post_type' => $this->type
-        ];
-
-        $args = array_merge($default_args, $args);
-
-        $query = new \WP_Query($args);
-
-        $next_id = $prev_id = false;
-
-        foreach($query->posts as $key => $_post_id) {
-            if($_post_id == $this->ID){
-                $next_id = $query->posts[$key + 1] ?? false;
-                $prev_id = $query->posts[$key - 1] ?? false;
-                break;
-            }
-        }
-
-        if( !$next_id && $loop )
-            $next_id = $query->posts[0];
-
-        if( !$prev_id && $loop )
-            $prev_id = $query->posts[ count($query->posts) - 1 ];
-
-        return [
-            'next' => $next_id ? PostFactory::create($next_id) : false,
-            'prev' => $prev_id ? PostFactory::create($prev_id) : false
-        ];
 	}
 
 
@@ -324,7 +287,13 @@ class Post extends Entity
 		return $this->parent;
 	}
 
-	public function getAncestors($reverse=true){
+    /**
+     * Get post ancestors
+     *
+     * @param $reverse
+     * @return array|Post[]
+     */
+    public function getAncestors($reverse=true){
 
 		if( is_null($this->ancestors) ){
 

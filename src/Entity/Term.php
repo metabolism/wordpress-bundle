@@ -19,8 +19,10 @@ class Term extends Entity
     public $taxonomy;
     public $slug;
     public $title;
-    public $children;
+    public $group;
 
+    /** @var Term[] */
+    protected $children;
     protected $depth;
     protected $excerpt;
     protected $link;
@@ -28,6 +30,7 @@ class Term extends Entity
     protected $parent;
     protected $template;
     protected $thumbnail;
+    protected $ancestors;
 
     /** @var \WP_Term|bool */
 	private $term;
@@ -60,6 +63,7 @@ class Term extends Entity
             $this->count = $term->count;
             $this->slug = $term->slug;
             $this->title = $term->name;
+            $this->group = $term->term_group;
 
             $this->loadMetafields($this->ID, $this->taxonomy);
 		}
@@ -95,6 +99,25 @@ class Term extends Entity
 	}
 
 
+	/**
+     * Get term children
+     *
+	 * @return Term[]
+     */
+	protected function getChildren( ) {
+
+        if( is_null($this->children) ){
+
+            $terms_id = get_term_children( $this->ID, $this->taxonomy );
+
+            foreach ($terms_id as $term_id)
+                $this->children[] = TermFactory::create($term_id);
+        }
+
+        return $this->children;
+	}
+
+
     /**
      * Get parent term
      *
@@ -122,6 +145,32 @@ class Term extends Entity
             $this->depth = count(get_ancestors( $this->ID, $this->taxonomy ));
 
         return $this->depth;
+    }
+
+    /**
+     * Get term ancestors
+     *
+     * @param $reverse
+     * @return array|Term[]
+     */
+    public function getAncestors($reverse=true){
+
+        if( is_null($this->ancestors) ){
+
+            $parents_id = get_ancestors($this->ID, $this->taxonomy);
+
+            if( $reverse )
+                $parents_id = array_reverse($parents_id);
+
+            $ancestors = [];
+
+            foreach ($parents_id as $term_id)
+                $ancestors[] = TermFactory::create($term_id);
+
+            $this->ancestors = $ancestors;
+        }
+
+        return $this->ancestors;
     }
 
     public function getTemplate(){
