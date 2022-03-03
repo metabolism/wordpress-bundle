@@ -9,9 +9,9 @@ class CachePlugin
 {
 	private $noticeMessage,  $errorMessage, $debug;
 
-
 	/**
-	 * Add maintenance button and checkbox
+	 * Purge url from id
+     *
 	 * @param bool $pid
 	 * @return void
 	 */
@@ -70,6 +70,59 @@ class CachePlugin
         $this->clear();
 	}
 
+    /**
+     * Purge cache
+     * @param bool $url
+     * @return array
+     */
+    public static function purgeUrl($url=false){
+
+        if( !$url )
+            $url = get_home_url(null, '.*');
+
+        $varnish_ssl = $_SERVER['VARNISH_SSL'] ?? false;
+        $result = [];
+
+        $args = [
+            'method' => 'PURGE',
+            'headers' => [
+                'host' => $_SERVER['HTTP_HOST'],
+                'X-VC-Purge-Method' => 'regex',
+                'X-VC-Purge-Host' => $_SERVER['HTTP_HOST']
+            ],
+            'sslverify' => false
+        ];
+
+        if( isset($_SERVER['VARNISH_IPS']) ){
+
+            $varnish_ips = explode(',',$_SERVER['VARNISH_IPS']);
+        }
+        elseif( isset($_SERVER['VARNISH_IP']) ){
+
+            $varnish_ips = [$_SERVER['VARNISH_IP']];
+        }
+        else{
+
+            $response = wp_remote_request(str_replace('.*', '*', $url), $args);
+            $result[] = ['url'=>$url, 'request'=>$response];
+
+            return $result;
+        }
+
+        foreach ($varnish_ips as $varnish_ip){
+
+            $varnish_url = str_replace($_SERVER['HTTP_HOST'], $varnish_ip, $url);
+
+            if( !$varnish_ssl )
+                $varnish_url = str_replace('https://', 'http://', $varnish_url);
+
+            $response = wp_remote_request($varnish_url, $args);
+            $result[] = ['url'=>$varnish_url, 'request'=>$response];
+        }
+
+        return $result;
+    }
+
 
 	/**
 	 * Purge cache
@@ -80,7 +133,7 @@ class CachePlugin
         if( $this->debug )
             return;
 
-        $results = WPS_Object_Cache::purgeUrl($url);
+        $results = self::purgeUrl($url);
 
         foreach ($results as $result){
 
@@ -101,7 +154,7 @@ class CachePlugin
 	 */
 	private function clear()
 	{
-		if ( !WPS_Object_Cache::clear() )
+		if ( !self::cacheFlush() )
 			$this->errorMessage[] = 'Unable to clear cache';
 		else
 			$this->noticeMessage[] = 'Cleared';
@@ -138,6 +191,45 @@ class CachePlugin
 
 		}, 999 );
 	}
+
+
+    /**
+     * Clear cache completely
+     */
+    public static function cacheFlush(){
+
+        wp_cache_flush();
+
+        return self::rrmdir(BASE_URI.'/var/cache', true);
+    }
+
+
+    /**
+     * Recursive rmdir
+     * @param string $dir
+     * @return bool
+     */
+    public static function rrmdir($dir, $keep=false) {
+
+        $status = true;
+
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    if (is_dir($dir."/".$object))
+                        $status = self::rrmdir($dir."/".$object) && $status;
+                    else
+                        $status = @unlink($dir."/".$object) && $status;
+                }
+            }
+
+            if( !$keep )
+                $status = @rmdir($dir) && $status;
+        }
+
+        return $status;
+    }
 
 
 	/**

@@ -3,9 +3,6 @@
 namespace Metabolism\WordpressBundle;
 
 use Env\Env;
-use Metabolism\WordpressBundle\Controller\AdminController;
-use Metabolism\WordpressBundle\Controller\FrontController;
-use Metabolism\WordpressBundle\Controller\WordpressController;
 use Metabolism\WordpressBundle\Entity\Blog;
 use Metabolism\WordpressBundle\Extension\TwigExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
