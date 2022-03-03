@@ -80,7 +80,7 @@ class CachePlugin
         if( $this->debug )
             return;
 
-        $results = WPS_Object_Cache::purgeUrl($url);
+        $results = \WPS_Object_Cache::purgeUrl($url);
 
         foreach ($results as $result){
 
@@ -101,7 +101,7 @@ class CachePlugin
 	 */
 	private function clear()
 	{
-		if ( !WPS_Object_Cache::clear() )
+		if ( !\WPS_Object_Cache::clear() )
 			$this->errorMessage[] = 'Unable to clear cache';
 		else
 			$this->noticeMessage[] = 'Cleared';
