@@ -5,7 +5,7 @@ namespace Metabolism\WordpressBundle\Service;
 class BreadcrumbService
 {
     /**
-     * Retrieve paginated link for archive post pages.
+     * Retrieve paginated links for archive post pages.
      * @param array $args
      * @return array
      */

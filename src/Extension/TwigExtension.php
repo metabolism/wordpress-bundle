@@ -49,8 +49,14 @@ class TwigExtension extends AbstractExtension{
 			new TwigFunction( 'is_active_sidebar', 'is_active_sidebar' ),
 			new TwigFunction( '_e', 'translate' ),
 			new TwigFunction( '_x', '_x' ),
+			new TwigFunction( '_ex', '_ex' ),
+			new TwigFunction( '_nx', '_nx' ),
+			new TwigFunction( '_n_noop', '_n_noop' ),
+			new TwigFunction( '_nx_noop', '_nx_noop' ),
 			new TwigFunction( '_n', '_n' ),
 			new TwigFunction( '__', 'translate' ),
+			new TwigFunction( 'translate', 'translate' ),
+			new TwigFunction( 'translate_nooped_plural', 'translate_nooped_plural' ),
 			new TwigFunction( 'wp_head', function(){ return @$this->getOutput('wp_head'); }, ['is_safe' => array('html')]  ),
 			new TwigFunction( 'wp_footer', function(){ return @$this->getOutput('wp_footer'); }, ['is_safe' => array('html')]  ),
 			new TwigFunction( 'Post', function($id){ return PostFactory::create($id); } ),
@@ -58,6 +64,7 @@ class TwigExtension extends AbstractExtension{
 			new TwigFunction( 'Term', function($id){ return TermFactory::create($id); } ),
 			new TwigFunction( 'Image', function($id){ return Factory::create($id, 'image'); } )
 		];
+
 	}
 
 

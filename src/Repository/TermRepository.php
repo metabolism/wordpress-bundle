@@ -54,6 +54,21 @@ class TermRepository
 
     /**
      * @param array $criteria
+     * @return int
+     */
+    public function count(array $criteria)
+    {
+        $criteria['fields'] = 'ID';
+        $criteria['number'] = 0;
+
+        $query = new \WP_Term_Query($criteria);
+
+        return count($query->terms);
+    }
+
+
+    /**
+     * @param array $criteria
      * @param array|null $orderBy
      * @param $limit
      * @param $offset
@@ -80,7 +95,17 @@ class TermRepository
         foreach ($query->terms as $term)
             $terms[] = TermFactory::create( $term );
 
-        return array_filter($terms);
+        $terms = array_filter($terms);
+
+        if( !isset($criteria['child_of']) && (!isset($criteria['sort']) || $criteria['sort'])  ){
+
+            $sorted = [];
+            $this->sort( $terms, $sorted );
+
+            return $sorted;
+        }
+
+        return $terms;
     }
 
     /**
@@ -90,25 +115,11 @@ class TermRepository
      */
     public function findOneBy(array $criteria, array $orderBy = null)
     {
+        $criteria['sort'] = false;
+
         $terms = $this->findBy($criteria, $orderBy, 1);
 
         return $terms[0]??null;
-    }
-
-    /**
-     * @param Term[] $raw_terms
-     * @return array
-     */
-    public function sortHierarchically($raw_terms){
-
-        $terms = [];
-
-        if( is_object($raw_terms) )
-            $raw_terms = (Array)$raw_terms;
-
-        $this->sort($raw_terms, $terms);
-
-        return $terms;
     }
 
     /**
@@ -116,7 +127,7 @@ class TermRepository
      * @param $into
      * @param int $parentId
      */
-    public function sort(&$terms, &$into, $parentId = 0)
+    protected function sort(&$terms, &$into, $parentId = 0)
     {
         foreach ($terms as $i => $term)
         {

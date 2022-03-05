@@ -346,12 +346,6 @@ class ContextService
             foreach ($raw_terms as $term)
                 $terms[$term->taxonomy][$term->ID] = is_wp_error($term) ? false : $term;
 
-            if( !isset($args['child_of']) && (!isset($args['sort']) || $args['sort']) ){
-
-                foreach ($terms as &$term_group)
-                    $term_group = $this->termRepository->sortHierarchically( $term_group );
-            }
-
             $ordered_terms =[];
 
             foreach ($args['taxonomy'] as $taxonomy){
@@ -363,9 +357,6 @@ class ContextService
             $terms = $ordered_terms;
         }
         else {
-
-            if( !isset($args['child_of']) && (!isset($args['sort']) || $args['sort'])  )
-                $raw_terms = $this->termRepository->sortHierarchically( $raw_terms );
 
             foreach ($raw_terms as $term)
                 $terms[$term->ID] = is_wp_error($term) ? false : $term;

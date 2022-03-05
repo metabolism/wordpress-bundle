@@ -51,6 +51,14 @@ class SiteHealthHelper {
 
 	public function check(){
 
+        if(($_SERVER['APP_TOKEN'] ?? false) != ($_REQUEST['token'] ?? false) ){
+
+            $response = new Response('Invalid token');
+            $response->setStatusCode(500);
+
+            return $response;
+        }
+
 		$this->checkPosts();
 		$this->checkTaxonomies();
 		$this->checkPagesWithState();
@@ -166,11 +174,10 @@ class SiteHealthHelper {
 
 		foreach ($options as $option=>$value){
 
-            if( strpos($option, 'page_on_') !== 0 )
+            if( strpos($option, 'page_on_') !== 0 || !$value )
                 continue;
 
 			$page = str_replace('page_on_', '', $value);
-
 			$url = get_page_link($page);
 			$this->getStatus('State '.$page, $url);
 		}

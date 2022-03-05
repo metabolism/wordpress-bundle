@@ -125,7 +125,7 @@ class PostRepository
      */
     public function findByState($state)
     {
-        if( $post = get_page_by_state($state) )
+        if( function_exists('get_page_by_state') && $post = get_page_by_state($state) )
             return PostFactory::create( $post );
 
         return null;

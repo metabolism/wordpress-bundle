@@ -2,7 +2,12 @@
 
 Use Wordpress as a backend for a Symfony application
 
-[![Latest Stable Version](http://poser.pugx.org/metabolism/wordpress-bundle/v)](https://packagist.org/packages/metabolism/wordpress-bundle) [![Total Downloads](http://poser.pugx.org/metabolism/wordpress-bundle/downloads)](https://packagist.org/packages/metabolism/wordpress-bundle) [![Latest Unstable Version](http://poser.pugx.org/metabolism/wordpress-bundle/v/unstable)](https://packagist.org/packages/metabolism/wordpress-bundle) [![License](http://poser.pugx.org/metabolism/wordpress-bundle/license)](https://packagist.org/packages/metabolism/wordpress-bundle)  [![Buy us a tree](https://img.shields.io/badge/Treeware-%F0%9F%8C%B3-lightgreen)](https://plant.treeware.earth/metabolism/wordpress-bundle)
+[![Latest Stable Version](http://poser.pugx.org/metabolism/wordpress-bundle/v)](https://packagist.org/packages/metabolism/wordpress-bundle)
+[![Total Downloads](http://poser.pugx.org/metabolism/wordpress-bundle/downloads)](https://packagist.org/packages/metabolism/wordpress-bundle)
+[![Latest Unstable Version](http://poser.pugx.org/metabolism/wordpress-bundle/v/unstable)](https://packagist.org/packages/metabolism/wordpress-bundle)
+[![License](http://poser.pugx.org/metabolism/wordpress-bundle/license)](https://packagist.org/packages/metabolism/wordpress-bundle)
+[![Buy us a tree](https://img.shields.io/badge/Treeware-%F0%9F%8C%B3-lightgreen)](https://plant.treeware.earth/metabolism/wordpress-bundle)
+[![Doc - Gitbook](https://img.shields.io/badge/Doc-Gitbook-346ddb?logo=gitbook&logoColor=fff)](https://metabolism.gitbook.io/symfony-wordpress-bundle/)
 
 ## How does it work ?
 
@@ -60,6 +65,11 @@ public function pageAction(Post $post, PostRepository $postRepository)
 {% endblock body %}
 ```
 
+## Documentation
+
+Full documentation is available on [Gitbook](https://metabolism.gitbook.io/symfony-wordpress-bundle/)
+
+[![Doc - Gitbook](https://img.shields.io/badge/Doc-Gitbook-346ddb?style=for-the-badge&logo=gitbook&logoColor=fff)](https://metabolism.gitbook.io/symfony-wordpress-bundle/)
 ## Features
 
 Using Composer :
@@ -103,11 +113,6 @@ Using [WP Steroids](https://github.com/wearemetabolism/wp-steroids) Wordpress pl
 * Relative urls
 * Multisite post deep copy ( with multisite-language-switcher plugin )
 * Custom datatable support with view and delete actions in admin
-
-## Migrating from 1.x to 2.0 ?
-
-Check the [migration guide](docs/migration.md)
-
 
 ## Drawbacks
 
@@ -205,7 +210,7 @@ return [
 $ symfony serve
 ```
 
-Please read the full [bundle installation guide](docs/index.md) to continue
+Please read the full [bundle installation guide](https://metabolism.gitbook.io/symfony-wordpress-bundle/getting-started/installation) to continue
   
 ## Why not Bedrock
 
@@ -226,7 +231,6 @@ Plus the security is a requirement for us and Wordpress failed to provide someth
 ## Roadmap
 
 * More samples
-* Better documentation
 * Global maintenance mode for multi-site
 * Unit tests
 
