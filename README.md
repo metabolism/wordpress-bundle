@@ -70,6 +70,7 @@ public function pageAction(Post $post, PostRepository $postRepository)
 Full documentation is available on [Gitbook](https://metabolism.gitbook.io/symfony-wordpress-bundle/)
 
 [![Doc - Gitbook](https://img.shields.io/badge/Doc-Gitbook-346ddb?style=for-the-badge&logo=gitbook&logoColor=fff)](https://metabolism.gitbook.io/symfony-wordpress-bundle/)
+
 ## Features
 
 Using Composer :
@@ -138,15 +139,7 @@ https://github.com/wearemetabolism/wordpress-bundle-demo
 
 This is an implementation of the Twenty Nineteen Wordpress theme for wordpress-bundle.
 
-Code
 [![Screenshot from 2021-05-03 10-08-22](https://user-images.githubusercontent.com/4919596/116854347-d8f2e180-abf7-11eb-9dec-29480cffa720.png)](https://user-images.githubusercontent.com/4919596/116854347-d8f2e180-abf7-11eb-9dec-29480cffa720.png)
-
-Front
-[![Screenshot from 2021-05-03 10-09-02](https://user-images.githubusercontent.com/4919596/116854351-d98b7800-abf7-11eb-9843-a57d521a2b7a.png)](https://user-images.githubusercontent.com/4919596/116854351-d98b7800-abf7-11eb-9843-a57d521a2b7a.png)
-
-Backoffice
-[![Screenshot from 2021-05-03 10-09-32](https://user-images.githubusercontent.com/4919596/116854353-d98b7800-abf7-11eb-9063-0520125a0e9e.png)](https://user-images.githubusercontent.com/4919596/116854353-d98b7800-abf7-11eb-9063-0520125a0e9e.png)
-
 
 ## Installation
 
@@ -211,22 +204,6 @@ $ symfony serve
 ```
 
 Please read the full [bundle installation guide](https://metabolism.gitbook.io/symfony-wordpress-bundle/getting-started/installation) to continue
-  
-## Why not Bedrock
-
-Because Bedrock "only" provides a folder organisation with composer dependencies management.
-This bundle comes from years of Bedrock usage + Timber plugin...
-
-## Why not Ekino Wordpress Bundle
-
-The philosophy is not the same, Ekino use Symfony to manipulate Wordpress database.
-Plus the last release was in 2015...
-
-## Is Wordpress classic theme bad ?
-
-It's more like a code philosophy, once you go Symfony you can't go back.
-
-Plus the security is a requirement for us and Wordpress failed to provide something good because of it's huge usage.
 
 ## Roadmap
 
