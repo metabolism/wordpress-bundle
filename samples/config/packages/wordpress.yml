@@ -381,9 +381,9 @@ security:
 
 export:
   copy:
-    /public/theme : /theme
-    /public/favicon : /favicon
-    /public/uploads : /uploads
+    '/public/theme' : /theme
+    '/public/favicon' : /favicon
+    '/public/uploads' : /uploads
 
 ##################
 ##    Search    ##

@@ -68,7 +68,9 @@ class ExportCommand  extends Command{
         $time_start = microtime(true);
 
         $output->writeln("<comment>Loading sitemaps</comment>");
-        $this->loadUrlsFromSitemap(get_home_url());
+
+        if( !$this->loadUrlsFromSitemap(get_home_url() ) )
+            return 0;
 
         if( $compare_url = $input->getOption('compare') ){
 
@@ -297,8 +299,8 @@ class ExportCommand  extends Command{
      */
     private function createZip(){
 
-        $filename = "export-".(new \DateTime())->getTimestamp().".zip";
-        $file_path = $this->export_dir.'/'.$filename;
+        $filename = "export.zip";
+        $file_path = $this->export_dir.'/../'.$filename;
 
         $status = wp_backup($this->export_dir, $file_path);
 
@@ -418,25 +420,23 @@ class ExportCommand  extends Command{
         global $_config;
         $export_options = $_config->get('export', []);
 
-
         $root_dir = $this->container->get('kernel')->getProjectDir();
 
-        if( !isset($export_options['copy']) )
-            return;
+        if( is_array($export_options['copy']??[]) ) {
 
-        foreach ($export_options['copy'] as $origin=>$target){
+            foreach ($export_options['copy'] as $origin => $target) {
 
-            $origin_path = $root_dir.$origin;
-            $target_path = $this->export_dir.$target;
+                $origin_path = $root_dir . $origin;
+                $target_path = $this->export_dir . $target;
 
-            if( $this->filesystem->exists($origin_path) ){
+                if ($this->filesystem->exists($origin_path)) {
 
-                $this->mirror($origin_path, $target_path);
-                $this->output->writeln("<info>- ".$origin." -> ".$target."</info>");
-            }
-            else{
+                    $this->mirror($origin_path, $target_path);
+                    $this->output->writeln("<info>- " . $origin . " -> " . $target . "</info>");
+                } else {
 
-                $this->error($origin_path." does not exists");
+                    $this->error($origin_path . " does not exists");
+                }
             }
         }
 
