@@ -127,11 +127,12 @@ of the Composer documentation.
 $ composer create-project metabolism/wordpress-skeleton my_project_directory
 ```
 
-Please read the full [bundle installation guide](https://metabolism.gitbook.io/symfony-wordpress-bundle/getting-started/installation) to continue
+
+Please read the full [bundle installation guide](https://metabolism.gitbook.io/symfony-wordpress-bundle/getting-started/wordpress) to continue
 
 ### Setting up an existing Symfony project
 
-To define installation path for Wordpress core and plugins, edit composer.json and edit :
+Define installation path for Wordpress core and plugins in `composer.json`
 
 ```json
 "minimum-stability": "dev",
@@ -147,7 +148,7 @@ To define installation path for Wordpress core and plugins, edit composer.json a
 
 ### Install the bundle
 
-Open a command console, enter your project directory and execute:
+Require Wordpress Bundle
 
 ```shell
 $ composer require metabolism/wordpress-bundle 2.0.x
@@ -155,8 +156,7 @@ $ composer require metabolism/wordpress-bundle 2.0.x
 
 #### For applications that don't use Symfony Flex
 
-Enable the bundle by adding it to the list of registered bundles
-in the `config/bundles.php` file of your project:
+Register the bundle
 
 ```php
 // config/bundles.php
@@ -167,7 +167,7 @@ return [
 ];
 ```
 
-Please read the full [bundle installation guide](https://metabolism.gitbook.io/symfony-wordpress-bundle/getting-started/installation) to continue
+Please read the full [bundle installation guide](https://metabolism.gitbook.io/symfony-wordpress-bundle/getting-started/wordpress) to continue
 
 ## Demo
 
