@@ -127,7 +127,6 @@ of the Composer documentation.
 $ composer create-project metabolism/wordpress-skeleton my_project_directory
 ```
 
-
 Please read the full [bundle installation guide](https://metabolism.gitbook.io/symfony-wordpress-bundle/getting-started/wordpress) to continue
 
 ### Setting up an existing Symfony project
@@ -147,8 +146,6 @@ Define installation path for Wordpress core and plugins in `composer.json`
 ```
 
 ### Install the bundle
-
-Require Wordpress Bundle
 
 ```shell
 $ composer require metabolism/wordpress-bundle 2.0.x
