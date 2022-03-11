@@ -63,7 +63,7 @@
       },
       "symlink": {
         "metabolism/wordpress-bundle": {
-          "docs/index.md": "docs/wordpress_bundle.md",
+          "README.md": "docs/wordpress_bundle.md",
           "samples/public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php"
         }
       }
