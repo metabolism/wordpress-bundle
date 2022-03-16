@@ -95,17 +95,7 @@ class TermRepository
         foreach ($query->terms as $term)
             $terms[] = TermFactory::create( $term );
 
-        $terms = array_filter($terms);
-
-        if( !isset($criteria['child_of']) && (!isset($criteria['sort']) || $criteria['sort'])  ){
-
-            $sorted = [];
-            $this->sort( $terms, $sorted );
-
-            return $sorted;
-        }
-
-        return $terms;
+        return array_filter($terms);
     }
 
     /**
@@ -120,31 +110,5 @@ class TermRepository
         $terms = $this->findBy($criteria, $orderBy, 1);
 
         return $terms[0]??null;
-    }
-
-    /**
-     * @param $terms
-     * @param $into
-     * @param int $parentId
-     */
-    protected function sort(&$terms, &$into, $parentId = 0)
-    {
-        foreach ($terms as $i => $term)
-        {
-            if (!is_wp_error($term) && $term->parent == $parentId)
-            {
-                $into[$term->ID] = $term;
-                unset($terms[$i]);
-            }
-        }
-
-        foreach ($into as $top_term)
-        {
-            $top_term->children = [];
-            $this->sort($terms, $top_term->children, $top_term->ID);
-
-            if( empty($top_term->children) )
-                unset($top_term->children);
-        }
     }
 }

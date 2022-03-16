@@ -56,6 +56,7 @@
       },
       "copy": {
         "metabolism/wordpress-bundle": {
+          "samples/public/.htaccess": "public/.htaccess",
           "samples/public/wp-config.php": "public/wp-config.php",
           "samples/config/packages/wordpress.yml": "config/packages/wordpress.yml",
           "samples/public/wp-bundle/themes/empty": "public/wp-bundle/themes/empty"

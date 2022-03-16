@@ -66,6 +66,18 @@ class ACFHelper
 	}
 
 
+    /**
+     * Magic method to load properties
+     *
+     * @param $id
+     * @return null|string|array|object
+     */
+	public function __call($id, $args) {
+
+		return $this->getValue($id);
+	}
+
+
 	/**
 	 * @param $id
 	 * @return bool
@@ -79,17 +91,20 @@ class ACFHelper
 
 
 	/**
-	 * @param $id
-	 * @return null|string|array|object
+	 * @deprecated
 	 */
 	public function get_value($id){
 
 		return $this->getValue($id);
 	}
 
+	/**
+	 * @param $id
+	 * @return null|string|array|object
+	 */
 	public function getValue($id){
 
-		if( ! $this->has($id) )
+		if( !$this->has($id) )
 			return null;
 
         $field = $this->objects[$id];

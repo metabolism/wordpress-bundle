@@ -33,7 +33,7 @@ class DataHelper {
 
         if( !is_string($data) ){
 
-            trigger_error('Method ' . $this->method . ' do not return string', E_USER_WARNING);
+            //trigger_error('Method ' . $this->method . ' do not return string', E_USER_WARNING);
             return '';
         }
 
