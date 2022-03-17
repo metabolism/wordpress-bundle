@@ -144,34 +144,6 @@ class UrlPlugin {
         return $permalink;
     }
 
-    /**
-     * @param $rewrite_rules
-     * @return mixed
-     */
-    public function searchRewriteRules($rewrite_rules){
-
-        global $wp_rewrite, $wp_search_base;
-
-        $search_slug = get_option( 'search_rewrite_slug' );
-
-        if( empty($wp_search_base) )
-            $wp_search_base = $wp_rewrite->search_base;
-
-        if( isset($wp_rewrite->search_structure) )
-            unset($wp_rewrite->search_structure);
-
-        if( !empty($search_slug) ){
-
-            $wp_rewrite->search_base = $search_slug;
-        }
-        else{
-
-            $wp_rewrite->search_base = $wp_search_base;
-        }
-
-        return $rewrite_rules;
-    }
-
 
     /**
      * Set permalink structure
@@ -183,7 +155,7 @@ class UrlPlugin {
 
         global $wp_rewrite, $_config;
 
-        $permalink_structure = $_config ? $_config->get('permalink_structure', '/%postname%') : '/%postname%';
+        $permalink_structure = '/%postname%';
 
         if( $wp_rewrite->permalink_structure != $permalink_structure ){
 
@@ -202,7 +174,6 @@ class UrlPlugin {
         add_filter('option_siteurl', [$this, 'optionSiteURL'] );
         add_filter('network_site_url', [$this, 'networkSiteURL'] );
         add_filter('home_url', [$this, 'homeURL'] );
-        add_filter('root_rewrite_rules', [$this, 'searchRewriteRules']);
 
         add_action('init', [$this, 'init']);
     }

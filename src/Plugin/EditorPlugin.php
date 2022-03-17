@@ -27,6 +27,8 @@ class EditorPlugin {
 
             echo "\n";
         }
+
+		echo "<style>.form-table.permalink-structure, .form-table.permalink-structure+h2{ display:none }</style>";
     }
 
 

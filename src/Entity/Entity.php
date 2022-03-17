@@ -59,7 +59,7 @@ abstract class Entity implements ArrayAccess
         return $data;
 	}
 
-    private function getMethodName($id){
+    private function getMethodName($id) {
 
         return 'get'.str_replace(' ', '', ucwords(strtolower(str_replace('_', ' ', $id))));
     }
@@ -123,8 +123,8 @@ abstract class Entity implements ArrayAccess
      * Return true if id exists
      * @return bool
      */
-    public function exist()
-	{
+    public function exist(){
+
 		return is_int( $this->ID );
 	}
 
@@ -134,8 +134,8 @@ abstract class Entity implements ArrayAccess
      * @param $id
      * @param $type
      */
-	protected function loadMetafields($id, $type)
-	{
+	protected function loadMetafields($id, $type){
+
 		if( $this->metafields )
 			return;
 
@@ -156,13 +156,13 @@ abstract class Entity implements ArrayAccess
         return apply_filters('get_the_date', $date, self::$date_format);
 	}
 
-    public function offsetExists($offset)
-    {
+    public function offsetExists($offset){
+
         return $this->__isset($offset);
     }
 
-    public function offsetGet($offset)
-    {
+    public function offsetGet($offset){
+
         return $this->__get($offset);
     }
 
