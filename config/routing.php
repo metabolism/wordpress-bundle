@@ -30,8 +30,8 @@ class Permastruct{
         if( empty($locale) ){
 
             $this->addRoute('robots', 'robots.txt', [], false, 'Metabolism\WordpressBundle\Helper\RobotsHelper::doAction');
-            $this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealthHelper::check');
 
+            $this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealthHelper::check');
             $this->addRoute('cache-purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::purge');
             $this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::clear');
         }
