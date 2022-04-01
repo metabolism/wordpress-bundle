@@ -1,6 +1,6 @@
-# Wordpress x Symfony
+# Symfony Wordpress Bundle
 
-Use Wordpress as a backend for a Symfony application
+Build enterprise solutions with WordPress.
 
 [![Latest Stable Version](http://poser.pugx.org/metabolism/wordpress-bundle/v)](https://packagist.org/packages/metabolism/wordpress-bundle)
 [![Total Downloads](http://poser.pugx.org/metabolism/wordpress-bundle/downloads)](https://packagist.org/packages/metabolism/wordpress-bundle)
