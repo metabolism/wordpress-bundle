@@ -3,6 +3,8 @@ services:
     autowire: true      # Automatically injects dependencies in your services.
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+  Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
+
   Metabolism\WordpressBundle\ArgumentResolver\PostsValueResolver:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
@@ -18,6 +20,10 @@ services:
   Metabolism\WordpressBundle\ArgumentResolver\UserValueResolver:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
+
+  Metabolism\WordpressBundle\Command\ExportCommand:
+    arguments:
+      - '@service_container'
 
   Metabolism\WordpressBundle\:
     resource: '../src/'

@@ -14,16 +14,30 @@ class PostsValueResolver implements ArgumentValueResolverInterface {
 
     private $postRepository;
 
+    /**
+     * @param PostRepository $postRepository
+     */
     public function __construct(PostRepository $postRepository)
     {
         $this->postRepository = $postRepository;
     }
 
+    /**
+     * @param Request $request
+     * @param ArgumentMetadata $argument
+     * @return bool
+     */
     public function supports(Request $request, ArgumentMetadata $argument)
     {
         return ('array' === $argument->getType() && in_array($argument->getName(), ['posts','pages']));
     }
 
+    /**
+     * @param Request $request
+     * @param ArgumentMetadata $argument
+     * @return \Generator
+     * @throws \Exception
+     */
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
         yield $this->postRepository->findQueried();

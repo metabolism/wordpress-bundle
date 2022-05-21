@@ -15,16 +15,30 @@ class UserValueResolver implements ArgumentValueResolverInterface {
 
     private $userRepository;
 
+    /**
+     * @param UserRepository $userRepository
+     */
     public function __construct(UserRepository $userRepository)
     {
         $this->userRepository = $userRepository;
     }
 
+    /**
+     * @param Request $request
+     * @param ArgumentMetadata $argument
+     * @return bool
+     */
     public function supports(Request $request, ArgumentMetadata $argument)
     {
         return User::class === $argument->getType();
     }
 
+    /**
+     * @param Request $request
+     * @param ArgumentMetadata $argument
+     * @return \Generator
+     * @throws \Exception
+     */
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
         yield $this->userRepository->findQueried();

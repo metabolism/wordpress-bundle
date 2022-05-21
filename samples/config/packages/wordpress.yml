@@ -105,6 +105,8 @@ acf:
   settings:
     use_entity: true #add new optimised return format
     autoload: true #autoload options
+  user_settings:
+    gallery_height: 210
   options_page: #add option pages https://www.advancedcustomfields.com/resources/options-page/
     - 'Personnalisation'
   toolbars: #customize wysiwyg toolbar

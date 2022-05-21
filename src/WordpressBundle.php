@@ -42,6 +42,7 @@ class WordpressBundle extends Bundle
 
             $twigExtension = new TwigExtension();
             $twig->addExtension($twigExtension);
+            $twig->addGlobal('blog', $blog);
         }
     }
 
