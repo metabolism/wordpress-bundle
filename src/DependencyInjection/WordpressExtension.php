@@ -15,6 +15,8 @@ class WordpressExtension extends Extension implements PrependExtensionInterface
 {
 
     /**
+     * @param array $configs
+     * @param ContainerBuilder $container
      * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container)
@@ -23,11 +25,18 @@ class WordpressExtension extends Extension implements PrependExtensionInterface
         $loader->load('services.yaml');
     }
 
+    /**
+     * @param ContainerBuilder $container
+     * @return void
+     */
     public function prepend(ContainerBuilder $container)
     {
         // TODO: Implement prepend() method.
     }
 
+    /**
+     * @return string
+     */
     public function getAlias()
     {
         return parent::getAlias();

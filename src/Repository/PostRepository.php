@@ -46,6 +46,9 @@ class PostRepository
      */
     public function findQueried()
     {
+        if( is_404() )
+            throw new \Exception('Post not found', 404);
+
         if( is_archive() || (is_home() && get_option('show_on_front') == 'posts') || is_search() ){
 
             global $wp_query;
@@ -59,7 +62,7 @@ class PostRepository
             return $this->find($id);
         }
 
-        return null;
+        throw new \Exception('Post not found', 404);
     }
 
     /**

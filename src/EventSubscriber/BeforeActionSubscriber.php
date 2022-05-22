@@ -2,22 +2,12 @@
 
 namespace Metabolism\WordpressBundle\EventSubscriber;
 
-use Psr\Container\ContainerInterface;
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class BeforeActionSubscriber implements EventSubscriberInterface
 {
-	private $container;
-
-	public function __construct(ContainerInterface $container)
-	{
-		$this->container = $container;
-	}
-
-
 	/**
 	 * @return array
 	 */
@@ -34,7 +24,7 @@ class BeforeActionSubscriber implements EventSubscriberInterface
      */
 	public function onKernelController(ControllerEvent $event)
 	{
-        if ( (method_exists($event, 'isMasterRequest') && !$event->isMasterRequest()) || (method_exists($event, 'isMainRequest') && !$event->isMainRequest()) )
+        if ( (method_exists($event, 'isMainRequest') && !$event->isMainRequest()) || (method_exists($event, 'isMasterRequest') && !$event->isMasterRequest()) )
 			return;
 
         if( wp_is_maintenance_mode() || (function_exists('wp_maintenance_mode') && wp_maintenance_mode()) )

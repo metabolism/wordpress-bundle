@@ -5,6 +5,7 @@ namespace Metabolism\WordpressBundle\Entity;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TermFactory;
+use Metabolism\WordpressBundle\Repository\PostRepository;
 
 /**
  * Class Post
@@ -29,6 +30,10 @@ class Post extends Entity
 	protected $thumbnail;
 	/** @var Post[] */
 	protected $ancestors;
+	/** @var Post[] */
+	protected $children;
+	/** @var Post[] */
+	protected $siblings;
 	/** @var Post */
 	protected $parent;
 	/** @var User */
@@ -56,7 +61,7 @@ class Post extends Entity
 
         return $this->title??'Invalid post';
     }
-    
+
 	/**
 	 * Post constructor.
 	 *
@@ -227,7 +232,7 @@ class Post extends Entity
 	protected function getSibling($direction, $in_same_term = false , $excluded_terms = '', $taxonomy = 'category'){
 
 		global $post;
-		
+
 		$old_global = $post;
 		$post = $this->post;
 
@@ -260,6 +265,40 @@ class Post extends Entity
 			$this->next = $this->getSibling('next', $in_same_term , $excluded_terms, $taxonomy);
 
 		return $this->next;
+	}
+
+
+	/**
+	 * Get child posts
+	 *
+	 * @return Post[]|false
+	 */
+	public function getChildren() {
+
+        if( is_null($this->children) ){
+
+            $postRepository = new PostRepository();
+            $this->children = $postRepository->findBy(['post_parent'=>$this->ID, 'post_type'=>$this->type],null, -1);
+        }
+
+		return $this->children;
+	}
+
+
+	/**
+	 * Get siblings
+	 *
+	 * @return Post[]|false
+	 */
+	public function getSiblings() {
+
+        if( is_null($this->siblings) ){
+
+            $postRepository = new PostRepository();
+            $this->siblings = $postRepository->findBy(['post_parent'=>$this->post->post_parent, 'post_type'=>$this->type, 'post__not_in'=>[$this->ID]], null, -1);
+        }
+
+		return $this->siblings;
 	}
 
 
@@ -442,7 +481,7 @@ class Post extends Entity
 				}
 			}
 		}
-		
+
 		return $term_array;
 	}
 

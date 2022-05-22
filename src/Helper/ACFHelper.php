@@ -32,7 +32,7 @@ class ACFHelper
         if( is_null(self::$use_entity) && $_config )
             self::$use_entity = $_config->get('acf.settings.use_entity', false);
 
-		if( !in_array($type, ['menu', 'menuItem', 'post', 'blog']) && $type)
+		if( !in_array($type, ['post', 'blog']) && $type)
 			$id = $type.'_'.$id;
 
 		$this->id = $id;
@@ -314,7 +314,7 @@ class ACFHelper
 				$value = TermFactory::create( $id );
 				break;
 		}
-		
+
 		return $value;
 	}
 
@@ -361,6 +361,7 @@ class ACFHelper
 					break;
 
 				case 'latest_posts':
+				case 'children':
 
 					$objects[$object['name']] = [];
 

@@ -18,7 +18,8 @@ class Menu extends Entity
     public $slug;
 	public $title;
 
-	private $menuItemClass;
+	private $itemClass;
+	private $menu;
 
     public static $locations;
 
@@ -36,21 +37,22 @@ class Menu extends Entity
 		$app_classname = 'App\Entity\MenuItem';
 
 		if( class_exists($app_classname) )
-			$this->menuItemClass = $app_classname;
+			$this->itemClass = $app_classname;
 		else
-			$this->menuItemClass = 'Metabolism\WordpressBundle\Entity\MenuItem';
+			$this->itemClass = 'Metabolism\WordpressBundle\Entity\MenuItem';
 
         if( is_string($id) )
             $id = $this->getMenuIdFromLocations($id);
 
 		if ( $id && $menu = $this->get($id) ){
 
+            $this->menu = $menu;
             $this->ID = $id;
             $this->title = $menu->name;
             $this->slug = $menu->slug;
             $this->description = $menu->description;
 
-            $this->loadMetafields($id, 'menu');
+            $this->loadMetafields($this->ID, 'term');
         }
 	}
 
@@ -69,7 +71,7 @@ class Menu extends Entity
 		_wp_menu_item_classes_by_context($menu_items);
 
 		foreach ($menu_items as $item)
-			$this->items[] = new $this->menuItemClass($item);
+			$this->items[] = new $this->itemClass($item);
 
 		global $_config;
 
@@ -90,7 +92,7 @@ class Menu extends Entity
 
 		foreach ($this->items as $item)
 		{
-			if( $item->menu_item_parent == $parent_id )
+			if( $item->item_parent == $parent_id )
 			{
 				if( $children = $this->addDepth($item->ID))
 					$item->children = $children;

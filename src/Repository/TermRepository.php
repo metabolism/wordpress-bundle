@@ -28,6 +28,9 @@ class TermRepository
      */
     public function findQueried()
     {
+        if( is_404() )
+            throw new \Exception('Term not found', 404);
+
         if( is_archive() ){
 
             if( !$id = get_queried_object_id() )
@@ -36,7 +39,7 @@ class TermRepository
             return $this->find($id);
         }
 
-        return null;
+        throw new \Exception('Term not found', 404);
     }
 
     /**

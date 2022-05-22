@@ -21,8 +21,8 @@ class MenuItem extends Entity
 	public $class;
 	public $description;
     public $link;
-    public $menu_order;
-    public $menu_item_parent;
+    public $order;
+    public $item_parent;
     public $object_id;
     public $target;
 	public $title;
@@ -32,7 +32,7 @@ class MenuItem extends Entity
 	public $current_item_parent;
 
     protected $object;
-    private $menu_item;
+    private $item;
 
     public function __toString()
     {
@@ -44,15 +44,15 @@ class MenuItem extends Entity
 	 * @param object $menu_item
 	 */
 	public function __construct($menu_item) {
-		
+
 		if ( $menu_item ){
 
-			$this->menu_item = $menu_item;
+			$this->item = $menu_item;
 
 			$this->ID = $menu_item->ID;
 			$this->object_id = intval($menu_item->object_id);
-			$this->menu_item_parent = $menu_item->menu_item_parent;
-            $this->menu_order = $menu_item->menu_order;
+			$this->item_parent = $menu_item->menu_item_parent;
+            $this->order = $menu_item->menu_order;
             $this->link = $menu_item->url;
 			$this->title = $menu_item->title;
 			$this->target = $menu_item->target;
@@ -64,14 +64,34 @@ class MenuItem extends Entity
             $this->current_item_ancestor = $menu_item->current_item_ancestor;
             $this->current_item_parent = $menu_item->current_item_parent;
 
-			$this->loadMetafields($this->ID, 'menuItem');
+			$this->loadMetafields($this->ID, 'post');
 		}
 	}
 
     public function getObject(){
 
-        if( is_null($this->object) )
-            $this->object = Factory::create($this->object_id, $this->menu_item->object);
+        if( is_null($this->object) ){
+
+            $default_class = $class = false;
+
+            if( $this->type == 'custom' ){
+
+                $this->object = false;
+                return $this->object;
+            }
+            if( $this->type == 'post_type' ){
+
+                $default_class = 'post';
+                $class = $this->item->object;
+            }
+            elseif( $this->type == 'taxonomy' ){
+
+                $default_class = 'term';
+                $class = $this->item->object;
+            }
+
+            $this->object = Factory::create($this->object_id, $class, $default_class);
+        }
 
         return $this->object;
     }

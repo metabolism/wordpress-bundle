@@ -3,7 +3,9 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use Metabolism\WordpressBundle\Factory\Factory;
+use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TermFactory;
+use Metabolism\WordpressBundle\Repository\PostRepository;
 
 /**
  * Class Term
@@ -20,6 +22,7 @@ class Term extends Entity
     public $slug;
     public $title;
     public $group;
+    public $content;
 
     /** @var Term[] */
     protected $children;
@@ -64,6 +67,7 @@ class Term extends Entity
             $this->slug = $term->slug;
             $this->title = $term->name;
             $this->group = $term->term_group;
+            $this->content = nl2br($term->description);
 
             $this->loadMetafields($this->ID, $this->taxonomy);
 		}
@@ -91,7 +95,7 @@ class Term extends Entity
 
 			if( is_wp_error($term) || !$term )
 				return false;
-			
+
 			$this->term = $term;
 		}
 
@@ -115,6 +119,24 @@ class Term extends Entity
         }
 
         return $this->children;
+	}
+
+
+	/**
+     * Get term posts
+     *
+	 * @return Post[]
+     */
+	protected function getPosts($orderBy=null, $limit=null, $offset=null) {
+
+        $postRepository = new PostRepository();
+
+        return $postRepository->findBy(['tax_query' => [[
+            'taxonomy' => $this->taxonomy,
+            'field' => 'slug',
+            'terms' => [$this->slug],
+            'operator' => 'IN'
+        ]]], $orderBy, $limit, $offset);
 	}
 
 

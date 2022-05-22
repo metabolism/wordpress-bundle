@@ -23,8 +23,10 @@ class TwigExtension extends AbstractExtension{
 	public function getFilters()
 	{
 		return [
-			new TwigFilter( 'placeholder', [$this, 'placeholder'] ),
-			new TwigFilter( 'more', [$this, 'more'] )
+            new TwigFilter( 'handle', 'sanitize_title' ),
+            new TwigFilter( 'placeholder', [$this, 'placeholder'] ),
+			new TwigFilter( 'more', [$this, 'more'] ),
+			new TwigFilter( 'resize', [$this, 'resize'] )
 		];
 	}
 
@@ -34,6 +36,7 @@ class TwigExtension extends AbstractExtension{
 	public function getFunctions()
 	{
 		return [
+			new TwigFunction( 'pixel', [$this, 'generatePixel'] ),
 			new TwigFunction( 'fn', [$this, 'execFunction'] ),
 			new TwigFunction( 'function', [$this, 'execFunction'] ),
 			new TwigFunction( 'shortcode', 'do_shortcode' ),
@@ -66,6 +69,42 @@ class TwigExtension extends AbstractExtension{
 		];
 
 	}
+
+    public function generatePixel($w = 1, $h = 1) {
+
+        ob_start();
+
+        $img = imagecreatetruecolor($w, $h);
+        imagetruecolortopalette($img, false, 1);
+        imagesavealpha($img, true);
+        $color = imagecolorallocatealpha($img, 0, 0, 0, 127);
+        imagefill($img, 0, 0, $color);
+        imagepng($img, null, 9);
+        imagedestroy($img);
+
+        $imagedata = ob_get_contents();
+        ob_end_clean();
+
+       return 'data:image/png;base64,' . base64_encode($imagedata);
+    }
+
+
+    /**
+     * Return resized image
+     *
+     * @param $image
+     * @param string $args
+     * @return string
+     */
+    public function resize($image, $width, $height=0, $args=[])
+    {
+        if( !$image instanceof Image )
+            $image = new Image();
+
+        $args['resize'] = [$width, $height];
+
+        return $image->edit($args);
+    }
 
 
     /**
