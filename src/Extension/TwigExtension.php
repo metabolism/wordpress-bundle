@@ -26,7 +26,8 @@ class TwigExtension extends AbstractExtension{
             new TwigFilter( 'handle', 'sanitize_title' ),
             new TwigFilter( 'placeholder', [$this, 'placeholder'] ),
 			new TwigFilter( 'more', [$this, 'more'] ),
-			new TwigFilter( 'resize', [$this, 'resize'] )
+			new TwigFilter( 'resize', [$this, 'resize'] ),
+			new TwigFilter( 'picture', [$this, 'picture'] )
 		];
 	}
 
@@ -104,6 +105,24 @@ class TwigExtension extends AbstractExtension{
         $args['resize'] = [$width, $height];
 
         return $image->edit($args);
+    }
+
+
+    /**
+     * Return resized picture
+     *
+     * @param $image
+     * @param $width
+     * @param int $height
+     * @param array $sources
+     * @return string
+     */
+    public function picture($image, $width, $height=0, $sources=[])
+    {
+        if( !$image instanceof Image )
+            $image = new Image();
+
+        return $image->toHTML($width, $height, $sources);
     }
 
 
