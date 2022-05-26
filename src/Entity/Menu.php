@@ -12,7 +12,6 @@ class Menu extends Entity
 {
 	public $entity = 'menu';
 
-    public $description;
 	/** @var MenuItem[] $items */
 	public $items;
     public $slug;
@@ -50,7 +49,6 @@ class Menu extends Entity
             $this->ID = $id;
             $this->title = $menu->name;
             $this->slug = $menu->slug;
-            $this->description = $menu->description;
 
             $this->loadMetafields($this->ID, 'term');
         }

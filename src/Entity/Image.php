@@ -617,7 +617,7 @@ class Image extends Entity
 	 * @param bool $sources
 	 * @return \Twig\Markup
 	 */
-	public function toHTML($w, $h=0, $sources=false){
+	public function toHTML($w, $h=0, $sources=false, $alt=false){
 
 		if( empty($this->src) || !file_exists($this->src) ){
 
@@ -656,13 +656,17 @@ class Image extends Entity
 				}
 			}
 
-			if( $ext == 'webp' )
+			if( $ext == 'webp' && $w )
 				$html .='<source srcset="'.$this->edit(['resize'=>[$w, $h]], $ext).'" type="'.$mime.'"/>';
 
-			$edited = $this->edit(['resize'=>[$w, $h]]);
-            $image_info = file_exists(BASE_URI.PUBLIC_DIR.$edited)?getimagesize(BASE_URI.PUBLIC_DIR.$edited):[0,0];
+            if( !$w )
+                $src = $this->file;
+            else
+                $src = $this->edit(['resize'=>[$w, $h]]);
 
-			$html .= '<img src="'.$edited.'" alt="'.$this->alt.'" loading="lazy" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[0]?'height="'.$image_info[1].'"':'').'/>';
+            $image_info = file_exists(BASE_URI.PUBLIC_DIR.$src)?getimagesize(BASE_URI.PUBLIC_DIR.$src):[0,0];
+
+			$html .= '<img src="'.$src.'" alt="'.($alt?:$this->alt).'" loading="lazy" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[0]?'height="'.$image_info[1].'"':'').'/>';
 		}
 
 		$html .='</picture>';

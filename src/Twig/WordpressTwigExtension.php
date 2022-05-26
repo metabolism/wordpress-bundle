@@ -7,7 +7,7 @@
  *
  */
 
-namespace Metabolism\WordpressBundle\Extension;
+namespace Metabolism\WordpressBundle\Twig;
 
 use Metabolism\WordpressBundle\Entity\Image;
 use Metabolism\WordpressBundle\Factory\Factory;
@@ -18,7 +18,7 @@ use Twig\Extension\AbstractExtension,
 	Twig\TwigFilter,
 	Twig\TwigFunction;
 
-class TwigExtension extends AbstractExtension{
+class WordpressTwigExtension extends AbstractExtension{
 
 	public function getFilters()
 	{
@@ -68,8 +68,8 @@ class TwigExtension extends AbstractExtension{
 			new TwigFunction( 'Term', function($id){ return TermFactory::create($id); } ),
 			new TwigFunction( 'Image', function($id){ return Factory::create($id, 'image'); } )
 		];
-
 	}
+
 
     public function generatePixel($w = 1, $h = 1) {
 
@@ -94,11 +94,16 @@ class TwigExtension extends AbstractExtension{
      * Return resized image
      *
      * @param $image
-     * @param string $args
+     * @param $width
+     * @param int $height
+     * @param array $args
      * @return string
      */
     public function resize($image, $width, $height=0, $args=[])
     {
+        if( is_string($image) )
+            $image = new Image($image);
+
         if( !$image instanceof Image )
             $image = new Image();
 
@@ -117,12 +122,12 @@ class TwigExtension extends AbstractExtension{
      * @param array $sources
      * @return string
      */
-    public function picture($image, $width, $height=0, $sources=[])
+    public function picture($image, $width, $height=0, $sources=[], $alt=false)
     {
         if( !$image instanceof Image )
             $image = new Image();
 
-        return $image->toHTML($width, $height, $sources);
+        return $image->toHTML($width, $height, $sources, $alt);
     }
 
 

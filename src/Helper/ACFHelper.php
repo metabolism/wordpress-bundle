@@ -3,13 +3,14 @@
 
 namespace Metabolism\WordpressBundle\Helper;
 
+use ArrayAccess;
 use Metabolism\WordpressBundle\Entity\Entity;
 
 use Metabolism\WordpressBundle\Factory\Factory,
 	Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TermFactory;
 
-class ACFHelper
+class ACFHelper implements ArrayAccess
 {
 	private $objects;
 	private $id;
@@ -70,6 +71,7 @@ class ACFHelper
      * Magic method to load properties
      *
      * @param $id
+     * @param $args
      * @return null|string|array|object
      */
 	public function __call($id, $args) {
@@ -121,6 +123,11 @@ class ACFHelper
 
 		return $this->objects[$id]['value'];
 	}
+
+    public function setValue($id, $value){
+
+        $this->objects[$id] = $value;
+    }
 
 	/**
 	 * @return array
@@ -575,4 +582,25 @@ class ACFHelper
 
 		return $objects;
 	}
+
+    public function offsetExists($offset)
+    {
+       return $this->has($offset);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->getValue($offset);
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->setValue($offset, $value);
+    }
+
+    public function offsetUnset($offset)
+    {
+        if( $this->has($offset) )
+            unset($this->objects[$offset]);
+    }
 }

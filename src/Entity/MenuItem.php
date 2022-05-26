@@ -19,7 +19,7 @@ class MenuItem extends Entity
 
 	public $classes;
 	public $class;
-	public $description;
+	public $content;
     public $link;
     public $order;
     public $item_parent;
@@ -27,6 +27,7 @@ class MenuItem extends Entity
     public $target;
 	public $title;
 	public $type;
+	public $attr_title;
 	public $current;
 	public $current_item_ancestor;
 	public $current_item_parent;
@@ -59,7 +60,8 @@ class MenuItem extends Entity
 			$this->class = trim(implode(' ', $menu_item->classes));
 			$this->classes = $menu_item->classes;
 			$this->type = $menu_item->type;
-			$this->description = $menu_item->description;
+			$this->attr_title = $menu_item->attr_title;
+			$this->content = nl2br($menu_item->post_content);
             $this->current = $menu_item->current;
             $this->current_item_ancestor = $menu_item->current_item_ancestor;
             $this->current_item_parent = $menu_item->current_item_parent;

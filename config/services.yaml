@@ -31,7 +31,6 @@ services:
       - '../src/DependencyInjection/'
       - '../src/Controller/'
       - '../src/Entity/'
-      - '../src/Extension/'
       - '../src/Factory/'
       - '../src/Helper/'
       - '../src/Loader/'

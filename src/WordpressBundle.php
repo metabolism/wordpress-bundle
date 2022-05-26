@@ -4,7 +4,7 @@ namespace Metabolism\WordpressBundle;
 
 use Env\Env;
 use Metabolism\WordpressBundle\Entity\Blog;
-use Metabolism\WordpressBundle\Extension\TwigExtension;
+use Metabolism\WordpressBundle\Extension\WordpressTwigExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use function Env\env;
 
@@ -38,11 +38,10 @@ class WordpressBundle extends Bundle
             $twig = $this->container->get('twig');
 
             $blog = Blog::getInstance();
-            $blog->setGlobals($twig);
-
-            $twigExtension = new TwigExtension();
-            $twig->addExtension($twigExtension);
             $twig->addGlobal('blog', $blog);
+
+            // retro-compatibility
+            $blog->setGlobals($twig);
         }
     }
 
