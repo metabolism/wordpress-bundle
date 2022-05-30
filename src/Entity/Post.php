@@ -104,6 +104,12 @@ class Post extends Entity
 		return $post;
 	}
 
+	/**
+	 * Get post date
+	 *
+	 * @param $format
+	 * @return mixed|string|void
+	 */
 	public function getDate($format=true){
 
 		if( is_null($this->date) && $format )
@@ -112,6 +118,12 @@ class Post extends Entity
 		return $format ? $this->date : $this->post->post_date;
 	}
 
+	/**
+	 * Get post modified date
+	 *
+	 * @param $format
+	 * @return mixed|string|void
+	 */
 	public function getModified($format=true){
 
 		if( is_null($this->modified) && $format )
@@ -120,6 +132,12 @@ class Post extends Entity
 		return $format ? $this->modified : $this->post->post_modified;
 	}
 
+	/**
+	 * Get post date gmt
+	 *
+	 * @param $format
+	 * @return mixed|string|void
+	 */
 	public function getDateGmt($format=true){
 
 		if( is_null($this->date_gmt) && $format )
@@ -128,6 +146,12 @@ class Post extends Entity
 		return $format ? $this->date_gmt : $this->post->post_date_gmt;
 	}
 
+	/**
+	 * Get post modified date gmt
+	 *
+	 * @param $format
+	 * @return string
+	 */
 	public function getModifiedGmt($format=true){
 
 		if( is_null($this->modified_gmt) && $format )
@@ -136,6 +160,11 @@ class Post extends Entity
 		return $format ? $this->modified_gmt : $this->post->post_modified_gmt;
 	}
 
+	/**
+	 * Get excerpt
+	 *
+	 * @return string
+	 */
 	public function getExcerpt(){
 
 		if( is_null($this->excerpt) )
@@ -144,6 +173,11 @@ class Post extends Entity
 		return $this->excerpt;
 	}
 
+	/**
+	 * Get post author
+	 *
+	 * @return User
+	 */
 	public function getAuthor(){
 
 		if( is_null($this->author) )
@@ -152,6 +186,11 @@ class Post extends Entity
 		return $this->author;
 	}
 
+	/**
+	 * Get post class
+	 *
+	 * @return string
+	 */
 	public function getClass(){
 
 		if( is_null($this->class) )
@@ -160,6 +199,11 @@ class Post extends Entity
 		return $this->class;
 	}
 
+	/**
+	 * Get post classes
+	 *
+	 * @return string[]
+	 */
 	public function getClasses(){
 
 		if( is_null($this->classes) )
@@ -168,6 +212,11 @@ class Post extends Entity
 		return $this->classes;
 	}
 
+	/**
+	 * Get is sticky
+	 *
+	 * @return bool
+	 */
 	public function getSticky(){
 
 		if( is_null($this->sticky) )
@@ -176,6 +225,11 @@ class Post extends Entity
 		return $this->sticky;
 	}
 
+	/**
+	 * Get post link
+	 *
+	 * @return false|string
+	 */
 	public function getLink(){
 
 		if( is_null($this->link) && $this->public )
@@ -184,6 +238,11 @@ class Post extends Entity
 		return $this->link;
 	}
 
+	/**
+	 * Get filtered content
+	 *
+	 * @return string
+	 */
 	public function getContent(){
 
 		if( is_null($this->content) ){
@@ -199,6 +258,11 @@ class Post extends Entity
 
 	}
 
+	/**
+	 * Get template
+	 *
+	 * @return false|string
+	 */
 	public function getTemplate(){
 
 		if( is_null($this->template) )
@@ -207,6 +271,11 @@ class Post extends Entity
 		return $this->template;
 	}
 
+	/**
+	 * Get thumbnail
+	 *
+	 * @return false|Image
+	 */
 	public function getThumbnail(){
 
 		if( is_null($this->thumbnail) ){
@@ -223,6 +292,7 @@ class Post extends Entity
 
 	/**
 	 * Get sibling post using date order
+	 *
 	 * @param $direction
 	 * @param $in_same_term
 	 * @param $excluded_terms
@@ -252,6 +322,7 @@ class Post extends Entity
 
 	/**
 	 * Get next post
+	 *
 	 * See: https://developer.wordpress.org/reference/functions/get_next_post/
 	 *
 	 * @param bool $in_same_term
@@ -407,7 +478,7 @@ class Post extends Entity
 
 
 	/**
-	 * Get term
+	 * Get primary term
 	 * See: https://codex.wordpress.org/Function_Reference/wp_get_post_terms
 	 *
 	 * @param string $tax

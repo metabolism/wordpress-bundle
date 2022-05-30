@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\ArgumentResolver;
 
+use Metabolism\WordpressBundle\Entity\PostCollection;
 use Metabolism\WordpressBundle\Repository\PostRepository;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +30,7 @@ class PostsValueResolver implements ArgumentValueResolverInterface {
      */
     public function supports(Request $request, ArgumentMetadata $argument)
     {
-        return ('array' === $argument->getType() && in_array($argument->getName(), ['posts','pages']));
+        return (PostCollection::class === $argument->getType() && in_array($argument->getName(), ['posts','pages']));
     }
 
     /**

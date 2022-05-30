@@ -11,6 +11,9 @@ use Metabolism\WordpressBundle\Factory\TermFactory;
 use Metabolism\WordpressBundle\Repository\PostRepository;
 use Metabolism\WordpressBundle\Repository\TermRepository;
 
+/**
+* @deprecated deprecated since version 2.0
+*/
 class ContextService
 {
 	protected $data;

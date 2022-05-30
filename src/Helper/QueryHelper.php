@@ -10,14 +10,12 @@ use Metabolism\WordpressBundle\Factory\TermFactory;
 /**
  * Class QueryHelper
  *
- * @package Metabolism\WordpressBundle\Entity
+ * @deprecated
  */
 class QueryHelper
 {
 	
 	/**
-     * @deprecated
-     *
 	 * QueryHelper terms
 	 * @param array $args see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
 	 * @return Term[]
@@ -41,8 +39,6 @@ class QueryHelper
 	}
 
 	/**
-     * @deprecated
-     *
 	 * @param $pid
 	 * @param array $args
 	 * @param bool $loop
@@ -91,8 +87,6 @@ class QueryHelper
 
 
 	/**
-     * @deprecated
-     *
 	 * @param $field
 	 * @param $value
 	 * @param $taxonomy
@@ -112,8 +106,6 @@ class QueryHelper
 
 
 	/**
-     * @deprecated
-     *
 	 * @param array $args
 	 * @return Post|bool|\WP_Error
 	 */
@@ -139,8 +131,6 @@ class QueryHelper
 
 
 	/**
-     * @deprecated
-     *
 	 * @param array $args
 	 * @return Post[]
 	 */
@@ -155,8 +145,6 @@ class QueryHelper
 
 
 	/**
-     * @deprecated
-     *
 	 * @param array $args
 	 * @return bool|mixed
 	 */

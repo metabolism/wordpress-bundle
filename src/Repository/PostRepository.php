@@ -2,8 +2,8 @@
 
 namespace Metabolism\WordpressBundle\Repository;
 
-
 use Metabolism\WordpressBundle\Entity\Post;
+use Metabolism\WordpressBundle\Entity\PostCollection;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 
 class PostRepository
@@ -25,7 +25,7 @@ class PostRepository
 
     /**
      *
-     * @return Post[]
+     * @return PostCollection
      */
     public function findAll(array $orderBy = null)
     {
@@ -41,7 +41,7 @@ class PostRepository
 
     /**
      *
-     * @return Post|Post[]|null
+     * @return PostCollection|Post
      * @throws \Exception
      */
     public function findQueried()
@@ -70,14 +70,14 @@ class PostRepository
      * @param array|null $orderBy
      * @param $limit
      * @param $offset
-     * @return Post[]
+     * @return PostCollection
      */
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
         $criteria['fields'] = 'ids';
 
-        if( $limit || !isset($criteria['posts_per_page']) )
-            $criteria['posts_per_page'] = $limit?:get_option( 'posts_per_page' );
+        if( $limit )
+            $criteria['posts_per_page'] = $limit;
 
         if( $offset )
             $criteria['offset'] = $offset;
@@ -85,18 +85,13 @@ class PostRepository
         if( $orderBy )
             $criteria = ['orderby' => $orderBy[0], 'order' => $orderBy[1]??'DESC'];
 
-        $query = new \WP_Query( $criteria );
-        $posts = [];
-
-        foreach ($query->posts as $post)
-            $posts[] = PostFactory::create( $post );
-
-        return array_filter($posts);
+        return new PostCollection($criteria);
     }
 
 
     /**
      * @param array $criteria
+     *
      * @return int
      */
     public function count(array $criteria)

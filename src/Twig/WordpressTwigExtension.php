@@ -27,7 +27,14 @@ class WordpressTwigExtension extends AbstractExtension{
             new TwigFilter( 'placeholder', [$this, 'placeholder'] ),
 			new TwigFilter( 'more', [$this, 'more'] ),
 			new TwigFilter( 'resize', [$this, 'resize'] ),
-			new TwigFilter( 'picture', [$this, 'picture'] )
+			new TwigFilter( 'picture', [$this, 'picture'] ),
+			new TwigFilter( 'stripshortcodes','strip_shortcodes' ),
+			new TwigFilter( 'function', [$this, 'execFunction'] ),
+			new TwigFilter( 'excerpt','wp_trim_words' ),
+			new TwigFilter( 'sanitize','sanitize_title' ),
+			new TwigFilter( 'shortcodes','do_shortcode' ),
+			new TwigFilter( 'wpautop','wpautop' ),
+			new TwigFilter( 'array',[$this, 'to_array'] ),
 		];
 	}
 
@@ -40,6 +47,7 @@ class WordpressTwigExtension extends AbstractExtension{
 			new TwigFunction( 'pixel', [$this, 'generatePixel'] ),
 			new TwigFunction( 'fn', [$this, 'execFunction'] ),
 			new TwigFunction( 'function', [$this, 'execFunction'] ),
+			new TwigFunction( 'action', [$this, 'doAction'] ),
 			new TwigFunction( 'shortcode', 'do_shortcode' ),
 			new TwigFunction( 'login_url', 'wp_login_url' ),
 			new TwigFunction( 'search_form', 'get_search_form' ),
@@ -68,6 +76,12 @@ class WordpressTwigExtension extends AbstractExtension{
 			new TwigFunction( 'Term', function($id){ return TermFactory::create($id); } ),
 			new TwigFunction( 'Image', function($id){ return Factory::create($id, 'image'); } )
 		];
+	}
+
+
+	public function to_array( $arr ) {
+
+		return (array)$arr;
 	}
 
 
@@ -225,6 +239,17 @@ class WordpressTwigExtension extends AbstractExtension{
 			$function_name = trim($function_name);
 
 		return call_user_func_array($function_name, ($args));
+	}
+
+
+	/**
+	 * @param $action_name
+	 * @param mixed ...$args
+	 * @return void
+	 */
+	public function doAction( $action_name, ...$args )
+	{
+		do_action_ref_array( $action_name, $args );
 	}
 
 

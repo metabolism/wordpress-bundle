@@ -48,7 +48,7 @@ public function pageAction(Post $post, PostRepository $postRepository)
 <article id="post-{{ post.ID }}" class="{{ post.class }}">
 
     {% if post.thumbnail %}
-        <img src="{{ post.thumbnail.resize(800, 600) }}" alt="{{ post.thumbnail.alt }}"/>
+        <img src="{{ post.thumbnail|resize(800, 600) }}" alt="{{ post.thumbnail.alt }}"/>
     {% endif %}
 
     <div class="entry-content">
