@@ -134,14 +134,16 @@ class WordpressTwigExtension extends AbstractExtension{
      * @param $width
      * @param int $height
      * @param array $sources
+     * @param bool $alt
+     * @param string $loading
      * @return string
      */
-    public function picture($image, $width, $height=0, $sources=[], $alt=false)
+    public function picture($image, $width, $height=0, $sources=[], $alt=false, $loading='lazy')
     {
         if( !$image instanceof Image )
             $image = new Image();
 
-        return $image->toHTML($width, $height, $sources, $alt);
+        return $image->toHTML($width, $height, $sources, $alt, $loading);
     }
 
 
