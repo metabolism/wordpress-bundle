@@ -651,6 +651,9 @@ class Image extends Entity
 
 				foreach ($sources as $media=>$size){
 
+                    if( is_int($media) )
+                        $media = 'max-width: '.$media.'px';
+
 					if( $ext == 'webp' )
 						$html .='<source media="('.$media.')" srcset="'.$this->edit(['resize'=>$size], $ext).'" type="'.$mime.'"/>';
 

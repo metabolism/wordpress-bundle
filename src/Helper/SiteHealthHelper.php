@@ -18,23 +18,20 @@ class SiteHealthHelper {
 	];
 
 	private $base_url;
-	private $output;
-	private $full;
 	private $password;
 
 	public function __construct(){
 
-		$this->base_url = get_home_url();
-		$this->output   = $_REQUEST['output'] ?? false;
-		$this->full     = $_REQUEST['full'] ?? false;
 		$this->password = $_SERVER['APP_PASSWORD'] ?? false;
+		$this->base_url = get_home_url();
 
 		$this->status['title']    = get_bloginfo('name');
 		$this->status['language'] = get_bloginfo('language');
 
-		$this->status['ip']    = $this->getIP();
-		$this->status['env']   = WP_ENV;
-		$this->status['debug'] = WP_DEBUG;
+		$this->status['base_url'] = $this->base_url;
+		$this->status['ip']       = $this->getIP();
+		$this->status['env']      = WP_ENV;
+		$this->status['debug']    = WP_DEBUG;
 	}
 
 	public function getIP() {
@@ -59,28 +56,40 @@ class SiteHealthHelper {
             return $response;
         }
 
-		$this->checkPosts();
-		$this->checkTaxonomies();
+        $output = $_REQUEST['output'] ?? false;
+        $full = $_REQUEST['full'] ?? false;
+
+        $status = $this->execute($full);
+
+        if( !$output ){
+
+            $content =$status['has_error'] ? '0' : '1';
+            $response = new Response($content);
+        }
+        else{
+
+            if( $output == 'json' ){
+                $content  = $status;
+                $response = new JsonResponse($content);
+            }
+            else{
+                $content  = $this->_toHTML();
+                $response = new Response($content);
+            }
+        }
+
+        $response->setSharedMaxAge(0);
+
+        return $response;
+    }
+
+	public function execute($full=false){
+
+		$this->checkPosts($full);
+		$this->checkTaxonomies($full);
 		$this->checkPagesWithState();
 
-		if( !$this->output ){
-			$content = $this->status['has_error'] ? '0' : '1';
-			$response = new Response($content);
-		}
-		else{
-			if( $this->output == 'json' ){
-				$content  = $this->status;
-				$response = new JsonResponse($content);
-			}
-			else{
-				$content  = $this->_toHTML();
-				$response = new Response($content);
-			}
-		}
-
-		$response->setSharedMaxAge(0);
-
-		return $response;
+        return $this->status;
 	}
 
 	private function _toHTML(){
@@ -141,7 +150,7 @@ class SiteHealthHelper {
 		$this->status['pages'][] = $page;
 	}
 
-	private function checkPosts(){
+	private function checkPosts($full){
 
 		global $wp_post_types;
 
@@ -151,7 +160,7 @@ class SiteHealthHelper {
 		{
 			if( $post_type->public && ($post_type->publicly_queryable || $post_type->name == 'page') && $post_type->name != 'attachment'){
 
-				$posts = get_posts(['post_type'=>$post_type->name, 'exclude'=>$home, 'posts_per_page'=>($this->full?-1:1)]);
+				$posts = get_posts(['post_type'=>$post_type->name, 'exclude'=>$home, 'posts_per_page'=>($full?-1:1)]);
 
 				foreach ($posts as $post){
 
@@ -185,7 +194,7 @@ class SiteHealthHelper {
 		$this->getStatus( 'Home', '/' );
 	}
 
-	private function checkTaxonomies(){
+	private function checkTaxonomies($full){
 
 		global $wp_taxonomies;
 
@@ -194,7 +203,7 @@ class SiteHealthHelper {
 			//todo: better category handle
 			if( $taxonomy->public && $taxonomy->publicly_queryable && !in_array($taxonomy->name, ['post_tag','post_format','category']) ){
 
-				$terms = get_terms(['taxonomy'=>$taxonomy->name, 'number'=>($this->full?0:1)]);
+				$terms = get_terms(['taxonomy'=>$taxonomy->name, 'number'=>($full?0:1)]);
 
 				foreach ($terms as $term){
 
