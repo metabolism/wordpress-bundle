@@ -33,7 +33,7 @@ class MenuItem extends Entity
 	public $current_item_parent;
 
     protected $object;
-    private $item;
+    protected $item;
 
     public function __toString()
     {

@@ -12,7 +12,7 @@ use Metabolism\WordpressBundle\Service\PaginationService;
 class PostCollection implements \IteratorAggregate, \Countable {
 
 	public $query;
-	private $items;
+    protected $items;
 
 	protected $pagination;
 

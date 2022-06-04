@@ -36,7 +36,7 @@ class Term extends Entity
     protected $ancestors;
 
     /** @var \WP_Term|bool */
-	private $term;
+    protected $term;
 
     public function __toString(){
 

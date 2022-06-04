@@ -140,6 +140,9 @@ class WordpressTwigExtension extends AbstractExtension{
      */
     public function picture($image, $width, $height=0, $sources=[], $alt=false, $loading='lazy')
     {
+        if( is_string($image) )
+            $image = new Image($image);
+
         if( !$image instanceof Image )
             $image = new Image();
 

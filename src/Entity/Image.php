@@ -35,10 +35,10 @@ class Image extends Entity
     protected $modified;
     protected $modified_gmt;
     protected $src;
+    protected $post;
 
-	private $compression;
-	private $post;
-	private $args;
+    protected $compression;
+    protected $args;
 
     public function __toString()
     {
@@ -90,6 +90,41 @@ class Image extends Entity
 		return $this->ID ===  0 || file_exists( $this->src );
 	}
 
+    /**
+     * @param $url
+     * @return false|string
+     */
+    private function downloadImage($url){
+
+        $basename = strtolower(pathinfo($url, PATHINFO_BASENAME));
+        $folder = '/cache/'.md5($url);
+        $filepath = $folder.'/'.$basename;
+
+        $folderpath =  $this->uploadDir('basedir').$folder;
+        $filename =  $this->uploadDir('basedir').$filepath;
+
+        if( file_exists($filename) )
+            return $filename;
+
+        $tmpfile = tempnam ('/tmp', 'img-');
+        file_put_contents($tmpfile, file_get_contents($url));
+
+        $mime_type = mime_content_type($tmpfile);
+
+        if( !in_array($mime_type, ['image/jpeg', 'image/jpg', 'image/gif', 'image/png']) ){
+
+            unlink($tmpfile);
+            return false;
+        }
+
+        if( !is_dir($folderpath) )
+            mkdir($folderpath, 0755, true);
+
+        rename($tmpfile, $filename);
+
+        return $filename;
+    }
+
 
 	/**
 	 * Remove useless data
@@ -129,7 +164,6 @@ class Image extends Entity
 				if( !file_exists( $filename) )
 					return;
 
-
 				$this->ID = $post->ID;
 				$this->caption = $post->post_excerpt;
 				$this->description = $post->post_content;
@@ -148,10 +182,13 @@ class Image extends Entity
 		}
 		else{
 
-			$filename = BASE_URI.$id;
+            if( substr($id,0, 7) == 'http://' || substr($id,0, 8) == 'https://' )
+                $filename = $this->downloadImage($id);
+            else
+                $filename = BASE_URI.$id;
 
-			if( !file_exists( $filename) || is_dir( $filename ) )
-				return;
+            if( !$filename || !file_exists( $filename) || is_dir( $filename ) )
+                return;
 
 			$this->ID = 0;
 			$this->file = $id;

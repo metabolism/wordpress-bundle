@@ -29,7 +29,7 @@ class File extends Entity
     protected $modified_gmt;
     protected $src;
 
-    private $post;
+    protected $post;
 
     public function __toString()
     {

@@ -17,8 +17,8 @@ class Menu extends Entity
     public $slug;
 	public $title;
 
-	private $itemClass;
-	private $menu;
+    protected $itemClass;
+    protected $menu;
 
     public static $locations;
 

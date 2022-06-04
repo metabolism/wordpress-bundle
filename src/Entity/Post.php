@@ -55,7 +55,7 @@ class Post extends Entity
 	protected $modified_gmt;
 
 	/** @var \WP_Post|bool */
-	private $post;
+	protected $post;
 
     public function __toString(){
 

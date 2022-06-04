@@ -25,7 +25,7 @@ class User extends Entity
     protected $avatar;
 
 	/** @var \WP_User */
-    private $user;
+    protected $user;
 
     public function __toString()
     {

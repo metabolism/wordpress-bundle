@@ -16,7 +16,7 @@ use Twig\Extension\AbstractExtension,
 class AppExtension extends AbstractExtension{
 
 
-	private $projectDir, $options;
+	private $projectDir, $uploadDir;
 
 	/**
 	 * AppExtension constructor.
@@ -27,6 +27,7 @@ class AppExtension extends AbstractExtension{
 	public function __construct($defaultLocale, $projectDir, $emailSender )
 	{
 		$this->projectDir = $projectDir;
+		$this->uploadDir = wp_upload_dir();
 	}
 
 
@@ -45,7 +46,6 @@ class AppExtension extends AbstractExtension{
 			new TwigFilter( 'remove_accent', [$this,'removeAccent'] ),
 			new TwigFilter( 'typeOf', [$this,'typeOf'] ),
 			new TwigFilter( 'bind', [$this,'bind'] ),
-			new TwigFilter( 'more', [$this,'more'] ),
 			new TwigFilter( 'implode', [$this,'implode'] ),
 			new TwigFilter( 'striptag', [$this, 'striptag']),
 			new TwigFilter( 'br_to_line', [$this, 'brToLine']),
@@ -66,59 +66,8 @@ class AppExtension extends AbstractExtension{
 			new TwigFunction( 'GTE', [$this,'GTE'] ),
 			new TwigFunction( 'LT', [$this,'LT'] ),
 			new TwigFunction( 'LTE', [$this,'LTE'] ),
-			new TwigFunction( 'blank', [$this,'blank'] ),
-			new TwigFunction( 'store', [$this, 'store'])
+			new TwigFunction( 'blank', [$this,'blank'] )
 		];
-	}
-
-
-	/**
-	 * @param $url
-	 * @param array $allowed_type
-	 * @return string
-	 */
-	public function store($url, $allowed_type = ['image/jpeg', 'image/jpg', 'image/gif', 'image/png'])
-	{
-		$publicFolder = $this->projectDir.'/public/cache';
-		$tmpFolder = $this->projectDir.'/var/tmp';
-		$filename = substr(sha1($url), 0, 16);
-		$tmpFile = $tmpFolder.'/'.$filename;
-		$publicFile = $publicFolder.'/'.$filename;
-
-		// check if file exists in cache, don't know the extension yet so glob it
-		$files = glob($publicFile.'.*');
-
-		if( count($files) )
-			return str_replace($this->projectDir.'/public', '', $files[0]);
-
-		//create folders
-		if( !is_dir($publicFolder) )
-			mkdir($publicFolder, 0755, true);
-
-		if( !is_dir($tmpFolder) )
-			mkdir($tmpFolder, 0755, true);
-
-		//download file
-		if( @file_put_contents($tmpFile, @file_get_contents($url)) ){
-
-			//check type
-			$mime_type = mime_content_type($tmpFile);
-
-			if( !in_array($mime_type, $allowed_type) ){
-
-				unlink($tmpFile);
-				return $url;
-			}
-
-			$mime_type = explode('/', $mime_type);
-			$file = $publicFile.'.'.$mime_type[1];
-
-			//move to public folder with ext
-			if( rename($tmpFile, $file) )
-				return str_replace($this->projectDir.'/public', '', $file);
-		}
-
-		return $url;
 	}
 
 
