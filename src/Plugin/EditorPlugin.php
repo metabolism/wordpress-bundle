@@ -10,7 +10,7 @@ class EditorPlugin {
 
     public function adminHead(){
 
-        $entrypoints = BASE_URI . '/public/build/entrypoints.json';
+        $entrypoints = BASE_URI.PUBLIC_DIR . '/build/entrypoints.json';
 
         if( file_exists($entrypoints) ){
 

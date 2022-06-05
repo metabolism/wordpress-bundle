@@ -73,7 +73,11 @@ class Image extends Entity
 	}
 
 
-	protected function uploadDir($field)
+    /**
+     * @param $field
+     * @return mixed|string
+     */
+    protected function uploadDir($field)
 	{
 		if ( !self::$wp_upload_dir )
 			self::$wp_upload_dir = wp_upload_dir();
@@ -90,11 +94,18 @@ class Image extends Entity
 		return $this->ID ===  0 || file_exists( $this->src );
 	}
 
+
     /**
+     * Download image
+     *
      * @param $url
+     * @param int $ttl
      * @return false|string
      */
-    private function downloadImage($url){
+    private function getRemoteImage($url, $ttl=false){
+
+        if( !$ttl )
+            $ttl = 2592000;
 
         $basename = strtolower(pathinfo($url, PATHINFO_BASENAME));
         $folder = '/cache/'.md5($url);
@@ -102,9 +113,15 @@ class Image extends Entity
 
         $folderpath =  $this->uploadDir('basedir').$folder;
         $filename =  $this->uploadDir('basedir').$filepath;
+        $relative_filename =  $this->uploadDir('relative').$filepath;
 
-        if( file_exists($filename) )
-            return $filename;
+        if( file_exists($filename) ){
+
+            $cachetime = filemtime($filename) + $ttl;
+
+            if( $cachetime > time() )
+                return $relative_filename;
+        }
 
         $tmpfile = tempnam ('/tmp', 'img-');
         file_put_contents($tmpfile, file_get_contents($url));
@@ -122,12 +139,13 @@ class Image extends Entity
 
         rename($tmpfile, $filename);
 
-        return $filename;
+        return $relative_filename;
     }
 
 
 	/**
-	 * Remove useless data
+	 * Get image data
+     *
 	 * @param $id
 	 * @return void
 	 */
@@ -183,9 +201,9 @@ class Image extends Entity
 		else{
 
             if( substr($id,0, 7) == 'http://' || substr($id,0, 8) == 'https://' )
-                $filename = $this->downloadImage($id);
-            else
-                $filename = BASE_URI.$id;
+                $id = $this->getRemoteImage($id, $this->args['ttl']??false);
+
+            $filename = BASE_URI.PUBLIC_DIR.$id;
 
             if( !$filename || !file_exists( $filename) || is_dir( $filename ) )
                 return;
@@ -194,11 +212,19 @@ class Image extends Entity
 			$this->file = $id;
 			$this->src = $filename;
 			$this->post = false;
-			$this->title = str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME));
+
+            if( isset($this->args['title']) )
+                $this->title = $this->args['title'];
+            else
+                $this->title = str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME));
+
+            if( isset($this->args['alt']) )
+                $this->alt = $this->args['alt'];
 
 			$image_size = getimagesize($filename);
 			$this->width = $image_size[0]??false;
 			$this->height = $image_size[1]??false;
+
 			$this->metadata = false;
 			$this->mime_type = mime_content_type($filename);
 		}

@@ -44,6 +44,6 @@ class AdminController {
 
 		$this->lock();
 
-		add_action( 'admin_init', [$this, 'init'] );
+		add_action( 'admin_init', [$this, 'init'], 99 );
 	}
 }
