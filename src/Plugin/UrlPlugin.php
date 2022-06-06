@@ -92,16 +92,10 @@ class UrlPlugin {
 
         if( isset($_GET['s']) ){
 
-            global $wp;
-            $wp->parse_request();
+            $permalink = get_search_link(sanitize_text_field($_GET['s']));
 
-            if( empty($wp->request) ){
-
-                $permalink = get_search_link($_GET['s']);
-
-                $query_args = $_GET;
-                unset($query_args['s']);
-            }
+            $query_args = $_GET;
+            unset($query_args['s']);
         }
         else{
 
