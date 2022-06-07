@@ -146,7 +146,7 @@ class Permastruct{
             $this->addRoute('search', $this->wp_rewrite->search_structure, [], true);
 
         if( isset($this->wp_rewrite->page_structure) )
-            $this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
+            $this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*[^/]']);
 
         if( isset($this->wp_rewrite->permalink_structure) && (!isset($this->wp_rewrite->page_structure) || str_replace('%pagename%','', $this->wp_rewrite->page_structure) != str_replace('/%postname%','', $this->wp_rewrite->permalink_structure)) )
             $this->addRoute('post', $this->wp_rewrite->permalink_structure, ['postname'=>'[a-zA-Z0-9]{2}[^/].*']);
