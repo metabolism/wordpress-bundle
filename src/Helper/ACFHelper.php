@@ -124,10 +124,21 @@ class ACFHelper implements ArrayAccess
 		return $this->objects[$id]['value'];
 	}
 
-    public function setValue($id, $value){
+
+    /**
+     * @param $id
+     * @param $value
+     * @param bool $updateField
+     * @return void
+     */
+    public function setValue($id, $value, $updateField=false){
 
         $this->objects[$id] = $value;
+
+        if( $updateField )
+            update_field($id, $value, $this->id);
     }
+
 
 	/**
 	 * @return array
@@ -302,8 +313,8 @@ class ACFHelper implements ArrayAccess
 		switch ($type)
 		{
 			case 'image':
-				$value = Factory::create($id, 'image');
-				break;
+                $value = Factory::create($id, 'image');
+                break;
 
 			case 'file':
 				$value = Factory::create($id, 'file');

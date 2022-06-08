@@ -53,7 +53,7 @@ class Image extends Entity
 	 */
 	public function __construct($id=null, $args=[])
 	{
-		global $_config;
+        global $_config;
 
 		$this->args = $args;
 
@@ -155,7 +155,7 @@ class Image extends Entity
 
 			if( $post = get_post($id) ) {
 
-				if( is_wp_error($post) || !$post )
+                if( is_wp_error($post) || !$post )
 					return;
 
 				$post_meta = get_post_meta($id);
@@ -179,10 +179,10 @@ class Image extends Entity
 
 				$filename = $this->uploadDir('basedir').'/'.$attachment_metadata['file'];
 
-				if( !file_exists( $filename) )
+                if( !file_exists( $filename) )
 					return;
 
-				$this->ID = $post->ID;
+                $this->ID = $post->ID;
 				$this->caption = $post->post_excerpt;
 				$this->description = $post->post_content;
 				$this->file = $this->uploadDir('relative').'/'.$attachment_metadata['file'];
@@ -724,10 +724,10 @@ class Image extends Entity
 				}
 			}
 
-			if( $ext == 'webp' && $w )
+			if( $ext == 'webp' && ($w || $h) )
 				$html .='<source srcset="'.$this->edit(['resize'=>[$w, $h]], $ext).'" type="'.$mime.'"/>';
 
-            if( !$w )
+            if( !$w && !$h )
                 $src = $this->file;
             else
                 $src = $this->edit(['resize'=>[$w, $h]]);

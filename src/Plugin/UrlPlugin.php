@@ -147,7 +147,7 @@ class UrlPlugin {
         if( !is_admin() && (isset($_GET['preview'], $_GET['p']) || isset($_GET['preview'], $_GET['page_id']) || isset($_GET['s']) ) )
             $this->redirect();
 
-        global $wp_rewrite, $_config;
+        global $wp_rewrite;
 
         $permalink_structure = '/%postname%';
 
