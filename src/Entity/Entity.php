@@ -26,7 +26,6 @@ abstract class Entity implements ArrayAccess
      */
 	public $metafields = false;
 
-
 	/**
 	 * Magic method to load properties
 	 *

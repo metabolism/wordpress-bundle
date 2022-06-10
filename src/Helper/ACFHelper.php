@@ -14,6 +14,8 @@ class ACFHelper implements ArrayAccess
 {
 	private $objects;
 	private $id;
+	private $entity_id;
+	private $type;
 
     public static $use_entity;
 
@@ -33,10 +35,13 @@ class ACFHelper implements ArrayAccess
         if( is_null(self::$use_entity) && $_config )
             self::$use_entity = $_config->get('acf.settings.use_entity', false);
 
-		if( !in_array($type, ['post', 'blog']) && $type)
+        $this->id = $id;
+
+        if( !in_array($type, ['post', 'blog']) && $type)
 			$id = $type.'_'.$id;
 
-		$this->id = $id;
+		$this->entity_id = $id;
+		$this->type = $type;
 
         if( $load_value )
             $this->getFieldObjects( true );
@@ -106,16 +111,25 @@ class ACFHelper implements ArrayAccess
 	 */
 	public function getValue($id){
 
-		if( !$this->has($id) )
-			return null;
+        if( !$this->has($id) ){
+
+            if( $this->type == 'post' )
+                return get_post_meta($this->id, $id, true);
+            elseif( $this->type == 'term'  )
+                return get_term_meta($this->id, $id, true);
+            elseif( $this->type == 'user'  )
+                return get_user_meta($this->id, $id, true);
+
+            return null;
+        }
 
         $field = $this->objects[$id];
 
         if( isset($field['value']) )
             return $field['value'];
 
-        $field['value'] = acf_get_value( $this->id, $field );
-        $field['value'] = acf_format_value( $field['value'], $this->id, $field );
+        $field['value'] = acf_get_value( $this->entity_id, $field );
+        $field['value'] = acf_format_value( $field['value'], $this->entity_id, $field );
 
         $data = $this->format([$field]);
 
@@ -136,17 +150,17 @@ class ACFHelper implements ArrayAccess
         $this->objects[$id] = $value;
 
         if( $updateField )
-            update_field($id, $value, $this->id);
+            update_field($id, $value, $this->entity_id);
     }
 
 
 	/**
+     * @deprecated Use Blog::getInstance instead
 	 * @return array
 	 */
 	public static function get($id){
 
 		$self = new self($id, false, true);
-
 		return $self->format($self->objects);
 	}
 
@@ -168,14 +182,14 @@ class ACFHelper implements ArrayAccess
         if( $this->loaded() )
             return;
 
-        if( $cached = wp_cache_get( $this->id, 'acf_helper' ) ){
+        if( $cached = wp_cache_get( $this->entity_id, 'acf_helper' ) ){
 
             $this->objects = $cached;
         }
         else{
 
-            $this->objects = get_field_objects($this->id, $load_value, $load_value);
-            wp_cache_set( $this->id, $this->objects, 'acf_helper' );
+            $this->objects = get_field_objects($this->entity_id, $load_value, $load_value);
+            wp_cache_set( $this->entity_id, $this->objects, 'acf_helper' );
         }
 	}
 

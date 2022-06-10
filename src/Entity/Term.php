@@ -38,6 +38,8 @@ class Term extends Entity
     /** @var \WP_Term|bool */
     protected $term;
 
+    protected $meta;
+
     public function __toString(){
 
         return $this->title??'Invalid term';
@@ -69,7 +71,7 @@ class Term extends Entity
             $this->group = $term->term_group;
             $this->content = nl2br($term->description);
 
-            $this->loadMetafields($this->ID, $this->taxonomy);
+            $this->loadMetafields($this->ID, 'term');
 		}
 	}
 

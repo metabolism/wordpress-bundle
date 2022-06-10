@@ -33,6 +33,11 @@ class Blog extends Entity
     public $paged;
     public $languages;
     public $maintenance_mode;
+
+    /**
+     * @var
+     * @deprecated
+     */
     public $options;
 
     protected $domain;

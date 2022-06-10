@@ -34,7 +34,8 @@ class WordpressTwigExtension extends AbstractExtension{
 			new TwigFilter( 'sanitize','sanitize_title' ),
 			new TwigFilter( 'shortcodes','do_shortcode' ),
 			new TwigFilter( 'wpautop','wpautop' ),
-			new TwigFilter( 'array',[$this, 'to_array'] ),
+			new TwigFilter( 'array',[$this, 'toArray'] ),
+			new TwigFilter( 'file_exists',[$this, 'fileExists'] ),
 		];
 	}
 
@@ -79,12 +80,35 @@ class WordpressTwigExtension extends AbstractExtension{
 	}
 
 
-	public function to_array( $arr ) {
+    /**
+     * Convert to array
+     *
+     * @param $arr
+     * @return array
+     */
+    public function toArray($arr ) {
 
 		return (array)$arr;
 	}
 
 
+    /**
+     * Check if file exists
+     * @param $path
+     * @return bool
+     */
+    public function fileExists($path ) {
+
+		return substr($path, 0, 4) == 'http' || file_exists(BASE_URI . PUBLIC_DIR . $path);
+	}
+
+
+    /**
+     * Generate transparent pixel base64 image
+     * @param $w
+     * @param $h
+     * @return string
+     */
     public function generatePixel($w = 1, $h = 1) {
 
         ob_start();
