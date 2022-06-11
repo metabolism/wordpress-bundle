@@ -1,12 +1,12 @@
 <?php
 
-namespace Metabolism\WordpressBundle\Controller;
+namespace Metabolism\WordpressBundle\Action;
 
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class FrontController {
+class FrontAction {
 
 	/**
 	 * @var string plugin domain name for translations

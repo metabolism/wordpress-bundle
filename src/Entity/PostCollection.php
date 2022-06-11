@@ -11,25 +11,40 @@ use Metabolism\WordpressBundle\Service\PaginationService;
  */
 class PostCollection implements \IteratorAggregate, \Countable {
 
-	public $query;
-    protected $items;
+	public $query=false;
+
+    protected $items=[];
+    protected $count=0;
 
 	protected $pagination;
 
 	/**
 	 * @param $query
 	 */
-	public function __construct($query)
+	public function __construct(?array $query=null)
 	{
-		$this->query = new \WP_Query( $query );
+        if( $query ){
 
-		$items = [];
+            $this->query = new \WP_Query( $query );
+            $this->setPosts($this->query->posts);
+        }
+    }
 
-		foreach ($this->query->posts as $post)
-			$items[] = PostFactory::create( $post );
 
-		$this->items = array_filter($items);
-	}
+    /**
+     * @param array $posts
+     * @return void
+     */
+    public function setPosts(array $posts){
+
+        $posts = array_unique(array_filter($posts));
+        $items = [];
+
+        foreach ($posts as $post)
+            $items[] = PostFactory::create( $post );
+
+        $this->items = array_filter($items);
+    }
 
 
 	/**
@@ -64,6 +79,6 @@ class PostCollection implements \IteratorAggregate, \Countable {
 	 */
 	public function count()
 	{
-		return $this->query->found_posts;
+		return $this->query ? $this->query->found_posts : count($this->items);
 	}
 }

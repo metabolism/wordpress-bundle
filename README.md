@@ -206,7 +206,7 @@ This package is [Treeware](https://treeware.earth). If you use it in production,
     
 ## Maintainers
 
-This project is made by Metabolism ( http://metabolism.fr )
+This project is made by Metabolism ( http://www.metabolism.fr )
 
 Current maintainers:
  * Jérôme Barbato - jerome@metabolism.fr

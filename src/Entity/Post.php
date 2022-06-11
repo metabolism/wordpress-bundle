@@ -56,7 +56,6 @@ class Post extends Entity
 
 	/** @var \WP_Post|bool */
 	protected $post;
-    protected $meta = [];
 
     public function __toString(){
 

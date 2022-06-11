@@ -29,7 +29,7 @@ services:
     resource: '../src/'
     exclude:
       - '../src/DependencyInjection/'
-      - '../src/Controller/'
+      - '../src/Action/'
       - '../src/Entity/'
       - '../src/Factory/'
       - '../src/Helper/'

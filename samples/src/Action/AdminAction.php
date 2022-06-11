@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controller;
+namespace App\Action;
 
-use Metabolism\WordpressBundle\Controller\AdminController as WordpressAdminController;
+use Metabolism\WordpressBundle\Action\AdminAction as WordpressAdminController;
 
-class AdminController extends WordpressAdminController
+class AdminAction extends WordpressAdminController
 {
 	/**
 	 * Execute code when the admin is loaded

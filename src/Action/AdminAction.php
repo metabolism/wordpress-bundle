@@ -1,11 +1,11 @@
 <?php
 
-namespace Metabolism\WordpressBundle\Controller;
+namespace Metabolism\WordpressBundle\Action;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class AdminController {
+class AdminAction {
 
 	/**
 	 * Init placeholder

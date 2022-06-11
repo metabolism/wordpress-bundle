@@ -3,7 +3,7 @@
 /**
  * Wordpress configuration file
  *
- * You may want to edit config/wordpress.yml to change :
+ * You may want to edit config/packages/wordpress.yml to change :
  *   Authentication Keys
  *   Debug mode
  *   Post types

@@ -1,12 +1,12 @@
 <?php
 
-namespace Metabolism\WordpressBundle\Controller;
+namespace Metabolism\WordpressBundle\Action;
 
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class WordpressController {
+class WordpressAction {
 
     public function init(){}
 

@@ -115,9 +115,9 @@ class ACFHelper implements ArrayAccess
 
             if( $this->type == 'post' )
                 return get_post_meta($this->id, $id, true);
-            elseif( $this->type == 'term'  )
+            elseif( $this->type == 'term' )
                 return get_term_meta($this->id, $id, true);
-            elseif( $this->type == 'user'  )
+            elseif( $this->type == 'user' )
                 return get_user_meta($this->id, $id, true);
 
             return null;

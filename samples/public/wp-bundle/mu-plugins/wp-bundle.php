@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Symfony Wordpress Bundle
- * Description: Configure Wordpress using yml and add various plugins
- * Version: 1.0.0
+ * Description: Load Wordpress in Symfony
+ * Version: 2.0.0
  * Author: Metabolism
  * Author URI: http://www.metabolism.fr
  */
@@ -16,23 +16,23 @@ if( WordpressBundle::isLoginUrl() )
 
 if( is_admin() )
 {
-	//load back only controller
-	if( class_exists('App\Controller\AdminController') )
-		new App\Controller\AdminController();
+	//load back only action
+	if( class_exists('App\Action\AdminAction') )
+		new App\Action\AdminAction();
 	else
-		new Metabolism\WordpressBundle\Controller\AdminController();
+		new Metabolism\WordpressBundle\Action\AdminAction();
 }
 else
 {
-	//load front only controller
-	if( class_exists('App\Controller\FrontController') )
-		new App\Controller\FrontController();
+	//load front only action
+	if( class_exists('App\Action\FrontAction') )
+		new App\Action\FrontAction();
 	else
-		new Metabolism\WordpressBundle\Controller\FrontController();
+		new Metabolism\WordpressBundle\Action\FrontAction();
 }
 
-//load both case controller
-if( class_exists('App\Controller\WordpressController') )
-	new App\Controller\WordpressController();
+//load both case action
+if( class_exists('App\Action\WordpressAction') )
+	new App\Action\WordpressAction();
 else
-	new Metabolism\WordpressBundle\Controller\WordpressController();
+	new Metabolism\WordpressBundle\Action\WordpressAction();

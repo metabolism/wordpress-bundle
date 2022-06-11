@@ -128,4 +128,27 @@ class PostRepository
 
         return null;
     }
+
+
+    /**
+     * @param $ids
+     * @return PostCollection
+     */
+    public function findByGuid(array $ids)
+    {
+        $postCollection = new PostCollection();
+
+        if( !count($ids) )
+            return $postCollection;
+
+        global $wpdb;
+        $in = implode(',', array_fill(0, count($ids), '%s') );
+
+        $ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE guid IN ($in)", $ids ), ARRAY_A );
+        $ids = array_map(function ($item){ return $item['ID']; }, $ids);
+
+        $postCollection->setPosts($ids);
+
+        return $postCollection;
+    }
 }
