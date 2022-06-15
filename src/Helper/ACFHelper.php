@@ -111,17 +111,8 @@ class ACFHelper implements ArrayAccess
 	 */
 	public function getValue($id){
 
-        if( !$this->has($id) ){
-
-            if( $this->type == 'post' )
-                return get_post_meta($this->id, $id, true);
-            elseif( $this->type == 'term' )
-                return get_term_meta($this->id, $id, true);
-            elseif( $this->type == 'user' )
-                return get_user_meta($this->id, $id, true);
-
+        if( !$this->has($id) )
             return null;
-        }
 
         $field = $this->objects[$id];
 

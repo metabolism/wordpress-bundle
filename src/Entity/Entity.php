@@ -5,6 +5,7 @@ namespace Metabolism\WordpressBundle\Entity;
 use ArrayAccess;
 use Metabolism\WordpressBundle\Helper\ACFHelper;
 use Metabolism\WordpressBundle\Helper\DataHelper;
+use Metabolism\WordpressBundle\Helper\MetaHelper;
 use ReflectionObject;
 use ReflectionProperty;
 use ReflectionMethod;
@@ -24,7 +25,9 @@ abstract class Entity implements ArrayAccess
     /**
      * @var bool|ACFHelper
      */
-	public $metafields = false;
+	public $custom_fields = false;
+
+	public $meta = false;
 
 	/**
 	 * Magic method to load properties
@@ -77,8 +80,8 @@ abstract class Entity implements ArrayAccess
 
 		if( method_exists($this, $method) )
 			return call_user_func([$this, $method]);
-        elseif( $this->metafields && $this->metafields->has($id) )
-            return $this->metafields->getValue($id);
+        elseif( $this->custom_fields && $this->custom_fields->has($id) )
+            return $this->custom_fields->getValue($id);
 
 		return null;
 	}
@@ -114,7 +117,7 @@ abstract class Entity implements ArrayAccess
 
         $method = $this->getMethodName($id);
 
-		return method_exists($this, $method) || ($this->metafields && $this->metafields->has($id));
+		return method_exists($this, $method) || ($this->custom_fields && $this->custom_fields->has($id));
 	}
 
 
@@ -135,11 +138,11 @@ abstract class Entity implements ArrayAccess
      */
 	protected function loadMetafields($id, $type){
 
-		if( $this->metafields )
-			return;
+        if( class_exists('ACF') && !$this->custom_fields )
+	        $this->custom_fields = new ACFHelper( $id, $type );
 
-        if( class_exists('ACF') )
-	        $this->metafields = new ACFHelper( $id, $type );
+        if( !$this->meta )
+	        $this->meta = new MetaHelper( $id, $type );
 	}
 
     /**

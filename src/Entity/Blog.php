@@ -93,7 +93,7 @@ class Blog extends Entity
 
         $this->loadMetafields('options', 'blog');
 
-        $this->options = $this->metafields;
+        $this->options = $this->custom_fields;
 	}
 
     public function getVersion(){

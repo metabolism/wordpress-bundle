@@ -55,7 +55,7 @@ public function pageAction(Post $post, PostRepository $postRepository)
         {{ post.content|raw }}
     </div>
     
-    <small>{{ post.metafields.mention }}</small>
+    <small>{{ post.custom_fields.mention }}</small>
     
     {% for brand in brands %}
         {% include 'brand.html.twig' %}

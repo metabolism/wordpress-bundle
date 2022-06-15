@@ -304,8 +304,11 @@ class WordpressTwigExtension extends AbstractExtension{
 
 			case 'state':
 
-				$page = get_page_by_state($page);
-				break;
+                if( !function_exists('get_page_by_state') )
+                    return false;
+
+                $page = get_page_by_state($page);
+                break;
 
 			case 'path':
 
