@@ -73,14 +73,23 @@ mce_buttons:
 ##    System    ##
 ##################
 
-## Add theme support
+## Add blog support
 support:
-  - thumbnail #add thumbnails to page
   - page #enable page
   - post #enable post
   - tag #enable tag taxonomy for post
   - category #enable category taxonomy for post
- #- post-formats: # https://wordpress.org/support/article/post-formats/#supported-formats
+
+## Add post type support
+## https://developer.wordpress.org/reference/functions/post_type_supports/
+post_type_support:
+  page: excerpt #add excerpt to page
+
+## Add theme support
+## https://developer.wordpress.org/reference/functions/add_theme_support/
+theme_support:
+  - thumbnail #add thumbnails to post
+  #- post-formats:
   #  - video
   #  - gallery
 
