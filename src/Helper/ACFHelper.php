@@ -589,8 +589,20 @@ class ACFHelper implements ArrayAccess
 					$objects[$object['name']] = do_shortcode($object['value']);
 					break;
 
-				default:
+				case 'link':
 
+                    if( !isset($object['value']['url']) )
+                        break;
+
+                    $objects[$object['name']] = [
+                        'link'=>$object['value']['url'],
+                        'target'=>$object['value']['target'],
+                        'title'=>$object['value']['title']
+                    ];
+
+					break;
+
+				default:
 					$objects[$object['name']] = $object['value'];
 					break;
 			}
