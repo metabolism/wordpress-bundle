@@ -32,6 +32,8 @@ class WordpressTwigExtension extends AbstractExtension{
 			new TwigFilter( 'function', [$this, 'execFunction'] ),
 			new TwigFilter( 'excerpt','wp_trim_words' ),
 			new TwigFilter( 'sanitize','sanitize_title' ),
+			new TwigFilter( 'base64_encode','base64_encode' ),
+			new TwigFilter( 'base64_decode','base64_decode' ),
 			new TwigFilter( 'shortcodes','do_shortcode' ),
 			new TwigFilter( 'wpautop','wpautop' ),
 			new TwigFilter( 'array',[$this, 'toArray'] ),
