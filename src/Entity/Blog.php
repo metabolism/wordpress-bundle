@@ -4,6 +4,7 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use lloc\Msls\MslsOptions;
 use Metabolism\WordpressBundle\Factory\Factory;
+use Metabolism\WordpressBundle\Helper\OptionsHelper;
 use Metabolism\WordpressBundle\Service\BreadcrumbService;
 use Metabolism\WordpressBundle\Service\PaginationService;
 use Metabolism\WordpressBundle\Traits\SingletonTrait;
@@ -33,11 +34,6 @@ class Blog extends Entity
     public $paged;
     public $languages;
     public $maintenance_mode;
-
-    /**
-     * @var
-     * @deprecated
-     */
     public $options;
 
     protected $domain;
@@ -93,7 +89,7 @@ class Blog extends Entity
 
         $this->loadMetafields('options', 'blog');
 
-        $this->options = $this->custom_fields;
+        $this->options = new OptionsHelper();
 	}
 
     public function getVersion(){

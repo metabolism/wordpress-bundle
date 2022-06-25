@@ -68,7 +68,6 @@ class MetaHelper implements ArrayAccess
      * @return null|string|array|object
      */
 	public function __call($id, $args) {
-
 		return $this->getValue($id);
 	}
 
@@ -101,22 +100,24 @@ class MetaHelper implements ArrayAccess
 
 
 	/**
-	 * @param $id
+	 * @param $key
 	 * @return null|string|array|object
 	 */
-	public function getValue($id){
+	public function getValue($key){
 
-        if( $value = $this->objects[$id]??false )
-            return $value;
+        if( isset($this->objects[$key]) )
+            return $this->objects[$key];
 
         if( $this->type == 'post' )
-            return get_post_meta($this->id, $id, true);
+            $this->objects[$key] = get_post_meta($this->id, $key, true);
         elseif( $this->type == 'term' )
-            return get_term_meta($this->id, $id, true);
+            $this->objects[$key] = get_term_meta($this->id, $key, true);
         elseif( $this->type == 'user' )
-            return get_user_meta($this->id, $id, true);
+            $this->objects[$key] = get_user_meta($this->id, $key, true);
+        else
+            $this->objects[$key] = false;
 
-        return null;
+        return $this->objects[$key];
 	}
 
 
