@@ -26,6 +26,9 @@ class ConfigLoader{
         if( !defined('WPS_YAML_FILE') )
             define('WPS_YAML_FILE', BASE_URI.$yaml_filepath);
 
+        if( !defined('WPS_YAML_TRANSLATION_FILES') )
+            define('WPS_YAML_TRANSLATION_FILES', BASE_URI.'/translations');
+
         /**
          * Load Composer
          */

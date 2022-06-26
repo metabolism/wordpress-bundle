@@ -2,11 +2,10 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
-use Dflydev\DotAccessData\Data;
 use function Env\env;
 
 /**
- * Class 
+ * Class
  */
 class NoticePlugin {
 
@@ -97,7 +96,7 @@ class NoticePlugin {
 		{
 			$args = [
 				'id'    => 'debug',
-				'title' => '<span style="position: fixed; left: 0; top: 0; width: 100%; background: #df0f0f; height: 2px; z-index: 99999"></span>'.__('Debug'),
+				'title' => '<span style="position: fixed; left: 0; top: 0; width: 100%; background: #df0f0f; height: 2px; z-index: 99999"></span>',
 				'href' => '#'
 			];
 
