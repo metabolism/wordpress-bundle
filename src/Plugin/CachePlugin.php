@@ -3,29 +3,58 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 /**
- * Class 
+ * Class
  */
 class CachePlugin
 {
 	private $noticeMessage,  $errorMessage, $debug;
 
 	/**
-	 * Purge url from id
+	 * Purge post url from id
      *
-	 * @param bool $pid
+	 * @param bool $post_id
 	 * @return void
 	 */
-	public function purgeCache($pid=false)
+	public function purgePostCache($post_id=false)
 	{
-		if( $pid ){
+		if( $post_id ){
 
-			$post = get_post($pid);
+            if( wp_is_post_revision( $post_id ) || (defined( 'DOING_AUTOSAVE' ) and DOING_AUTOSAVE) )
+                return;
+
+			$post = get_post($post_id);
 			$post_type_object = get_post_type_object($post->post_type);
 
 			if( $post && $post->post_status === 'publish' && $post_type_object->publicly_queryable ){
 
 				$home_url = get_home_url();
-				$url = $home_url.get_permalink($pid);
+				$url = $home_url.get_permalink($post_id);
+
+				$this->purge($url);
+			}
+		}
+	}
+
+	/**
+	 * Purge term url from id
+     *
+	 * @param bool $term_id
+	 * @return void
+	 */
+	public function purgeTermCache($term_id=false)
+	{
+		if( $term_id ){
+
+            if( defined( 'DOING_AUTOSAVE' ) and DOING_AUTOSAVE )
+                return;
+
+            $term = get_term($term_id);
+			$taxonomy_object = get_taxonomy($term->taxonomy);
+
+			if( $term && $taxonomy_object->public && $taxonomy_object->publicly_queryable ){
+
+				$home_url = get_home_url();
+				$url = $home_url.get_term_link($term_id);
 
 				$this->purge($url);
 			}
@@ -252,8 +281,8 @@ class CachePlugin
 
 				$this->addClearCacheButton();
 
-				foreach (['save_post', 'deleted_post', 'trashed_post', 'edit_post'] as $action)
-					add_action( $action, [$this, 'purgeCache']);
+                add_action( 'save_post', [$this, 'purgePostCache']);
+                add_action( 'saved_term', [$this, 'purgeTermCache']);
 			});
 		}
 

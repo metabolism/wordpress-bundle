@@ -27,6 +27,9 @@ abstract class Entity implements ArrayAccess
      */
 	public $custom_fields = false;
 
+    /**
+     * @var bool|MetaHelper
+     */
 	public $meta = false;
 
 	/**
