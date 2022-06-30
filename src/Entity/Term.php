@@ -227,20 +227,4 @@ class Term extends Entity
 
         return $this->thumbnail;
     }
-
-    /**
-     * Set term meta
-     *
-     * @param $key
-     * @param $value
-     * @param $prev_value
-     * @return void
-     */
-    public function setMeta($key, $value, $prev_value=''){
-
-        if( $value )
-            update_term_meta($this->ID, $key, $value, $prev_value);
-        else
-            delete_term_meta($this->ID, $key);
-    }
 }
