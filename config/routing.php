@@ -45,9 +45,16 @@ class Permastruct{
     }
 
 
+    /**
+     * @param $taxonomy
+     * @return array|false
+     */
     private function getSlugs($taxonomy){
 
         $terms = get_terms($taxonomy);
+
+        if( is_wp_error($terms) )
+            return false;
 
         $slugs = [];
 
@@ -86,7 +93,8 @@ class Permastruct{
 
                         $struct = explode('%', $struct);
 
-                        $requirements[$struct[1]] = implode('|', $this->getSlugs($struct[1]));
+                        if( $slugs = $this->getSlugs($struct[1]) )
+                            $requirements[$struct[1]] = implode('|', $slugs);
 
                         $struct = implode('%', $struct);
                     }
@@ -125,7 +133,9 @@ class Permastruct{
                     if( substr($struct,0, 8) == '/%empty%' ){
 
                         $struct = explode('%', $struct);
-                        $requirements[$struct[3]] = implode('|', $this->getSlugs($struct[3]));
+
+                        if( $slugs = $this->getSlugs($struct[3]) )
+                            $requirements[$struct[3]] = implode('|', $slugs);
 
                         $struct = implode('%', $struct);
                         $struct = str_replace('%empty%/','', $struct);
