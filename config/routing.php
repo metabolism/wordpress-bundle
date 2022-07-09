@@ -99,6 +99,9 @@ class Permastruct{
                         $struct = implode('%', $struct);
                     }
 
+	                $struct = apply_filters('post_type_routing_struct', $struct, $post_type);
+	                $requirements = apply_filters('post_type_routing_requirements', $requirements, $struct, $post_type);
+
                     $this->addRoute($post_type->name, $struct, $requirements);
                 }
 
@@ -106,10 +109,12 @@ class Permastruct{
 
                     $base_struct = is_string($post_type->has_archive) ? $post_type->has_archive : $post_type->name;
                     $translated_slug = get_option( $post_type->name. '_rewrite_archive' );
+	                $struct = empty($translated_slug) ? $base_struct : $translated_slug;
 
-                    $struct = empty($translated_slug) ? $base_struct : $translated_slug;
+	                $struct = apply_filters('post_type_archive_routing_struct', $struct, $post_type);
+	                $requirements = apply_filters('post_type_archive_routing_requirements', [], $struct, $post_type);
 
-                    $this->addRoute($post_type->name.'_archive', $struct, [], $this->wp_rewrite->extra_permastructs[$post_type->name]['struct']);
+                    $this->addRoute($post_type->name.'_archive', $struct, $requirements, $this->wp_rewrite->extra_permastructs[$post_type->name]['struct']);
                 }
             }
         }
@@ -140,6 +145,9 @@ class Permastruct{
                         $struct = implode('%', $struct);
                         $struct = str_replace('%empty%/','', $struct);
                     }
+
+	                $struct = apply_filters('taxonomy_routing_struct', $struct, $taxonomy);
+	                $requirements = apply_filters('taxonomy_routing_requirements', $requirements, $struct, $taxonomy);
 
                     $this->addRoute($taxonomy->name, $struct, $requirements, $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
 
@@ -186,7 +194,7 @@ class Permastruct{
         $path = trim($path, '/');
         $path = !empty($this->locale)? $this->locale.'/'.$path: $path;
 
-        return ['singular'=>$path, 'archive'=>$path.'/'.$this->wp_rewrite->pagination_base.'/{page}'];
+        return ['singular'=>$path, 'archive'=>$path.(substr($path, -1, 1)=='/'?'':'/').$this->wp_rewrite->pagination_base.'/{page}'];
     }
 
     /**
