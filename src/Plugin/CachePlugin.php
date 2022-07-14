@@ -15,9 +15,9 @@ class CachePlugin
 	 * @param bool $post_id
 	 * @return void
 	 */
-	public function purgePostCache($post_id=false)
+	public function purgePostCache($post_id, $post, $update)
 	{
-		if( $post_id ){
+		if( $post_id && $update){
 
             if( wp_is_post_revision( $post_id ) || (defined( 'DOING_AUTOSAVE' ) and DOING_AUTOSAVE) )
                 return;
@@ -41,9 +41,9 @@ class CachePlugin
 	 * @param bool $term_id
 	 * @return void
 	 */
-	public function purgeTermCache($term_id=false)
+	public function purgeTermCache($term_id, $tt_id, $taxonomy, $update)
 	{
-		if( $term_id ){
+		if( $term_id && $update ){
 
             if( defined( 'DOING_AUTOSAVE' ) and DOING_AUTOSAVE )
                 return;
@@ -281,8 +281,8 @@ class CachePlugin
 
 				$this->addClearCacheButton();
 
-                add_action( 'save_post', [$this, 'purgePostCache']);
-                add_action( 'saved_term', [$this, 'purgeTermCache']);
+                add_action( 'save_post', [$this, 'purgePostCache'], 10, 3);
+                add_action( 'saved_term', [$this, 'purgeTermCache'], 10, 4);
 			});
 		}
 
