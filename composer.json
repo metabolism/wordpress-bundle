@@ -32,7 +32,6 @@
     "metabolism/package-actions": "^1.0",
     "metabolism/wp-steroids": "1.0.x-dev",
     "metabolism/void": "^2.0",
-    "metabolism/wp-bundle": "^2.0",
     "johnpbloch/wordpress-core": "^5.0|^6.0",
     "ifsnop/mysqldump-php":"^2.0",
     "dflydev/dot-access-data":"^3.0",
@@ -66,11 +65,8 @@
         "metabolism/wordpress-bundle": {
           "samples/public/.htaccess": "public/.htaccess",
           "samples/public/wp-config.php": "public/wp-config.php",
-          "samples/config/packages/wordpress.yml": "config/packages/wordpress.yml"
-        }
-      },
-      "symlink": {
-        "metabolism/wordpress-bundle": {
+          "samples/config/packages/wordpress.yml": "config/packages/wordpress.yml",
+          "samples/public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php",
           "README.md": "docs/wordpress_bundle.md"
         }
       }
@@ -81,12 +77,11 @@
           "config/packages/wordpress_bundle.yml": "config/packages/wordpress.yml"
         }
       },
-      "remove": {
-        "metabolism/wordpress-bundle": ["public/wp-bundle/mu-plugins/wp-bundle.php"]
-      },
       "copy": {
         "metabolism/wordpress-bundle": {
-          "samples/public/wp-config.php": "public/wp-config.php"
+          "samples/public/wp-config.php": "public/wp-config.php",
+          "samples/public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php",
+          "README.md": "docs/wordpress_bundle.md"
         }
       }
     },
