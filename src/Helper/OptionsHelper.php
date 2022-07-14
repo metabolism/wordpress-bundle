@@ -75,6 +75,31 @@ class OptionsHelper implements ArrayAccess
 	}
 
 
+	/**
+	 * @param $key
+	 * @param $value
+	 * @param bool $updateField
+	 * @param bool $autoload
+	 * @return null|string|array|object
+	 */
+	public function setValue($key, $value, $updateField=false, $autoload=true){
+
+		if( $updateField ){
+
+			update_option($key, $value, $autoload);
+			unset($this->objects[$key]);
+
+			$value = $this->getValue($key);
+		}
+		else{
+
+			$this->objects[$key] = $value;
+		}
+
+		return $value;
+	}
+
+
     public function offsetExists($offset)
     {
        return $this->has($offset);
