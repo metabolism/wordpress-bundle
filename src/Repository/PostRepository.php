@@ -151,4 +151,19 @@ class PostRepository
 
         return $postCollection;
     }
+
+
+    /**
+     * @param $id
+     * @return Post|null
+     */
+    public function findOneByGuid($id)
+    {
+         $postCollection = $this->findByGuid([$id]);
+
+		 if( count($postCollection) )
+			 return $postCollection[0];
+
+		 return null;
+    }
 }

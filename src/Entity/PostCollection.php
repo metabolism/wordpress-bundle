@@ -3,13 +3,15 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use ArrayIterator;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\TentativeType;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Service\PaginationService;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class PostCollection implements \IteratorAggregate, \Countable {
+class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 	public $query=false;
 
@@ -80,5 +82,42 @@ class PostCollection implements \IteratorAggregate, \Countable {
 	public function count()
 	{
 		return $this->query ? $this->query->found_posts : count($this->items);
+	}
+
+	/**
+	 * @param $offset
+	 * @return bool
+	 */
+	public function offsetExists($offset)
+	{
+		return isset($this->items[$offset]);
+	}
+
+	/**
+	 * @param $offset
+	 * @return Post|null
+	 */
+	public function offsetGet($offset)
+	{
+		return $this->items[$offset]??null;
+	}
+
+	/**
+	 * @param $offset
+	 * @param $value
+	 * @return void
+	 */
+	public function offsetSet($offset, $value)
+	{
+		$this->items[$offset] = $value;
+	}
+
+	/**
+	 * @param $offset
+	 * @return void
+	 */
+	public function offsetUnset($offset)
+	{
+		unset($this->items[$offset]);
 	}
 }
