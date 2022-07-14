@@ -140,6 +140,7 @@ Define installation path for Wordpress core and plugins in `composer.json`
     "installer-paths": {
         "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
         "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
+        "public/wp-bundle/themes/{$name}/": ["type:wordpress-theme"],
         "public/edition/": ["type:wordpress-core"]
     }
 }

@@ -39,10 +39,10 @@ class EditorPlugin {
     {
         $template = get_option('template');
 
-        if( !is_dir(WP_CONTENT_DIR.'/themes/'.$template) && $template != 'empty'){
+        if( !is_dir(WP_CONTENT_DIR.'/themes/'.$template) && $template != 'void'){
 
-            update_option('template', 'empty');
-            update_option('stylesheet', 'empty');
+            update_option('template', 'void');
+            update_option('stylesheet', 'void');
         }
     }
 
