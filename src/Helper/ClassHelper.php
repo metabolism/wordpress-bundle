@@ -12,7 +12,7 @@ class ClassHelper {
         $this->class = $class;
     }
 
-    public function __call($id, $args){
+    public function __call($id, $args=[]){
 
         $class = $this->class;
 

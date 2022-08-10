@@ -39,7 +39,7 @@ wordpress:
 
   ## Hide page from submenu
   remove_submenu_page:
-    themes.php: customize.php?return=%2Fedition%2Fwp-admin%2F
+    #themes.php: nav-menus.php
 
   ## Customize WYSIWYG Editor TinyMCE Buttons
   ##https://www.tiny.cloud/docs/advanced/editor-control-identifiers/

@@ -5,7 +5,7 @@ namespace Metabolism\WordpressBundle\Entity;
 use lloc\Msls\MslsOptions;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Helper\ClassHelper;
-use Metabolism\WordpressBundle\Helper\DataHelper;
+use Metabolism\WordpressBundle\Helper\FunctionHelper;
 use Metabolism\WordpressBundle\Helper\OptionsHelper;
 use Metabolism\WordpressBundle\Service\BreadcrumbService;
 use Metabolism\WordpressBundle\Service\PaginationService;
@@ -48,7 +48,6 @@ class Blog extends Entity
     protected $privacy_policy_title;
     protected $user;
     protected $posts_per_page;
-    protected $bloginfo;
     protected $info;
     protected $title;
     protected $body_class;
@@ -316,13 +315,11 @@ class Blog extends Entity
 	 */
 	public function getMenu(?string $location=null){
 
-        if( !$location ){
+		if( is_null($this->menu) )
+			$this->menu = new ClassHelper(Menu::class);
 
-	        if( is_null($this->menu) )
-		        $this->menu = new ClassHelper(Menu::class);
-
+        if( !$location )
 	        return $this->menu;
-        }
 
         return $this->menu->__call($location);
     }
@@ -438,15 +435,18 @@ class Blog extends Entity
     }
 
 	/**
-	 * @param string $name
+	 * @param string|null $name
 	 * @return mixed|string|null
 	 */
-	public function getInfo(string $name){
+	public function getInfo(?string $name=null){
 
-		if(is_null($this->bloginfo) || !isset($this->bloginfo[$name]))
-			$this->bloginfo[$name] = get_bloginfo($name);
+		if(is_null($this->info) )
+			$this->info = new FunctionHelper('get_bloginfo');
 
-		return $this->bloginfo[$name];
+		if( !$name )
+			return $this->info;
+
+		return $this->info->__call($name);
     }
 
 	/**
