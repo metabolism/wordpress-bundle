@@ -4,6 +4,8 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use lloc\Msls\MslsOptions;
 use Metabolism\WordpressBundle\Factory\Factory;
+use Metabolism\WordpressBundle\Helper\ClassHelper;
+use Metabolism\WordpressBundle\Helper\DataHelper;
 use Metabolism\WordpressBundle\Helper\OptionsHelper;
 use Metabolism\WordpressBundle\Service\BreadcrumbService;
 use Metabolism\WordpressBundle\Service\PaginationService;
@@ -50,7 +52,7 @@ class Blog extends Entity
     protected $info;
     protected $title;
     protected $body_class;
-    protected $menus;
+    protected $menu;
 
     private $queried_object;
 
@@ -310,17 +312,19 @@ class Blog extends Entity
 
 	/**
 	 * @param string|null $location
-	 * @return false|Menu
+	 * @return ClassHelper|Menu
 	 */
 	public function getMenu(?string $location=null){
 
-        if( !$location )
-            return false;
+        if( !$location ){
 
-        if(is_null($this->menus) || !isset($this->menus[$location]))
-            $this->menus[$location] = new Menu($location);
+	        if( is_null($this->menu) )
+		        $this->menu = new ClassHelper(Menu::class);
 
-        return $this->menus[$location];
+	        return $this->menu;
+        }
+
+        return $this->menu->__call($location);
     }
 
     /**

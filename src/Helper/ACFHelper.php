@@ -9,6 +9,7 @@ use Metabolism\WordpressBundle\Entity\Entity;
 use Metabolism\WordpressBundle\Factory\Factory,
 	Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TermFactory;
+use function Env\env;
 
 class ACFHelper implements ArrayAccess
 {
@@ -27,13 +28,11 @@ class ACFHelper implements ArrayAccess
      */
 	public function __construct( $id=false, $type=false, $load_value=false )
 	{
-		global $_config;
-
 		if( !class_exists('ACF') || !$id )
 			return;
 
-        if( is_null(self::$use_entity) && $_config )
-            self::$use_entity = $_config->get('acf.settings.use_entity', false);
+        if( is_null(self::$use_entity) )
+            self::$use_entity = !env('MIGRATE_FROM_V1');
 
         $this->id = $id;
 

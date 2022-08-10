@@ -3,7 +3,7 @@
 /**
  * Wordpress configuration file
  *
- * You may want to edit config/packages/wordpress.yml to change :
+ * You may want to edit config/packages/wordpress.yaml to change :
  *   Authentication Keys
  *   Debug mode
  *   Post types
@@ -43,7 +43,7 @@ if (!env('APP_ENV') ) {
 Env::$options = Env::USE_ENV_ARRAY;
 
 $loader = new ConfigLoader();
-$loader->import(dirname(__DIR__), '/config/packages/wordpress.yml');
+$loader->import(dirname(__DIR__), '/config/packages/wordpress.yaml');
 
 global $table_prefix;
 

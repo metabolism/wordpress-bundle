@@ -66,7 +66,7 @@
         "metabolism/wordpress-bundle": {
           "samples/public/.htaccess": "public/.htaccess",
           "samples/public/wp-config.php": "public/wp-config.php",
-          "samples/config/packages/wordpress.yml": "config/packages/wordpress.yml",
+          "samples/config/packages/wordpress.yaml": "config/packages/wordpress.yaml",
           "samples/public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php",
           "README.md": "docs/wordpress_bundle.md"
         }
@@ -75,7 +75,8 @@
     "post-package-update": {
       "rename": {
         "metabolism/wordpress-bundle": {
-          "config/packages/wordpress_bundle.yml": "config/packages/wordpress.yml"
+          "config/packages/wordpress_bundle.yml": "config/packages/wordpress.yaml",
+          "config/packages/wordpress.yml": "config/packages/wordpress.yaml"
         }
       },
       "copy": {

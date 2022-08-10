@@ -73,9 +73,19 @@ abstract class Entity implements ArrayAccess
 	 * @param $id
 	 * @return string
 	 */
-	private function getMethodName($id): string {
+	private function getMethodName($id): ?string {
 
-        return 'get'.str_replace(' ', '', ucwords(strtolower(str_replace('_', ' ', $id))));
+        $method = str_replace(' ', '', ucwords(strtolower(str_replace('_', ' ', $id))));
+
+		if( method_exists($this, $method) )
+			return $method;
+
+        $method = 'get'.ucwords($method);
+
+		if( method_exists($this, $method) )
+			return $method;
+
+		return null;
     }
 
 
@@ -88,9 +98,7 @@ abstract class Entity implements ArrayAccess
 	 */
 	public function __get($id) {
 
-        $method = $this->getMethodName($id);
-
-		if( method_exists($this, $method) )
+		if( $method = $this->getMethodName($id) )
 			return call_user_func([$this, $method]);
         elseif( $this->custom_fields && $this->custom_fields->has($id) )
             return $this->custom_fields->getValue($id);
@@ -109,9 +117,7 @@ abstract class Entity implements ArrayAccess
 	 */
 	public function __call($id, $args) {
 
-        $method = $this->getMethodName($id);
-
-		if( method_exists($this, $method) )
+		if(  $method = $this->getMethodName($id) )
 			return call_user_func_array([$this, $method], $args);
 
 		return null;
@@ -129,7 +135,7 @@ abstract class Entity implements ArrayAccess
 
         $method = $this->getMethodName($id);
 
-		return method_exists($this, $method) || ($this->custom_fields && $this->custom_fields->has($id));
+		return $method || ($this->custom_fields && $this->custom_fields->has($id));
 	}
 
 
@@ -158,7 +164,6 @@ abstract class Entity implements ArrayAccess
      */
 	protected function loadMetafields($id, $type)
 	{
-
         if( class_exists('ACF') && !$this->custom_fields )
 	        $this->custom_fields = new ACFHelper( $id, $type );
 

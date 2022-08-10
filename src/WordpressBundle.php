@@ -40,7 +40,8 @@ class WordpressBundle extends Bundle
             $twig->addGlobal('blog', $blog);
 
             // retro-compatibility
-            $blog->setGlobals($twig);
+	        if( env('MIGRATE_FROM_V1') )
+		        $blog->setGlobals($twig);
         }
     }
 
@@ -110,7 +111,7 @@ class WordpressBundle extends Bundle
 
         $composer = $this->root_dir.'/composer.json';
 
-        // get Wordpress path
+        // get WordPress path
         if( !is_dir($this->root_dir.'/'.$this->wp_path) && file_exists($composer) ){
 
             $composer = json_decode(file_get_contents($composer), true);
@@ -123,7 +124,7 @@ class WordpressBundle extends Bundle
             }
         }
 
-        // start loading Wordpress core without theme support
+        // start loading WordPress core without theme support
         $wp_load_script = $this->root_dir.'/'.$this->wp_path.'wp-load.php';
 
         if( !file_exists($wp_load_script) )

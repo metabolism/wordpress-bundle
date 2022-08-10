@@ -98,7 +98,7 @@ Using Wordpress Bundle :
 * Static site export command
 
 Using [WP Steroids](https://github.com/wearemetabolism/wp-steroids) Wordpress plugin :
-* Wordpress YML configuration ( [view sample](samples/config/packages/wordpress.yml) )
+* Wordpress YML configuration ( [view sample](samples/config/packages/wordpress.yaml) )
 * Permalink configuration for custom post type and taxonomy
 * Maintenance mode
 * Backup download in dev mode

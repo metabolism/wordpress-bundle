@@ -10,7 +10,7 @@ class ConfigLoader{
 
     public static $loaded=false;
 
-    public static function import($root_dir, $yaml_filepath='/config/packages/wordpress.yml')
+    public static function import($root_dir, $yaml_filepath='/config/packages/wordpress.yaml')
     {
         if( self::$loaded )
             return;
