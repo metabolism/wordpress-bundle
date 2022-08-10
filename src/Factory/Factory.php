@@ -18,9 +18,8 @@ class Factory {
 		$str = trim($str);
 		// uppercase the first character of each word
 		$str = ucwords($str);
-		$str = str_replace(" ", "", $str);
 
-		return $str;
+		return str_replace(" ", "", $str);
 	}
 
 

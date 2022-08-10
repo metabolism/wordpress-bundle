@@ -13,10 +13,9 @@ class Menu extends Entity
 	public $entity = 'menu';
 
 	/** @var MenuItem[] $items */
-	public $items;
-    public $slug;
-	public $title;
-
+	protected $items;
+	protected $slug;
+	protected $title;
     protected $itemClass;
     protected $menu;
 
@@ -54,6 +53,48 @@ class Menu extends Entity
         }
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getSlug(): string
+	{
+		return $this->slug;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTitle(): string
+	{
+		return $this->title;
+	}
+
+	/**
+	 * @return false|MenuItem[]
+	 */
+	public function getItems(){
+
+		if( is_null($this->items) ){
+
+			$menu_items = wp_get_nav_menu_items($this->ID);
+
+			if ( !$menu_items ){
+
+				$this->items = false;
+				return $this->items;
+			}
+
+			_wp_menu_item_classes_by_context($menu_items);
+
+			foreach ($menu_items as $item)
+				$this->items[] = new $this->itemClass($item);
+
+			$this->items = $this->addDepth();
+		}
+
+		return $this->items;
+	}
+
 
 	/**
 	 * @param $menu_id
@@ -61,21 +102,6 @@ class Menu extends Entity
 	 */
 	protected function get($menu_id )
 	{
-		$menu_items = wp_get_nav_menu_items($menu_id);
-
-		if ( !$menu_items )
-			return false;
-
-		_wp_menu_item_classes_by_context($menu_items);
-
-		foreach ($menu_items as $item)
-			$this->items[] = new $this->itemClass($item);
-
-		global $_config;
-
-		if( !$_config || $_config->get('menu.depth',  true) )
-			$this->items = $this->addDepth();
-
         return wp_get_nav_menu_object($menu_id);
 	}
 
@@ -90,10 +116,10 @@ class Menu extends Entity
 
 		foreach ($this->items as $item)
 		{
-			if( $item->item_parent == $parent_id )
+			if( $item->getItemParent() == $parent_id )
 			{
 				if( $children = $this->addDepth($item->ID))
-					$item->children = $children;
+					$item->setChildren($children);
 
 				$branch[] = $item;
 			}

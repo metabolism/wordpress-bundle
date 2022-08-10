@@ -4,11 +4,6 @@
 namespace Metabolism\WordpressBundle\Helper;
 
 use ArrayAccess;
-use Metabolism\WordpressBundle\Entity\Entity;
-
-use Metabolism\WordpressBundle\Factory\Factory,
-	Metabolism\WordpressBundle\Factory\PostFactory,
-	Metabolism\WordpressBundle\Factory\TermFactory;
 
 class MetaHelper implements ArrayAccess
 {

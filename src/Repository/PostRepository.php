@@ -66,13 +66,13 @@ class PostRepository
     }
 
     /**
-     * @param array $criteria
-     * @param array|null $orderBy
+     * @param array $criteria https://developer.wordpress.org/reference/classes/wp_query/#parameters
+     * @param array|string|null $orderBy
      * @param $limit
      * @param $offset
      * @return PostCollection
      */
-    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function findBy(array $criteria, $orderBy = null, $limit = null, $offset = null)
     {
         $criteria['fields'] = 'ids';
 
@@ -82,15 +82,20 @@ class PostRepository
         if( $offset )
             $criteria['offset'] = $offset;
 
-        if( $orderBy )
-            $criteria = ['orderby' => $orderBy[0], 'order' => $orderBy[1]??'DESC'];
+        if( $orderBy ){
+
+			if( is_string($orderBy) )
+				$criteria = array_merge($criteria, ['orderby' => $orderBy, 'order' => 'DESC']);
+			else
+				$criteria = array_merge($criteria, ['orderby' => (array_keys($orderBy)[0]), 'order' => (array_values($orderBy)[0])]);
+        }
 
         return new PostCollection($criteria);
     }
 
 
     /**
-     * @param array $criteria
+     * @param array $criteria https://developer.wordpress.org/reference/classes/wp_query/#parameters
      *
      * @return int
      */
@@ -105,7 +110,7 @@ class PostRepository
 
 
     /**
-     * @param array $criteria
+     * @param array $criteria https://developer.wordpress.org/reference/classes/wp_query/#parameters
      * @param array|null $orderBy
      * @return Post|null
      */
@@ -130,10 +135,10 @@ class PostRepository
     }
 
 
-    /**
-     * @param $ids
-     * @return PostCollection
-     */
+	/**
+	 * @param array $ids
+	 * @return PostCollection
+	 */
     public function findByGuid(array $ids)
     {
         $postCollection = new PostCollection();

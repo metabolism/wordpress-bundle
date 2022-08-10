@@ -21,21 +21,20 @@ class Blog extends Entity
 
 	public $entity = 'blog';
 
-    public $debug;
-    public $environment;
-    public $locale;
-    public $is_admin;
-    public $language;
-    public $is_front_page;
-    public $is_customize_preview;
-    public $is_single;
-    public $is_tax;
-    public $is_archive;
-    public $paged;
-    public $languages;
-    public $maintenance_mode;
-    public $options;
-
+    protected $debug;
+    protected $environment;
+    protected $locale;
+    protected $is_admin;
+    protected $language;
+    protected $is_front_page;
+    protected $is_customize_preview;
+    protected $is_single;
+    protected $is_tax;
+    protected $is_archive;
+    protected $paged;
+    protected $languages;
+    protected $maintenance_mode;
+    protected $options;
     protected $domain;
     protected $breadcrumb;
     protected $pagination;
@@ -66,45 +65,210 @@ class Blog extends Entity
 	 */
 	public function __construct()
 	{
-        global $wp_query;
-        $this->queried_object = $wp_query->get_queried_object();
-
         $this->ID = get_current_blog_id();
-        $this->debug = WP_DEBUG;
-        $this->environment = WP_ENV;
-        $this->paged = max(1, get_query_var('paged', 0));
-        $this->maintenance_mode = function_exists('wp_maintenance_mode') && wp_maintenance_mode();
 
-        $this->is_admin = current_user_can('manage_options');
-        $this->is_customize_preview = is_customize_preview();
-        $this->is_front_page = is_front_page();
-        $this->is_single = $this->queried_object->post_type??false;
-        $this->is_tax = $this->queried_object->taxonomy??false;
-        $this->is_archive = is_object($this->queried_object) && get_class($this->queried_object) == 'WP_Post_Type' ? $this->queried_object->name : false;
-
-        $this->languages = $this->getLanguages();
-        $this->language = get_bloginfo('language');
-        $language  = explode('-', $this->language);
-        $this->locale = count($language) ? $language[0] : 'en';
-
-        $this->loadMetafields('options', 'blog');
-
-        $this->options = new OptionsHelper();
+		$this->loadMetafields('options', 'blog');
 	}
 
-    public function getVersion(){
+	/**
+	 * @return \WP_Term|\WP_Post_Type|\WP_Post|\WP_User|null The queried object.
+	 */
+	public function getQueriedObject(){
 
+		if( is_null($this->queried_object) ){
+
+			global $wp_query;
+			$this->queried_object = $wp_query->get_queried_object();
+		}
+
+		return $this->queried_object;
+	}
+
+	/**
+	 * @return OptionsHelper
+	 */
+	public function getOptions(): OptionsHelper
+	{
+		if( is_null($this->options) )
+			$this->options = new OptionsHelper();
+
+		return $this->options;
+	}
+
+	/**
+	 * @param $key
+	 * @return array|object|string|null
+	 */
+	public function getOption($key){
+
+		$options = $this->getOptions();
+
+		return $options->getValue($key);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLanguage(): string
+	{
+		if( is_null($this->language) )
+			$this->language = get_bloginfo('language');
+
+		return $this->language;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLocale(): string
+	{
+		if( is_null($this->locale) ){
+
+			$language = explode('-', $this->getLanguage());
+			$this->locale = count($language) ? $language[0] : 'en';
+		}
+
+		return $this->locale;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isSingle(): bool
+	{
+		if( is_null($this->is_single) ){
+
+			$queried_object = $this->getQueriedObject();
+			$this->is_single = $queried_object->post_type??false;
+		}
+
+		return $this->is_single;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isTax(): bool
+	{
+		if( is_null($this->is_tax) ){
+
+			$queried_object = $this->getQueriedObject();
+			$this->is_tax = $queried_object->taxonomy??false;
+		}
+
+		return $this->is_tax;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isArchive(): bool
+	{
+		if( is_null($this->is_archive) ){
+
+			$queried_object = $this->getQueriedObject();
+			$this->is_archive = is_object($queried_object) && get_class($queried_object) == 'WP_Post_Type' ? $queried_object->name : false;
+		}
+
+		return $this->is_archive;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isFrontPage(): bool
+	{
+		if( is_null($this->is_front_page) )
+			$this->is_front_page = is_front_page();
+
+		return $this->is_front_page;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isCustomizePreview(): bool
+	{
+		if( is_null($this->is_customize_preview) )
+			$this->is_customize_preview = is_customize_preview();
+
+		return $this->is_customize_preview;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isAdmin(): bool
+	{
+		if( is_null($this->is_admin) )
+			$this->is_admin = current_user_can('manage_options');
+
+		return $this->is_admin;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getPaged(): int
+	{
+		if( is_null($this->paged) )
+			$this->paged = max(1, get_query_var('paged', 0));
+
+		return $this->paged;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getMaintenanceMode(): bool
+	{
+		if( is_null($this->maintenance_mode) )
+			$this->maintenance_mode = function_exists('wp_maintenance_mode') && wp_maintenance_mode();
+
+		return $this->maintenance_mode;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getDebug(): bool
+	{
+		if( is_null($this->debug) )
+			$this->debug = WP_DEBUG;
+
+		return $this->debug;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getEnvironment(): bool
+	{
+		if( is_null($this->environment) )
+			$this->environment = WP_ENV;
+
+		return $this->environment;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getVersion(): ?string
+	{
         if(is_null($this->version) && file_exists(BASE_URI.'/composer.json')){
 
             $composer = json_decode(file_get_contents(BASE_URI.'/composer.json'), true);
-            $this->version = $composer['version'];
+            $this->version = $composer['version']??'1.0.0';
         }
 
         return $this->version;
     }
 
-    public function getBreadcrumb(){
-
+	/**
+	 * @return array
+	 */
+	public function getBreadcrumb(): array
+    {
         if(is_null($this->breadcrumb) ){
 
             $breadcrumbServcie = new BreadcrumbService();
@@ -114,8 +278,11 @@ class Blog extends Entity
         return $this->breadcrumb;
     }
 
-    public function getPagination(){
-
+	/**
+	 * @return array
+	 */
+	public function getPagination(): array
+    {
         if(is_null($this->pagination) ){
 
             $paginationService = new PaginationService();
@@ -125,7 +292,10 @@ class Blog extends Entity
         return $this->pagination;
     }
 
-    public function getUser(){
+	/**
+	 * @return User|false
+	 */
+	public function getUser(){
 
         if( is_null($this->user) ){
 
@@ -138,7 +308,11 @@ class Blog extends Entity
         return $this->user;
     }
 
-    public function getMenu($location=false){
+	/**
+	 * @param string|null $location
+	 * @return false|Menu
+	 */
+	public function getMenu(?string $location=null){
 
         if( !$location )
             return false;
@@ -159,8 +333,11 @@ class Blog extends Entity
         return $this->getTitle();
     }
 
-    public function getTitle(){
-
+	/**
+	 * @return string
+	 */
+	public function getTitle(): string
+    {
         if(is_null($this->title) ){
 
             $wp_title = trim(@wp_title(' ', false));
@@ -170,8 +347,11 @@ class Blog extends Entity
         return $this->title;
     }
 
-    public function getBodyClass(){
-
+	/**
+	 * @return string
+	 */
+	public function getBodyClass(): string
+    {
         if(is_null($this->body_class) ){
 
             $body_class = !is_404() ? implode(' ', @get_body_class()) : '';
@@ -181,32 +361,48 @@ class Blog extends Entity
         return $this->body_class;
     }
 
-    public function getHomeUrl(){
+	/**
+	 * @param string $path
+	 * @return string
+	 */
+	public function getHomeUrl($path='/'): string
+    {
+	    if( $path != '/' )
+		    return home_url($path);
 
-        if(is_null($this->home_url) )
-            $this->home_url = home_url('/');
+	    if( is_null($this->home_url) )
+            $this->home_url = home_url();
 
         return $this->home_url;
     }
 
-    public function getSearchUrl(){
-
+	/**
+	 * @return string
+	 */
+	public function getSearchUrl(): string
+    {
         if(is_null($this->search_url) )
             $this->search_url = get_search_link();
 
         return $this->search_url;
     }
 
-    public function getPrivacyPolicyUrl(){
-
+	/**
+	 * @return string
+	 */
+	public function getPrivacyPolicyUrl(): string
+    {
         if(is_null($this->privacy_policy_url) )
             $this->privacy_policy_url = get_privacy_policy_url();
 
         return $this->privacy_policy_url;
     }
 
-    public function getPrivacyPolicyTitle(){
-
+	/**
+	 * @return string
+	 */
+	public function getPrivacyPolicyTitle(): string
+    {
         if(is_null($this->privacy_policy_title) ){
 
 	        $policy_page_id = (int) get_option( 'wp_page_for_privacy_policy' );
@@ -216,32 +412,55 @@ class Blog extends Entity
         return $this->privacy_policy_title;
     }
 
-    public function getNetworkHomeUrl(){
-
+	/**
+	 * @return string
+	 */
+	public function getNetworkHomeUrl(): string
+	{
         if(is_null($this->network_home_url) )
             $this->network_home_url = trim(network_home_url(), '/');
 
         return $this->network_home_url;
     }
 
-    public function getBloginfo($name=false){
+	/**
+	 * @param string $name
+	 * @deprecated use getInfo
+	 * @return mixed|string|null
+	 */
+	public function getBloginfo(string $name){
 
-        if(is_null($this->bloginfo) || !isset($this->bloginfo[$name]))
-            $this->bloginfo[$name] = get_bloginfo($name);
-
-        return $this->bloginfo[$name];
+        return $this->getInfo($name);
     }
 
-    public function getPostsPerPage(){
+	/**
+	 * @param string $name
+	 * @return mixed|string|null
+	 */
+	public function getInfo(string $name){
 
+		if(is_null($this->bloginfo) || !isset($this->bloginfo[$name]))
+			$this->bloginfo[$name] = get_bloginfo($name);
+
+		return $this->bloginfo[$name];
+    }
+
+	/**
+	 * @return int
+	 */
+	public function getPostsPerPage(): int
+    {
         if(is_null($this->posts_per_page) )
             $this->posts_per_page = intval(get_option( 'posts_per_page' ));
 
         return $this->posts_per_page;
     }
 
-    public function getDomain(){
-
+	/**
+	 * @return string
+	 */
+	public function getDomain(): string
+	{
         if(is_null($this->domain) )
             $this->domain = strtok(preg_replace('/https?:\/\//', '', home_url('')),':');
 
@@ -250,18 +469,21 @@ class Blog extends Entity
 
     /**
      * Get multisite multilingual data
-     * @return array|false
+     * @return array
      */
-    protected function getLanguages(){
+	public function getLanguages(): array
+    {
+	    if( !is_null($this->languages) )
+			return $this->languages;
 
-        if( !is_multisite() )
-            return false;
+	    $this->languages = [];
 
-        $languages = [];
+	    if( !is_multisite() )
+			return $this->languages;
 
-        if( defined('ICL_LANGUAGE_CODE') )
-        {
-            $languages = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc' );
+	    if( defined('ICL_LANGUAGE_CODE') )
+	    {
+		    $this->languages = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc' );
         }
         elseif( defined('MSLS_PLUGIN_VERSION') && is_multisite() )
         {
@@ -281,7 +503,7 @@ class Blog extends Entity
 
                 $alternate = $current_blog_id != $site->blog_id ? $this->getAlternativeLink($mslsOptions, $site, $locale) : false;
 
-                $languages[] = [
+	            $this->languages[] = [
                     'id' => $site->blog_id,
                     'active' => $current_blog_id==$site->blog_id,
                     'name' => format_code_lang($lang),
@@ -292,18 +514,16 @@ class Blog extends Entity
             }
         }
 
-        return $languages;
+        return $this->languages;
     }
 
-
     /**
-     * Return function echo
      * @param MslsOptions $mslsOptions
      * @param \WP_Site $site
      * @param string $locale
-     * @return string
+     * @return false|string
      */
-    protected function getAlternativeLink($mslsOptions, $site, $locale)
+    protected function getAlternativeLink(MslsOptions $mslsOptions, \WP_Site $site, string $locale)
     {
         switch_to_blog($site->blog_id);
 
@@ -321,6 +541,7 @@ class Blog extends Entity
     }
 
     /**
+     * Todo: deprecate
      * @param Environment $twig
      * @return void
      */

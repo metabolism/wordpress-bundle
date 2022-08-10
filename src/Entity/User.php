@@ -11,21 +11,20 @@ class User extends Entity
 {
 	public $entity = 'user';
 
-    public $firstname;
-    public $lastname;
-    public $description;
-    public $display_name;
-    public $email;
-	public $login;
-	public $nicename;
-	public $registered;
-	public $status;
-
+	protected $firstname;
+	protected $lastname;
+	protected $description;
+	protected $display_name;
+	protected $email;
+	protected $login;
+	protected $nicename;
+	protected $registered;
+	protected $status;
     protected $link;
     protected $avatar;
 
 	/** @var \WP_User */
-    protected $user;
+    private $user;
 
     public function __toString()
     {
@@ -76,6 +75,77 @@ class User extends Entity
 		return $user;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getFirstname(): string
+	{
+		return $this->firstname;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLastname(): string
+	{
+		return $this->lastname;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDescription(): string
+	{
+		return $this->description;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDisplayName(): string
+	{
+		return $this->display_name;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEmail(): string
+	{
+		return $this->email;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLogin(): string
+	{
+		return $this->login;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getNicename(): string
+	{
+		return $this->nicename;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getRegistered(): string
+	{
+		return $this->registered;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getStatus(): string
+	{
+		return $this->status;
+	}
 
     /**
      * Get avatar url

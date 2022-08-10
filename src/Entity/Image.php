@@ -230,6 +230,9 @@ class Image extends Entity
 		}
     }
 
+	/**
+	 * @return string|null
+	 */
 	public function getLink(){
 
         if( is_null($this->link) && $this->src )
@@ -238,6 +241,9 @@ class Image extends Entity
         return $this->link;
     }
 
+	/**
+	 * @return string
+	 */
 	public function getExtension(){
 
         if( is_null($this->extension) && $this->src )
@@ -246,6 +252,9 @@ class Image extends Entity
         return $this->extension;
     }
 
+	/**
+	 * @return float|int
+	 */
 	public function getSize(){
 
         if( is_null($this->size) && $this->src )
@@ -254,6 +263,9 @@ class Image extends Entity
         return $this->size;
     }
 
+	/**
+	 * @return array|mixed
+	 */
 	public function getFocusPoint(){
 
 		if( is_null($this->focus_point) && $this->ID ){
@@ -273,6 +285,10 @@ class Image extends Entity
 		return $this->focus_point;
 	}
 
+	/**
+	 * @param $format
+	 * @return false|int|mixed|null
+	 */
 	public function getDate($format=true){
 
 		if( is_null($this->date) && $format ){
@@ -289,6 +305,10 @@ class Image extends Entity
             return $this->post ? $this->post->post_date : filemtime($this->src);
 	}
 
+	/**
+	 * @param $format
+	 * @return false|int|mixed|null
+	 */
 	public function getModified($format=true){
 
 		if( is_null($this->modified) && $format ){
@@ -305,6 +325,10 @@ class Image extends Entity
             return $this->post ? $this->post->post_modified : filectime($this->src);
 	}
 
+	/**
+	 * @param $format
+	 * @return false|int|mixed|null
+	 */
 	public function getDateGmt($format=true){
 
 		if( is_null($this->date_gmt) && $format ){
@@ -321,6 +345,10 @@ class Image extends Entity
             return $this->post ? $this->post->post_date_gmt : filemtime($this->src);
 	}
 
+	/**
+	 * @param $format
+	 * @return false|int|mixed|null
+	 */
 	public function getModifiedGmt($format=true){
 
 		if( is_null($this->modified_gmt) && $format ){
@@ -337,6 +365,9 @@ class Image extends Entity
             return $this->post ? $this->post->post_modified_gmt : filectime($this->src);
 	}
 
+	/**
+	 * @return array|false
+	 */
 	public function getMetadata(){
 
 		if(is_null($this->metadata) && function_exists('exif_read_data'))
@@ -346,6 +377,9 @@ class Image extends Entity
 	}
 
 
+	/**
+	 * @return mixed
+	 */
 	public function getSrc(){
 
 		return $this->src;
@@ -417,9 +451,7 @@ class Image extends Entity
         else
             $url = str_replace($this->uploadDir('basedir'), $this->uploadDir('baseurl'), $file);
 
-		$url = str_replace(BASE_URI.PUBLIC_DIR, '', $url);
-
-		return $url;
+		return str_replace(BASE_URI.PUBLIC_DIR, '', $url);
 	}
 
 
@@ -680,7 +712,7 @@ class Image extends Entity
      * @param bool $sources
      * @param bool $alt
      * @param string $loading
-     * @return \Twig\Markup
+     * @return string
      */
 	public function toHTML($w, $h=0, $sources=false, $alt=false, $loading='lazy'){
 
@@ -696,7 +728,7 @@ class Image extends Entity
 			$html .= '<img src="'.$this->placeholder($w, $h).'" alt="'.$this->alt.'" loading="'.$loading.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
 			$html .='</picture>';
 
-			return new \Twig\Markup($html, 'UTF-8');
+			return $html;
 		}
 
 		$ext = function_exists('imagewebp') ? 'webp' : null;
@@ -739,7 +771,7 @@ class Image extends Entity
 
 		$html .='</picture>';
 
-		return new \Twig\Markup($html, 'UTF-8');
+		return $html;
 	}
 
 

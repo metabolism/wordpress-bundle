@@ -168,22 +168,24 @@ class WordpressTwigExtension extends AbstractExtension{
      */
     public function picture($image, $width, $height=0, $sources=[], $alt=false, $loading='lazy')
     {
-        if( is_string($image) ){
+	    if( is_string($image) ){
 
             $image = new Image($image);
         }
         elseif( is_array($image) && isset($image['url']) ){
 
-            if( !$alt && isset($image['alt']) )
+	        if( !$alt && isset($image['alt']) )
                 $alt = $image['alt'];
 
             $image = new Image($image['url']);
         }
 
-        if( !$image instanceof Image )
+	    if( !$image instanceof Image )
             $image = new Image();
 
-        return $image->toHTML($width, $height, $sources, $alt, $loading);
+        $html = $image->toHTML($width, $height, $sources, $alt, $loading);
+
+		return new \Twig\Markup($html, 'UTF-8');
     }
 
 

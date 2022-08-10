@@ -4,6 +4,7 @@ namespace Metabolism\WordpressBundle\Entity;
 
 
 use Metabolism\WordpressBundle\Factory\Factory;
+use Metabolism\WordpressBundle\Factory\PostFactory;
 
 /**
  * Class Comment
@@ -14,17 +15,16 @@ class Comment extends Entity
 {
 	public $entity = 'comment';
 
-	public $post_ID;
-	public $author;
-	public $agent;
-	public $author_email;
-	public $author_url;
-	public $author_IP;
-	public $content;
-	public $karma;
-	public $approved;
-	public $parent;
-
+	protected $post;
+	protected $author;
+	protected $agent;
+	protected $author_email;
+	protected $author_url;
+	protected $author_IP;
+	protected $content;
+	protected $karma;
+	protected $approved;
+	protected $parent;
     protected $user;
 	protected $replies;
 	protected $date;
@@ -35,7 +35,7 @@ class Comment extends Entity
 
     public function __toString()
     {
-        return $this->content;
+        return $this->content??'Invalid comment';
     }
 
 	/**
@@ -76,6 +76,80 @@ class Comment extends Entity
 		return $comment;
 	}
 
+	/**
+	 * @return Post
+	 */
+	public function getPost()
+	{
+		if( is_null($this->post) )
+			$this->post = PostFactory::create($this->comment->comment_post_ID);
+
+		return $this->post;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAuthor(): string
+	{
+		return $this->author;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAgent(): string
+	{
+		return $this->agent;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAuthorEmail(): string
+	{
+		return $this->author_email;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAuthorUrl(): string
+	{
+		return $this->author_url;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAuthorIP(): string
+	{
+		return $this->author_IP;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getContent(): string
+	{
+		return $this->content;
+	}
+
+	/**
+	 * @return int|string
+	 */
+	public function getKarma()
+	{
+		return $this->karma;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getApproved(): string
+	{
+		return $this->approved;
+	}
 
 	/**
 	 * @return User

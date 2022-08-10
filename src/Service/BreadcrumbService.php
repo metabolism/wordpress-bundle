@@ -2,6 +2,10 @@
 
 namespace Metabolism\WordpressBundle\Service;
 
+use Metabolism\WordpressBundle\Entity\Blog;
+use Metabolism\WordpressBundle\Factory\PostFactory;
+use Metabolism\WordpressBundle\Factory\TermFactory;
+
 class BreadcrumbService
 {
     /**
@@ -12,36 +16,40 @@ class BreadcrumbService
     public function build($args=[])
     {
         $breadcrumb = [];
+		$blog = Blog::getInstance();
 
         if( $args['add_home']??true )
-            $breadcrumb[] = ['title' => __('Home'), 'link' => home_url('/')];
+            $breadcrumb[] = ['title' => __('Home'), 'link' => $blog->getHomeUrl()];
 
         if( ($args['data']??false) && is_array($args['data']) )
             $breadcrumb = array_merge($breadcrumb, $args['data']);
 
+        if( !($args['data']??false) && !($args['add_home']??false) && !($args['add_current']??false) && is_array($args) )
+            $breadcrumb = array_merge($breadcrumb, $args);
+
         if( $args['add_current']??true ){
 
-            if( (is_single() || is_page()) && !is_attachment() )
+			$queried_object = $blog->getQueriedObject();
+
+            if( $blog->isSingle() )
             {
-                /** @var \WP_Post $post */
-                if( $post = get_post() ){
+                if( $post = PostFactory::create( $queried_object ) ){
 
-                    if( $post->post_parent ){
+                    if( $post->getParent() ){
 
-                        $parents_id = get_post_ancestors($post->ID);
-                        $parents_id = array_reverse($parents_id);
+	                    $parents = $post->getAncestors();
 
-                        foreach ($parents_id as $parent_id)
-                            $breadcrumb[] = ['title' => get_the_title($parent_id), 'link' => get_permalink($parent_id)];
+                        foreach ($parents as $parent)
+                            $breadcrumb[] = ['title' => $parent->getTitle(), 'link' => $parent->getLink()];
                     }
 
-                    $breadcrumb[] = ['title' => $post->post_title];
+                    $breadcrumb[] = ['title' => $post->getTitle()];
                 }
             }
-            elseif( is_archive() )
+            elseif( $blog->isTax() )
             {
-                if( $title = single_term_title('', false) )
-                    $breadcrumb[] = ['title' => $title];
+	            if( $term = TermFactory::create( $queried_object ) )
+                    $breadcrumb[] = ['title' => $term->getTitle()];
             }
         }
 

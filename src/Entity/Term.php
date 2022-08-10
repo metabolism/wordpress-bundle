@@ -3,7 +3,6 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use Metabolism\WordpressBundle\Factory\Factory;
-use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TermFactory;
 use Metabolism\WordpressBundle\Repository\PostRepository;
 
@@ -16,13 +15,13 @@ class Term extends Entity
 {
 	public $entity = 'term';
 
-    public $current;
-    public $count;
-    public $taxonomy;
-    public $slug;
-    public $title;
-    public $group;
-    public $content;
+	protected $current;
+	protected $count;
+	protected $taxonomy;
+	protected $slug;
+	protected $title;
+	protected $group;
+	protected $content;
 
     /** @var Term[] */
     protected $children;
@@ -61,13 +60,12 @@ class Term extends Entity
 		if( $term = $this->get($id) ) {
 
             $this->ID = $term->term_id;
-            $this->current = get_queried_object_id() == $this->ID;
             $this->taxonomy = $term->taxonomy;
             $this->count = $term->count;
             $this->slug = $term->slug;
             $this->title = $term->name;
             $this->group = $term->term_group;
-            $this->content = nl2br($term->description);
+            $this->content = $term->description;
 
             $this->loadMetafields($this->ID, 'term');
 		}
@@ -121,13 +119,73 @@ class Term extends Entity
         return $this->children;
 	}
 
+	/**
+	 * @return bool
+	 */
+	public function isCurrent(): bool
+	{
+		if( is_null($this->current) )
+			$this->current = get_queried_object_id() == $this->ID;
+
+		return $this->current;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getCount(): int
+	{
+		return $this->count;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTaxonomy(): string
+	{
+		return $this->taxonomy;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSlug(): string
+	{
+		return $this->slug;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTitle(): string
+	{
+		return $this->title;
+	}
+
+	/**
+	 * @return int|string
+	 */
+	public function getGroup()
+	{
+		return $this->group;
+	}
+
+	/**
+	 * @param bool $nl2br
+	 * @return string
+	 */
+	public function getContent(?bool $nl2br=true): string
+	{
+		return $nl2br?nl2br($this->content):$this->content;
+	}
+
 
 	/**
      * Get term posts
      *
-	 * @return Post[]
+	 * @return PostCollection
      */
-	protected function getPosts($orderBy=null, $limit=null, $offset=null) {
+	public function getPosts($orderBy=null, $limit=null, $offset=null) {
 
         $postRepository = new PostRepository();
 

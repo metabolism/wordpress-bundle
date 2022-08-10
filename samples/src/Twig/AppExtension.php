@@ -16,21 +16,6 @@ use Twig\Extension\AbstractExtension,
 class AppExtension extends AbstractExtension{
 
 
-	private $projectDir, $uploadDir;
-
-	/**
-	 * AppExtension constructor.
-	 * @param $defaultLocale
-	 * @param $projectDir
-	 * @param $emailSender
-	 */
-	public function __construct($defaultLocale, $projectDir, $emailSender )
-	{
-		$this->projectDir = $projectDir;
-		$this->uploadDir = wp_upload_dir();
-	}
-
-
 	/**
 	 * @return array|TwigFilter[]
 	 */
@@ -62,10 +47,6 @@ class AppExtension extends AbstractExtension{
 	public function getFunctions()
 	{
 		return [
-			new TwigFunction( 'GT', [$this,'GT'] ),
-			new TwigFunction( 'GTE', [$this,'GTE'] ),
-			new TwigFunction( 'LT', [$this,'LT'] ),
-			new TwigFunction( 'LTE', [$this,'LTE'] ),
 			new TwigFunction( 'blank', [$this,'blank'] )
 		];
 	}
@@ -103,9 +84,7 @@ class AppExtension extends AbstractExtension{
 		$content = preg_replace( '/<\/object>/Si', '</object></div>', $content );
 
 		$content = preg_replace( '/<iframe.+?src=\"(.+?)\"/Si', '<div class="embed-container"><iframe src="\1" frameborder="0" allowfullscreen>', $content );
-		$content = preg_replace( '/<\/iframe>/Si', '</iframe></div>', $content );
-
-		return $content;
+		return preg_replace( '/<\/iframe>/Si', '</iframe></div>', $content );
 	}
 
 
@@ -290,7 +269,7 @@ class AppExtension extends AbstractExtension{
 
 	/**
 	 * @param $text
-	 * @return mixed
+	 * @return string
 	 */
 	public function brToSpace($text)
 	{
@@ -351,51 +330,9 @@ class AppExtension extends AbstractExtension{
 
 		$str = preg_replace( '#&([A-za-z])(?:acute|cedil|caron|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str );
 		$str = preg_replace( '#&([A-za-z]{2})(?:lig);#', '\1', $str ); // pour les ligatures e.g. '&oelig;'
-		$str = preg_replace( '#&[^;]+;#', '', $str ); // supprime les autres caractères
 
-		return $str;
+		return preg_replace( '#&[^;]+;#', '', $str ); // supprime les autres caractères
 	}
-
-	/**
-	 * @param $reference
-	 * @param $compare
-	 * @return bool
-	 */
-	public function GT($reference, $compare)
-	{
-		return floatval($reference) > floatval($compare);
-	}
-
-	/**
-	 * @param $reference
-	 * @param $compare
-	 * @return bool
-	 */
-	public function GTE($reference, $compare)
-	{
-		return floatval($reference) >= floatval($compare);
-	}
-
-	/**
-	 * @param $reference
-	 * @param $compare
-	 * @return bool
-	 */
-	public function LT($reference, $compare)
-	{
-		return floatval($reference) < floatval($compare);
-	}
-
-	/**
-	 * @param $reference
-	 * @param $compare
-	 * @return bool
-	 */
-	public function LTE($reference, $compare)
-	{
-		return floatval($reference) <= floatval($compare);
-	}
-
 
 	/**
 	 * @param $map_field

@@ -16,16 +16,16 @@ class Post extends Entity
 {
 	public $entity = 'post';
 
-    public $comment_status;
-    public $comment_count;
-    public $menu_order;
-    public $password;
-    public $slug;
-	public $status;
-    public $title;
-	public $type;
-	public $public;
+	protected $comment_status;
+	protected $comment_count;
+	protected $menu_order;
+	protected $password;
 
+	protected $slug;
+	protected $status;
+	protected $type;
+	protected $title;
+	protected $public;
 	/** @var Image|bool */
 	protected $thumbnail;
 	/** @var Post[] */
@@ -78,9 +78,8 @@ class Post extends Entity
 			$this->password = $post->post_password;
 			$this->slug = $post->post_name;
 			$this->status = $post->post_status;
-			$this->title = $post->post_title;
 			$this->type = $post->post_type;
-			$this->public = is_post_type_viewable($post->post_type);
+			$this->title = $post->post_title;
 
 			$this->loadMetafields($this->ID, 'post');
         }
@@ -102,6 +101,80 @@ class Post extends Entity
 		}
 
 		return $post;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCommentStatus(): string
+	{
+		return $this->comment_status;
+	}
+
+	/**
+	 * @return int|string
+	 */
+	public function getCommentCount()
+	{
+		return $this->comment_count;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getMenuOrder(): int
+	{
+		return $this->menu_order;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPassword(): string
+	{
+		return $this->password;
+	}
+	/**
+	 * @return string
+	 */
+	public function getTitle(): string
+	{
+		return $this->title;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSlug(): string
+	{
+		return $this->slug;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getStatus(): string
+	{
+		return $this->status;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getType(): string
+	{
+		return $this->type;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isPublic(): bool
+	{
+		if( is_null($this->public) )
+			$this->public = is_post_type_viewable($this->type);
+
+		return $this->public;
 	}
 
 	/**
@@ -217,7 +290,7 @@ class Post extends Entity
 	 *
 	 * @return bool
 	 */
-	public function getSticky(){
+	public function isSticky(){
 
 		if( is_null($this->sticky) )
 			$this->sticky = is_sticky($this->post->ID);
@@ -232,7 +305,7 @@ class Post extends Entity
 	 */
 	public function getLink(){
 
-		if( is_null($this->link) && $this->public )
+		if( is_null($this->link) && $this->isPublic() )
 			$this->link = get_permalink( $this->post );
 
 		return $this->link;
@@ -380,7 +453,7 @@ class Post extends Entity
 	 */
 	public function hasParent() {
 
-		return $this->post->post_parent > 0;
+		return $this->post->post_parent;
 	}
 
 

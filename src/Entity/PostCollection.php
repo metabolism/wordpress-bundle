@@ -3,8 +3,6 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use ArrayIterator;
-use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
-use JetBrains\PhpStorm\Internal\TentativeType;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Service\PaginationService;
 
@@ -13,7 +11,7 @@ use Metabolism\WordpressBundle\Service\PaginationService;
  */
 class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
-	public $query=false;
+	private $query=false;
 
     protected $items=[];
     protected $count=0;
@@ -21,7 +19,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	protected $pagination;
 
 	/**
-	 * @param $query
+	 * @param array|null $query
 	 */
 	public function __construct(?array $query=null)
 	{
@@ -66,11 +64,20 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 
 	/**
-	 * @return ArrayIterator
+	 * @return ArrayIterator|Post[]
 	 */
 	public function getIterator() {
 
 		return new ArrayIterator($this->items);
+	}
+
+
+	/**
+	 * @return \WP_Query
+	 */
+	public function getQuery() {
+
+		return $this->query;
 	}
 
 

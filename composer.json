@@ -21,6 +21,7 @@
     "ext-iconv" : "*",
     "ext-json" : "*",
     "ext-pcre": "*",
+    "ext-simplexml": "*",
     "ext-fileinfo" : "*",
     "ext-session": "*",
     "oscarotero/env": "^2.1",

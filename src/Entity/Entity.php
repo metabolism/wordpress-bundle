@@ -34,9 +34,8 @@ abstract class Entity implements ArrayAccess
 
 	/**
 	 * Magic method to load properties
-	 *
 	 */
-    public function __toArray() {
+    public function __toArray(): array {
 
         $data = [];
 
@@ -54,9 +53,15 @@ abstract class Entity implements ArrayAccess
         foreach ($methods as $method){
 
             $name = $method->name;
+
             if( substr($name,0,3) == 'get'){
 
                 $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', preg_replace('/get(.*)/', '$1', $name)));
+                $data[$key] = new DataHelper($this, $name, $key);
+            }
+            elseif( substr($name,0,2) == 'is' && ctype_upper(substr($name,2,1)) ){
+
+                $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $name));
                 $data[$key] = new DataHelper($this, $name, $key);
             }
         }
@@ -64,7 +69,11 @@ abstract class Entity implements ArrayAccess
         return $data;
 	}
 
-    private function getMethodName($id) {
+	/**
+	 * @param $id
+	 * @return string
+	 */
+	private function getMethodName($id): string {
 
         return 'get'.str_replace(' ', '', ucwords(strtolower(str_replace('_', ' ', $id))));
     }
@@ -133,13 +142,22 @@ abstract class Entity implements ArrayAccess
 		return is_int( $this->ID );
 	}
 
+	/**
+	 * @return mixed
+	 */
+	public function getID(){
+
+		return $this->ID;
+	}
+
 
     /**
      * load custom fields data
      * @param $id
      * @param $type
      */
-	protected function loadMetafields($id, $type){
+	protected function loadMetafields($id, $type)
+	{
 
         if( class_exists('ACF') && !$this->custom_fields )
 	        $this->custom_fields = new ACFHelper( $id, $type );
@@ -152,25 +170,44 @@ abstract class Entity implements ArrayAccess
      * @param $date
      * @return mixed|void
      */
-    protected function formatDate($date){
-
+    protected function formatDate($date)
+    {
         if( !self::$date_format )
             self::$date_format = get_option('date_format');
 
 		$date = (string) mysql2date( self::$date_format, $date);
+
         return apply_filters('get_the_date', $date, self::$date_format);
 	}
 
-    public function offsetExists($offset){
+	/**
+	 * @param $offset
+	 * @return bool
+	 */
+	public function offsetExists($offset){
 
         return $this->__isset($offset);
     }
 
-    public function offsetGet($offset){
+	/**
+	 * @param $offset
+	 * @return mixed
+	 */
+	public function offsetGet($offset){
 
         return $this->__get($offset);
     }
 
-    public function offsetSet($offset, $value){}
-    public function offsetUnset($offset){}
+	/**
+	 * @param $offset
+	 * @param $value
+	 * @return void
+	 */
+	public function offsetSet($offset, $value){}
+
+	/**
+	 * @param $offset
+	 * @return void
+	 */
+	public function offsetUnset($offset){}
 }

@@ -4,11 +4,6 @@
 namespace Metabolism\WordpressBundle\Helper;
 
 use ArrayAccess;
-use Metabolism\WordpressBundle\Entity\Entity;
-
-use Metabolism\WordpressBundle\Factory\Factory,
-	Metabolism\WordpressBundle\Factory\PostFactory,
-	Metabolism\WordpressBundle\Factory\TermFactory;
 
 class OptionsHelper implements ArrayAccess
 {
@@ -61,7 +56,7 @@ class OptionsHelper implements ArrayAccess
 
 
 	/**
-	 * @param $id
+	 * @param $key
 	 * @return null|string|array|object
 	 */
 	public function getValue($key){

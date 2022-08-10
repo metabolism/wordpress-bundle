@@ -17,12 +17,12 @@ class UrlPlugin {
         if( WP_FOLDER && strpos($url, WP_FOLDER) === false )
         {
             $url = str_replace('/wp-login', WP_FOLDER.'/wp-login', $url);
-            $url = str_replace('/wp-admin', WP_FOLDER.'/wp-admin', $url);
-
-            return $url;
+	        return str_replace('/wp-admin', WP_FOLDER.'/wp-admin', $url);
         }
-        else
-            return $url;
+        else{
+
+	        return $url;
+        }
     }
 
 
