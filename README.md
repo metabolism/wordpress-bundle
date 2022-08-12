@@ -1,4 +1,4 @@
-# Symfony Wordpress Bundle
+# Symfony WordPress Bundle
 
 Build enterprise solutions with WordPress.
 
@@ -11,7 +11,7 @@ Build enterprise solutions with WordPress.
 
 ## How does it work ?
 
-When the Wordpress bundle is loaded, it includes the minimal amount of Wordpress Core files to allow usage of Wordpress functions and plugins
+When the WordPress bundle is loaded, it includes the minimal amount of WordPress Core files to allow usage of WordPress functions and plugins
 inside Symfony.
 
 __Example :__
@@ -45,7 +45,7 @@ public function pageAction(Post $post, PostRepository $postRepository)
 {% extends 'layout.html.twig' %}
 
 {% block body %}
-<article id="post-{{ post.ID }}" class="{{ post.class }}">
+<article id="post-{{ post.ID }}" class="entry {{ post.class }}">
 
     {% if post.thumbnail %}
         <img src="{{ post.thumbnail|resize(800, 600) }}" alt="{{ post.thumbnail.alt }}"/>
@@ -74,7 +74,7 @@ Full documentation is available on [Gitbook](https://metabolism.gitbook.io/symfo
 ## Features
 
 Using Composer :
-* Install/update Wordpress via composer
+* Install/update WordPress via composer
 * Install/update plugins via composer
 
 Using Symfony :
@@ -84,21 +84,21 @@ Using Symfony :
 * Routing
 * YML configuration
 * DotEnv
-* Enhanced Security ( Wordpress is 'hidden' )
+* Enhanced Security ( WordPress is 'hidden' )
 * Dynamic image resize
 * MVC
 
-Using Wordpress Bundle :
+Using WordPress Bundle :
 * Post/Term Repository
 * Controller argument resolver for post(s), term and user
 * Symfony Cache invalidation on update ( Varnish compatible )
-* Post/Image/Menu/Term/User/Comment/Blog entity
-* Wordpress predefined routes
+* Post/PostCollection/Image/Menu/Term/User/Comment/Blog entity
+* WordPress predefined routes
 * Site health checker url
 * Static site export command
 
-Using [WP Steroids](https://github.com/wearemetabolism/wp-steroids) Wordpress plugin :
-* Wordpress YML configuration ( [view sample](samples/config/packages/wordpress.yaml) )
+Using [WP Steroids](https://github.com/wearemetabolism/wp-steroids) WordPress plugin :
+* WordPress YML configuration ( [view sample](config/wordpress.yaml) )
 * Permalink configuration for custom post type and taxonomy
 * Maintenance mode
 * Backup download in dev mode
@@ -106,10 +106,10 @@ Using [WP Steroids](https://github.com/wearemetabolism/wp-steroids) Wordpress pl
 * Disabled automatic update
 * Enhanced Security
 * Better guid using RFC 4122 compliant UUID version 5
-* Multisite images sync ( for multisite as multilangue )
+* Multisite images sync ( for multisite as multi-langue )
 * SVG Support
 * Better Performance
-* Wordpress Bugfix
+* WordPress Bugfix
 * CSS Fix
 * Relative urls
 * Multisite post deep copy ( with multisite-language-switcher plugin )
@@ -131,11 +131,9 @@ Please read the full [bundle installation guide](https://metabolism.gitbook.io/s
 
 ### Setting up an existing Symfony project
 
-Define installation path for Wordpress core and plugins in `composer.json`
+Define installation path for WordPress core and plugins in `composer.json`
 
 ```json
-"minimum-stability": "dev",
-...
 "extra": {
     "installer-paths": {
         "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
@@ -149,7 +147,7 @@ Define installation path for Wordpress core and plugins in `composer.json`
 ### Install the bundle
 
 ```shell
-$ composer require metabolism/wordpress-bundle 2.0.x
+$ composer require metabolism/wordpress-bundle
 ```
 
 #### For applications that don't use Symfony Flex
@@ -161,7 +159,7 @@ Register the bundle
 
 return [
     // ...
-    Metabolism\WordpressBundle\WordpressBundle::class => ['all' => true],
+    Metabolism\WordPressBundle\WordPressBundle::class => ['all' => true],
 ];
 ```
 
@@ -171,7 +169,7 @@ Please read the full [bundle installation guide](https://metabolism.gitbook.io/s
 
 https://github.com/wearemetabolism/wordpress-bundle-demo
 
-This is an implementation of the Twenty Nineteen Wordpress theme for wordpress-bundle.
+This is an implementation of the Twenty Nineteen WordPress theme for wordpress-bundle.
 
 [![Screenshot from 2021-05-03 10-08-22](https://user-images.githubusercontent.com/4919596/116854347-d8f2e180-abf7-11eb-9dec-29480cffa720.png)](https://user-images.githubusercontent.com/4919596/116854347-d8f2e180-abf7-11eb-9dec-29480cffa720.png)
 
@@ -182,7 +180,7 @@ This is an implementation of the Twenty Nineteen Wordpress theme for wordpress-b
 - [Classic editor](https://wordpress.org/plugins/classic-editor) Restores the previous (« classic ») WordPress editor and the « Edit Post » screen.
 - [WP smartcrop](https://wordpress.org/plugins/wp-smartcrop) Set the 'focal point' of any image, right from the media library
 - [Multisite language switcher](https://wordpress.org/plugins/multisite-language-switcher) Add multilingual support using a WordPress multisite
-- [Wordpress seo](https://wordpress.org/plugins/wordpress-seo) The favorite WordPress SEO plugin of millions of users worldwide!
+- [WordPress seo](https://wordpress.org/plugins/wordpress-seo) The favorite WordPress SEO plugin of millions of users worldwide!
 - [Query monitor](https://wordpress.org/plugins/query-monitor) Query Monitor is the developer tools panel for WordPress
 - [Redirection](https://wordpress.org/plugins/redirection) Easily manage 301 redirections, keep track of 404 errors
 - [Contact form 7](https://wordpress.org/plugins/contact-form-7)  Manage multiple contact forms, plus you can customize the form and the mail contents
@@ -195,7 +193,7 @@ This is an implementation of the Twenty Nineteen Wordpress theme for wordpress-b
 
 ## Drawbacks
 
-Wordpress functions are available in the global namespace.
+WordPress's functions are available in the global namespace.
 
 Some plugins may not work ( ex : Woocommerce ).
 
@@ -207,7 +205,5 @@ This package is [Treeware](https://treeware.earth). If you use it in production,
     
 ## Maintainers
 
-This project is made by Metabolism ( http://www.metabolism.fr )
-
 Current maintainers:
- * Jérôme Barbato - jerome@metabolism.fr
+ * Jérôme Barbato - jerome@akhela.fr
