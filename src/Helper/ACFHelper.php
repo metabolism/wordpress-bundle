@@ -17,6 +17,7 @@ class ACFHelper implements ArrayAccess
 	private $id;
 	private $entity_id;
 	private $type;
+	private $data;
 
     public static $use_entity;
 
@@ -36,7 +37,7 @@ class ACFHelper implements ArrayAccess
 
         $this->id = $id;
 
-        if( !in_array($type, ['post', 'blog']) && $type)
+        if( !in_array($type, ['post', 'blog', 'block']) && $type)
 			$id = $type.'_'.$id;
 
 		$this->entity_id = $id;
@@ -90,11 +91,19 @@ class ACFHelper implements ArrayAccess
 	 */
 	public function has($id){
 
-        $this->getFieldObjects();
+		$this->getFieldObjects();
 
         return isset($this->objects[$id]);
 	}
 
+	/**
+	 * @param $data
+	 * @return void
+	 */
+	public function setData($data){
+
+		$this->data = $data;
+	}
 
 	/**
 	 * @deprecated
@@ -118,8 +127,11 @@ class ACFHelper implements ArrayAccess
         if( isset($field['value']) )
             return $field['value'];
 
-        $field['value'] = acf_get_value( $this->entity_id, $field );
-        $field['value'] = acf_format_value( $field['value'], $this->entity_id, $field );
+		if( $this->data )
+			acf_setup_meta($this->data, $this->id, true);
+
+		$value = acf_get_value( $this->entity_id, $field );
+		$field['value'] = acf_format_value( $value, $this->entity_id, $field );
 
         $data = $this->format([$field]);
 
@@ -179,7 +191,7 @@ class ACFHelper implements ArrayAccess
         else{
 
             $this->objects = get_field_objects($this->entity_id, $load_value, $load_value);
-            wp_cache_set( $this->entity_id, $this->objects, 'acf_helper' );
+	        wp_cache_set( $this->entity_id, $this->objects, 'acf_helper' );
         }
 	}
 
@@ -585,7 +597,7 @@ class ACFHelper implements ArrayAccess
 					break;
 
 				case 'wysiwyg':
-					$objects[$object['name']] = do_shortcode($object['value']);
+					$objects[$object['name']] = do_shortcode(wpautop($object['value']));
 					break;
 
 				case 'link':
@@ -612,7 +624,7 @@ class ACFHelper implements ArrayAccess
 
     public function offsetExists($offset)
     {
-       return $this->has($offset);
+	    return $this->has($offset);
     }
 
     public function offsetGet($offset)

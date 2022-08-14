@@ -92,13 +92,13 @@ Using WordPress Bundle :
 * Post/Term Repository
 * Controller argument resolver for post(s), term and user
 * Symfony Cache invalidation on update ( Varnish compatible )
-* Post/PostCollection/Image/Menu/Term/User/Comment/Blog entity
+* Post/PostCollection/Image/Menu/Term/User/Comment/Blog/Block entity
 * WordPress predefined routes
 * Site health checker url
 * Static site export command
 
 Using [WP Steroids](https://github.com/wearemetabolism/wp-steroids) WordPress plugin :
-* WordPress YML configuration ( [view sample](config/wordpress.yaml) )
+* WordPress configuration using yml ( [view sample](config/wordpress.yaml) )
 * Permalink configuration for custom post type and taxonomy
 * Maintenance mode
 * Backup download in dev mode

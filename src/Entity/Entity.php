@@ -167,7 +167,7 @@ abstract class Entity implements ArrayAccess
         if( class_exists('ACF') && !$this->custom_fields )
 	        $this->custom_fields = new ACFHelper( $id, $type );
 
-        if( !$this->meta )
+        if( !$this->meta && $type != 'block' )
 	        $this->meta = new MetaHelper( $id, $type );
 	}
 

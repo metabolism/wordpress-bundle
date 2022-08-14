@@ -5,7 +5,9 @@ namespace Metabolism\WordpressBundle\Entity;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TermFactory;
+use Metabolism\WordpressBundle\Helper\BlockHelper;
 use Metabolism\WordpressBundle\Repository\PostRepository;
+use function Metabolism\WordpressBundle\Helper\BlockHelper;
 
 /**
  * Class Post
@@ -21,6 +23,7 @@ class Post extends Entity
 	protected $menu_order;
 	protected $password;
 
+	protected $blocks;
 	protected $slug;
 	protected $status;
 	protected $type;
@@ -189,6 +192,19 @@ class Post extends Entity
 			$this->date = $this->formatDate($this->post->post_date);
 
 		return $format ? $this->date : $this->post->post_date;
+	}
+
+	/**
+	 * Get post blocks
+	 *
+	 * @return array[]
+	 */
+	public function getBlocks(){
+
+		if( is_null($this->blocks) )
+			$this->blocks = BlockHelper::parse($this->post->post_content);
+
+		return $this->blocks;
 	}
 
 	/**

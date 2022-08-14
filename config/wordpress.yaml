@@ -1,6 +1,6 @@
 ##########################################################################
 ##                                                                      ##
-##                Wordpress Bundle configuration file                   ##
+##                WordPress Bundle configuration file                   ##
 ##                                                                      ##
 ##    Doc : https://metabolism.gitbook.io/symfony-wordpress-bundle/     ##
 ##                                                                      ##
@@ -8,12 +8,23 @@
 
 wordpress:
 
+  #####################
+  ##    Gutenberg    ##
+  #####################
+
+  gutenberg:
+    replace_reset_styles: true
+    remove_core_block: true
+    remove_block_library: true
+    #block_editor_style: '/build/bundle.css'
+
+
   #########################
   ##    Image options    ##
   #########################
 
   image:
-    compression: 90 #on the fly compression ration
+    compression: 90 #on the fly compression ratio
     resize: #resize image on upload to save server space
       max_width: 1920
       max_height: 2160
@@ -121,6 +132,7 @@ wordpress:
     toolbars: #customize wysiwyg toolbar
       Full:
         1:
+          - formatselect
           - bold
           - italic
           - underline
@@ -156,22 +168,16 @@ wordpress:
           - wp_help
       Basic:
         1:
+          - formatselect
           - bold
           - italic
           - underline
-          - blockquote
           - strikethrough
           - superscript
-          - bullist
-          - numlist
-          - table
-          - alignleft
-          - aligncenter
-          - alignright
-          - undo
-          - redo
           - link
-          - fullscreen
+          - alignleft
+          - alignjustify
+          - pastetext
 
 
   ################
@@ -198,6 +204,21 @@ wordpress:
       before_title : '<h2 class="widget-title">'
       after_title : '</h2>'
 
+
+  ##########################
+  ##       New block      ##
+  ##########################
+
+  block:
+    title-text:
+      title: Title with text
+      description: Title with text
+      render_template: 'block/title-text.html.twig'
+      category: 'layout'
+      icon: 'editor-alignleft'
+      #preview_image: true
+
+
   ##########################
   ##    New post types    ##
   ##########################
@@ -217,11 +238,12 @@ wordpress:
       #posts_per_page: 11
       #orderby: name #https://developer.wordpress.org/reference/classes/wp_query/#order-orderby-parameters
       #order: ASC
+      show_in_rest: true
       supports:
         - title
         - excerpt
         - thumbnail
-        #- editor
+        - editor
         #- author
         #- excerpt
         #- trackbacks
@@ -385,6 +407,7 @@ wordpress:
     rest_api: false
     xmlrpc: false
     pings: false
+    disable_update: true
 
   ###################
   ##    Export    ##
@@ -403,10 +426,3 @@ wordpress:
   #search: # change search settings
   # use_metafields: false
   # posts_per_page: 12
-
-  ################
-  ##    Misc    ##
-  ################
-
-  gutenberg: false
-  disable_update: true
