@@ -53,6 +53,12 @@ public function pageAction(Post $post, PostRepository $postRepository)
 
     <div class="entry-content">
         {{ post.content|raw }}
+        
+        {# or #}
+        
+        {% for block in post.blocks %}
+            {% include 'block/'~block.name~'.html.twig' %}
+        {% endfor %}
     </div>
     
     <small>{{ post.custom_fields.mention }}</small>
