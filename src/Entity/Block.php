@@ -4,6 +4,7 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use App\Twig\AppExtension;
 use Metabolism\WordpressBundle\Helper\ACFHelper;
+use Metabolism\WordpressBundle\Repository\PostRepository;
 use Metabolism\WordpressBundle\Twig\WordpressTwigExtension;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -118,7 +119,7 @@ class Block extends Entity
 	 */
 	public function render(){
 
-		$loader = new FilesystemLoader(BASE_URI);
+		$loader = new FilesystemLoader(BASE_URI.'/templates');
 
 		$options = [];
 
@@ -135,6 +136,9 @@ class Block extends Entity
 		$template = $twig->load($this->block['render_template']);
 		$blog = Blog::getInstance();
 
-		return $template->render(['props'=>$this->getContent(), 'block'=>$this, 'blog'=>$blog, 'is_component_preview'=>true]);
+		$postRepository = new PostRepository();
+		$post = $postRepository->findQueried();
+
+		return $template->render(['props'=>$this->getContent(), 'post'=>$post, 'block'=>$this, 'blog'=>$blog, 'is_component_preview'=>true]);
 	}
 }

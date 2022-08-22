@@ -211,7 +211,7 @@ class ConfigLoader{
         if (!defined('WP_DEFAULT_THEME'))
             define('WP_DEFAULT_THEME', 'empty');
 
-        foreach (['HEADLESS', 'URL_MAPPING', 'BUILD_HOOK', 'BUILD_BADGE'] as $key){
+        foreach (['HEADLESS', 'URL_MAPPING', 'BUILD_HOOK', 'BUILD_BADGE', 'GOOGLE_MAP_API_KEY', 'GOOGLE_TRANSLATE_KEY'] as $key){
 
             if (!defined($key))
                 define($key, env($key) );

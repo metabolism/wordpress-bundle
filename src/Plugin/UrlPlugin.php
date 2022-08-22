@@ -169,6 +169,6 @@ class UrlPlugin {
         add_filter('network_site_url', [$this, 'networkSiteURL'] );
         add_filter('home_url', [$this, 'homeURL'] );
 
-        add_action('init', [$this, 'init']);
+        add_action('init', [$this, 'init'], 99);
     }
 }

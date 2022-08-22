@@ -13,9 +13,6 @@ class BlockHelper
 	/**
 	 * @param $acf_block
 	 * @return void
-	 * @throws LoaderError
-	 * @throws RuntimeError
-	 * @throws SyntaxError
 	 */
 	public static function render($acf_block){
 
