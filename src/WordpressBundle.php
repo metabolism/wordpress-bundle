@@ -30,19 +30,6 @@ class WordpressBundle extends Bundle
 
         $this->resolveServer();
         $this->loadWordpress();
-
-        //todo: use dependency injection
-        if( $this->container->has('twig') ){
-
-            $twig = $this->container->get('twig');
-
-            $blog = Blog::getInstance();
-            $twig->addGlobal('blog', $blog);
-
-            // retro-compatibility
-	        if( env('MIGRATE_FROM_V1') )
-		        $blog->setGlobals($twig);
-        }
     }
 
 

@@ -4,6 +4,7 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use App\Twig\AppExtension;
 use Metabolism\WordpressBundle\Helper\ACFHelper;
+use Metabolism\WordpressBundle\Helper\TwigHelper;
 use Metabolism\WordpressBundle\Repository\PostRepository;
 use Metabolism\WordpressBundle\Twig\WordpressTwigExtension;
 use Twig\Environment;
@@ -119,19 +120,7 @@ class Block extends Entity
 	 */
 	public function render(){
 
-		$loader = new FilesystemLoader(BASE_URI.'/templates');
-
-		$options = [];
-
-		if( WP_ENV != 'dev' && is_dir( BASE_URI.'/var/cache') )
-			$options['cache'] = BASE_URI.'/var/cache/components';
-
-		$twig = new Environment($loader, $options);
-
-		if( class_exists('App\Twig\AppExtension'))
-			$twig->addExtension(new AppExtension());
-
-		$twig->addExtension(new WordpressTwigExtension());
+		$twig = TwigHelper::getEnvironment();
 
 		$template = $twig->load($this->block['render_template']);
 		$blog = Blog::getInstance();

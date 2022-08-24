@@ -62,7 +62,7 @@ class Image extends Entity
 		else
 			$this->compression = $_config ? $_config->get('image.compression', 90) : 90;
 
-		if (isset($_REQUEST['debug']) && $_REQUEST['debug'] == 'image' && WP_ENV == 'dev') {
+		if (!$id || ($_REQUEST['debug']??false == 'image' && WP_ENV == 'dev')) {
 
 			$this->ID = 0;
 		}
@@ -698,7 +698,7 @@ class Image extends Entity
 	 * @param int $h
 	 * @return string
 	 */
-	private function placeholder($w, $h=0){
+	public function placeholder($w, $h=0){
 
 		$width = $w == 0 ? 1280 : $w;
 		$height = $h > 0 ? 'x'.$h : '';

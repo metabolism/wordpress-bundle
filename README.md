@@ -52,6 +52,7 @@ public function pageAction(Post $post, PostRepository $postRepository)
     {% endif %}
 
     <div class="entry-content">
+        
         {{ post.content|raw }}
         
         {# or #}

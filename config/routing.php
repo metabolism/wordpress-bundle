@@ -69,7 +69,7 @@ class Permastruct{
      */
     public function addRoutes(){
 
-        $this->addRoute('home', '', [], true);
+	    $this->addRoute('home', '', [], true);
 
         global $wp_post_types, $wp_taxonomies;
 

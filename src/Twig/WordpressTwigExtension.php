@@ -20,7 +20,10 @@ use Twig\Extension\AbstractExtension,
 
 class WordpressTwigExtension extends AbstractExtension{
 
-	public function getFilters()
+	/**
+	 * @return array
+	 */
+	public function getFilters(): array
 	{
 		return [
             new TwigFilter( 'handle', 'sanitize_title' ),
@@ -44,9 +47,10 @@ class WordpressTwigExtension extends AbstractExtension{
 	/**
 	 * @return array
 	 */
-	public function getFunctions()
+	public function getFunctions(): array
 	{
 		return [
+			new TwigFunction( 'placeholder', [$this, 'generatePlaceholder'] ),
 			new TwigFunction( 'pixel', [$this, 'generatePixel'] ),
 			new TwigFunction( 'fn', [$this, 'execFunction'] ),
 			new TwigFunction( 'function', [$this, 'execFunction'] ),
@@ -350,5 +354,18 @@ class WordpressTwigExtension extends AbstractExtension{
 			return new Image();
 
 		return $image;
+	}
+
+
+	/**
+	 * @param $w
+	 * @param $h
+	 * @return string
+	 */
+	public function generatePlaceholder($w, $h)
+	{
+		$image = new Image();
+
+		return $image->placeholder($w, $h);
 	}
 }

@@ -2,12 +2,12 @@
 
 namespace Metabolism\WordpressBundle\Command;
 
+use App\Kernel;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -16,20 +16,20 @@ use Symfony\Component\Filesystem\Filesystem;
 class ExportCommand  extends Command{
 
     private $export_dir;
-    private $container;
+    private $kernel;
     private $output;
     private $input;
     private $filesystem;
     private $errors;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Kernel $kernel)
     {
         parent::__construct();
 
         if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
             return;
 
-        $this->container = $container;
+        $this->kernel = $kernel;
         $this->errors = [];
         $this->filesystem = new Filesystem();
 
@@ -46,7 +46,7 @@ class ExportCommand  extends Command{
 
     public function setExportDir($folder){
 
-        $this->export_dir = $this->container->get('kernel')->getCacheDir().'/command/'.$folder;
+        $this->export_dir = $this->kernel->getCacheDir().'/command/'.$folder;
 
         if( $this->filesystem->exists($this->export_dir) )
             $this->filesystem->remove($this->export_dir);
@@ -420,7 +420,7 @@ class ExportCommand  extends Command{
         global $_config;
         $export_options = $_config->get('export', []);
 
-        $root_dir = $this->container->get('kernel')->getProjectDir();
+        $root_dir = $this->kernel->getProjectDir();
 
         if( is_array($export_options['copy']??[]) ) {
 
@@ -440,7 +440,7 @@ class ExportCommand  extends Command{
             }
         }
 
-        $export_dir = $this->container->get('kernel')->locateResource('@WordpressBundle/samples/public/export');
+        $export_dir = $this->kernel->locateResource('@WordpressBundle/samples/public/export');
 
         $this->filesystem->copy($export_dir.'/.htaccess', $this->export_dir.'/.htaccess');
         $this->output->writeln("<info>- .htaccess</info>");

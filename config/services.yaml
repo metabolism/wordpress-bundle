@@ -25,6 +25,10 @@ services:
     arguments:
       - '@service_container'
 
+  Metabolism\WordpressBundle\Twig\TwigGlobalSubscriber:
+    tags:
+      - { name: kernel.event_listener, event: kernel.request }
+
   Metabolism\WordpressBundle\:
     resource: '../src/'
     exclude:

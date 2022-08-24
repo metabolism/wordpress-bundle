@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\Repository;
 
 use Metabolism\WordpressBundle\Entity\Term;
+use Metabolism\WordpressBundle\Entity\TermCollection;
 use Metabolism\WordpressBundle\Factory\TermFactory;
 
 class TermRepository
@@ -43,7 +44,7 @@ class TermRepository
     }
 
     /**
-     * @return Term[]
+     * @return TermCollection
      */
     public function findAll(array $orderBy = null)
     {
@@ -78,13 +79,16 @@ class TermRepository
      *
      * @see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
      *
-     * @return Term[]
+     * @return TermCollection
      */
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
         $criteria['fields'] = 'ids';
 
-        $criteria['number'] = $limit?:0;
+        $criteria['number'] = max(0, $limit?:0);
+
+		if( !isset($criteria['parent']) )
+			$criteria['parent'] = 0;
 
         if( $offset )
             $criteria['offset'] = $offset;
@@ -92,13 +96,7 @@ class TermRepository
         if( $orderBy )
             $criteria = ['orderby' => $orderBy[0], 'order' => $orderBy[1]??'DESC'];
 
-        $query = new \WP_Term_Query($criteria);
-        $terms = [];
-
-        foreach ($query->terms as $term)
-            $terms[] = TermFactory::create( $term );
-
-        return array_filter($terms);
+        return new TermCollection($criteria);
     }
 
     /**

@@ -66,7 +66,7 @@ class PostRepository
 		    return $this->find($id);
 	    }
 
-        throw new \Exception('Post not found', 404);
+		throw new \Exception('Post not found', 404);
     }
 
     /**
