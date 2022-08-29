@@ -29,17 +29,12 @@ class Post extends Entity
 	protected $type;
 	protected $title;
 	protected $public;
-	/** @var Image|bool */
 	protected $thumbnail;
-	/** @var Post[] */
+	protected $ancestor;
 	protected $ancestors;
-	/** @var Post[] */
 	protected $children;
-	/** @var Post[] */
 	protected $siblings;
-	/** @var Post */
 	protected $parent;
-	/** @var User */
 	protected $author;
 	protected $template;
 	protected $content;
@@ -48,11 +43,10 @@ class Post extends Entity
 	protected $link;
 	protected $sticky;
 	protected $excerpt;
-	/** @var Post */
 	protected $next;
-	/** @var Post */
 	protected $prev;
 	protected $date;
+	protected $current;
 	protected $date_gmt;
 	protected $modified;
 	protected $modified_gmt;
@@ -112,6 +106,17 @@ class Post extends Entity
 	public function getCommentStatus(): string
 	{
 		return $this->comment_status;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isCurrent(): bool
+	{
+		if( is_null($this->current) )
+			$this->current = $this->ID == get_queried_object_id();
+
+		return $this->current;
 	}
 
 	/**
@@ -510,6 +515,28 @@ class Post extends Entity
 		}
 
 		return $this->ancestors;
+	}
+
+    /**
+     * Get post root ancestor
+     *
+     * @return false|Post
+     */
+    public function getAncestor(){
+
+		if( is_null($this->ancestor) ){
+
+			$parents_id = get_post_ancestors($this->ID);
+
+			$parents_id = array_reverse($parents_id);
+
+			if( count($parents_id) )
+				$this->ancestor = PostFactory::create($parents_id[0]);
+			else
+				$this->ancestor = false;
+		}
+
+		return $this->ancestor;
 	}
 
 

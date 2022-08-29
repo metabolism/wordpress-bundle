@@ -203,8 +203,9 @@ class WordpressTwigExtension extends AbstractExtension{
     {
         ob_start();
         call_user_func_array($function, $args);
-        $data = ob_get_contents();
-        ob_end_clean();
+
+		if( $data = ob_get_contents() )
+	        ob_end_clean();
 
         return $data;
     }

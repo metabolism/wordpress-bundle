@@ -22,9 +22,10 @@ class User extends Entity
 	protected $status;
     protected $link;
     protected $avatar;
+    protected $current;
 
 	/** @var \WP_User */
-    private $user;
+	protected $user;
 
     public function __toString()
     {
@@ -73,6 +74,17 @@ class User extends Entity
 		}
 
 		return $user;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isCurrent(): bool
+	{
+		if( is_null($this->current) )
+			$this->current = $this->ID == get_queried_object_id();
+
+		return $this->current;
 	}
 
 	/**

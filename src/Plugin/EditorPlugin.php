@@ -59,7 +59,10 @@ class EditorPlugin {
         });
 
         // When viewing admin
-        if( is_admin() )
-            add_action('admin_head', [$this, 'adminHead']);
+        if( is_admin() ){
+
+	        add_filter('update_right_now_text', function (){ return 'WordPress %1$s'; });
+	        add_action('admin_head', [$this, 'adminHead']);
+        }
     }
 }

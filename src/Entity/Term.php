@@ -22,13 +22,10 @@ class Term extends Entity
 	protected $title;
 	protected $group;
 	protected $content;
-
-    /** @var Term[] */
     protected $children;
     protected $depth;
     protected $excerpt;
     protected $link;
-    /** @var Term */
     protected $parent;
     protected $template;
     protected $thumbnail;
@@ -125,7 +122,7 @@ class Term extends Entity
 	public function isCurrent(): bool
 	{
 		if( is_null($this->current) )
-			$this->current = get_queried_object_id() == $this->ID;
+			$this->current = $this->ID == get_queried_object_id();
 
 		return $this->current;
 	}

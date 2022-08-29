@@ -31,7 +31,7 @@ class Comment extends Entity
 	protected $date_gmt;
 
 	/** @var \WP_Comment */
-	private $comment;
+	protected $comment;
 
     public function __toString()
     {

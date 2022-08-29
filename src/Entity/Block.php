@@ -24,7 +24,7 @@ class Block extends Entity
 
 	protected $name;
 
-	private $block;
+	protected $block;
 
 	/**
 	 * @param $block

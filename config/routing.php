@@ -93,11 +93,15 @@ class Permastruct{
 
                         $struct = explode('%', $struct);
 
-                        if( $slugs = $this->getSlugs($struct[1]) )
+	                    if( $slugs = $this->getSlugs($struct[1]) )
                             $requirements[$struct[1]] = implode('|', $slugs);
 
                         $struct = implode('%', $struct);
                     }
+
+	                $position = array_search( '%'.$post_type->rewrite['slug'].'%', $this->wp_rewrite->rewritecode, true );
+	                if ( false !== $position )
+		                $requirements[$post_type->rewrite['slug']] = $this->wp_rewrite->rewritereplace[ $position ];
 
 	                $struct = apply_filters('post_type_routing_struct', $struct, $post_type);
 	                $requirements = apply_filters('post_type_routing_requirements', $requirements, $struct, $post_type);
@@ -145,6 +149,10 @@ class Permastruct{
                         $struct = implode('%', $struct);
                         $struct = str_replace('%empty%/','', $struct);
                     }
+
+	                $position = array_search( '%'.$taxonomy->rewrite['slug'].'%', $this->wp_rewrite->rewritecode, true );
+	                if ( false !== $position )
+		                $requirements[$taxonomy->rewrite['slug']] = $this->wp_rewrite->rewritereplace[ $position ];
 
 	                $struct = apply_filters('taxonomy_routing_struct', $struct, $taxonomy);
 	                $requirements = apply_filters('taxonomy_routing_requirements', $requirements, $struct, $taxonomy);
