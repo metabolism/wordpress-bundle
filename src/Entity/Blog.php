@@ -89,6 +89,57 @@ class Blog extends Entity
 	}
 
 	/**
+	 * @param $criteria
+	 * @param array|null $orderBy
+	 * @param $limit
+	 * @param $offset
+	 * @return UserCollection
+	 */
+	public function getUsers($criteria, array $orderBy = null, $limit = null, $offset = null){
+
+		if( is_string($criteria) )
+			$criteria = ['role'=>$criteria];
+
+		$userRepository = new UserRepository();
+
+		return $userRepository->findBy($criteria, $orderBy, $limit, $offset);
+	}
+
+	/**
+	 * @param $criteria
+	 * @param array|null $orderBy
+	 * @param $limit
+	 * @param $offset
+	 * @return PostCollection
+	 */
+	public function getPosts($criteria, array $orderBy = null, $limit = null, $offset = null){
+
+		if( is_string($criteria) )
+			$criteria = ['post_type'=>$criteria];
+
+		$postRepository = new PostRepository();
+
+		return $postRepository->findBy($criteria, $orderBy, $limit, $offset);
+	}
+
+	/**
+	 * @param $criteria
+	 * @param array|null $orderBy
+	 * @param $limit
+	 * @param $offset
+	 * @return TermCollection
+	 */
+	public function getTerms($criteria, array $orderBy = null, $limit = null, $offset = null){
+
+		if( is_string($criteria) )
+			$criteria = ['taxonomy'=>$criteria];
+
+		$termRepository = new TermRepository();
+
+		return $termRepository->findBy($criteria, $orderBy, $limit, $offset);
+	}
+
+	/**
 	 * @return OptionsHelper
 	 */
 	public function getOptions(): OptionsHelper

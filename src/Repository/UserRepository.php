@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\Repository;
 
 use Metabolism\WordpressBundle\Entity\User;
+use Metabolism\WordpressBundle\Entity\UserCollection;
 use Metabolism\WordpressBundle\Factory\Factory;
 
 class UserRepository
@@ -60,7 +61,7 @@ class UserRepository
      * @param array|null $orderBy
      * @param $limit
      * @param $offset
-     * @return User[]
+     * @return UserCollection
      */
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
@@ -75,13 +76,7 @@ class UserRepository
         if( $orderBy )
             $criteria = ['orderby' => $orderBy[0], 'order' => $orderBy[1]??'DESC'];
 
-        $query = new \WP_User_Query($criteria);
-        $users = [];
-
-        foreach ($query->get_results() as $user)
-            $users[] = Factory::create( $user, 'user' );
-
-        return array_filter($users);
+        return new UserCollection($criteria);
     }
 
 
