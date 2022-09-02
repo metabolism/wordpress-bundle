@@ -15,7 +15,6 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	private $query=false;
 
     protected $items=[];
-    protected $count=0;
 
 	protected $pagination;
 
