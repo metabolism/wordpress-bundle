@@ -622,7 +622,13 @@ class Post extends Entity
 	 */
 	public function getTerms( $tax='category', $args=[] ) {
 
-		$args['fields'] = 'ids';
+		$return = 'fields';
+
+		if( empty($args['fields']??'') ){
+
+			$return = 'entities';
+			$args['fields'] = 'ids';
+		}
 
 		$taxonomies = array();
 
@@ -648,6 +654,7 @@ class Post extends Entity
 			if ( $taxonomy == 'categories' )
 				$taxonomy = 'category';
 
+			//todo: use TermRepository
 			$terms = wp_get_post_terms($this->ID, $taxonomy, $args);
 
 			if( is_wp_error($terms) ){
@@ -659,6 +666,9 @@ class Post extends Entity
 			}
 			else
 			{
+				if( $return != 'entities')
+					return $terms;
+
 				foreach ($terms as $term){
 
 					if( (!isset($args['hierarchical']) || $args['hierarchical']) && count($taxonomies)>1 )

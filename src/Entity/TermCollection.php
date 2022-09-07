@@ -3,9 +3,7 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use ArrayIterator;
-use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TermFactory;
-use Metabolism\WordpressBundle\Service\PaginationService;
 
 /**
  * Class Metabolism\WordpressBundle Framework
@@ -30,6 +28,14 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
         }
     }
 
+	/**
+	 * @return int[]
+	 */
+	public function getTerms(){
+
+		return $this->query->terms;
+	}
+
 
     /**
      * @param array $terms
@@ -48,7 +54,7 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 
 	/**
-	 * @return ArrayIterator|Post[]
+	 * @return ArrayIterator|Term[]
 	 */
 	public function getIterator() {
 
@@ -66,7 +72,7 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 
 	/**
-	 * Get total post count
+	 * Get total term count
 	 *
 	 * @return int
 	 */
@@ -86,7 +92,7 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 	/**
 	 * @param $offset
-	 * @return Post|null
+	 * @return Term|null
 	 */
 	public function offsetGet($offset)
 	{

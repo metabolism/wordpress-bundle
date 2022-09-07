@@ -29,6 +29,13 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
         }
     }
 
+	/**
+	 * @return int[]
+	 */
+	public function getPosts(){
+
+		return $this->query->posts;
+	}
 
     /**
      * @param array $posts

@@ -4,9 +4,6 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use ArrayIterator;
 use Metabolism\WordpressBundle\Factory\Factory;
-use Metabolism\WordpressBundle\Factory\PostFactory;
-use Metabolism\WordpressBundle\Factory\TermFactory;
-use Metabolism\WordpressBundle\Service\PaginationService;
 
 /**
  * Class Metabolism\WordpressBundle Framework
@@ -27,13 +24,20 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
         if( $query ){
 
             $this->query = new \WP_User_Query( $query );
-            $this->setUsers( $this->query->get_results());
+            $this->setUsers( $this->query->get_results() );
         }
     }
 
+	/**
+	 * @return int[]
+	 */
+	public function getUsers(){
+
+		return $this->query->get_results();
+	}
 
     /**
-     * @param array $terms
+     * @param array $users
      * @return void
      */
     public function setUsers(array $users){
@@ -49,7 +53,7 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 
 	/**
-	 * @return ArrayIterator|Post[]
+	 * @return ArrayIterator|User[]
 	 */
 	public function getIterator() {
 
@@ -67,7 +71,7 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 
 	/**
-	 * Get total post count
+	 * Get total user count
 	 *
 	 * @return int
 	 */
@@ -87,7 +91,7 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 	/**
 	 * @param $offset
-	 * @return Post|null
+	 * @return User|null
 	 */
 	public function offsetGet($offset)
 	{
