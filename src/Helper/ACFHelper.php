@@ -600,11 +600,6 @@ class ACFHelper implements ArrayAccess
 					$objects[$object['name']] = do_shortcode(wpautop($object['value']));
 					break;
 
-				case 'text':
-				case 'textarea':
-					$objects[$object['name']] = do_shortcode($object['value']);
-					break;
-
 				case 'link':
 
                     if( !isset($object['value']['url']) )
