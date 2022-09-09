@@ -205,7 +205,7 @@ class Image extends Entity
 
             $filename = BASE_URI.PUBLIC_DIR.$id;
 
-            if( !$filename || !file_exists( $filename) || is_dir( $filename ) )
+            if( !file_exists( $filename) || is_dir( $filename ) )
                 return;
 
 			$this->ID = 0;
@@ -235,8 +235,8 @@ class Image extends Entity
 	 */
 	public function getLink(){
 
-        if( is_null($this->link) && $this->src )
-            $this->link = home_url($this->file);
+        if( is_null($this->link) && $this->ID )
+            $this->link = wp_get_attachment_url($this->ID);
 
         return $this->link;
     }

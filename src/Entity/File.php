@@ -14,15 +14,15 @@ class File extends Entity
 	public static $wp_upload_dir = false;
 
 	public $file;
-	public $link;
 	public $mime_type;
-	public $extension;
 	public $title;
 	public $caption;
 	public $description;
-	public $size;
 
-    protected $alt;
+	protected $extension;
+	protected $size;
+	protected $link;
+	protected $alt;
     protected $date;
     protected $date_gmt;
     protected $modified;
@@ -33,7 +33,7 @@ class File extends Entity
 
     public function __toString()
     {
-        return $this->link??'';
+        return $this->getLink();
     }
 
     /**
@@ -97,7 +97,7 @@ class File extends Entity
         }
         else{
 
-            $filename = BASE_URI.$id;
+            $filename = BASE_URI.PUBLIC_DIR.$id;
 
             if( !file_exists( $filename) || is_dir( $filename ) )
                 return;
@@ -106,25 +106,61 @@ class File extends Entity
             $this->file = $id;
             $this->src = $filename;
             $this->post = false;
-            $this->title = str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME));
-            $this->mime_type = mime_content_type($filename);
-        }
 
-        if( $this->src ){
+	        if( isset($this->args['title']) )
+		        $this->title = $this->args['title'];
+	        else
+		        $this->title = str_replace('_', ' ', pathinfo($filename, PATHINFO_FILENAME));
 
-            $this->link = home_url($this->file);
-            $this->extension = pathinfo($this->src, PATHINFO_EXTENSION);
-            $this->size = filesize($this->src);
+			$this->mime_type = mime_content_type($filename);
         }
     }
 
+	/**
+	 * @return float|int
+	 */
+	public function getSize(){
 
+		if( is_null($this->size) && $this->src )
+			$this->size = filesize($this->src)/1024;
+
+		return $this->size;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getLink(){
+
+		if( is_null($this->link) && $this->ID )
+			$this->link = wp_get_attachment_url($this->ID);
+
+		return $this->link;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getExtension(){
+
+		if( is_null($this->extension) && $this->src )
+			$this->extension = pathinfo($this->src, PATHINFO_EXTENSION);
+
+		return $this->extension;
+	}
+
+	/**
+	 * @return mixed
+	 */
 	public function getSrc(){
 
 		return $this->src;
 	}
 
-    public function getDate(){
+	/**
+	 * @return mixed|null
+	 */
+	public function getDate(){
 
         if( is_null($this->date) ){
 
@@ -137,7 +173,10 @@ class File extends Entity
         return $this->date;
     }
 
-    public function getModified(){
+	/**
+	 * @return mixed|null
+	 */
+	public function getModified(){
 
         if( is_null($this->modified) ){
 
@@ -150,7 +189,10 @@ class File extends Entity
         return $this->modified;
     }
 
-    public function getDateGmt(){
+	/**
+	 * @return mixed|null
+	 */
+	public function getDateGmt(){
 
         if( is_null($this->date_gmt) ){
 
@@ -163,7 +205,10 @@ class File extends Entity
         return $this->date_gmt;
     }
 
-    public function getModifiedGmt(){
+	/**
+	 * @return mixed|null
+	 */
+	public function getModifiedGmt(){
 
         if( is_null($this->modified_gmt) ){
 
