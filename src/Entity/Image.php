@@ -703,7 +703,7 @@ class Image extends Entity
 		$width = $w == 0 ? 1280 : $w;
 		$height = $h > 0 ? 'x'.$h : '';
 
-		return 'https://via.placeholder.com/'.$width.$height.'.jpg';
+		return 'https://placehold.jp/'.$width.$height.'.png';
 	}
 
     /**
