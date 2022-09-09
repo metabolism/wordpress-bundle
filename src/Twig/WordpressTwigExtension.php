@@ -37,7 +37,7 @@ class WordpressTwigExtension extends AbstractExtension{
 			new TwigFilter( 'sanitize','sanitize_title' ),
 			new TwigFilter( 'base64_encode','base64_encode' ),
 			new TwigFilter( 'base64_decode','base64_decode' ),
-			new TwigFilter( 'shortcodes','do_shortcode' ),
+			new TwigFilter( 'shortcodes', [$this, 'doShortcode'] ),
 			new TwigFilter( 'wpautop','wpautop' ),
 			new TwigFilter( 'array',[$this, 'toArray'] ),
 			new TwigFilter( 'file_exists',[$this, 'fileExists'] ),
@@ -188,6 +188,19 @@ class WordpressTwigExtension extends AbstractExtension{
             $image = new Image();
 
         $html = $image->toHTML($width, $height, $sources, $alt, $loading);
+
+		return new \Twig\Markup($html, 'UTF-8');
+    }
+
+
+    /**
+     * Return html
+     *
+     * @param $text
+     */
+    public function doShortcode($text)
+    {
+        $html = do_shortcode($text);
 
 		return new \Twig\Markup($html, 'UTF-8');
     }
