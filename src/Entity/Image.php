@@ -235,8 +235,13 @@ class Image extends Entity
 	 */
 	public function getLink(){
 
-        if( is_null($this->link) && $this->ID )
+        if( is_null($this->link) ){
+
+	        if ($this->ID)
             $this->link = wp_get_attachment_url($this->ID);
+			else
+				$this->link = home_url($this->file);
+        }
 
         return $this->link;
     }
