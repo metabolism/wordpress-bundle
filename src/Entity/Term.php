@@ -182,11 +182,13 @@ class Term extends Entity
      *
 	 * @return PostCollection
      */
-	public function getPosts($orderBy=null, $limit=null, $offset=null) {
+	public function getPosts($post_type='post', $orderBy=null, $limit=null, $offset=null) {
 
         $postRepository = new PostRepository();
 
-        return $postRepository->findBy(['tax_query' => [[
+        return $postRepository->findBy([
+			'post_type'=>$post_type,
+	        'tax_query' => [[
             'taxonomy' => $this->taxonomy,
             'field' => 'slug',
             'terms' => [$this->slug],
