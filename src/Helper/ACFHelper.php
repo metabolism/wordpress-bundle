@@ -149,7 +149,7 @@ class ACFHelper implements ArrayAccess
      */
     public function setValue($id, $value, $updateField=false){
 
-        $this->objects[$id] = $value;
+        $this->objects[$id]['value'] = $value;
 
         if( $updateField )
             update_field($id, $value, $this->entity_id);
