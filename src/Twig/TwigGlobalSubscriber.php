@@ -30,7 +30,10 @@ class TwigGlobalSubscriber implements EventSubscriberInterface {
 			$blog->setGlobals($this->twig);
 	}
 
-	public static function getSubscribedEvents() {
+	/**
+	 * @return array
+	 */
+	public static function getSubscribedEvents(): array{
 
 		return [ KernelEvents::CONTROLLER =>  'injectGlobalVariables' ];
 	}
