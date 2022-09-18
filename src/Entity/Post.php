@@ -46,6 +46,7 @@ class Post extends Entity
 	protected $next;
 	protected $prev;
 	protected $current;
+	protected $state;
 
 	/** @var \WP_Post|bool */
 	protected $post;
@@ -113,6 +114,23 @@ class Post extends Entity
 			$this->current = $this->ID == get_queried_object_id();
 
 		return $this->current;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getState(): string
+	{
+		if( is_null($this->state) ){
+
+			global $wpdb;
+
+			$option = $wpdb->get_row( $wpdb->prepare( "SELECT option_name FROM $wpdb->options WHERE option_name LIKE 'page_on_%' AND option_value = %s LIMIT 1", $this->ID ) );
+
+			$this->state = str_replace('page_on_', '', $option->option_name??'');
+		}
+
+		return $this->state;
 	}
 
 	/**
