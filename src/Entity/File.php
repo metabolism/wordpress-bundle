@@ -23,10 +23,6 @@ class File extends Entity
 	protected $size;
 	protected $link;
 	protected $alt;
-    protected $date;
-    protected $date_gmt;
-    protected $modified;
-    protected $modified_gmt;
     protected $src;
 
     protected $post;
@@ -160,67 +156,51 @@ class File extends Entity
 	}
 
 	/**
+	 * @param bool|string $format
 	 * @return mixed|null
 	 */
-	public function getDate(){
+	public function getDate($format=true){
 
-        if( is_null($this->date) ){
-
-            if( $this->post )
-                $this->date = $this->formatDate($this->post->post_date);
-            else
-                $this->date = $this->formatDate(filemtime($this->src));
-        }
-
-        return $this->date;
+		if( $this->post )
+			return $this->formatDate($this->post->post_date, $format);
+		else
+			return $this->formatDate(filemtime($this->src), $format);
     }
 
 	/**
+	 * @param bool|string $format
 	 * @return mixed|null
 	 */
-	public function getModified(){
+	public function getModified($format=true){
 
-        if( is_null($this->modified) ){
-
-            if( $this->post )
-                $this->modified = $this->formatDate($this->post->post_modified);
-            else
-                $this->modified = $this->formatDate(filectime($this->src));
-        }
-
-        return $this->modified;
+		if( $this->post )
+			return $this->formatDate($this->post->post_modified, $format);
+		else
+			return $this->formatDate(filectime($this->src), $format);
     }
 
 	/**
+	 * @param bool|string $format
 	 * @return mixed|null
 	 */
-	public function getDateGmt(){
+	public function getDateGmt($format=true){
 
-        if( is_null($this->date_gmt) ){
-
-            if( $this->post )
-                $this->date_gmt = $this->formatDate($this->post->post_date_gmt);
-            else
-                $this->date_gmt = $this->formatDate(filemtime($this->src));
-        }
-
-        return $this->date_gmt;
+		if( $this->post )
+			return $this->formatDate($this->post->post_date_gmt, $format);
+		else
+			return $this->formatDate(filemtime($this->src), $format);
     }
 
 	/**
+	 * @param bool|string $format
 	 * @return mixed|null
 	 */
-	public function getModifiedGmt(){
+	public function getModifiedGmt($format=true){
 
-        if( is_null($this->modified_gmt) ){
-
-            if( $this->post )
-                $this->modified_gmt = $this->formatDate($this->post->post_modified_gmt);
-            else
-                $this->modified_gmt = $this->formatDate(filectime($this->src));
-        }
-
-        return $this->modified_gmt;
+		if( $this->post )
+			return $this->formatDate($this->post->post_modified_gmt, $format);
+		else
+			return $this->formatDate(filectime($this->src), $format);
     }
 
 

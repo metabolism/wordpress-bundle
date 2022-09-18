@@ -45,11 +45,7 @@ class Post extends Entity
 	protected $excerpt;
 	protected $next;
 	protected $prev;
-	protected $date;
 	protected $current;
-	protected $date_gmt;
-	protected $modified;
-	protected $modified_gmt;
 
 	/** @var \WP_Post|bool */
 	protected $post;
@@ -188,15 +184,12 @@ class Post extends Entity
 	/**
 	 * Get post date
 	 *
-	 * @param $format
+	 * @param string|bool $format
 	 * @return mixed|string|void
 	 */
 	public function getDate($format=true){
 
-		if( is_null($this->date) && $format )
-			$this->date = $this->formatDate($this->post->post_date);
-
-		return $format ? $this->date : $this->post->post_date;
+		return $this->formatDate($this->post->post_date, $format);
 	}
 
 	/**
@@ -215,43 +208,34 @@ class Post extends Entity
 	/**
 	 * Get post modified date
 	 *
-	 * @param $format
+	 * @param string|bool $format
 	 * @return mixed|string|void
 	 */
 	public function getModified($format=true){
 
-		if( is_null($this->modified) && $format )
-			$this->modified = $this->formatDate($this->post->post_modified);
-
-		return $format ? $this->modified : $this->post->post_modified;
+		return $this->formatDate($this->post->post_modified, $format);
 	}
 
 	/**
 	 * Get post date gmt
 	 *
-	 * @param $format
+	 * @param string|bool $format
 	 * @return mixed|string|void
 	 */
 	public function getDateGmt($format=true){
 
-		if( is_null($this->date_gmt) && $format )
-			$this->date_gmt = $this->formatDate($this->post->post_date_gmt);
-
-		return $format ? $this->date_gmt : $this->post->post_date_gmt;
+		return $this->formatDate($this->post->post_date_gmt, $format);
 	}
 
 	/**
 	 * Get post modified date gmt
 	 *
-	 * @param $format
+	 * @param string|bool $format
 	 * @return string
 	 */
 	public function getModifiedGmt($format=true){
 
-		if( is_null($this->modified_gmt) && $format )
-			$this->modified_gmt = $this->formatDate($this->post->post_modified_gmt);
-
-		return $format ? $this->modified_gmt : $this->post->post_modified_gmt;
+		return $this->formatDate($this->post->post_modified_gmt, $format);
 	}
 
 	/**

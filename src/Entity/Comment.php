@@ -162,12 +162,13 @@ class Comment extends Entity
         return $this->user;
 	}
 
+	/**
+	 * @param bool|string $format
+	 * @return mixed|null
+	 */
 	public function getDate($format=true){
 
-		if( is_null($this->date) && $format )
-			$this->date = $this->formatDate($this->comment->comment_date);
-
-		return $format ? $this->date : $this->comment->comment_date;
+		return $this->formatDate($this->comment->comment_date, $format);
 	}
 
 	public function getParent(){
@@ -178,12 +179,13 @@ class Comment extends Entity
 		return $this->parent;
 	}
 
+	/**
+	 * @param bool|string $format
+	 * @return mixed|null
+	 */
 	public function getDateGmt($format=true){
 
-		if( is_null($this->date_gmt) && $format )
-			$this->date_gmt = $this->formatDate($this->comment->comment_date_gmt);
-
-		return $format ? $this->date_gmt : $this->comment->comment_date_gmt;
+		return $this->formatDate($this->comment->comment_date_gmt, $format);
 	}
 
 	public function getReplies($args=[]){

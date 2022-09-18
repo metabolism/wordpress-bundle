@@ -189,11 +189,12 @@ class Term extends Entity
         return $postRepository->findBy([
 			'post_type'=>$post_type,
 	        'tax_query' => [[
-            'taxonomy' => $this->taxonomy,
-            'field' => 'slug',
-            'terms' => [$this->slug],
-            'operator' => 'IN'
-        ]]], $orderBy, $limit, $offset);
+		        'taxonomy' => $this->taxonomy,
+		        'field' => 'slug',
+		        'terms' => [$this->slug],
+		        'operator' => 'IN'
+	        ]]
+        ], $orderBy, $limit, $offset);
 	}
 
 

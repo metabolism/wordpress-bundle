@@ -171,16 +171,23 @@ abstract class Entity implements ArrayAccess
 	        $this->meta = new MetaHelper( $id, $type );
 	}
 
-    /**
-     * @param $date
-     * @return mixed|void
-     */
-    protected function formatDate($date)
+	/**
+	 * @param $date
+	 * @param bool|string $format
+	 * @return mixed|void
+	 */
+    protected function formatDate($date, $format=true)
     {
+		if( !$format )
+			return $date;
+
         if( !self::$date_format )
             self::$date_format = get_option('date_format');
 
-		$date = (string) mysql2date( self::$date_format, $date);
+		if( is_string($format) )
+			$date = (string) mysql2date( $format, $date);
+		else
+			$date = (string) mysql2date( self::$date_format, $date);
 
         return apply_filters('get_the_date', $date, self::$date_format);
 	}

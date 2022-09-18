@@ -65,8 +65,14 @@ class PaginationService
 
         $total = (int) $args['total'];
 
+	    $pagination = [
+			'pages'=>[],
+			'prev'=>false,
+			'next'=>false
+	    ];
+
         if ( $total < 2 )
-            return [];
+            return $pagination;
 
         $current  = (int) $args['current'];
         $end_size = (int) $args['end_size'];
@@ -78,7 +84,6 @@ class PaginationService
             $mid_size = 2;
 
         $add_args = $args['add_args'];
-        $pagination = [];
         $dots = false;
 
         if ( $current && 1 < $current ):
@@ -90,8 +95,6 @@ class PaginationService
 
             $pagination['prev'] = ['link' => esc_url(apply_filters('paginate_links', $link)), 'text' => $args['prev_text']];
         endif;
-
-        $pagination['pages'] = [];
 
         for ( $n = 1; $n <= $total; $n++ ) :
             if ( $n == $current ) :
