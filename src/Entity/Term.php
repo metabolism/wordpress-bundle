@@ -22,22 +22,22 @@ class Term extends Entity
 	protected $title;
 	protected $group;
 	protected $content;
-    protected $children;
-    protected $depth;
-    protected $excerpt;
-    protected $link;
-    protected $parent;
-    protected $template;
-    protected $thumbnail;
-    protected $ancestors;
+	protected $children;
+	protected $depth;
+	protected $excerpt;
+	protected $link;
+	protected $parent;
+	protected $template;
+	protected $thumbnail;
+	protected $ancestors;
 
-    /** @var \WP_Term|bool */
-    protected $term;
+	/** @var \WP_Term|bool */
+	protected $term;
 
-    public function __toString(){
+	public function __toString(){
 
-        return $this->title??'Invalid term';
-    }
+		return $this->title??'Invalid term';
+	}
 
 	/**
 	 * Post constructor.
@@ -46,7 +46,7 @@ class Term extends Entity
 	 */
 	public function __construct($id){
 
-        if( is_array($id) ) {
+		if( is_array($id) ) {
 
 			if( empty($id) || isset($id['invalid_taxonomy']) )
 				return;
@@ -56,28 +56,28 @@ class Term extends Entity
 
 		if( $term = $this->get($id) ) {
 
-            $this->ID = $term->term_id;
-            $this->taxonomy = $term->taxonomy;
-            $this->count = $term->count;
-            $this->slug = $term->slug;
-            $this->title = $term->name;
-            $this->group = $term->term_group;
-            $this->content = $term->description;
+			$this->ID = $term->term_id;
+			$this->taxonomy = $term->taxonomy;
+			$this->count = $term->count;
+			$this->slug = $term->slug;
+			$this->title = $term->name;
+			$this->group = $term->term_group;
+			$this->content = $term->description;
 
-            $this->loadMetafields($this->ID, 'term');
+			$this->loadMetafields($this->ID, 'term');
 		}
 	}
 
 
-    /**
-     * Has parent term
-     *
-     * @return bool
-     */
-    public function hasParent() {
+	/**
+	 * Has parent term
+	 *
+	 * @return bool
+	 */
+	public function hasParent() {
 
-        return $this->term->parent > 0;
-    }
+		return $this->term->parent > 0;
+	}
 
 
 	/**
@@ -99,21 +99,21 @@ class Term extends Entity
 
 
 	/**
-     * Get term children
-     *
+	 * Get term children
+	 *
 	 * @return Term[]
-     */
+	 */
 	protected function getChildren( ) {
 
-        if( is_null($this->children) ){
+		if( is_null($this->children) ){
 
-            $terms_id = get_term_children( $this->ID, $this->taxonomy );
+			$terms_id = get_term_children( $this->ID, $this->taxonomy );
 
-            foreach ($terms_id as $term_id)
-                $this->children[] = TermFactory::create($term_id);
-        }
+			foreach ($terms_id as $term_id)
+				$this->children[] = TermFactory::create($term_id);
+		}
 
-        return $this->children;
+		return $this->children;
 	}
 
 	/**
@@ -178,111 +178,125 @@ class Term extends Entity
 
 
 	/**
-     * Get term posts
-     *
+	 * Get term posts
+	 *
 	 * @return PostCollection
-     */
+	 */
 	public function getPosts($post_type='post', $orderBy=null, $limit=null, $offset=null) {
 
-        $postRepository = new PostRepository();
+		$postRepository = new PostRepository();
 
-        return $postRepository->findBy([
+		return $postRepository->findBy([
 			'post_type'=>$post_type,
-	        'tax_query' => [[
-		        'taxonomy' => $this->taxonomy,
-		        'field' => 'slug',
-		        'terms' => [$this->slug],
-		        'operator' => 'IN'
-	        ]]
-        ], $orderBy, $limit, $offset);
+			'tax_query' => [[
+				'taxonomy' => $this->taxonomy,
+				'field' => 'slug',
+				'terms' => [$this->slug],
+				'operator' => 'IN'
+			]]
+		], $orderBy, $limit, $offset);
 	}
 
 
-    /**
-     * Get parent term
-     *
-     * @return Term|false
-     */
-    public function getParent() {
+	/**
+	 * Get parent term
+	 *
+	 * @return Term|false
+	 */
+	public function getParent() {
 
-        if( is_null($this->parent) )
-            $this->parent = TermFactory::create($this->term->parent);
+		if( is_null($this->parent) )
+			$this->parent = TermFactory::create($this->term->parent);
 
-        return $this->parent;
-    }
+		return $this->parent;
+	}
 
-    public function getLink(){
+	public function getLink(){
 
-        if( is_null($this->link) )
-            $this->link = get_term_link( $this->term );
+		if( is_null($this->link) )
+			$this->link = get_term_link( $this->term );
 
-        return $this->link;
-    }
+		return $this->link;
+	}
 
-    public function getDepth(){
+	public function getDepth(){
 
-        if( is_null($this->depth) )
-            $this->depth = count(get_ancestors( $this->ID, $this->taxonomy ));
+		if( is_null($this->depth) )
+			$this->depth = count(get_ancestors( $this->ID, $this->taxonomy ));
 
-        return $this->depth;
-    }
+		return $this->depth;
+	}
 
-    /**
-     * Get term ancestors
-     *
-     * @param $reverse
-     * @return array|Term[]
-     */
-    public function getAncestors($reverse=true){
+	/**
+	 * Get term ancestors
+	 *
+	 * @param $reverse
+	 * @return array|Term[]
+	 */
+	public function getAncestors($reverse=true){
 
-        if( is_null($this->ancestors) ){
+		if( is_null($this->ancestors) ){
 
-            $parents_id = get_ancestors($this->ID, $this->taxonomy);
+			$parents_id = get_ancestors($this->ID, $this->taxonomy);
 
-            if( $reverse )
-                $parents_id = array_reverse($parents_id);
+			if( $reverse )
+				$parents_id = array_reverse($parents_id);
 
-            $ancestors = [];
+			$ancestors = [];
 
-            foreach ($parents_id as $term_id)
-                $ancestors[] = TermFactory::create($term_id);
+			foreach ($parents_id as $term_id)
+				$ancestors[] = TermFactory::create($term_id);
 
-            $this->ancestors = $ancestors;
-        }
+			$this->ancestors = $ancestors;
+		}
 
-        return $this->ancestors;
-    }
+		return $this->ancestors;
+	}
 
-    public function getTemplate(){
+	public function getTemplate(){
 
-        if( is_null($this->template) )
-            $this->template =  get_term_meta($this->ID, 'template', true);
+		if( is_null($this->template) )
+			$this->template =  get_term_meta($this->ID, 'template', true);
 
-        return $this->template;
-    }
+		return $this->template;
+	}
 
-    public function getExcerpt(){
+	public function getExcerpt(){
 
-        if( is_null($this->excerpt) )
-            $this->excerpt = strip_tags(term_description($this->ID),'<b><i><strong><em><br>');
+		if( is_null($this->excerpt) )
+			$this->excerpt = strip_tags(term_description($this->ID),'<b><i><strong><em><br>');
 
-        return $this->excerpt;
-    }
+		return $this->excerpt;
+	}
 
-    public function getThumbnail(){
+	/**
+	 * @param $width
+	 * @param $height
+	 * @param $args
+	 * @return bool|Entity|mixed
+	 */
+	public function getThumbnail($width=0, $height=0, $args=[]){
 
-        //todo: move to ACFHelper Provider using action
-        if( is_null($this->thumbnail) && function_exists('get_field_object') ){
+		//todo: move to ACFHelper Provider using action
+		if( is_null($this->thumbnail) && function_exists('get_field_object') ){
 
-            $object = get_field_object('thumbnail', $this->taxonomy.'_'.$this->ID);
+			$object = get_field_object('thumbnail', $this->taxonomy.'_'.$this->ID);
 
-            if( $object && $object['value'] ){
+			if( $object && $object['value'] ){
 
-                $id = $object['return_format'] == 'array' ? $object['value']['id'] : $object['value'];
-                $this->thumbnail = Factory::create( $id, 'image');
-            }
-        }
+				$id = $object['return_format'] == 'array' ? $object['value']['id'] : $object['value'];
+				$this->thumbnail = Factory::create( $id, 'image');
+			}
+		}
 
-        return $this->thumbnail;
-    }
+		if( !func_num_args() || !$this->thumbnail ){
+
+			return $this->thumbnail;
+		}
+		else{
+
+			$args['resize'] = [$width, $height];
+			return $this->thumbnail->edit($args);
+		}
+	}
 }

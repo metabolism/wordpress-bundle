@@ -415,10 +415,7 @@ class Image extends Entity
 
 		$file = $this->process($params, $ext);
 
-        if( apply_filters('wp_make_url_relative', true) )
-            $url = str_replace($this->uploadDir('basedir'), $this->uploadDir('relative'), $file);
-        else
-            $url = str_replace($this->uploadDir('basedir'), $this->uploadDir('baseurl'), $file);
+		$url = str_replace($this->uploadDir('basedir'), $this->uploadDir('baseurl'), $file);
 
 		return str_replace(BASE_URI.PUBLIC_DIR, '', $url);
 	}

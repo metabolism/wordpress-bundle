@@ -51,10 +51,10 @@ class Post extends Entity
 	/** @var \WP_Post|bool */
 	protected $post;
 
-    public function __toString(){
+	public function __toString(){
 
-        return $this->title??'Invalid post';
-    }
+		return $this->title??'Invalid post';
+	}
 
 	/**
 	 * Post constructor.
@@ -76,7 +76,7 @@ class Post extends Entity
 			$this->title = $post->post_title;
 
 			$this->loadMetafields($this->ID, 'post');
-        }
+		}
 	}
 
 
@@ -370,9 +370,12 @@ class Post extends Entity
 	/**
 	 * Get thumbnail
 	 *
+	 * @param int $width
+	 * @param int $height
+	 * @param array $args
 	 * @return false|Image
 	 */
-	public function getThumbnail(){
+	public function getThumbnail($width=0, $height=0, $args=[]){
 
 		if( is_null($this->thumbnail) ){
 
@@ -382,7 +385,15 @@ class Post extends Entity
 				$this->thumbnail = Factory::create($post_thumbnail_id, 'image');
 		}
 
-		return $this->thumbnail;
+		if( !func_num_args() || !$this->thumbnail ){
+
+			return $this->thumbnail;
+		}
+		else{
+
+			$args['resize'] = [$width, $height];
+			return $this->thumbnail->edit($args);
+		}
 	}
 
 
@@ -442,11 +453,11 @@ class Post extends Entity
 	 */
 	public function getChildren() {
 
-        if( is_null($this->children) ){
+		if( is_null($this->children) ){
 
-            $postRepository = new PostRepository();
-            $this->children = $postRepository->findBy(['post_parent'=>$this->ID, 'post_type'=>$this->type],null, -1);
-        }
+			$postRepository = new PostRepository();
+			$this->children = $postRepository->findBy(['post_parent'=>$this->ID, 'post_type'=>$this->type],null, -1);
+		}
 
 		return $this->children;
 	}
@@ -459,11 +470,11 @@ class Post extends Entity
 	 */
 	public function getSiblings() {
 
-        if( is_null($this->siblings) ){
+		if( is_null($this->siblings) ){
 
-            $postRepository = new PostRepository();
-            $this->siblings = $postRepository->findBy(['post_parent'=>$this->post->post_parent, 'post_type'=>$this->type, 'post__not_in'=>[$this->ID]], null, -1);
-        }
+			$postRepository = new PostRepository();
+			$this->siblings = $postRepository->findBy(['post_parent'=>$this->post->post_parent, 'post_type'=>$this->type, 'post__not_in'=>[$this->ID]], null, -1);
+		}
 
 		return $this->siblings;
 	}
@@ -493,13 +504,13 @@ class Post extends Entity
 		return $this->parent;
 	}
 
-    /**
-     * Get post ancestors
-     *
-     * @param $reverse
-     * @return array|Post[]
-     */
-    public function getAncestors($reverse=true){
+	/**
+	 * Get post ancestors
+	 *
+	 * @param $reverse
+	 * @return array|Post[]
+	 */
+	public function getAncestors($reverse=true){
 
 		if( is_null($this->ancestors) ){
 
@@ -519,12 +530,12 @@ class Post extends Entity
 		return $this->ancestors;
 	}
 
-    /**
-     * Get post root ancestor
-     *
-     * @return false|Post
-     */
-    public function getAncestor(){
+	/**
+	 * Get post root ancestor
+	 *
+	 * @return false|Post
+	 */
+	public function getAncestor(){
 
 		if( is_null($this->ancestor) ){
 
@@ -568,8 +579,8 @@ class Post extends Entity
 
 		foreach ($comments_id as $comment_id)
 		{
-            /** @var Comment $comment */
-            $comment = Factory::create($comment_id, 'comment');
+			/** @var Comment $comment */
+			$comment = Factory::create($comment_id, 'comment');
 			$comments[$comment_id] = $comment;
 		}
 
@@ -661,10 +672,10 @@ class Post extends Entity
 
 			if( is_wp_error($terms) ){
 
-                if( (!isset($args['hierarchical']) || $args['hierarchical']) && count($taxonomies)>1 )
-                    $term_array[$taxonomy][] = $terms->get_error_message();
-                else
-                    $term_array[] = $terms->get_error_message();
+				if( (!isset($args['hierarchical']) || $args['hierarchical']) && count($taxonomies)>1 )
+					$term_array[$taxonomy][] = $terms->get_error_message();
+				else
+					$term_array[] = $terms->get_error_message();
 			}
 			else
 			{
