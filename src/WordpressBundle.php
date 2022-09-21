@@ -3,7 +3,6 @@
 namespace Metabolism\WordpressBundle;
 
 use Env\Env;
-use Metabolism\WordpressBundle\Entity\Blog;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use function Env\env;
 

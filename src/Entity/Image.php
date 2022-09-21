@@ -120,7 +120,11 @@ class Image extends Entity
         }
 
         $tmpfile = tempnam ('/tmp', 'img-');
-        file_put_contents($tmpfile, file_get_contents($url));
+
+		if( !$data = @file_get_contents($url) )
+			return false;
+
+        file_put_contents($tmpfile, $data);
 
         $mime_type = mime_content_type($tmpfile);
 
@@ -198,6 +202,9 @@ class Image extends Entity
 
             if( substr($id,0, 7) == 'http://' || substr($id,0, 8) == 'https://' )
                 $id = $this->getRemoteImage($id, $this->args['ttl']??false);
+
+			if( !$id )
+				return;
 
             $filename = BASE_URI.PUBLIC_DIR.$id;
 

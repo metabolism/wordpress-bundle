@@ -2,16 +2,12 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
-use App\Twig\AppExtension;
 use Metabolism\WordpressBundle\Helper\ACFHelper;
 use Metabolism\WordpressBundle\Helper\TwigHelper;
 use Metabolism\WordpressBundle\Repository\PostRepository;
-use Metabolism\WordpressBundle\Twig\WordpressTwigExtension;
-use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
-use Twig\Loader\FilesystemLoader;
 
 /**
  * Class Block
@@ -114,20 +110,32 @@ class Block extends Entity
 
 	/**
 	 * @return string
-	 * @throws LoaderError
-	 * @throws RuntimeError
-	 * @throws SyntaxError
 	 */
 	public function render(){
 
 		$twig = TwigHelper::getEnvironment();
 
-		$template = $twig->load($this->block['render_template']);
+		try {
+
+			$template = $twig->load($this->block['render_template']);
+
+		} catch (\Throwable $t) {
+
+			return $t->getMessage();
+		}
+
 		$blog = Blog::getInstance();
 
 		$postRepository = new PostRepository();
-		$post = $postRepository->findQueried();
 
-		return $template->render(['props'=>$this->getContent(), 'post'=>$post, 'block'=>$this, 'blog'=>$blog, 'is_component_preview'=>true]);
+		try {
+
+			$post = $postRepository->findQueried();
+			return $template->render(['props'=>$this->getContent(), 'post'=>$post, 'block'=>$this, 'blog'=>$blog, 'is_component_preview'=>true]);
+
+		} catch (\Throwable $t) {
+
+			return $t->getMessage();
+		}
 	}
 }

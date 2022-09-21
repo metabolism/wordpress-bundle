@@ -147,7 +147,7 @@ class ACFHelper implements ArrayAccess
      * @param bool $updateField
      * @return void
      */
-    public function setValue($id, $value, $updateField=false){
+    public function setValue($id, $value, $updateField=true){
 
         $this->objects[$id]['value'] = $value;
 

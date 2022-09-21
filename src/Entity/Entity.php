@@ -17,20 +17,79 @@ use ReflectionMethod;
  */
 abstract class Entity implements ArrayAccess
 {
-	public $ID;
-	public $entity;
+	protected $ID;
+	protected $entity;
 
 	public static $date_format = false;
 
     /**
      * @var bool|ACFHelper
      */
-	public $custom_fields = false;
+	protected $custom_fields = false;
 
     /**
      * @var bool|MetaHelper
      */
-	public $meta = false;
+	protected $meta = false;
+
+	/**
+	 * @param $id
+	 * @return mixed|MetaHelper
+	 */
+	public function getMeta($id=false){
+
+		if( !$this->meta )
+			return false;
+
+		if( $id )
+			return $this->meta->getValue($id);
+		else
+			return $this->meta;
+	}
+
+	/**
+	 * @param $id
+	 * @param $value
+	 * @param bool $update
+	 * @return void
+	 */
+	public function setMeta($id, $value, $update=true){
+
+		if( $this->meta )
+			$this->meta->setValue($id, $value, $update);
+	}
+
+	/**
+	 * @return bool|ACFHelper
+	 */
+	public function getCustomFields(){
+
+		return $this->custom_fields;
+	}
+
+	/**
+	 * @param $id
+	 * @return mixed
+	 */
+	public function getCustomField($id){
+
+		if( !$this->custom_fields )
+			return false;
+
+		return $this->custom_fields->getValue($id);
+	}
+
+	/**
+	 * @param $id
+	 * @param $value
+	 * @param $update
+	 * @return void
+	 */
+	public function setCustomField($id, $value, $update=true){
+
+		if( $this->custom_fields )
+			$this->custom_fields->setValue($id, $value, $update);
+	}
 
 	/**
 	 * Magic method to load properties

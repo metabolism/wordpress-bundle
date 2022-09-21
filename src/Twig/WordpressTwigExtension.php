@@ -17,6 +17,7 @@ use Metabolism\WordpressBundle\Factory\TermFactory;
 use Twig\Extension\AbstractExtension,
 	Twig\TwigFilter,
 	Twig\TwigFunction;
+use Twig\Markup;
 
 class WordpressTwigExtension extends AbstractExtension{
 
@@ -193,11 +194,12 @@ class WordpressTwigExtension extends AbstractExtension{
     }
 
 
-    /**
-     * Return html
-     *
-     * @param $text
-     */
+	/**
+	 * Return html
+	 *
+	 * @param $text
+	 * @return Markup
+	 */
     public function doShortcode($text)
     {
         $html = do_shortcode($text);

@@ -300,8 +300,8 @@ class ContextService
 
         foreach ($raw_posts as $post){
 
-            if( isset($post->ID) )
-                $posts[$post->ID] = $post;
+            if( $post->getID() )
+                $posts[$post->getID()] = $post;
             else
                 $posts[] = $post;
         }
@@ -347,7 +347,7 @@ class ContextService
         if( isset($args['taxonomy'], $args['group']) && is_array($args['taxonomy']) && $args['group']) {
 
             foreach ($raw_terms as $term)
-                $terms[$term->taxonomy][$term->ID] = is_wp_error($term) ? false : $term;
+                $terms[$term->taxonomy][$term->getID()] = is_wp_error($term) ? false : $term;
 
             $ordered_terms =[];
 
@@ -362,7 +362,7 @@ class ContextService
         else {
 
             foreach ($raw_terms as $term)
-                $terms[$term->ID] = is_wp_error($term) ? false : $term;
+                $terms[$term->getID()] = is_wp_error($term) ? false : $term;
         }
 
         if( $callback && is_callable($callback) )

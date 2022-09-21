@@ -70,6 +70,7 @@ class Blog extends Entity
 	public function __construct()
 	{
         $this->ID = get_current_blog_id();
+		$this->options = new OptionsHelper();
 
 		$this->loadMetafields('options', 'blog');
 	}
@@ -144,9 +145,6 @@ class Blog extends Entity
 	 */
 	public function getOptions(): OptionsHelper
 	{
-		if( is_null($this->options) )
-			$this->options = new OptionsHelper();
-
 		return $this->options;
 	}
 
@@ -156,9 +154,17 @@ class Blog extends Entity
 	 */
 	public function getOption($key){
 
-		$options = $this->getOptions();
+		return $this->options->getValue($key);
+	}
 
-		return $options->getValue($key);
+	/**
+	 * @param $key
+	 * @param $value
+	 * @return array|object|string|null
+	 */
+	public function setOption($key, $value){
+
+		return $this->options->setValue($key, $value);
 	}
 
 	/**

@@ -77,7 +77,7 @@ class OptionsHelper implements ArrayAccess
 	 * @param bool $autoload
 	 * @return null|string|array|object
 	 */
-	public function setValue($key, $value, $updateField=false, $autoload=true){
+	public function setValue($key, $value, $updateField=true, $autoload=true){
 
 		if( $updateField ){
 

@@ -4,9 +4,6 @@
 namespace Metabolism\WordpressBundle\Helper;
 
 use Metabolism\WordpressBundle\Entity\Block;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 
 class BlockHelper
 {
