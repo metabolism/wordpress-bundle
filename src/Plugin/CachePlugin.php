@@ -8,10 +8,12 @@ namespace Metabolism\WordpressBundle\Plugin;
 class CachePlugin
 {
 	private $noticeMessage,  $errorMessage, $debug;
+	private $home_url;
+
 
 	/**
 	 * Purge post url from id
-     *
+	 *
 	 * @param bool $post_id
 	 * @return void
 	 */
@@ -19,16 +21,14 @@ class CachePlugin
 	{
 		if( $post_id && $update){
 
-            if( wp_is_post_revision( $post_id ) || (defined( 'DOING_AUTOSAVE' ) and DOING_AUTOSAVE) )
-                return;
+			if( wp_is_post_revision( $post_id ) || (defined( 'DOING_AUTOSAVE' ) and DOING_AUTOSAVE) )
+				return;
 
 			$post = get_post($post_id);
-			$post_type_object = get_post_type_object($post->post_type);
 
-			if( $post && $post->post_status === 'publish' && $post_type_object->publicly_queryable ){
+			if( $post && $post->post_status === 'publish' && is_post_type_viewable($post->post_type) ){
 
-				$home_url = get_home_url();
-				$url = $home_url.get_permalink($post_id);
+				$url = get_permalink($post_id);
 
 				$this->purge($url);
 			}
@@ -37,7 +37,7 @@ class CachePlugin
 
 	/**
 	 * Purge term url from id
-     *
+	 *
 	 * @param bool $term_id
 	 * @return void
 	 */
@@ -45,16 +45,14 @@ class CachePlugin
 	{
 		if( $term_id && $update ){
 
-            if( defined( 'DOING_AUTOSAVE' ) and DOING_AUTOSAVE )
-                return;
+			if( defined( 'DOING_AUTOSAVE' ) and DOING_AUTOSAVE )
+				return;
 
-            $term = get_term($term_id);
-			$taxonomy_object = get_taxonomy($term->taxonomy);
+			$term = get_term($term_id);
 
-			if( $term && $taxonomy_object->public && $taxonomy_object->publicly_queryable ){
+			if( $term && is_taxonomy_viewable($term->taxonomy) ){
 
-				$home_url = get_home_url();
-				$url = $home_url.get_term_link($term_id);
+				$url = get_term_link($term_id);
 
 				$this->purge($url);
 			}
@@ -64,29 +62,29 @@ class CachePlugin
 
 	public function message()
 	{
-        $html = '';
+		$html = '';
 
-        if( !empty($this->noticeMessage) ){
+		if( !empty($this->noticeMessage) ){
 
-            $html .= '<div id="message" class="updated fade"><p><strong>' . __('Cache') . '</strong><br />';
+			$html .= '<div id="message" class="updated fade"><p><strong>' . __('Cache') . '</strong><br />';
 
-            foreach ( $this->noticeMessage as $message )
-                $html .= $message.'<br/>';
+			foreach ( $this->noticeMessage as $message )
+				$html .= $message.'<br/>';
 
-            $html .= '</p></div>';
-        }
+			$html .= '</p></div>';
+		}
 
-        if( !empty($this->errorMessage) ){
+		if( !empty($this->errorMessage) ){
 
-            $html .= '<div id="message" class="error fade"><p><strong>' . __('Cache') . '</strong><br />';
+			$html .= '<div id="message" class="error fade"><p><strong>' . __('Cache') . '</strong><br />';
 
-            foreach ( $this->errorMessage as $message )
-                $html .= $message.'<br/>';
+			foreach ( $this->errorMessage as $message )
+				$html .= $message.'<br/>';
 
-            $html .= '</p></div>';
-        }
+			$html .= '</p></div>';
+		}
 
-        echo $html;
+		echo $html;
 	}
 
 
@@ -95,62 +93,62 @@ class CachePlugin
 	 */
 	public function reset()
 	{
-        $this->purge();
-        $this->clear();
+		$this->purge();
+		$this->clear();
 	}
 
-    /**
-     * Purge cache
-     * @param bool $url
-     * @return array
-     */
-    public static function purgeUrl($url=false){
+	/**
+	 * Purge cache
+	 * @param bool $url
+	 * @return array
+	 */
+	public static function purgeUrl($url=false){
 
-        if( !$url )
-            $url = get_home_url(null, '.*');
+		if( !$url )
+			$url = get_home_url(null, '.*');
 
-        $varnish_ssl = $_SERVER['VARNISH_SSL'] ?? false;
-        $result = [];
+		$varnish_ssl = $_SERVER['VARNISH_SSL'] ?? false;
+		$result = [];
 
-        $args = [
-            'method' => 'PURGE',
-            'headers' => [
-                'host' => $_SERVER['HTTP_HOST'],
-                'X-VC-Purge-Method' => 'regex',
-                'X-VC-Purge-Host' => $_SERVER['HTTP_HOST']
-            ],
-            'sslverify' => false
-        ];
+		$args = [
+			'method' => 'PURGE',
+			'headers' => [
+				'host' => $_SERVER['HTTP_HOST'],
+				'X-VC-Purge-Method' => 'regex',
+				'X-VC-Purge-Host' => $_SERVER['HTTP_HOST']
+			],
+			'sslverify' => false
+		];
 
-        if( isset($_SERVER['VARNISH_IPS']) ){
+		if( isset($_SERVER['VARNISH_IPS']) ){
 
-            $varnish_ips = explode(',',$_SERVER['VARNISH_IPS']);
-        }
-        elseif( isset($_SERVER['VARNISH_IP']) ){
+			$varnish_ips = explode(',',$_SERVER['VARNISH_IPS']);
+		}
+		elseif( isset($_SERVER['VARNISH_IP']) ){
 
-            $varnish_ips = [$_SERVER['VARNISH_IP']];
-        }
-        else{
+			$varnish_ips = [$_SERVER['VARNISH_IP']];
+		}
+		else{
 
-            $response = wp_remote_request(str_replace('.*', '*', $url), $args);
-            $result[] = ['url'=>$url, 'request'=>$response];
+			$response = wp_remote_request(str_replace('.*', '*', $url), $args);
+			$result[] = ['url'=>$url, 'request'=>$response];
 
-            return $result;
-        }
+			return $result;
+		}
 
-        foreach ($varnish_ips as $varnish_ip){
+		foreach ($varnish_ips as $varnish_ip){
 
-            $varnish_url = str_replace($_SERVER['HTTP_HOST'], $varnish_ip, $url);
+			$varnish_url = str_replace($_SERVER['HTTP_HOST'], $varnish_ip, $url);
 
-            if( !$varnish_ssl )
-                $varnish_url = str_replace('https://', 'http://', $varnish_url);
+			if( !$varnish_ssl )
+				$varnish_url = str_replace('https://', 'http://', $varnish_url);
 
-            $response = wp_remote_request($varnish_url, $args);
-            $result[] = ['url'=>$varnish_url, 'request'=>$response];
-        }
+			$response = wp_remote_request($varnish_url, $args);
+			$result[] = ['url'=>$varnish_url, 'request'=>$response];
+		}
 
-        return $result;
-    }
+		return $result;
+	}
 
 
 	/**
@@ -159,22 +157,22 @@ class CachePlugin
 	 */
 	private function purge($url=false)
 	{
-        if( $this->debug )
-            return;
+		if( $this->debug || strpos($url, $this->home_url) === false )
+			return;
 
-        $results = self::purgeUrl($url);
+		$results = self::purgeUrl($url);
 
-        foreach ($results as $result){
+		foreach ($results as $result){
 
-            if ( is_wp_error($result['request']) )
-                $this->errorMessage[] = $result['url'].' : '.$result['request']->get_error_code().' '.$result['request']->get_error_message();
-            elseif($result['request']['response']['code'] >= 300)
-                $this->errorMessage[] = $result['url'].' : '.$result['request']['response']['code'].' '.$result['request']['response']['message'];
-            else
-                $this->noticeMessage[] = $result['url'].' : '.$result['request']['response']['code'].' '.$result['request']['response']['message'];
-        }
+			if ( is_wp_error($result['request']) )
+				$this->errorMessage[] = $result['url'].' : '.$result['request']->get_error_code().' '.$result['request']->get_error_message();
+			elseif($result['request']['response']['code'] >= 300)
+				$this->errorMessage[] = $result['url'].' : '.$result['request']['response']['code'].' '.$result['request']['response']['message'];
+			else
+				$this->noticeMessage[] = $result['url'].' : '.$result['request']['response']['code'].' '.$result['request']['response']['message'];
+		}
 
-        add_action('admin_notices', [$this, 'message'], 999);
+		add_action('admin_notices', [$this, 'message'], 999);
 	}
 
 
@@ -222,43 +220,43 @@ class CachePlugin
 	}
 
 
-    /**
-     * Clear cache completely
-     */
-    public static function cacheFlush(){
+	/**
+	 * Clear cache completely
+	 */
+	public static function cacheFlush(){
 
-        wp_cache_flush();
+		wp_cache_flush();
 
-        return self::rrmdir(BASE_URI.'/var/cache', true);
-    }
+		return self::rrmdir(BASE_URI.'/var/cache', true);
+	}
 
 
-    /**
-     * Recursive rmdir
-     * @param string $dir
-     * @return bool
-     */
-    public static function rrmdir($dir, $keep=false) {
+	/**
+	 * Recursive rmdir
+	 * @param string $dir
+	 * @return bool
+	 */
+	public static function rrmdir($dir, $keep=false) {
 
-        $status = true;
+		$status = true;
 
-        if (is_dir($dir)) {
-            $objects = scandir($dir);
-            foreach ($objects as $object) {
-                if ($object != "." && $object != "..") {
-                    if (is_dir($dir."/".$object))
-                        $status = self::rrmdir($dir."/".$object) && $status;
-                    else
-                        $status = @unlink($dir."/".$object) && $status;
-                }
-            }
+		if (is_dir($dir)) {
+			$objects = scandir($dir);
+			foreach ($objects as $object) {
+				if ($object != "." && $object != "..") {
+					if (is_dir($dir."/".$object))
+						$status = self::rrmdir($dir."/".$object) && $status;
+					else
+						$status = @unlink($dir."/".$object) && $status;
+				}
+			}
 
-            if( !$keep )
-                $status = @rmdir($dir) && $status;
-        }
+			if( !$keep )
+				$status = @rmdir($dir) && $status;
+		}
 
-        return $status;
-    }
+		return $status;
+	}
 
 
 	/**
@@ -268,22 +266,19 @@ class CachePlugin
 	{
 		$env = $_SERVER['APP_ENV'] ?? 'dev';
 		$this->debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env));
+		$this->home_url = home_url();
 
 		if( !$this->debug ) {
 
-            if( isset($_GET['cache']) && $_GET['cache'] == 'purge' )
-                $this->purge();
+			if( isset($_GET['cache']) && $_GET['cache'] == 'purge' )
+				$this->purge();
 
-            if( isset($_GET['cache']) && $_GET['cache'] == 'clear' )
-                $this->clear();
+			if( isset($_GET['cache']) && $_GET['cache'] == 'clear' )
+				$this->clear();
 
-			add_action( 'init', function(){
-
-				$this->addClearCacheButton();
-
-                add_action( 'save_post', [$this, 'purgePostCache'], 10, 3);
-                add_action( 'saved_term', [$this, 'purgeTermCache'], 10, 4);
-			});
+			add_action( 'init', [$this, 'addClearCacheButton']);
+			add_action( 'save_post', [$this, 'purgePostCache'], 10, 3);
+			add_action( 'saved_term', [$this, 'purgeTermCache'], 10, 4);
 		}
 
 		add_action( 'reset_cache', [$this, 'reset']);
