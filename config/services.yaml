@@ -5,7 +5,7 @@ services:
 
   Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
 
-  Metabolism\WordpressBundle\ArgumentResolver\PostsValueResolver:
+  Metabolism\WordpressBundle\ArgumentResolver\PostCollectionValueResolver:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
 

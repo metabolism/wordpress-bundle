@@ -63,10 +63,16 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 */
 	public function getPagination($args=[]){
 
+		if( !empty($args) ){
+
+			$paginationService = new PaginationService();
+			return $paginationService->build($args, $this->query);
+		}
+
 		if( is_null($this->pagination) ){
 
 			$paginationService = new PaginationService();
-			$this->pagination = $paginationService->build($args);
+			$this->pagination = $paginationService->build($args, $this->query);
 		}
 
 		return $this->pagination;

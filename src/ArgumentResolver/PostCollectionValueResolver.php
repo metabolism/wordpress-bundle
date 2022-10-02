@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class PostsValueResolver implements ArgumentValueResolverInterface {
+class PostCollectionValueResolver implements ArgumentValueResolverInterface {
 
     private $postRepository;
 

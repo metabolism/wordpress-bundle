@@ -8,7 +8,7 @@ class PaginationService
      * Retrieve paginated link for archive post pages.
      * @param array $args
      * @param \WP_Query $query
-     * @return array
+     * @return array|false
      */
     public function build($args=[], $query=null)
     {
@@ -17,10 +17,14 @@ class PaginationService
 		if( is_null($query) )
 			$query = $wp_query;
 
+	    $total = $query->max_num_pages ?? 1;
+
+		if( $total <= 1 )
+			return false;
+
         $pagenum_link = html_entity_decode( get_pagenum_link() );
         $url_parts    = explode( '?', $pagenum_link );
 
-        $total   = $query->max_num_pages ?? 1;
         $current = get_query_var( 'paged' ) ? intval( get_query_var( 'paged' ) ) : 1;
 
         $pagenum_link = trailingslashit( $url_parts[0] ) . '%_%';

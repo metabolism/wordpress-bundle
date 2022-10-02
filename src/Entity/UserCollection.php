@@ -17,14 +17,18 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	protected $pagination;
 
 	/**
-	 * @param array|null $query
+	 * @param array|\WP_User_Query|null $query
 	 */
-	public function __construct(?array $query=null)
+	public function __construct($query=null)
 	{
         if( $query ){
 
-            $this->query = new \WP_User_Query( $query );
-            $this->setUsers( $this->query->get_results() );
+			if( $query instanceof \WP_User_Query )
+				$this->query = $query;
+			else
+				$this->query = new \WP_User_Query( $query );
+
+			$this->setUsers( $this->query->get_results() );
         }
     }
 

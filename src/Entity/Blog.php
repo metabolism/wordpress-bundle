@@ -424,12 +424,13 @@ class Blog extends Entity
 
 	/**
 	 * @param string $path
+	 * @param null $scheme
 	 * @return string
 	 */
-	public function getHomeUrl($path='/'): string
+	public function getHomeUrl($path = '', $scheme = null): string
     {
-	    if( $path != '/' )
-		    return home_url($path);
+	    if( !empty($path) )
+		    return home_url($path, $scheme);
 
 	    if( is_null($this->home_url) )
             $this->home_url = home_url();
@@ -438,12 +439,24 @@ class Blog extends Entity
     }
 
 	/**
+	 * @param string $query
 	 * @return string
 	 */
-	public function getSearchUrl(): string
+	public function getSearchUrl($query=''): string
     {
-        if(is_null($this->search_url) )
-            $this->search_url = get_search_link();
+		if( !empty($query) )
+			return get_search_link($query);
+
+        if(is_null($this->search_url) ){
+
+	        $search_url = get_search_link();
+	        $search_query = get_search_query( false );
+
+			if( !empty($search_query) )
+				$this->search_url = str_replace('/'.$search_query, '', $search_url);
+			else
+				$this->search_url = $search_url;
+        }
 
         return $this->search_url;
     }
@@ -474,10 +487,15 @@ class Blog extends Entity
     }
 
 	/**
+	 * @param string $path
+	 * @param null $scheme
 	 * @return string
 	 */
-	public function getNetworkHomeUrl(): string
+	public function getNetworkHomeUrl($path = '', $scheme = null): string
 	{
+		if( !empty($path) )
+			return network_home_url($path, $scheme);
+
         if(is_null($this->network_home_url) )
             $this->network_home_url = trim(network_home_url(), '/');
 

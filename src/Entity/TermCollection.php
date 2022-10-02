@@ -17,13 +17,17 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	protected $pagination;
 
 	/**
-	 * @param array|null $query
+	 * @param array|\WP_Term_Query|null $query
 	 */
-	public function __construct(?array $query=null)
+	public function __construct($query=null)
 	{
         if( $query ){
 
-            $this->query = new \WP_Term_Query( $query );
+			if( $query instanceof \WP_Term_Query )
+				$this->query = $query;
+			else
+				$this->query = new \WP_Term_Query( $query );
+
             $this->setTerms($this->query->terms);
         }
     }

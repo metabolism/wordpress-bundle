@@ -54,14 +54,7 @@ class PostRepository
             global $wp_query;
             return new PostCollection($wp_query);
         }
-        elseif( is_single() || is_page() ){
-
-            if( !$id = get_the_ID() )
-                throw new \Exception('Post not found', 404);
-
-            return $this->find($id);
-        }
-	    elseif( $id = get_the_ID() ){
+        elseif( $id = get_the_ID() ){
 
 		    return $this->find($id);
 	    }

@@ -48,7 +48,7 @@ class UserRepository
 
     /**
      *
-     * @return User[]
+     * @return UserCollection
      */
     public function findAll(array $orderBy = null)
     {
