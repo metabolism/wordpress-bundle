@@ -18,13 +18,17 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	protected $pagination;
 
 	/**
-	 * @param array|null $query
+	 * @param array|\WP_Query|null $query
 	 */
-	public function __construct(?array $query=null)
+	public function __construct($query=null)
 	{
         if( $query ){
 
-            $this->query = new \WP_Query( $query );
+			if( $query instanceof \WP_Query )
+				$this->query = $query;
+			else
+				$this->query = new \WP_Query( $query );
+
             $this->setPosts($this->query->posts);
         }
     }
@@ -43,7 +47,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
      */
     public function setPosts(array $posts){
 
-        $posts = array_unique(array_filter($posts));
+        $posts = array_filter($posts);
         $items = [];
 
         foreach ($posts as $post)
