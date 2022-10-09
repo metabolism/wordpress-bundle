@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\Command;
 
 use App\Kernel;
+use FilesystemIterator;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -69,7 +70,7 @@ class ExportCommand  extends Command{
 
         $output->writeln("<comment>Loading sitemaps</comment>");
 
-        if( !$this->loadUrlsFromSitemap(get_home_url() ) )
+        if( !$this->loadUrlsFromSitemap( get_home_url() ) )
             return 0;
 
         if( $compare_url = $input->getOption('compare') ){
@@ -81,8 +82,11 @@ class ExportCommand  extends Command{
         }
         else{
 
-            $output->writeln("<comment>Copying files and folders</comment>");
-            $this->copyFilesFolders();
+	        if( $input->getOption('write') ) {
+
+		        $output->writeln("<comment>Copying files and folders</comment>");
+		        $this->copyFilesFolders();
+	        }
 
             if( $input->getOption('zip') && $input->getOption('write') ){
 
@@ -143,8 +147,13 @@ class ExportCommand  extends Command{
      */
     private function mirror($origin_path, $target_path){
 
-        if( $this->input->getOption('write') )
-            $this->filesystem->mirror($origin_path, $target_path);
+        if( $this->input->getOption('write') ){
+
+			if( is_dir($origin_path) )
+				$this->filesystem->mirror($origin_path, $target_path);
+			else
+				$this->filesystem->copy($origin_path, $target_path);
+        }
     }
 
 
@@ -164,12 +173,18 @@ class ExportCommand  extends Command{
         $sitemaps = (array)$robots['Sitemap'];
 
         $urls = [];
+	    $sitemap_urls = [];
 
         foreach ($sitemaps as $sitemap_url){
 
-            if( $sitemap = $this->loadSitemap($base_url, $sitemap_url) )
-                $urls = array_merge($urls, $this->parseSitemap($base_url, $sitemap));
+            if( !in_array($sitemap_url, $sitemap_urls) && $sitemap = $this->loadSitemap($base_url, $sitemap_url) ){
+
+	            $sitemap_urls[] = $sitemap_url;
+	            $urls = array_merge($urls, $this->parseSitemap($base_url, $sitemap));
+            }
         }
+
+	    $urls = array_unique($urls);
 
         if( count($urls) )
             $this->output->writeln("<info>=> Found ".count($urls)." urls</info>");
@@ -293,6 +308,76 @@ class ExportCommand  extends Command{
         return number_format($size)." bytes";
     }
 
+	/**
+	 * Export folder, recursive
+	 *
+	 * @param $zip
+	 * @param $source
+	 * @param array $exclude
+	 * @param bool $exclude_pattern
+	 * @return bool
+	 */
+	private function dumpFolder($zip, $source, $exclude = [], $exclude_pattern=false)
+	{
+		if ( is_string( $source ) )
+			$source_arr = [$source];
+		else
+			$source_arr = $source;
+
+		foreach ( $source_arr as $source ) {
+
+			$source = str_replace( '\\', '/', realpath( $source ) );
+			$folder = "";
+
+			if ( count( $source_arr ) > 1 ) {
+
+				$folder = substr( $source, strrpos( $source, '/' ) + 1 ) . '/';
+				$zip->addEmptyDir( $folder );
+			}
+
+			if ( is_dir( $source ) === true ) {
+
+				$directory = new \RecursiveDirectoryIterator($source, FilesystemIterator::SKIP_DOTS);
+				$iterator = new \RecursiveIteratorIterator($directory, \RecursiveIteratorIterator::SELF_FIRST);
+
+				foreach ( $iterator as $file ) {
+
+					$file = str_replace( '\\', '/', $file );
+
+					if( $exclude_pattern && preg_match($exclude_pattern, $file))
+						continue;
+
+					$file = realpath( $file );
+
+					if ( is_dir( $file ) === true ) {
+
+						$zip->addEmptyDir( $folder . str_replace( $source . '/', '', $file . '/' ) );
+					}
+					else {
+
+						if ( is_file( $file ) === true ) {
+
+							$localname = $folder . str_replace( $source . '/', '', $file );
+							$zip->addFile($file, $localname);
+							$zip->setCompressionName($localname, \ZipArchive::CM_STORE);
+						}
+					}
+				}
+			}
+			else {
+
+				if ( is_file( $source ) === true ) {
+
+					$localname = $folder . basename( $source );
+					$zip->addFile($source, $localname);
+					$zip->setCompressionName($localname, \ZipArchive::CM_STORE);
+				}
+			}
+		}
+
+		return true;
+	}
+
 
     /**
      * @return bool
@@ -302,12 +387,20 @@ class ExportCommand  extends Command{
         $filename = "export.zip";
         $file_path = $this->export_dir.'/../'.$filename;
 
-        $status = wp_backup($this->export_dir, $file_path);
+	    if ( !extension_loaded( 'zip' ) )
+		    die('Zip Extension is not loaded');
 
-        if( !is_wp_error($status) )
-            $this->output->writeln("<info>Zip created (".$this->getFileSize($file_path).")</info>");
-        else
-            return $this->error($status->get_error_message());
+	    $zip = new \ZipArchive();
+
+	    if ( !$zip->open( $file_path, \ZipArchive::CREATE ) )
+		    die('Can\'t create archive file');
+
+	    $status = $this->dumpFolder($zip, $this->export_dir);
+
+        if( $status )
+	        $this->output->writeln("<info>Zip created (".$this->getFileSize($file_path).")</info>");
+		else
+			$this->filesystem->remove($file_path);
 
         return true;
     }
@@ -337,8 +430,8 @@ class ExportCommand  extends Command{
 
             $ssl = substr($this->input->getOption('domain'), 0, 5) == 'https';
 
-            $domain = strtok(preg_replace('/https?:\/\//', '', $this->input->getOption('domain')),':');
-            $current_domain = strtok(preg_replace('/https?:\/\//', '', $base_url),':');
+            $domain = preg_replace('/https?:\/\//', '', $this->input->getOption('domain'));
+            $current_domain = preg_replace('/https?:\/\//', '', $base_url);
 
             if( $ssl && !is_ssl() ) {
 
@@ -422,6 +515,11 @@ class ExportCommand  extends Command{
 
         $root_dir = $this->kernel->getProjectDir();
 
+	    $export_dir = $this->kernel->locateResource('@WordpressBundle/samples/public/export');
+
+	    $this->filesystem->copy($export_dir.'/.htaccess', $this->export_dir.'/.htaccess');
+	    $this->output->writeln("<info>- .htaccess</info>");
+
         if( is_array($export_options['copy']??[]) ) {
 
             foreach ($export_options['copy'] as $origin => $target) {
@@ -431,19 +529,15 @@ class ExportCommand  extends Command{
 
                 if ($this->filesystem->exists($origin_path)) {
 
-                    $this->mirror($origin_path, $target_path);
+					$this->mirror($origin_path, $target_path);
                     $this->output->writeln("<info>- " . $origin . " -> " . $target . "</info>");
+
                 } else {
 
                     $this->error($origin_path . " does not exists");
                 }
             }
         }
-
-        $export_dir = $this->kernel->locateResource('@WordpressBundle/samples/public/export');
-
-        $this->filesystem->copy($export_dir.'/.htaccess', $this->export_dir.'/.htaccess');
-        $this->output->writeln("<info>- .htaccess</info>");
     }
 
 
@@ -457,7 +551,7 @@ class ExportCommand  extends Command{
 
         $this->addOption('domain', null, InputOption::VALUE_OPTIONAL, 'Target domain', false);
         $this->addOption('write', null, InputOption::VALUE_OPTIONAL, 'Write file to disk, set false to use as warmup', true);
-        $this->addOption('zip', null, InputOption::VALUE_OPTIONAL, 'Create zip from export folder', true);
+        $this->addOption('zip', null, InputOption::VALUE_OPTIONAL, 'Create zip from export folder', false);
         $this->addOption('compare', null, InputOption::VALUE_OPTIONAL, 'Compare with other domain', false);
     }
 }
