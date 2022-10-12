@@ -4,6 +4,7 @@ namespace Metabolism\WordpressBundle;
 
 use Env\Env;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Routing\Router;
 use function Env\env;
 
 class WordpressBundle extends Bundle
@@ -11,6 +12,7 @@ class WordpressBundle extends Bundle
     private $root_dir;
     private $public_dir;
     private $log_dir;
+    private Router $router;
 
     private $wp_path = "public/edition/";
 
@@ -23,8 +25,12 @@ class WordpressBundle extends Bundle
     {
         Env::$options = Env::USE_ENV_ARRAY;
 
-        $this->log_dir = $this->container->get('kernel')->getLogDir();
-        $this->root_dir = $this->container->get('kernel')->getProjectDir();
+		$kernel = $this->container->get('kernel');
+
+        $this->log_dir = $kernel->getLogDir();
+        $this->root_dir = $kernel->getProjectDir();
+        $this->router = $this->container->get('router');
+
         $this->public_dir = $this->root_dir.(is_dir($this->root_dir.'/public') ? '/public' : '/web');
 
         $this->resolveServer();
@@ -34,8 +40,7 @@ class WordpressBundle extends Bundle
 
     private function resolveServer(){
 
-        if( !isset($_SERVER['REQUEST_METHOD']) )
-            $_SERVER['REQUEST_METHOD'] = 'GET';
+		$context = $this->router->getContext();
 
         if( !isset($_SERVER['HTTP_HOST']) ) {
 
@@ -49,11 +54,15 @@ class WordpressBundle extends Bundle
             }
             else{
 
-                $_SERVER['HTTP_HOST'] = '127.0.0.1:8000';
-                $_SERVER['SERVER_PORT'] = '8000';
+	            $_SERVER['SERVER_PORT'] = $context->isSecure() ? $context->getHttpsPort() : $context->getHttpPort();
+
+				if( $context->isSecure() )
+					$_SERVER['HTTP_HOST'] = $context->getHost().($context->getHttpPort()!=443?':'.$context->getHttpsPort():'');
+	            else
+		            $_SERVER['HTTP_HOST'] = $context->getHost().($context->getHttpPort()!=80?':'.$context->getHttpPort():'');
             }
         }
-    }
+	}
 
     public static function loadPlugins (){
 
@@ -87,11 +96,6 @@ class WordpressBundle extends Bundle
         if( !file_exists($this->public_dir.'/wp-config.php') )
             return;
 
-        global $request;
-
-        if( is_object($request) && get_class($request) == 'Symfony\Component\HttpFoundation\Request' )
-            $httpRequest = $request;
-
         if (!defined('WP_DEBUG_LOG'))
             define('WP_DEBUG_LOG', realpath($this->log_dir . '/wp-errors.log'));
 
@@ -118,19 +122,6 @@ class WordpressBundle extends Bundle
 
         include $wp_load_script;
 
-        global $wp;
-
-        $wp->init();
-        $wp->parse_request();
-        $wp->query_posts();
-        $wp->register_globals();
-
-        do_action_ref_array( 'wp', array( &$wp ) );
-
         remove_action( 'template_redirect', 'redirect_canonical' );
-        do_action( 'template_redirect' );
-
-        if( isset($httpRequest) )
-            $request = $httpRequest;
     }
 }

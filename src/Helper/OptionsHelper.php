@@ -95,22 +95,39 @@ class OptionsHelper implements ArrayAccess
 	}
 
 
-    public function offsetExists($offset)
+	/**
+	 * @param $offset
+	 * @return bool
+	 */
+	public function offsetExists($offset)
     {
        return $this->has($offset);
     }
 
-    public function offsetGet($offset)
+	/**
+	 * @param $offset
+	 * @return mixed
+	 */
+	public function offsetGet($offset)
     {
         return $this->getValue($offset);
     }
 
-    public function offsetSet($offset, $value)
+	/**
+	 * @param $offset
+	 * @param $value
+	 * @return void
+	 */
+	public function offsetSet($offset, $value)
     {
         $this->setValue($offset, $value);
     }
 
-    public function offsetUnset($offset)
+	/**
+	 * @param $offset
+	 * @return void
+	 */
+	public function offsetUnset($offset)
     {
         if( $this->has($offset) )
             unset($this->objects[$offset]);

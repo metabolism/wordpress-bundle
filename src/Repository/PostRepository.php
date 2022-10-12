@@ -49,7 +49,7 @@ class PostRepository
         if( is_404() )
             throw new \Exception('Post not found', 404);
 
-        if( is_archive() || is_search() || (is_home() && get_option('show_on_front') == 'posts')){
+	    if( is_archive() || is_search() || (is_home() && get_option('show_on_front') == 'posts')){
 
             global $wp_query;
             return new PostCollection($wp_query);
@@ -88,7 +88,7 @@ class PostRepository
 				$criteria = array_merge($criteria, ['orderby' => (array_keys($orderBy)[0]), 'order' => (array_values($orderBy)[0])]);
         }
 
-        return new PostCollection($criteria);
+	    return new PostCollection($criteria);
     }
 
 

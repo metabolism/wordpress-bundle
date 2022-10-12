@@ -47,6 +47,7 @@ class Post extends Entity
 	protected $prev;
 	protected $current;
 	protected $state;
+	protected $path;
 
 	/** @var \WP_Post|bool */
 	protected $post;
@@ -332,6 +333,26 @@ class Post extends Entity
 			$this->link = get_permalink( $this->post );
 
 		return $this->link;
+	}
+
+	/**
+	 * Get post link
+	 *
+	 * @return false|string
+	 */
+	public function getPath(){
+
+		if( is_null($this->path) && $this->isPublic() ){
+
+			$post_type_object = get_post_type_object($this->type);
+
+			if( $rewrite_slug = $post_type_object->rewrite['slug']??false )
+				$this->path = str_replace(get_home_url().'/'.$rewrite_slug.'/', '', $this->getLink());
+			else
+				$this->path = str_replace(get_home_url().'/', '', $this->getLink());
+		}
+
+		return $this->path;
 	}
 
 	/**

@@ -8,7 +8,9 @@ use function Env\env;
 class Permastruct{
 
     public $collection;
-    private $controller_name, $wp_rewrite, $locale;
+    private $controller_name;
+    private $wp_rewrite;
+    private $locale;
 
     /**
      * Permastruct constructor.
@@ -16,9 +18,8 @@ class Permastruct{
      * @param $collection
      * @param $locale
      * @param $controller_name
-     * @param $_config
      */
-    public function __construct($collection, $locale, $controller_name, $_config)
+    public function __construct($collection, $locale, $controller_name)
     {
         global $wp_rewrite;
 
@@ -26,20 +27,6 @@ class Permastruct{
         $this->controller_name = $controller_name;
         $this->locale = $locale;
         $this->wp_rewrite = $wp_rewrite;
-
-        if( empty($locale) ){
-
-            $this->addRoute('robots', 'robots.txt', [], false, 'Metabolism\WordpressBundle\Helper\RobotsHelper::doAction');
-
-            $this->addRoute('site-health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealthHelper::check');
-            $this->addRoute('cache-purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::purge');
-            $this->addRoute('cache-clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::clear');
-        }
-
-        $remove_rewrite_rules = $_config ? $_config->get('rewrite_rules.remove', []) : [];
-
-        if( !in_array('feed', $remove_rewrite_rules) )
-            $this->addRoute('feed', '{feed}', ['feed'=>'feed|rdf|rss|rss2|atom'], false, 'Metabolism\WordpressBundle\Helper\FeedHelper::doAction');
 
         $this->addRoutes();
     }
@@ -69,7 +56,22 @@ class Permastruct{
      */
     public function addRoutes(){
 
-	    $this->addRoute('home', '', [], true);
+	    if( empty($locale) ){
+
+		    $this->addRoute('_site_health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealthHelper::check');
+		    $this->addRoute('_cache_purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::purge');
+		    $this->addRoute('_cache_clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::clear');
+
+		    $this->addRoute('robots', 'robots.txt', [], false, 'Metabolism\WordpressBundle\Helper\RobotsHelper::doAction');
+	    }
+
+	    global $_config;
+	    $remove_rewrite_rules = $_config ? $_config->get('rewrite_rules.remove', []) : [];
+
+	    if( !in_array('feed', $remove_rewrite_rules) )
+		    $this->addRoute('feed', '{feed}', ['feed'=>'feed|rdf|rss|rss2|atom'], false, 'Metabolism\WordpressBundle\Helper\FeedHelper::doAction');
+
+	    $this->addRoute('home', '', [], get_option('show_on_front') == 'posts');
 
         global $wp_post_types, $wp_taxonomies;
 
@@ -79,7 +81,7 @@ class Permastruct{
 
             if( $post_type->public && $post_type->publicly_queryable ){
 
-                if( isset($this->wp_rewrite->extra_permastructs[$post_type->name]) ){
+                if( isset($this->wp_rewrite->extra_permastructs[$post_type->name]) && $post_type->query_var ){
 
                     $base_struct = $this->wp_rewrite->extra_permastructs[$post_type->name]['struct'];
                     $translated_slug = get_option( $post_type->name. '_rewrite_slug' );
@@ -165,7 +167,7 @@ class Permastruct{
             }
         }
 
-        if( isset($this->wp_rewrite->author_structure) )
+        if( isset($this->wp_rewrite->author_structure) && !in_array('author', $remove_rewrite_rules) )
             $this->addRoute('author', $this->wp_rewrite->author_structure);
 
         if( isset($this->wp_rewrite->search_structure) )
@@ -236,7 +238,6 @@ class Permastruct{
 }
 
 
-global $_config;
 $collection = new RouteCollection();
 
 if( !isset($_SERVER['SERVER_NAME'] ) && (!isset($_SERVER['WP_INSTALLED']) || !$_SERVER['WP_INSTALLED']) )
@@ -254,14 +255,14 @@ if( env('WP_MULTISITE') && !env('SUBDOMAIN_INSTALL') )
         flush_rewrite_rules();
 
         $locale = trim($site->path, '/');
-        new Permastruct($collection, $locale, $controller_name, $_config);
+        new Permastruct($collection, $locale, $controller_name);
     }
 
     switch_to_blog($current_site_id);
 }
 else{
 
-    new Permastruct($collection, '', $controller_name, $_config);
+    new Permastruct($collection, '', $controller_name);
 }
 
 return $collection;

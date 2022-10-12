@@ -21,10 +21,6 @@ services:
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
 
-  Metabolism\WordpressBundle\Command\ExportCommand:
-    arguments:
-      - '@service_container'
-
   Metabolism\WordpressBundle\Twig\TwigGlobalSubscriber:
     tags:
       - { name: kernel.event_listener, event: kernel.request }
