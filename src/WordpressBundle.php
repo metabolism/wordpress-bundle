@@ -57,7 +57,7 @@ class WordpressBundle extends Bundle
 	            $_SERVER['SERVER_PORT'] = $context->isSecure() ? $context->getHttpsPort() : $context->getHttpPort();
 
 				if( $context->isSecure() )
-					$_SERVER['HTTP_HOST'] = $context->getHost().($context->getHttpPort()!=443?':'.$context->getHttpsPort():'');
+					$_SERVER['HTTP_HOST'] = $context->getHost().($context->getHttpsPort()!=443?':'.$context->getHttpsPort():'');
 	            else
 		            $_SERVER['HTTP_HOST'] = $context->getHost().($context->getHttpPort()!=80?':'.$context->getHttpPort():'');
             }
