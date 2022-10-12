@@ -62,6 +62,9 @@ class WordpressBundle extends Bundle
 		            $_SERVER['HTTP_HOST'] = $context->getHost().($context->getHttpPort()!=80?':'.$context->getHttpPort():'');
             }
         }
+
+		if( !isset($_SERVER['REMOTE_ADDR']) && php_sapi_name() == "cli" )
+			$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 	}
 
     public static function loadPlugins (){
