@@ -45,14 +45,18 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 	 */
 	public function onKernelRequest(RequestEvent $event)
 	{
-		$request = $event->getRequest();
+		$httpRequest = $event->getRequest();
 
-		$_SERVER['REQUEST_METHOD'] = $request->getMethod();
-		$_SERVER['REQUEST_URI'] = $request->getRequestUri();
-		$_SERVER['PHP_SELF'] = $request->getScriptName();
-		$_SERVER['PATH_INFO'] = $request->getPathInfo();
+		$_SERVER['REQUEST_METHOD'] = $httpRequest->getMethod();
+		$_SERVER['REQUEST_URI'] = $httpRequest->getRequestUri();
+		$_SERVER['PHP_SELF'] = $httpRequest->getScriptName();
+		$_SERVER['PATH_INFO'] = $httpRequest->getPathInfo();
 
-		global $wp;
+		global $wp, $request;
+
+		//Wordpress override $request, Symfony needs it so keep a copy
+		if( is_object($request) && get_class($request) == 'Symfony\Component\HttpFoundation\Request' )
+			$_request = $request;
 
 		$wp->init();
 		$wp->parse_request();
@@ -61,6 +65,10 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
 		do_action_ref_array( 'wp', array( &$wp ) );
 		do_action( 'template_redirect' );
+
+		//Restore request
+		if( isset($_request) )
+			$request = $_request;
 	}
 
 

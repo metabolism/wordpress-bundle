@@ -12,7 +12,7 @@ class WordpressBundle extends Bundle
     private $root_dir;
     private $public_dir;
     private $log_dir;
-    private Router $router;
+    private $router;
 
     private $wp_path = "public/edition/";
 
