@@ -18,11 +18,9 @@ class SiteHealthHelper {
 	];
 
 	private $base_url;
-	private $password;
 
 	public function __construct(){
 
-		$this->password = $_SERVER['APP_PASSWORD'] ?? false;
 		$this->base_url = get_home_url();
 
 		$this->status['title']    = get_bloginfo('name');
@@ -114,7 +112,7 @@ class SiteHealthHelper {
 		$html .= '<thead><tr><th>Label</th><th>Url</th><th style="text-align:center">Code</th><th style="text-align:center">Empty</th><th style="text-align:center">Body</th><th style="text-align:center">Timing</th></tr></thead>';
 
 		foreach ( $this->status['pages'] as $page)
-			$html .= '<tr><td>'.$page['label'].'</td><td><a href="'.$this->base_url.$page['url'].'" target="_blank">'.$page['url'].'</a></td><td style="text-align:center;color:'.($page['code']!=200?'red':'').'">'.$page['code'].'</td><td style="text-align:center">'.($page['empty']?'yes':'no').'</td><td style="text-align:center">'.($page['body']>0?'yes':'no').'</td><td style="text-align:center">'.$page['response_time'].'ms</td></tr>';
+			$html .= '<tr><td>'.$page['label'].'</td><td><a href="'.$page['url'].'" target="_blank">'.$page['url'].'</a></td><td style="text-align:center;color:'.($page['code']!=200?'red':'').'">'.$page['code'].'</td><td style="text-align:center">'.($page['empty']?'yes':'no').'</td><td style="text-align:center">'.($page['body']>0?'yes':'no').'</td><td style="text-align:center">'.$page['response_time'].'ms</td></tr>';
 
 		$html .= '<table>';
 
@@ -129,7 +127,7 @@ class SiteHealthHelper {
 			return;
 
 		$time_start = microtime(true);
-		$response   = wp_remote_get($this->base_url.$url.($this->password?'?APP_PASSWORD='.$this->password:''), ['timeout'=>30]);
+		$response   = wp_remote_get($url, ['timeout'=>30]);
 		$time_end   = microtime(true);
 
 		$response_code    = wp_remote_retrieve_response_code( $response );
@@ -186,12 +184,10 @@ class SiteHealthHelper {
             if( strpos($option, 'page_on_') !== 0 || !$value )
                 continue;
 
-			$page = str_replace('page_on_', '', $value);
-			$url = get_page_link($page);
-			$this->getStatus('State '.$page, $url);
+			$page = str_replace('_', ' ', str_replace('page_on_', '', $option));
+			$url = get_page_link($value);
+			$this->getStatus(ucfirst($page), $url);
 		}
-
-		$this->getStatus( 'Home', '/' );
 	}
 
 	private function checkTaxonomies($full){
