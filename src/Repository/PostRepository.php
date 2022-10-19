@@ -27,12 +27,22 @@ class PostRepository
      *
      * @return PostCollection
      */
-    public function findAll(array $orderBy = null)
+    public function findAll(array $orderBy = null, $public=true)
     {
+		if( $public ){
+
         $post_types = get_post_types(['public'=> true]);
+			unset($post_types['attachment']);
+
+			$post_types = array_filter($post_types, function ($post_type){ return is_post_type_viewable($post_type); });
+		}
+		else{
+
+			$post_types = get_post_types();
+		}
 
         $criteria = [
-            'post_type' => array_diff($post_types, ['attachment', 'revision', 'nav_menu_item'])
+		    'post_type' => $post_types
         ];
 
         return $this->findBy($criteria, $orderBy, -1);

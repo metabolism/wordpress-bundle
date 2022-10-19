@@ -160,9 +160,6 @@ class Permastruct{
 	                $requirements = apply_filters('taxonomy_routing_requirements', $requirements, $struct, $taxonomy);
 
                     $this->addRoute($taxonomy->name, $struct, $requirements, $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
-
-                    if( strpos($struct, '/%parent%') !== false )
-                        $this->addRoute($taxonomy->name.'_parent', str_replace('/%parent%', '', $struct), $requirements, $this->wp_rewrite->extra_permastructs[$taxonomy->name]['paged']);
                 }
             }
         }

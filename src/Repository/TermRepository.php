@@ -46,10 +46,20 @@ class TermRepository
     /**
      * @return TermCollection
      */
-    public function findAll(array $orderBy = null)
+    public function findAll(array $orderBy = null, $public=true)
     {
+	    if( $public ){
+
+		    $taxonomies = get_taxonomies(['public'=> true]);
+		    $taxonomies = array_filter($taxonomies, function ($taxonomy){ return is_taxonomy_viewable($taxonomy); });
+	    }
+	    else{
+
+		    $taxonomies = get_taxonomies();
+	    }
+
         $criteria = [
-            'taxonomy' => get_taxonomies(['public'=> true])
+            'taxonomy' => $taxonomies
         ];
 
         return $this->findBy($criteria, $orderBy, -1);

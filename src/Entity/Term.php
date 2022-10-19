@@ -30,6 +30,8 @@ class Term extends Entity
 	protected $template;
 	protected $thumbnail;
 	protected $ancestors;
+	protected $path;
+	protected $public;
 
 	/** @var \WP_Term|bool */
 	protected $term;
@@ -97,6 +99,36 @@ class Term extends Entity
 		return $term;
 	}
 
+	/**
+	 * Get term path
+	 *
+	 * @return false|string
+	 */
+	public function getPath(){
+
+		if( is_null($this->path) && $this->isPublic() ){
+
+			$taxonomy_object = get_taxonomy($this->taxonomy);
+
+			if( $rewrite_slug = $taxonomy_object->rewrite['slug']??false )
+				$this->path = str_replace(get_home_url().'/'.$rewrite_slug.'/', '', $this->getLink());
+			else
+				$this->path = str_replace(get_home_url().'/', '', $this->getLink());
+		}
+
+		return $this->path;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isPublic(): bool
+	{
+		if( is_null($this->public) )
+			$this->public = is_taxonomy_viewable($this->taxonomy);
+
+		return $this->public;
+	}
 
 	/**
 	 * Get term children

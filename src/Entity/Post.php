@@ -336,7 +336,7 @@ class Post extends Entity
 	}
 
 	/**
-	 * Get post link
+	 * Get post path
 	 *
 	 * @return false|string
 	 */
