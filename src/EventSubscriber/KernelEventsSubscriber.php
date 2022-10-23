@@ -65,9 +65,9 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 		// using cli,
 		if( is_multisite() && !is_admin() && php_sapi_name() == 'cli' ){
 
-			$site = get_site_by_path( $request->getHost(), $request->getRequestUri() );
+			$site = get_site_by_path( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] );
 
-			if( get_current_blog_id() != $site->blog_id )
+			if( $site && get_current_blog_id() != $site->blog_id )
 				switch_to_blog($site->blog_id);
 		}
 
