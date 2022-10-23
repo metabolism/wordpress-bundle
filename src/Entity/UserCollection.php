@@ -28,7 +28,8 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 			else
 				$this->query = new \WP_User_Query( $query );
 
-			$this->setUsers( $this->query->get_results() );
+			if( $users  = $this->query->get_results() )
+				$this->setUsers( $users );
         }
     }
 

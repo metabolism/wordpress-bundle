@@ -77,16 +77,16 @@ class Block extends Entity
 
 		if( class_exists('ACF') && !empty($block['attrs']) ){
 
-			if( $acf_block = acf_get_block_type($block['attrs']['name']) ){
+			if( $block = acf_prepare_block($block['attrs']) ){
 
-				$this->block = array_merge($block, $acf_block);
+				$this->block = $block;
 
-				acf_setup_meta( $block['attrs']['data']??[], $block['attrs']['id'], true );
+				acf_setup_meta( $block['data']??[], $block['id'], true );
 
-				$this->loadMetafields($block['attrs']['id'], 'block');
+				$this->loadMetafields($block['id'], 'block');
 
 				$this->custom_fields->getFieldObjects();
-				$this->custom_fields->setData($block['attrs']['data']??[]);
+				$this->custom_fields->setData($block['data']??[]);
 			}
 		}
 		else{

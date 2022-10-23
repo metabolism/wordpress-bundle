@@ -29,7 +29,8 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 			else
 				$this->query = new \WP_Query( $query );
 
-            $this->setPosts($this->query->posts);
+			if( $this->query->posts )
+				$this->setPosts($this->query->posts);
         }
     }
 

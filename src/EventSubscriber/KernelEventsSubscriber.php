@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -22,6 +23,18 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 		];
 	}
 
+
+	/**
+	 * @param Request $request
+	 * @return void
+	 */
+	private function fixServerVars(Request $request){
+
+		$_SERVER['REQUEST_METHOD'] = $request->getMethod();
+		$_SERVER['REQUEST_URI'] = $request->getRequestUri();
+		$_SERVER['PHP_SELF'] = $request->getScriptName();
+		$_SERVER['PATH_INFO'] = $request->getPathInfo();
+	}
 
     /**
      * @param ControllerEvent $event
@@ -45,18 +58,20 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 	 */
 	public function onKernelRequest(RequestEvent $event)
 	{
-		$httpRequest = $event->getRequest();
+		$request = $event->getRequest();
 
-		$_SERVER['REQUEST_METHOD'] = $httpRequest->getMethod();
-		$_SERVER['REQUEST_URI'] = $httpRequest->getRequestUri();
-		$_SERVER['PHP_SELF'] = $httpRequest->getScriptName();
-		$_SERVER['PATH_INFO'] = $httpRequest->getPathInfo();
+		$this->fixServerVars($request);
 
-		global $wp, $request;
+		// using cli,
+		if( is_multisite() && !is_admin() && php_sapi_name() == 'cli' ){
 
-		//Wordpress override $request, Symfony needs it so keep a copy
-		if( is_object($request) && get_class($request) == 'Symfony\Component\HttpFoundation\Request' )
-			$_request = $request;
+			$site = get_site_by_path( $request->getHost(), $request->getRequestUri() );
+
+			if( get_current_blog_id() != $site->blog_id )
+				switch_to_blog($site->blog_id);
+		}
+
+		global $wp;
 
 		$wp->init();
 		$wp->parse_request();
@@ -66,9 +81,9 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 		do_action_ref_array( 'wp', array( &$wp ) );
 		do_action( 'template_redirect' );
 
-		//Restore request
-		if( isset($_request) )
-			$request = $_request;
+		//Wordpress override $request, so restore it for Kernel shutdown
+		global $request;
+		$request = $event->getRequest();
 	}
 
 

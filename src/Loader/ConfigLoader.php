@@ -75,9 +75,10 @@ class ConfigLoader{
         {
             define( 'MULTISITE', true );
             define( 'SUBDOMAIN_INSTALL', env('SUBDOMAIN_INSTALL') );
-            define( 'DOMAIN_CURRENT_SITE', $_SERVER['HTTP_HOST']);
-            define( 'SITE_ID_CURRENT_SITE', env('SITE_ID_CURRENT_SITE')?:1);
-            define( 'BLOG_ID_CURRENT_SITE', env('BLOG_ID_CURRENT_SITE')?:1);
+            //define( 'DOMAIN_CURRENT_SITE', $_SERVER['HTTP_HOST']);
+            //define( 'SITE_ID_CURRENT_SITE', env('SITE_ID_CURRENT_SITE')?:1);
+            //define( 'BLOG_ID_CURRENT_SITE', env('BLOG_ID_CURRENT_SITE')?:1);
+            //define( 'PATH_CURRENT_SITE', env('PATH_CURRENT_SITE')?:'/');
         }
         else
         {

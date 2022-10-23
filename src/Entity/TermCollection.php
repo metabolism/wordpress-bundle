@@ -28,7 +28,8 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 			else
 				$this->query = new \WP_Term_Query( $query );
 
-            $this->setTerms($this->query->terms);
+			if( $this->query->terms )
+				$this->setTerms($this->query->terms);
         }
     }
 
