@@ -602,7 +602,7 @@ class ACFHelper implements ArrayAccess
 
 				case 'link':
 
-                    if( !isset($object['value']['url']) )
+                    if( empty($object['value']['url']??'') )
                         break;
 
                     $objects[$object['name']] = [

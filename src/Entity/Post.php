@@ -470,7 +470,7 @@ class Post extends Entity
 	/**
 	 * Get child posts
 	 *
-	 * @return Post[]|false
+	 * @return PostCollection|false
 	 */
 	public function getChildren() {
 
