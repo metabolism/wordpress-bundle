@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use function Env\env;
 
 class KernelEventsSubscriber implements EventSubscriberInterface
 {
@@ -98,13 +99,13 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
 		global $wpdb;
 
-		$base_url = get_home_url();
+		$default_uri = php_sapi_name() == 'cli' ? env('DEFAULT_URI') : get_home_url();
 		$home_url = $wpdb->get_row( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", 'home' ) );
 
-		if( $home_url->option_value != $base_url ){
+		if( $home_url->option_value != $default_uri ){
 
-			$content = str_replace($home_url->option_value, $base_url, $response->getContent());
-			$content = str_replace(substr(json_encode($home_url->option_value), 1 , -1), substr(json_encode($base_url), 1 , -1), $content);
+			$content = str_replace($home_url->option_value, $default_uri, $response->getContent());
+			$content = str_replace(substr(json_encode($home_url->option_value), 1 , -1), substr(json_encode($default_uri), 1 , -1), $content);
 
 			$response->setContent($content);
 		}

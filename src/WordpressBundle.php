@@ -4,6 +4,7 @@ namespace Metabolism\WordpressBundle;
 
 use Env\Env;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use function Env\env;
 
 class WordpressBundle extends Bundle
 {
@@ -42,20 +43,32 @@ class WordpressBundle extends Bundle
 
 		if( !isset($_SERVER['HTTP_HOST']) ) {
 
-			$_SERVER['SERVER_PORT'] = $context->isSecure() ? $context->getHttpsPort() : $context->getHttpPort();
+            $multisite = env('WP_MULTISITE');
 
-			if( $context->isSecure() ){
+            if( $multisite && php_sapi_name() == 'cli' ){
 
-				$_SERVER['REQUEST_SCHEME'] = 'https';
-				$_SERVER['HTTPS'] = 'on';
-				$_SERVER['HTTP_HOST'] = $context->getHost().($context->getHttpsPort()!=443?':'.$context->getHttpsPort():'');
-			}
-			else{
+                $url = parse_url($multisite);
 
-				$_SERVER['REQUEST_SCHEME'] = 'http';
-				$_SERVER['HTTPS'] = 'off';
-				$_SERVER['HTTP_HOST'] = $context->getHost().($context->getHttpPort()!=80?':'.$context->getHttpPort():'');
-			}
+                $_SERVER['SERVER_PORT'] = $url['port']??80;
+                $_SERVER['REQUEST_SCHEME'] = $url['scheme']??'https';
+
+                if( $_SERVER['REQUEST_SCHEME'] == 'https' )
+                    $_SERVER['HTTP_HOST'] = $url['host']??'127.0.0.1'.($_SERVER['SERVER_PORT']!=443?':'.$_SERVER['SERVER_PORT']:'');
+                else
+                    $_SERVER['HTTP_HOST'] = $url['host']??'127.0.0.1'.($_SERVER['SERVER_PORT']!=80?':'.$_SERVER['SERVER_PORT']:'');
+            }
+            else{
+
+                $_SERVER['SERVER_PORT'] = $context->isSecure() ? $context->getHttpsPort() : $context->getHttpPort();
+                $_SERVER['REQUEST_SCHEME'] = $context->isSecure() ? 'https' : 'http';
+
+                if( $context->isSecure() )
+                    $_SERVER['HTTP_HOST'] = $context->getHost().($context->getHttpsPort()!=443?':'.$context->getHttpsPort():'');
+                else
+                    $_SERVER['HTTP_HOST'] = $context->getHost().($context->getHttpPort()!=80?':'.$context->getHttpPort():'');
+            }
+
+            $_SERVER['HTTPS'] = $_SERVER['REQUEST_SCHEME'] == 'https' ? 'on' : 'off';
 		}
 
 		if( !isset($_SERVER['REMOTE_ADDR']) && php_sapi_name() == "cli" )
