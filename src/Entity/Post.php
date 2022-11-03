@@ -23,6 +23,7 @@ class Post extends Entity
 	protected $menu_order;
 	protected $password;
 
+	protected $taxonomies;
 	protected $blocks;
 	protected $slug;
 	protected $status;
@@ -487,7 +488,7 @@ class Post extends Entity
 	/**
 	 * Get siblings
 	 *
-	 * @return Post[]|false
+	 * @return PostCollection|false
 	 */
 	public function getSiblings() {
 
@@ -626,6 +627,16 @@ class Post extends Entity
 		return $this->prev;
 	}
 
+    /**
+     * @return \WP_Taxonomy[]
+     */
+    public function getTaxonomies(){
+
+        if( is_null($this->taxonomies) )
+            $this->taxonomies = get_object_taxonomies( $this->type );
+
+        return $this->taxonomies;
+    }
 
 	/**
 	 * Get primary term
@@ -635,9 +646,9 @@ class Post extends Entity
 	 * @param array $args
 	 * @return Term|bool
 	 */
-	public function getTerm( $tax='category', $args=[] ) {
+	public function getTerm( $tax='', $args=[] ) {
 
-		$args['number'] = 1;
+        $args['number'] = 1;
 		$terms = $this->getTerms($tax, $args);
 
 		if( is_array($terms) && count($terms) )
@@ -654,7 +665,7 @@ class Post extends Entity
 	 * @param array $args
 	 * @return Term[]|[]
 	 */
-	public function getTerms( $tax='category', $args=[] ) {
+	public function getTerms( $tax='', $args=[] ) {
 
 		$return = 'fields';
 
@@ -664,16 +675,15 @@ class Post extends Entity
 			$args['fields'] = 'ids';
 		}
 
-		$taxonomies = array();
+		$taxonomies = [];
 
 		if ( is_array($tax) )
-		{
 			$taxonomies = $tax;
-		}
-		if ( is_string($tax) )
-		{
+
+		if ( is_string($tax) ) {
+
 			if ( in_array($tax, ['all', 'any', '']) )
-				$taxonomies = get_object_taxonomies($this->type);
+				$taxonomies = $this->getTaxonomies();
 			else
 				$taxonomies = [$tax];
 		}
