@@ -162,7 +162,7 @@ class Image extends Entity
 
 				$attachment_metadata = apply_filters( 'wp_get_attachment_metadata', maybe_unserialize($post_meta['_wp_attachment_metadata'][0]??''), $id );
 
-				if( !$attachment_metadata ){
+				if( !$attachment_metadata || !isset($attachment_metadata['file']) ){
 
 					if( $post->post_mime_type != 'image/svg' && $post->post_mime_type != 'image/svg+xml' )
 						return;
