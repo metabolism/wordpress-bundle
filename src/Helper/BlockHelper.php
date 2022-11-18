@@ -20,7 +20,7 @@ class BlockHelper
 
 		if( $image = $acf_block['data']['_preview_image']??false ){
 
-			echo '<img src="'.get_home_url().'/'.$image.'" style="width:100%;height:auto"/>';
+			echo '<img src="'.get_home_url().'/'.$image.'" style="width:100%;height:auto" class="preview_image"/>';
 			return;
 		}
 
