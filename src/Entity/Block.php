@@ -47,7 +47,7 @@ class Block extends Entity
 	 */
 	public function getAlign(){
 
-		return $this->block['attrs']['align']??'full';
+		return $this->block['align']??'full';
 	}
 
 	/**
@@ -55,7 +55,7 @@ class Block extends Entity
 	 */
 	public function getAlignText(){
 
-		return $this->block['attrs']['align_text']??'left';
+		return $this->block['align_text']??'left';
 	}
 
 	/**
@@ -63,7 +63,7 @@ class Block extends Entity
 	 */
 	public function getAlignContent(){
 
-		return $this->block['attrs']['align_content']??'top';
+		return $this->block['align_content']??'top';
 	}
 
 	/**
