@@ -337,6 +337,15 @@ class Post extends Entity
 	}
 
 	/**
+	 * @deprecated
+	 * @return false|string
+	 */
+	public function getUrl(){
+
+		return $this->getLink();
+	}
+
+	/**
 	 * Get post path
 	 *
 	 * @return false|string

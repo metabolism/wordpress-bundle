@@ -123,6 +123,15 @@ class MenuItem extends Entity
 	}
 
 	/**
+     * @deprecated
+	 * @return mixed
+	 */
+	public function getUrl()
+	{
+		return $this->getLink();
+	}
+
+	/**
 	 * @return mixed
 	 */
 	public function getOrder()

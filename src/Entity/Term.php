@@ -243,6 +243,11 @@ class Term extends Entity
 		return $this->parent;
 	}
 
+    /**
+     * Get term link
+     *
+     * @return false|string
+     */
 	public function getLink(){
 
 		if( is_null($this->link) )
@@ -251,6 +256,21 @@ class Term extends Entity
 		return $this->link;
 	}
 
+
+    /**
+     * @deprecated
+     * @return false|string
+     */
+    public function getUrl(){
+
+        return $this->getLink();
+    }
+
+    /**
+     * Get term depth
+     *
+     * @return int
+     */
 	public function getDepth(){
 
 		if( is_null($this->depth) )
@@ -285,6 +305,11 @@ class Term extends Entity
 		return $this->ancestors;
 	}
 
+    /**
+     * Get term template
+     *
+     * @return string
+     */
 	public function getTemplate(){
 
 		if( is_null($this->template) )
@@ -293,6 +318,11 @@ class Term extends Entity
 		return $this->template;
 	}
 
+    /**
+     * Get term excerpt
+     *
+     * @return string
+     */
 	public function getExcerpt(){
 
 		if( is_null($this->excerpt) )

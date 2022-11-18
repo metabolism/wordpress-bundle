@@ -249,6 +249,15 @@ class Image extends Entity
         return $this->link;
     }
 
+    /**
+     * @deprecated
+     * @return string|null
+     */
+    public function getUrl(){
+
+        return $this->getLink();
+    }
+
 	/**
 	 * @return string
 	 */
