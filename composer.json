@@ -49,7 +49,8 @@
     "wpackagist-plugin/query-monitor": "Query Monitor is the developer tools panel for WordPress.",
     "wpackagist-plugin/redirection" : "Easily manage 301 redirections, keep track of 404 errors",
     "wpackagist-plugin/relevanssi" : "Replaces the standard WordPress search with a better search engine, with lots of features and configurable options.",
-    "wpackagist-plugin/contact-form-7" : "Manage multiple contact forms, plus you can customize the form and the mail contents"
+    "wpackagist-plugin/contact-form-7" : "Manage multiple contact forms, plus you can customize the form and the mail contents",
+    "wpackagist-plugin/wp-2fa" : "Harden your website login page; add two-factor authentication (2FA) for all your users with this easy to use plugin."
 
   },
   "extra": {

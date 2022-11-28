@@ -16,6 +16,7 @@ wordpress:
     replace_reset_styles: true
     remove_core_block: true
     remove_block_library: true
+    load_remote_block_patterns: false
     #block_editor_style: '/build/bundle.css'
 
 
