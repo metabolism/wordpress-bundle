@@ -397,43 +397,51 @@ class Image extends Entity
 		$params = array_merge(['resize'=>[$w, $h]], $params);
 		unset($params['name']);
 
-		$image = $this->edit($params, $ext);
+		$image = $this->edit($params, $ext, 'object');
 
-		if( is_null($ext) )
-			$ext = pathinfo($image, PATHINFO_EXTENSION);
+        $image_info = file_exists($image['src'])?getimagesize($image['src']):[0,0, 'mime'=>''];
 
 		if( $name ){
 
 			unset($params['resize']);
 
-			$src = BASE_URI.PUBLIC_DIR.$image;
-			$image_info = file_exists($src)?getimagesize($src):[0,0, 'mime'=>''];
-
 			$this->sizes[$name][] = array_merge([
-				'file'=>$image,
+				'file'=>$image['url'],
 				'extension'=>$ext,
-				'mime-type'=>$image_info['mime'],
+                'mime-type'=>$image_info['mime'],
 				'width'=>$image_info[0],
 				'height'=>$image_info[1]
 			], $params);
 		}
 
-		return $image;
+		return $image['url'];
 	}
 
 
 	/**
 	 * @param array $params
 	 * @param null $ext
-	 * @return string
+	 * @return string|array
 	 */
-	public function edit($params, $ext=null){
+	public function edit($params, $ext=null, $output='url'){
 
 		$file = $this->process($params, $ext);
 
-		$url = str_replace($this->uploadDir('basedir'), $this->uploadDir('baseurl'), $file);
+        if( isset($file['error']) ){
 
-		return str_replace(BASE_URI.PUBLIC_DIR, '', $url);
+            if( $output == 'url' )
+                return WP_DEBUG ? $file['error'] : '';
+            else
+                return $file;
+        }
+
+        $file['url'] = str_replace($this->uploadDir('basedir'), $this->uploadDir('baseurl'), $file['src']);
+        $file['url'] = str_replace(BASE_URI.PUBLIC_DIR, '', $file['url']);
+
+        if( $output == 'url')
+            return $file['url'];
+        else
+            return $file;
 	}
 
 
@@ -441,12 +449,12 @@ class Image extends Entity
 	 * Edit image using Intervention library
 	 * @param array $params
 	 * @param null $ext
-	 * @return string
+	 * @return array
 	 */
 	private function process($params, $ext=null){
 
 		if( $this->src && !in_array($this->getExtension(), ['jpg','jpeg','png','gif','webp']) )
-			return $this->src;
+			return ['src'=>$this->src];
 
 		$this->getFocusPoint();
 
@@ -493,7 +501,7 @@ class Image extends Entity
 
 		//return placeholder if image is empty
 		if( empty($this->src) || !file_exists($this->src) )
-			return $this->placeholder($w, $h);
+			return ['src'=>$this->placeholder($w, $h), 'width'=>$w, 'height'=>$h];
 
 		//remove focus point if invalid
 		if( !is_array($this->focus_point) || !isset($this->focus_point['x'], $this->focus_point['y']) )
@@ -501,7 +509,7 @@ class Image extends Entity
 
 		//return if image is svg or gif
 		if( $this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' )
-			return $this->src;
+			return ['src'=>$this->src];
 
 		// get src ext
 		$src_ext = pathinfo($this->src, PATHINFO_EXTENSION);
@@ -547,7 +555,7 @@ class Image extends Entity
 		if( file_exists($dest) ){
 
 			if( filemtime($dest) > filemtime($this->src) )
-				return $dest;
+				return ['src'=>$dest, 'width'=>$w, 'height'=>$h];
 			else
 				unlink($dest);
 		}
@@ -666,11 +674,11 @@ class Image extends Entity
 
 			$image->save($dest, $this->compression);
 
-			return $dest;
+			return ['src'=>$dest, 'width'=>$w, 'height'=>$h];
 		}
 		catch(\Exception $e)
 		{
-			return $e->getMessage();
+			return ['error'=>$e->getMessage(), 'src'=>''];
 		}
 	}
 
@@ -742,13 +750,13 @@ class Image extends Entity
 				$html .='<source srcset="'.$this->edit(['resize'=>[$w, $h]], $ext).'" type="'.$mime.'"/>';
 
             if( !$w && !$h )
-                $src = $this->file;
+                $file = ['src'=>$this->src, 'url'=>$this->file];
             else
-                $src = $this->edit(['resize'=>[$w, $h]]);
+                $file = $this->edit(['resize'=>[$w, $h]], null, 'object');
 
-            $image_info = file_exists(BASE_URI.PUBLIC_DIR.$src)?getimagesize(BASE_URI.PUBLIC_DIR.$src):[0,0];
+            $image_info = file_exists($file['src'])?getimagesize($file['src']):[0,0];
 
-			$html .= '<img src="'.$src.'" alt="'.($alt?:$this->alt).'" loading="'.$loading.'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[0]?'height="'.$image_info[1].'"':'').'/>';
+            $html .= '<img src="'.$file['url'].'" alt="'.($alt?:$this->alt).'" loading="'.$loading.'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[1]?'height="'.$image_info[1].'"':'').'/>';
 		}
 
 		$html .='</picture>';
