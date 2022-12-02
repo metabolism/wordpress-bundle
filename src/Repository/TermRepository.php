@@ -27,20 +27,30 @@ class TermRepository
      * @return bool|Term|null
      * @throws \Exception
      */
-    public function findQueried()
+    public function findQueried($allowNull=false)
     {
-        if( is_404() )
-            throw new \Exception('Term not found', 404);
+        try {
 
-        if( is_archive() ){
-
-            if( !$id = get_queried_object_id() )
+            if( is_404() )
                 throw new \Exception('Term not found', 404);
 
-            return $this->find($id);
-        }
+            if( is_archive() ){
 
-        throw new \Exception('Term not found', 404);
+                if( !$id = get_queried_object_id() )
+                    throw new \Exception('Term not found', 404);
+
+                return $this->find($id);
+            }
+
+            throw new \Exception('Term not found', 404);
+        }
+        catch (\Exception $e){
+
+            if( !$allowNull )
+                throw $e;
+
+            return null;
+        }
     }
 
     /**

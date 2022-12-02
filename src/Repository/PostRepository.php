@@ -54,22 +54,32 @@ class PostRepository
      * @return PostCollection|Post
      * @throws \Exception
      */
-    public function findQueried()
+    public function findQueried($allowNull=false)
     {
-        if( is_404() )
+        try {
+
+            if( is_404() )
+                throw new \Exception('Post not found', 404);
+
+            if( is_archive() || is_search() || (is_home() && get_option('show_on_front') == 'posts')){
+
+                global $wp_query;
+                return new PostCollection($wp_query);
+            }
+            elseif( $id = get_the_ID() ){
+
+                return $this->find($id);
+            }
+
             throw new \Exception('Post not found', 404);
-
-	    if( is_archive() || is_search() || (is_home() && get_option('show_on_front') == 'posts')){
-
-            global $wp_query;
-            return new PostCollection($wp_query);
         }
-        elseif( $id = get_the_ID() ){
+        catch (\Exception $e){
 
-		    return $this->find($id);
-	    }
+            if( !$allowNull )
+                throw $e;
 
-		throw new \Exception('Post not found', 404);
+            return null;
+        }
     }
 
 

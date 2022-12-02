@@ -27,22 +27,31 @@ class UserRepository
      * @return bool|User|null
      * @throws \Exception
      */
-    public function findQueried()
+    public function findQueried($allowNull=false)
     {
-        if( is_404() )
-            throw new \Exception('Author not found', 404);
-
-        if( is_author() ){
-
-            global $wp_query;
-
-            if( !$id = $wp_query->query_vars['author'] )
+        try{
+            if( is_404() )
                 throw new \Exception('Author not found', 404);
 
-            return $this->find($id);
-        }
+            if( is_author() ){
 
-        throw new \Exception('Author not found', 404);
+                global $wp_query;
+
+                if( !$id = $wp_query->query_vars['author'] )
+                    throw new \Exception('Author not found', 404);
+
+                return $this->find($id);
+            }
+
+            throw new \Exception('Author not found', 404);
+        }
+        catch (\Exception $e){
+
+            if( !$allowNull )
+                throw $e;
+
+            return null;
+        }
     }
 
 

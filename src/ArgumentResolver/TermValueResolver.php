@@ -41,6 +41,6 @@ class TermValueResolver implements ArgumentValueResolverInterface {
      */
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
-        yield $this->termRepository->findQueried();
+        yield $this->termRepository->findQueried($argument->isNullable());
     }
 }

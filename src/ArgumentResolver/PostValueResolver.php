@@ -41,6 +41,6 @@ class PostValueResolver implements ArgumentValueResolverInterface {
      */
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
-        yield $this->postRepository->findQueried();
+        yield $this->postRepository->findQueried($argument->isNullable());
     }
 }

@@ -167,8 +167,11 @@ class Permastruct{
         if( isset($this->wp_rewrite->author_structure) && !in_array('author', $remove_rewrite_rules) )
             $this->addRoute('author', $this->wp_rewrite->author_structure);
 
-        if( isset($this->wp_rewrite->search_structure) )
+        if( isset($this->wp_rewrite->search_structure) ){
+
             $this->addRoute('search', $this->wp_rewrite->search_structure, [], true);
+            $this->addRoute('empty_search', str_replace('/%search%', '', $this->wp_rewrite->search_structure), [], false, $this->getControllerName('search'));
+        }
 
         if( isset($this->wp_rewrite->page_structure) )
             $this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
@@ -217,6 +220,7 @@ class Permastruct{
 
         $controller = $controllerName ?: $this->getControllerName($name);
         $paths = $this->getPaths($struct);
+
         $locale = $this->locale?'.'.$this->locale:'';
 
         $route = new Route( $paths['singular'], ['_controller'=>$controller], $requirements);

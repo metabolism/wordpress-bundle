@@ -120,6 +120,9 @@ class WordpressTwigExtension extends AbstractExtension{
 
         ob_start();
 
+        if( $h == 0 )
+            $h = $w;
+
         $img = imagecreatetruecolor($w, $h);
         imagetruecolortopalette($img, false, 1);
         imagesavealpha($img, true);
@@ -185,10 +188,17 @@ class WordpressTwigExtension extends AbstractExtension{
             $image = new Image($image['url']);
         }
 
-	    if( !$image instanceof Image )
-            $image = new Image();
+	    if( !$image instanceof Image ){
 
-        $html = $image->toHTML($width, $height, $sources, $alt, $loading);
+            if( !$height )
+                $height = $width;
+
+            $html = '<picture><img src="'.$this->generatePixel($width, $height).'" class="placeholder" width="'.$width.'" height="'.$height.'" alt="'.$alt.'"/></picture>';
+        }
+        else{
+
+            $html = $image->toHTML($width, $height, $sources, $alt, $loading);
+        }
 
 		return new \Twig\Markup($html, 'UTF-8');
     }

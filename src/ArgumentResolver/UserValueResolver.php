@@ -41,6 +41,6 @@ class UserValueResolver implements ArgumentValueResolverInterface {
      */
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
-        yield $this->userRepository->findQueried();
+        yield $this->userRepository->findQueried($argument->isNullable());
     }
 }

@@ -365,6 +365,14 @@ class Post extends Entity
 		return $this->path;
 	}
 
+    /**
+     * @return bool
+     */
+    public function hasBlocks(){
+
+        return has_blocks( $this->post->post_content );
+    }
+
 	/**
 	 * Get filtered content
 	 *
@@ -374,11 +382,37 @@ class Post extends Entity
 
 		if( is_null($this->content) ){
 
-			$post_content = get_the_content(null, false, $this->post);
-			$post_content = apply_filters( 'the_content', $post_content );
-			$post_content = str_replace( ']]>', ']]&gt;', $post_content );
+            if( $this->hasBlocks() ){
 
-			$this->content = $post_content;
+                $this->content = [];
+
+                $blocks = parse_blocks( $this->post->post_content );
+
+                foreach ($blocks as $block){
+
+                    $data = $block['attrs']['data']??[];
+                    $content = [];
+
+                    foreach ($data as $key=>$value){
+
+                        if( substr($key, 0,1 ) != '_' && is_string($value) && !is_numeric($value) )
+                            $content[] = $value;
+                    }
+
+                    $this->content = array_merge($this->content, $content);
+                }
+
+                $this->content = array_unique(array_filter($this->content));
+                $this->content = implode("\n", $this->content);
+            }
+            else{
+
+                $post_content = get_the_content(null, false, $this->post);
+                $post_content = apply_filters( 'the_content', $post_content );
+                $post_content = str_replace( ']]>', ']]&gt;', $post_content );
+
+                $this->content = $post_content;
+            }
 		}
 
 		return $this->content;
