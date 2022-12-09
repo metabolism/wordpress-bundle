@@ -176,11 +176,11 @@ class WordpressTwigExtension extends AbstractExtension{
      */
     public function picture($image, $width, $height=0, $sources=[], $alt=false, $loading='lazy')
     {
-	    if( is_string($image) ){
+	    if( is_string($image) && !empty($image) ){
 
             $image = new Image($image);
         }
-        elseif( is_array($image) && isset($image['url']) ){
+        elseif( is_array($image) && !empty($image['url']??'') ){
 
 	        if( !$alt && isset($image['alt']) )
                 $alt = $image['alt'];
@@ -193,7 +193,7 @@ class WordpressTwigExtension extends AbstractExtension{
             if( !$height )
                 $height = $width;
 
-            $html = '<picture><img src="'.$this->generatePixel($width, $height).'" class="placeholder" width="'.$width.'" height="'.$height.'" alt="'.$alt.'"/></picture>';
+            $html = '<picture><img src="'.$this->generatePixel($width, $height).'" class="placeholder" width="'.$width.'" height="'.$height.'" alt="'.htmlspecialchars($alt).'"/></picture>';
         }
         else{
 
