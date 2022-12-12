@@ -692,6 +692,8 @@ class Post extends Entity
 	public function getTerm( $tax='', $args=[] ) {
 
         $args['number'] = 1;
+        $args['hierarchical'] = false;
+
 		$terms = $this->getTerms($tax, $args);
 
 		if( is_array($terms) && count($terms) )
