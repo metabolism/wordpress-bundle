@@ -27,7 +27,9 @@ class Block extends Entity
 	 */
 	public function __construct($block)
 	{
-		if( $this->get($block) ){
+		if( $block = $this->get($block) ){
+
+            $this->block = $block;
 
 			$this->name = $block['blockName'];
 			$this->ID = $block['id']??null;
@@ -68,7 +70,7 @@ class Block extends Entity
 
 	/**
 	 * @param $block
-	 * @return bool
+	 * @return bool|array
 	 */
 	public function get($block){
 
@@ -79,7 +81,10 @@ class Block extends Entity
 
 			if( $block = acf_prepare_block($block['attrs']) ){
 
-				$this->block = $block;
+                if( defined('ACF_MAJOR_VERSION') && ACF_MAJOR_VERSION > 5 )
+                    $block['id'] =  acf_ensure_block_id_prefix(acf_get_block_id( $block ));
+
+                $block['blockName'] = $block['name'];
 
 				acf_setup_meta( $block['data']??[], $block['id'], true );
 
@@ -89,12 +94,8 @@ class Block extends Entity
 				$this->custom_fields->setData($block['data']??[]);
 			}
 		}
-		else{
 
-			$this->block = $block;
-		}
-
-		return true;
+		return $block;
 	}
 
 	/**
