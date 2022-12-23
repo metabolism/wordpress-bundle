@@ -5,9 +5,6 @@ namespace Metabolism\WordpressBundle\Entity;
 use Metabolism\WordpressBundle\Helper\ACFHelper;
 use Metabolism\WordpressBundle\Helper\TwigHelper;
 use Metabolism\WordpressBundle\Repository\PostRepository;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 
 /**
  * Class Block

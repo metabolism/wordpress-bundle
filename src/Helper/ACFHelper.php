@@ -11,7 +11,7 @@ use Metabolism\WordpressBundle\Factory\Factory,
 	Metabolism\WordpressBundle\Factory\TermFactory;
 use function Env\env;
 
-class ACFHelper implements ArrayAccess
+class ACFHelper implements ArrayAccess, \IteratorAggregate
 {
 	private $objects;
 	private $id;
@@ -138,6 +138,21 @@ class ACFHelper implements ArrayAccess
         $this->objects[$id]['value'] = $data[$id]??null;
 
 		return $this->objects[$id]['value'];
+	}
+
+    /**
+     * @return array
+     */
+	public function getValues(){
+
+        $this->getFieldObjects( true );
+        $data = [];
+
+        foreach ($this->objects as $key=>$value){
+            $data[$key] = $this->getValue($key);
+        }
+
+        return $data;
 	}
 
 
@@ -658,5 +673,13 @@ class ACFHelper implements ArrayAccess
     {
         if( $this->has($offset) )
             unset($this->objects[$offset]);
+    }
+
+    /**
+     * @return \ArrayObject
+     */
+    public function getIterator()
+    {
+        return new \ArrayObject($this->getValues());
     }
 }

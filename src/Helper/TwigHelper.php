@@ -33,6 +33,9 @@ class TwigHelper {
 	    if( class_exists('App\Twig\AppExtension'))
 		    $twig->addExtension(new AppExtension());
 
+	    if( class_exists('\Twig\Extra\Intl\IntlExtension'))
+		    $twig->addExtension(new \Twig\Extra\Intl\IntlExtension());
+
 	    $twig->addExtension(new WordpressTwigExtension());
 
 		self::$env = $twig;
