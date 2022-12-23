@@ -197,7 +197,10 @@ class WordpressTwigExtension extends AbstractExtension{
         }
         else{
 
-            $html = $image->toHTML($width, $height, $sources, $alt, $loading);
+            $html = $image->picture($width, $height, $sources, $alt, $loading);
+
+            if( $image->caption )
+                $html  = '<figure>'.$html.'<figcaption>'.$image->caption.'</figcaption></figure>';
         }
 
 		return new \Twig\Markup($html, 'UTF-8');

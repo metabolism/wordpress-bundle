@@ -697,14 +697,23 @@ class Image extends Entity
 	}
 
     /**
-     * @param $w
-     * @param int $h
-     * @param bool $sources
-     * @param bool $alt
-     * @param string $loading
-     * @return string
+     * @deprecated
+     * Use picture
      */
 	public function toHTML($w, $h=0, $sources=false, $alt=false, $loading='lazy'){
+
+        return $this->picture($w, $h, $sources, $alt, $loading);
+    }
+
+    /**
+     * @param $w
+     * @param $h
+     * @param $sources
+     * @param $alt
+     * @param $loading
+     * @return string
+     */
+    public function picture($w, $h=0, $sources=false, $alt=false, $loading='lazy'){
 
 		if( empty($this->src) || !file_exists($this->src) ){
 
