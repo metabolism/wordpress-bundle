@@ -23,7 +23,9 @@ class TwigGlobalSubscriber implements EventSubscriberInterface {
 	public function injectGlobalVariables() {
 
 		$blog = Blog::getInstance();
+
 		$this->twig->addGlobal('blog', $blog);
+		$this->twig->addGlobal('is_component_preview', false);
 
 		// retro-compatibility
 		if( env('MIGRATE_FROM_V1') )

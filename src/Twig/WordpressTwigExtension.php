@@ -199,7 +199,7 @@ class WordpressTwigExtension extends AbstractExtension{
 
             $html = $image->picture($width, $height, $sources, $alt, $loading);
 
-            if( $image->caption )
+            if( !empty($image->caption) and $image->caption != 'default' )
                 $html  = '<figure>'.$html.'<figcaption>'.$image->caption.'</figcaption></figure>';
         }
 
