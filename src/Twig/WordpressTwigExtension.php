@@ -32,6 +32,7 @@ class WordpressTwigExtension extends AbstractExtension{
 			new TwigFilter( 'more', [$this, 'more'] ),
 			new TwigFilter( 'resize', [$this, 'resize'] ),
 			new TwigFilter( 'picture', [$this, 'picture'] ),
+			new TwigFilter( 'figure', [$this, 'figure'] ),
 			new TwigFilter( 'stripshortcodes','strip_shortcodes' ),
 			new TwigFilter( 'function', [$this, 'execFunction'] ),
 			new TwigFilter( 'excerpt','wp_trim_words' ),
@@ -198,10 +199,55 @@ class WordpressTwigExtension extends AbstractExtension{
         else{
 
             $html = $image->picture($width, $height, $sources, $alt, $loading);
+        }
+
+		return new \Twig\Markup($html, 'UTF-8');
+    }
+
+
+    /**
+     * Return resized picture
+     *
+     * @param $image
+     * @param $width
+     * @param int $height
+     * @param array $sources
+     * @param bool $alt
+     * @param string $loading
+     * @return string
+     */
+    public function figure($image, $width, $height=0, $sources=[], $alt=false, $loading='lazy')
+    {
+	    if( is_string($image) && !empty($image) ){
+
+            $image = new Image($image);
+        }
+        elseif( is_array($image) && !empty($image['url']??'') ){
+
+	        if( !$alt && isset($image['alt']) )
+                $alt = $image['alt'];
+
+            $image = new Image($image['url']);
+        }
+
+	    if( !$image instanceof Image ){
+
+            if( !$height )
+                $height = $width;
+
+            $html = '<picture><img src="'.$this->generatePixel($width, $height).'" class="placeholder" width="'.$width.'" height="'.$height.'" alt="'.htmlspecialchars($alt).'"/></picture>';
+        }
+        else{
+
+            $html = $image->picture($width, $height, $sources, $alt, $loading);
+        }
+
+        $html  = '<figure>'.$html;
 
             if( !empty($image->caption) and $image->caption != 'default' )
-                $html  = '<figure>'.$html.'<figcaption>'.$image->caption.'</figcaption></figure>';
-        }
+            $html  .= '<figcaption>'.$image->caption.'</figcaption>';
+
+        $html .= '</figure>';
 
 		return new \Twig\Markup($html, 'UTF-8');
     }
