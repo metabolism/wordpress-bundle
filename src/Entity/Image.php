@@ -713,7 +713,7 @@ class Image extends Entity
      * @param $loading
      * @return string
      */
-    public function picture($w, $h=0, $sources=false, $alt=false, $loading='lazy'){
+    public function picture($w, $h=0, $sources=false, $alt=false, $loading='lazy', $params=[]){
 
 		if( empty($this->src) || !file_exists($this->src) ){
 
@@ -745,23 +745,27 @@ class Image extends Entity
 
 				foreach ($sources as $media=>$size){
 
+                    $params['resize'] = $size;
+
                     if( is_int($media) )
                         $media = 'max-width: '.$media.'px';
 
 					if( $ext == 'webp' )
-						$html .='<source media="('.$media.')" srcset="'.$this->edit(['resize'=>$size], $ext).'" type="'.$mime.'"/>';
+						$html .='<source media="('.$media.')" srcset="'.$this->edit($params, $ext).'" type="'.$mime.'"/>';
 
-					$html .='<source media="('.$media.')" srcset="'.$this->edit(['resize'=>$size]).'" type="'.$this->mime_type.'"/>';
+					$html .='<source media="('.$media.')" srcset="'.$this->edit($params).'" type="'.$this->mime_type.'"/>';
 				}
 			}
 
+            $params['resize'] = [$w, $h];
+
 			if( $ext == 'webp' && ($w || $h) )
-				$html .='<source srcset="'.$this->edit(['resize'=>[$w, $h]], $ext).'" type="'.$mime.'"/>';
+				$html .='<source srcset="'.$this->edit($params, $ext).'" type="'.$mime.'"/>';
 
             if( !$w && !$h )
                 $file = ['src'=>$this->src, 'url'=>$this->file];
             else
-                $file = $this->edit(['resize'=>[$w, $h]], null, 'object');
+                $file = $this->edit($params, null, 'object');
 
             $image_info = file_exists($file['src'])?getimagesize($file['src']):[0,0];
 

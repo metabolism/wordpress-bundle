@@ -145,10 +145,10 @@ class WordpressTwigExtension extends AbstractExtension{
      * @param $image
      * @param $width
      * @param int $height
-     * @param array $args
+     * @param array $params
      * @return string
      */
-    public function resize($image, $width, $height=0, $args=[])
+    public function resize($image, $width, $height=0, $params=[])
     {
         if( is_string($image) )
             $image = new Image($image);
@@ -158,9 +158,9 @@ class WordpressTwigExtension extends AbstractExtension{
         if( !$image instanceof Image )
             $image = new Image();
 
-        $args['resize'] = [$width, $height];
+        $params['resize'] = [$width, $height];
 
-        return $image->edit($args);
+        return $image->edit($params);
     }
 
 
@@ -173,10 +173,14 @@ class WordpressTwigExtension extends AbstractExtension{
      * @param array $sources
      * @param bool $alt
      * @param string $loading
-     * @return string
+     * @param array $params
+     * @return Markup
      */
-    public function picture($image, $width, $height=0, $sources=[], $alt=false, $loading='lazy')
+    public function picture($image, $width, $height=0, $sources=[], $alt=false, $loading='lazy', $params=[])
     {
+        if( !is_array($params) )
+            $params = [];
+
 	    if( is_string($image) && !empty($image) ){
 
             $image = new Image($image);
@@ -198,7 +202,7 @@ class WordpressTwigExtension extends AbstractExtension{
         }
         else{
 
-            $html = $image->picture($width, $height, $sources, $alt, $loading);
+            $html = $image->picture($width, $height, $sources, $alt, $loading, $params);
         }
 
 		return new \Twig\Markup($html, 'UTF-8');
@@ -214,10 +218,14 @@ class WordpressTwigExtension extends AbstractExtension{
      * @param array $sources
      * @param bool $alt
      * @param string $loading
-     * @return string
+     * @param array $params
+     * @return Markup
      */
-    public function figure($image, $width, $height=0, $sources=[], $alt=false, $loading='lazy')
+    public function figure($image, $width, $height=0, $sources=[], $alt=false, $loading='lazy', $params=[])
     {
+        if( !is_array($params) )
+            $params = [];
+
 	    if( is_string($image) && !empty($image) ){
 
             $image = new Image($image);
@@ -239,7 +247,7 @@ class WordpressTwigExtension extends AbstractExtension{
         }
         else{
 
-            $html = $image->picture($width, $height, $sources, $alt, $loading);
+            $html = $image->picture($width, $height, $sources, $alt, $loading, $params);
         }
 
         $html  = '<figure>'.$html;
