@@ -9,6 +9,7 @@ use Metabolism\WordpressBundle\Entity\Entity;
 use Metabolism\WordpressBundle\Factory\Factory,
 	Metabolism\WordpressBundle\Factory\PostFactory,
 	Metabolism\WordpressBundle\Factory\TermFactory;
+
 use function Env\env;
 
 class ACFHelper implements ArrayAccess, \IteratorAggregate
@@ -415,9 +416,10 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
 					$objects[$object['name']] = [];
 
 					if( isset($object['value']) && is_iterable($object['value']) ){
+
 						foreach($object['value'] as $post)
 							$objects[$object['name']][] = $this->load('post', $post->ID);
-					}
+                    }
 
 					break;
 

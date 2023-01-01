@@ -32,6 +32,7 @@ class Term extends Entity
 	protected $ancestors;
 	protected $path;
 	protected $public;
+    protected $post_types;
 
 	/** @var \WP_Term|bool */
 	protected $term;
@@ -79,6 +80,23 @@ class Term extends Entity
 	public function hasParent() {
 
 		return $this->term->parent > 0;
+	}
+
+
+	/**
+	 * Get attached post types
+	 *
+     * @return array
+	 */
+	public function getPostTypes() {
+
+        if( is_null($this->post_types) ){
+
+            global $wp_taxonomies;
+            $this->post_types = $wp_taxonomies[$this->getTaxonomy()]->object_type;
+        }
+
+		return $this->post_types;
 	}
 
 

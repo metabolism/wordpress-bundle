@@ -178,6 +178,62 @@ class Blog extends Entity
 		return $this->language;
 	}
 
+    /**
+     * @param string $post_type
+     * @return false|string
+     */
+    public function getArchiveLink(string $post_type){
+
+        $post_type_obj = get_post_type_object( $post_type );
+
+        if( $post_type_obj->has_archive )
+            return get_post_type_archive_link($post_type);
+
+        if( function_exists('get_page_by_state') ){
+
+            if( $post = get_page_by_state('archive_'.$post_type) )
+                return get_permalink($post);
+            elseif( $post = get_page_by_state($post_type.'_archive') )
+                return get_permalink($post);
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getArchiveTitle($post_type, $prefix=''){
+
+        $title = '';
+
+        $post_type_obj = get_post_type_object( $post_type );
+
+        if( $post_type_obj->has_archive ){
+
+            $title = apply_filters( 'post_type_archive_title', $post_type_obj->labels->name, $post_type );
+        }
+        elseif( function_exists('get_page_by_state') ){
+
+            if( $post = get_page_by_state('archive_'.$post_type) )
+                $title = get_the_title($post);
+            elseif( $post = get_page_by_state($post_type.'_archive') )
+                $title = get_the_title($post);
+        }
+
+        return $prefix . $title;
+    }
+
+    /**
+     * @param string $redirect
+     * @param bool $force_reauth
+     * @return string
+     */
+    public function getLoginLink($redirect = '', $force_reauth = false){
+
+        return wp_login_url($redirect, $force_reauth);
+    }
+
 	/**
 	 * @return string
 	 */
@@ -193,9 +249,9 @@ class Blog extends Entity
 	}
 
 	/**
-	 * @return bool
+	 * @return string
 	 */
-	public function isSingle(): bool
+	public function isSingle(): string
 	{
 		if( is_null($this->is_single) ){
 
@@ -207,9 +263,9 @@ class Blog extends Entity
 	}
 
 	/**
-	 * @return bool
+	 * @return string
 	 */
-	public function isTax(): bool
+	public function isTax(): string
 	{
 		if( is_null($this->is_tax) ){
 
@@ -221,9 +277,9 @@ class Blog extends Entity
 	}
 
 	/**
-	 * @return bool
+	 * @return string
 	 */
-	public function isArchive(): bool
+	public function isArchive(): string
 	{
 		if( is_null($this->is_archive) ){
 
@@ -328,7 +384,7 @@ class Blog extends Entity
 	/**
 	 * @return array
 	 */
-	public function getBreadcrumb(): array
+	public function getBreadcrumb()
     {
         if(is_null($this->breadcrumb) ){
 
@@ -423,11 +479,19 @@ class Blog extends Entity
     }
 
 	/**
+	 * @deprecated
+	 */
+	public function getHomeUrl($path = '', $scheme = null): string
+    {
+        return $this->getHomeLink($path, $scheme);
+    }
+
+	/**
 	 * @param string $path
 	 * @param null $scheme
 	 * @return string
 	 */
-	public function getHomeUrl($path = '', $scheme = null): string
+	public function getHomeLink($path = '', $scheme = null): string
     {
 	    if( !empty($path) )
 		    return home_url($path, $scheme);
@@ -439,10 +503,18 @@ class Blog extends Entity
     }
 
 	/**
+	 * @deprecated
+	 */
+	public function getSearchUrl($query=''): string
+    {
+        return $this->getSearchLink($query);
+    }
+
+	/**
 	 * @param string $query
 	 * @return string
 	 */
-	public function getSearchUrl($query=''): string
+	public function getSearchLink($query=''): string
     {
 		if( !empty($query) )
 			return get_search_link($query);
@@ -462,9 +534,17 @@ class Blog extends Entity
     }
 
 	/**
-	 * @return string
+	 * @deprecated
 	 */
 	public function getPrivacyPolicyUrl(): string
+    {
+        return $this->getPrivacyPolicyLink();
+    }
+
+	/**
+	 * @return string
+	 */
+	public function getPrivacyPolicyLink(): string
     {
         if(is_null($this->privacy_policy_url) )
             $this->privacy_policy_url = get_privacy_policy_url();
@@ -487,11 +567,19 @@ class Blog extends Entity
     }
 
 	/**
+	 * @deprecated
+	 */
+	public function getNetworkHomeUrl($path = '', $scheme = null): string
+	{
+        return $this->getNetworkHomeLink($path, $scheme);
+    }
+
+	/**
 	 * @param string $path
 	 * @param null $scheme
 	 * @return string
 	 */
-	public function getNetworkHomeUrl($path = '', $scheme = null): string
+	public function getNetworkHomeLink($path = '', $scheme = null): string
 	{
 		if( !empty($path) )
 			return network_home_url($path, $scheme);
