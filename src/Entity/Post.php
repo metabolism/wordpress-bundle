@@ -395,7 +395,7 @@ class Post extends Entity
 
                     foreach ($data as $key=>$value){
 
-                        if( substr($key, 0,1 ) != '_' && is_string($value) && !is_numeric($value) )
+                        if( substr($key, 0,1 ) != '_' && is_string($value) && !is_numeric($value) && $value != 'none' )
                             $content[] = $value;
                     }
 
