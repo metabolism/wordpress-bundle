@@ -34,6 +34,7 @@ class WordpressTwigExtension extends AbstractExtension{
 			new TwigFilter( 'picture', [$this, 'picture'] ),
 			new TwigFilter( 'figure', [$this, 'figure'] ),
 			new TwigFilter( 'stripshortcodes','strip_shortcodes' ),
+			new TwigFilter( 'trim_words','wp_trim_words' ),
 			new TwigFilter( 'function', [$this, 'execFunction'] ),
 			new TwigFilter( 'excerpt','wp_trim_words' ),
 			new TwigFilter( 'sanitize','sanitize_title' ),

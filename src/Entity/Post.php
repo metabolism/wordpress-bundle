@@ -265,10 +265,34 @@ class Post extends Entity
 	 */
 	public function getExcerpt(){
 
-		if( is_null($this->excerpt) )
-			$this->excerpt = apply_filters( 'get_the_excerpt', $this->post->post_excerpt, $this->post );
+        if( is_null($this->excerpt) ){
 
-		return $this->excerpt;
+            if( !empty($this->post->post_excerpt) ){
+
+                $this->excerpt = nl2br($this->post->post_excerpt);
+            }
+            else{
+
+                $excerpt_length = (int) apply_filters( 'excerpt_length', 55 );
+
+                $content = $this->getContent();
+                $text = wp_trim_words( $content, $excerpt_length, '...' );
+
+                $this->excerpt = apply_filters( 'wp_trim_excerpt', $text, $content );
+            }
+        }
+
+        return $this->excerpt;
+	}
+
+	/**
+	 * Detect excerpt
+	 *
+	 * @return bool
+	 */
+	public function hasExcerpt(){
+
+		return !empty($this->post->post_excerpt);
 	}
 
 	/**
