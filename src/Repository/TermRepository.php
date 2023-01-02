@@ -53,20 +53,25 @@ class TermRepository
         }
     }
 
+
+    /**
+     * @param array $args
+     * @param string $output
+     * @param string $operator
+     * @return string[]|\WP_Taxonomy[]
+     */
+    public function findTaxonomies($args=[], $output='names', $operator='and'){
+
+        return get_taxonomies($args, $output, $operator);
+    }
+
+
     /**
      * @return TermCollection
      */
     public function findAll(array $orderBy = null, $public=true)
     {
-	    if( $public ){
-
-		    $taxonomies = get_taxonomies(['public'=> true]);
-		    $taxonomies = array_filter($taxonomies, function ($taxonomy){ return is_taxonomy_viewable($taxonomy); });
-	    }
-	    else{
-
-		    $taxonomies = get_taxonomies();
-	    }
+        $taxonomies = $this->findTaxonomies(['public'=> $public, 'publicly_queryable'=> $public]);
 
         $criteria = [
             'taxonomy' => $taxonomies

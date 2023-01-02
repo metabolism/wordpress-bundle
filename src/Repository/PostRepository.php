@@ -24,25 +24,27 @@ class PostRepository
 
 
     /**
+     * @param array $args
+     * @param string $output
+     * @param string $operator
+     * @return string[]|\WP_Post_Type[]
+     */
+    public function findPostTypes($args=[], $output='names', $operator='and'){
+
+        return get_post_types($args, $output, $operator);
+    }
+
+
+    /**
      *
      * @return PostCollection
      */
     public function findAll(array $orderBy = null, $public=true)
     {
-		if( $public ){
-
-        $post_types = get_post_types(['public'=> true]);
-			unset($post_types['attachment']);
-
-			$post_types = array_filter($post_types, function ($post_type){ return is_post_type_viewable($post_type); });
-		}
-		else{
-
-			$post_types = get_post_types();
-		}
+        $post_types = $this->findPostTypes(['public'=> $public, 'publicly_queryable'=>$public]);
 
         $criteria = [
-		    'post_type' => $post_types
+            'post_type' => $post_types
         ];
 
         return $this->findBy($criteria, $orderBy, -1);
@@ -105,13 +107,13 @@ class PostRepository
 
         if( $orderBy ){
 
-			if( is_string($orderBy) )
-				$criteria = array_merge($criteria, ['orderby' => $orderBy, 'order' => 'DESC']);
-			else
-				$criteria = array_merge($criteria, ['orderby' => (array_keys($orderBy)[0]), 'order' => (array_values($orderBy)[0])]);
+            if( is_string($orderBy) )
+                $criteria = array_merge($criteria, ['orderby' => $orderBy, 'order' => 'DESC']);
+            else
+                $criteria = array_merge($criteria, ['orderby' => (array_keys($orderBy)[0]), 'order' => (array_values($orderBy)[0])]);
         }
 
-	    return new PostCollection($criteria);
+        return new PostCollection($criteria);
     }
 
 
@@ -156,10 +158,10 @@ class PostRepository
     }
 
 
-	/**
-	 * @param array $ids
-	 * @return PostCollection
-	 */
+    /**
+     * @param array $ids
+     * @return PostCollection
+     */
     public function findByGuid(array $ids)
     {
         $postCollection = new PostCollection();
@@ -185,11 +187,11 @@ class PostRepository
      */
     public function findOneByGuid($id)
     {
-         $postCollection = $this->findByGuid([$id]);
+        $postCollection = $this->findByGuid([$id]);
 
-		 if( count($postCollection) )
-			 return $postCollection[0];
+        if( count($postCollection) )
+            return $postCollection[0];
 
-		 return null;
+        return null;
     }
 }
