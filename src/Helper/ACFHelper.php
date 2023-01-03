@@ -361,8 +361,8 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
 				break;
 
 			case 'term':
-				$value = TermFactory::create( $id );
-				break;
+                $value = TermFactory::create( $id );
+                break;
 		}
 
 		return $value;
@@ -582,7 +582,7 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
 							else
 								$objects[$object['name']] = $value;
 						}
-					}
+                    }
 
 					break;
 

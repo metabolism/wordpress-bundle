@@ -52,11 +52,11 @@ class TermFactory {
 		if( !$taxonomy_name )
 		{
 			$term = get_term($id);
-			if( $term && !is_wp_error($term) )
+            if( $term && !is_wp_error($term) )
 				$taxonomy_name = $term->taxonomy;
 		}
 
-		if( !$taxonomy_name )
+        if( !$taxonomy_name )
 			return false;
 
 		return Factory::create($id, $taxonomy_name, 'term');

@@ -79,7 +79,7 @@ class Block extends Entity
             if( $block = acf_prepare_block($block['attrs']) ){
 
                 if( defined('ACF_MAJOR_VERSION') && ACF_MAJOR_VERSION > 5 )
-                    $block['id'] =  acf_ensure_block_id_prefix(acf_get_block_id( $block ));
+                    $block['id'] = acf_ensure_block_id_prefix(acf_get_block_id( $block ));
 
                 $block['blockName'] = $block['name'];
 

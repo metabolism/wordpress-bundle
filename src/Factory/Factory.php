@@ -35,7 +35,12 @@ class Factory {
 		if( $id == null || is_array($id) )
 			return false;
 
-		return wp_cache_get( $id.'_'.crc32(json_encode($args)), $type.'_factory' );
+        $key = $id;
+
+        if( !empty($args) )
+            $key .= crc32(json_encode($args));
+
+		return wp_cache_get( $key, $type.'_factory' );
 	}
 
 
@@ -52,7 +57,12 @@ class Factory {
 		if( $id == null || is_array($id) )
 			return false;
 
-		return wp_cache_set( $id.'_'.crc32(json_encode($args)), $object, $type.'_factory' );
+        $key = $id;
+
+        if( !empty($args) )
+            $key .= crc32(json_encode($args));
+
+		return wp_cache_set( $key, $object, $type.'_factory' );
 	}
 
 
@@ -71,33 +81,32 @@ class Factory {
 		$item = self::loadFromCache($id, $class);
 
 		if( $item )
-			return $item;
+            return $item;
 
 		$classname = self::getClassname($class);
+
 		$app_classname = 'App\Entity\\'.$classname;
-        $bundle_classname = 'Metabolism\WordpressBundle\Entity\\'.$classname;
+        $bundle_classname = $default_classname = 'Metabolism\WordpressBundle\Entity\\'.$classname;
 
-		if( class_exists($app_classname) && class_exists($bundle_classname) && is_subclass_of($app_classname, $bundle_classname) ){
+        if( $default_class )
+            $default_classname = 'Metabolism\WordpressBundle\Entity\\'.self::getClassname($default_class);
 
-			$item = new $app_classname($id);
+		if( class_exists($app_classname) && is_subclass_of($app_classname, $default_classname)  ){
+
+            $item = new $app_classname($id);
 		}
 		else{
 
-			if( class_exists($bundle_classname) ){
-
+            if( class_exists($bundle_classname) )
 				$item = new $bundle_classname($id);
-            }
-			elseif( $default_class ){
-
+			elseif( $default_class )
 				$item = self::create($id, $default_class);
-			}
 		}
 
 		if( is_wp_error($item) || !$item || !$item->exist() )
 			$item = false;
 
-		if( !$item )
-			self::saveToCache($id, $item, $class);
+		self::saveToCache($id, $item, $class);
 
 		return $item;
 	}

@@ -49,7 +49,7 @@ class Term extends Entity
 	 */
 	public function __construct($id){
 
-		if( is_array($id) ) {
+        if( is_array($id) ) {
 
 			if( empty($id) || isset($id['invalid_taxonomy']) )
 				return;
@@ -108,7 +108,7 @@ class Term extends Entity
 
 		if( $term = get_term($pid) ) {
 
-			if( is_wp_error($term) || !$term )
+            if( is_wp_error($term) || !$term )
 				return false;
 
 			$this->term = $term;
