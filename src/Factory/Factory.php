@@ -75,14 +75,13 @@ class Factory {
 
 		$classname = self::getClassname($class);
 		$app_classname = 'App\Entity\\'.$classname;
+        $bundle_classname = 'Metabolism\WordpressBundle\Entity\\'.$classname;
 
-		if( class_exists($app_classname) ){
+		if( class_exists($app_classname) && class_exists($bundle_classname) && is_subclass_of($app_classname, $bundle_classname) ){
 
 			$item = new $app_classname($id);
 		}
 		else{
-
-			$bundle_classname = 'Metabolism\WordpressBundle\Entity\\'.$classname;
 
 			if( class_exists($bundle_classname) ){
 

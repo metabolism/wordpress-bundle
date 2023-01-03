@@ -393,6 +393,21 @@ class WordpressTwigExtension extends AbstractExtension{
 
 				$page = get_page_by_title($page);
 				break;
+
+			case 'slug':
+
+                if( !is_array($page) or count($page) != 2 )
+                    return false;
+
+                $post_ids = get_posts([
+                    'name'   => $page[0],
+                    'post_type'   => $page[1],
+                    'numberposts' => 1,
+                    'fields' => 'ids'
+                ]);
+
+				if( count($post_ids) )
+                    $page = $post_ids[0];
 		}
 
 		if( $page ){
