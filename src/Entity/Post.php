@@ -219,8 +219,20 @@ class Post extends Entity
 	 */
 	public function getBlocks(){
 
-		if( is_null($this->blocks) )
-			$this->blocks = BlockHelper::parse($this->post->post_content);
+		if( is_null($this->blocks) ){
+
+            $_blocks = parse_blocks($this->post->post_content);
+
+            $blocks = [];
+
+            foreach ($_blocks as $_block){
+
+                if( !empty($_block['blockName']) )
+                    $blocks[] = new Block($_block);
+            }
+
+            $this->blocks = $blocks;
+        }
 
 		return $this->blocks;
 	}

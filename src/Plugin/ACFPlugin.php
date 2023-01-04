@@ -2,7 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Plugin;
 
-use Metabolism\WordpressBundle\Helper\BlockHelper;
+use Metabolism\WordpressBundle\Entity\Block;
 
 
 /**
@@ -32,6 +32,29 @@ class ACFPlugin {
         return $field;
     }
 
+    /**
+     * Render block
+     * @param $acf_block
+     * @return void
+     */
+    public static function renderBlock($acf_block){
+
+        $block = [
+            'blockName'=>$acf_block['name'],
+            'attrs' => $acf_block
+        ];
+
+        if( $image = $acf_block['data']['_preview_image']??false ){
+
+            echo '<img src="'.get_home_url().'/'.$image.'" style="width:100%;height:auto" class="preview_image"/>';
+            return;
+        }
+
+        $block = new Block($block);
+
+        echo $block->render();
+    }
+
 
     /**
      * ACFPlugin constructor.
@@ -42,7 +65,6 @@ class ACFPlugin {
         add_filter('acf/settings/load_json', function(){ return [BASE_URI.$this::$folder]; });
 
         add_filter('acf/validate_field', [$this, 'validateField']);
-
-		add_filter('block_render_callback', function ( $callback ){ return [BlockHelper::class, 'render']; });
+		add_filter('block_render_callback', function (){ return [self::class, 'renderBlock']; });
     }
 }

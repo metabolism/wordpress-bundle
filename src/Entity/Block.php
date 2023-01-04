@@ -129,7 +129,14 @@ class Block extends Entity
 		try {
 
 			$post = $postRepository->findQueried();
-			return $template->render(['props'=>$this->getContent(), 'post'=>$post, 'block'=>$this, 'blog'=>$blog, 'is_component_preview'=>true]);
+
+			return $template->render([
+                'props'=>$this->getContent(),
+                'post'=>$post,
+                'block'=>$this,
+                'blog'=>$blog,
+                'is_component_preview'=>true
+            ]);
 
 		} catch (\Throwable $t) {
 
