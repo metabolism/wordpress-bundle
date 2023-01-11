@@ -36,7 +36,7 @@ class Image extends Entity
     protected $compression;
     protected $args;
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getLink();
     }

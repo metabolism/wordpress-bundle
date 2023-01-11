@@ -33,7 +33,7 @@ class Comment extends Entity
 	/** @var \WP_Comment */
 	protected $comment;
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->content??'Invalid comment';
     }

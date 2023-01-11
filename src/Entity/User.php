@@ -27,7 +27,7 @@ class User extends Entity
 	/** @var \WP_User */
 	protected $user;
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->display_name??'Invalid user';
     }

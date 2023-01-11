@@ -58,7 +58,7 @@ class Blog extends Entity
 
     private $queried_object;
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getTitle();
     }

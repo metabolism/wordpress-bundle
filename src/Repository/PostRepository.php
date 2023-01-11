@@ -96,9 +96,6 @@ class PostRepository
     {
         $criteria['fields'] = 'ids';
 
-        if( !isset($criteria['post_status']) )
-            $criteria['post_status'] = 'publish';
-
         if( $limit )
             $criteria['posts_per_page'] = $limit;
 

@@ -27,7 +27,7 @@ class File extends Entity
 
     protected $post;
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getLink();
     }

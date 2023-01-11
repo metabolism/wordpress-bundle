@@ -53,7 +53,8 @@ class Post extends Entity
 	/** @var \WP_Post|bool */
 	protected $post;
 
-	public function __toString(){
+	public function __toString(): string
+    {
 
 		return $this->title??'Invalid post';
 	}

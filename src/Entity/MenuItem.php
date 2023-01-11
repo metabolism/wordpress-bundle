@@ -33,7 +33,7 @@ class MenuItem extends Entity
 	protected $object;
 	protected $item;
 
-	public function __toString()
+	public function __toString(): string
 	{
 		return $this->title ? '<a href="' . $this->link . '" target="' . $this->target . '">' . $this->title . '</a>' : '';
 	}
