@@ -17,7 +17,10 @@ wordpress:
     remove_core_block: true
     remove_block_library: true
     load_remote_block_patterns: false
-    #block_editor_style: '/build/bundle.css'
+    block_editor_style: '/build/bundle.css'
+    block_editor_script: '/blocks.js'
+    render_template: 'blocks/{name}.html.twig'
+    preview_image: true
 
 
   #########################
@@ -63,6 +66,7 @@ wordpress:
     - sup
     - strikethrough
     - superscript
+    - subscript
     - bullist
     - numlist
     - blockquote
@@ -129,56 +133,53 @@ wordpress:
     user_settings:
       gallery_height: 210
     options_page: #add option pages https://www.advancedcustomfields.com/resources/options-page/
-      - 'Personnalisation'
+      - 'Global'
+      - 'Translations'
+    input:
+      lock_max_length: false
     toolbars: #customize wysiwyg toolbar
       Full:
         1:
           - formatselect
           - bold
           - italic
-          - underline
           - blockquote
-          - strikethrough
           - superscript
+          - subscript
           - bullist
           - numlist
-          - blockquote
-          - hr
           - table
-          - alignleft
-          - aligncenter
-          - alignright
           - alignjustify
-          - link
-          - unlink
-          - wp_more
-          - spellchecker
-          - wp_adv
-          - dfw
-        2:
-          - strikethrough
-          - hr
-          - forecolor
           - pastetext
+          - removeformat
+          - link
+          - wp_adv
+          - fullscreen
+        2:
+          - undo
+          - redo
+          - hr
+          - underline
+          - strikethrough
+          - forecolor
           - removeformat
           - charmap
           - outdent
           - indent
-          - undo
-          - redo
-          - wp_help
       Basic:
         1:
-          - formatselect
           - bold
           - italic
-          - underline
-          - strikethrough
+          - blockquote
           - superscript
+          - subscript
+          - bullist
+          - numlist
           - link
-          - alignleft
           - alignjustify
           - pastetext
+          - removeformat
+          - fullscreen
 
 
   ################
@@ -214,10 +215,13 @@ wordpress:
     title-text:
       title: Title with text
       description: Title with text
-      render_template: 'block/title-text.html.twig'
-      category: 'layout'
+      supports:
+        align_text: 'left'
+        #multiple: false
       icon: 'editor-alignleft'
-      #preview_image: true
+      post_types:
+        - page
+        - guide
 
 
   ##########################
@@ -240,6 +244,11 @@ wordpress:
       #orderby: name #https://developer.wordpress.org/reference/classes/wp_query/#order-orderby-parameters
       #order: ASC
       show_in_rest: true
+      #template:
+      #  - - acf/title-text
+      #    - lock:
+      #        move: true
+      #        remove: true
       supports:
         - title
         - excerpt
@@ -285,6 +294,11 @@ wordpress:
       #publicly_queryable: false
       object_type:
         - guide
+      #capabilities:
+      #  manage_terms: 'do_not_allow'
+      #  edit_terms: 'do_not_allow'
+      #  delete_terms: 'do_not_allow'
+      #  assign_terms: 'edit_posts'
       #labels:
       #  name:           'Catégories'
       #  singular_name:  'Catégorie'
@@ -317,9 +331,9 @@ wordpress:
   #      reportage: 'Reportage'
   #      video: 'Video'
 
-  ## Add page states, like "homepage"
+  ## Add page states like "homepage"
   #page_states:
-    #archive_guide: 'Archive des guides'
+    #archive_guide: 'Guide archive'
 
   #################################
   ##    Database table viewer    ##
@@ -355,29 +369,45 @@ wordpress:
   #############################################
   #role:
   #  translator:
-  #    display_name: Traducteur
+  #    display_name: Translator
   #    redirect_to: edit.php?post_type=guide
   #    #inherit: editor
   #    capabilities:
   #      read: true
   #      publish: false
+  #      manage_items: true
+  #      edit_items: true
   #
-  #      edit_others_guides: true
-  #      read_guide: true
-  #      edit_guides: true
-  #      publish_guides: false
-  #      edit_published_guides: true
+  #      edit_blocks: false
   #
+  #      manage_categories: true
+  #      edit_category: true
+  #      delete_category: false
+  #      assign_category: false
+  #
+  #      edit_others_pages: true
+  #      read_page: true
+  #      edit_pages: true
+  #      publish_pages: false
+  #      edit_published_pages: true
+  #
+  #      edit_others_posts: true
+  #      read_post: true
+  #      edit_posts: true
+  #      publish_posts: false
+  #      edit_published_posts: true
+  #
+  #      acf_edit_taxonomy: false
   #      acf_edit_layout: false
+  #      acf_edit_relationship: false
   #      acf_edit_repeater: false
   #      acf_edit_true-false: false
   #      acf_edit_radio: false
+  #      acf_edit_select: false
   #      acf_edit_image: false
   #      acf_edit_file: false
+  #      acf_edit_link: false
   #      acf_edit_post-object: false
-  #
-  #      manage_items: true
-  #      edit_items: true
 
 
   ############################
@@ -394,6 +424,7 @@ wordpress:
 
   rewrite_rules:
     remove:
+      - author
       - attachment
       - embed
       - trackback
@@ -409,16 +440,6 @@ wordpress:
     xmlrpc: false
     pings: false
     disable_update: true
-
-  ###################
-  ##    Export    ##
-  ##################
-
-  export:
-    copy:
-      '/public/theme' : /theme
-      '/public/favicon' : /favicon
-      '/public/uploads' : /uploads
 
   ##################
   ##    Search    ##
