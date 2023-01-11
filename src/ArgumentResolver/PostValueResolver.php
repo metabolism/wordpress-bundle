@@ -30,6 +30,10 @@ class PostValueResolver implements ArgumentValueResolverInterface {
      */
     public function supports(Request $request, ArgumentMetadata $argument)
     {
+        if(is_null($argument->getType()) || !class_exists($argument->getType())) {
+            return false;
+        }
+        
         return Post::class === $argument->getType() || get_parent_class($argument->getType()) == Post::class;
     }
 
