@@ -553,12 +553,12 @@ class Post extends Entity
 	 *
 	 * @return PostCollection|false
 	 */
-	public function getChildren() {
+	public function getChildren($orderBy='menu_order') {
 
-		if( is_null($this->children) ){
+		if( is_null($this->children) || $orderBy != 'menu_order' ){
 
 			$postRepository = new PostRepository();
-			$this->children = $postRepository->findBy(['post_parent'=>$this->ID, 'post_type'=>$this->type],null, -1);
+			$this->children = $postRepository->findBy(['post_parent'=>$this->ID, 'post_type'=>$this->type], $orderBy, -1);
 		}
 
 		return $this->children;
@@ -570,12 +570,12 @@ class Post extends Entity
 	 *
 	 * @return PostCollection|false
 	 */
-	public function getSiblings() {
+	public function getSiblings($orderBy='menu_order') {
 
-		if( is_null($this->siblings) ){
+		if( is_null($this->siblings) || $orderBy != 'menu_order' ){
 
 			$postRepository = new PostRepository();
-			$this->siblings = $postRepository->findBy(['post_parent'=>$this->post->post_parent, 'post_type'=>$this->type, 'post__not_in'=>[$this->ID]], null, -1);
+			$this->siblings = $postRepository->findBy(['post_parent'=>$this->post->post_parent, 'post_type'=>$this->type, 'post__not_in'=>[$this->ID]], $orderBy, -1);
 		}
 
 		return $this->siblings;

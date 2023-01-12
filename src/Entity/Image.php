@@ -552,6 +552,7 @@ class Image extends Entity
         }
 
         $image = ImageManagerStatic::make($this->src);
+        $image->orientate();
 
         foreach ($params as $type=>$param){
 
