@@ -22,8 +22,6 @@ class AppExtension extends AbstractExtension{
 	public function getFilters()
 	{
 		return [
-			new TwigFilter( 'protect_email', [$this,'protectEmail'], ['pre_escape' => 'html', 'is_safe' => ['html']] ),
-			new TwigFilter( 'youtube_id', [$this,'youtubeID'] ),
 			new TwigFilter( 'clean_id', [$this,'cleanID'] ),
 			new TwigFilter( 'format_number', [$this,'formatNumber'] ),
 			new TwigFilter( 'll_CC', [$this,'llCC'] ),
@@ -36,7 +34,6 @@ class AppExtension extends AbstractExtension{
 			new TwigFilter( 'br_to_line', [$this, 'brToLine']),
 			new TwigFilter( 'remove_br', [$this, 'removeBr']),
 			new TwigFilter( 'file_content', [$this, 'getFileContent']),
-			new TwigFilter( 'map_url', [$this, 'mapUrl']),
 			new TwigFilter( 'wrap_embed', [$this, 'wrapEmbed']),
 			new TwigFilter( 'truncate', [$this, 'truncate'])		];
 	}
@@ -195,48 +192,6 @@ class AppExtension extends AbstractExtension{
 
 
 	/**
-	 * Email string verification.
-	 *
-	 * @param        $text
-	 * @param bool $mailto
-	 * @return mixed
-	 */
-	public function protectEmail($text, $mailto = false)
-	{
-		preg_match_all( '/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', $text, $potentialEmails, PREG_SET_ORDER );
-
-		$potentialEmailsCount = count( $potentialEmails );
-
-		for ( $i = 0; $i < $potentialEmailsCount; $i++ )
-		{
-			if ( filter_var( $potentialEmails[$i][0], FILTER_VALIDATE_EMAIL ) )
-			{
-				$email = $potentialEmails[$i][0];
-				$email = explode( '@', $email );
-
-				$text = str_replace( $potentialEmails[$i][0], '<email name="' . $email[0] . '" domain="' . $email[1] . '" mailto="'.($mailto?1:0).'"></email>', $text );
-			}
-		}
-
-		return $text;
-	}
-
-
-	/**
-	 * Returns the video ID of a youtube video.
-	 *
-	 * @param $url
-	 * @return string
-	 */
-	public function youtubeID($url)
-	{
-		preg_match( '/^(?:http(?:s)?:\/\/)?(?:www\.)?(?:m\.)?(?:youtu\.be\/|youtube\.com\/(?:(?:watch)?\?(?:.*&)?v(?:i)?=|(?:embed|v|vi|user)\/))([^\?&">]+)/', $url, $matches );
-
-		return count( $matches ) > 1 ? $matches[1] : '';
-	}
-
-
-	/**
 	 * format id
 	 *
 	 * @param $text
@@ -332,18 +287,6 @@ class AppExtension extends AbstractExtension{
 		$str = preg_replace( '#&([A-za-z]{2})(?:lig);#', '\1', $str ); // pour les ligatures e.g. '&oelig;'
 
 		return preg_replace( '#&[^;]+;#', '', $str ); // supprime les autres caractères
-	}
-
-	/**
-	 * @param $map_field
-	 * @return bool|string
-	 */
-	public function mapURL($map_field)
-	{
-		if( isset($map_field['lat'], $map_field['lng']))
-			return 'https://www.google.com/maps?daddr='.$map_field['lat'].','.$map_field['lng'];
-
-		return false;
 	}
 
 	/**
