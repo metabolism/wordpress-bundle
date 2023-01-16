@@ -44,6 +44,8 @@ class EditorPlugin {
             update_option('template', 'void');
             update_option('stylesheet', 'void');
         }
+
+        remove_submenu_page('themes.php', 'themes.php' );
     }
 
 

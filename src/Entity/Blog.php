@@ -29,6 +29,8 @@ class Blog extends Entity
     protected $debug;
     protected $environment;
     protected $locale;
+    protected $charset;
+    protected $description;
     protected $is_admin;
     protected $language;
     protected $is_front_page;
@@ -178,6 +180,28 @@ class Blog extends Entity
 		return $this->language;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getCharset(): string
+	{
+		if( is_null($this->charset) )
+			$this->charset = get_bloginfo('charset');
+
+		return $this->charset;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDescription(): string
+	{
+		if( is_null($this->description) )
+			$this->description = get_bloginfo('description');
+
+		return $this->description;
+	}
+
     /**
      * @param string $post_type
      * @return false|string
@@ -247,6 +271,14 @@ class Blog extends Entity
 
 		return $this->locale;
 	}
+
+    /**
+     * return lang attribute
+     */
+    public function getLanguageAttributes(): string
+    {
+        return 'lang="'.$this->getLocale().'"';
+    }
 
 	/**
 	 * @return string

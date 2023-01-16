@@ -10,8 +10,6 @@ use Metabolism\WordpressBundle\Entity\Block;
  */
 class ACFPlugin {
 
-    public static $folder = '/config/packages/acf';
-
 
     /**
      * Add entity return format
@@ -61,9 +59,6 @@ class ACFPlugin {
      */
     public function __construct()
     {
-        add_filter('acf/settings/save_json', function(){ return BASE_URI.$this::$folder; });
-        add_filter('acf/settings/load_json', function(){ return [BASE_URI.$this::$folder]; });
-
         add_filter('acf/validate_field', [$this, 'validateField']);
 		add_filter('block_render_callback', function (){ return [self::class, 'renderBlock']; });
     }

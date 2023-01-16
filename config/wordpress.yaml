@@ -17,8 +17,8 @@ wordpress:
     remove_core_block: true
     remove_block_library: true
     load_remote_block_patterns: false
-    block_editor_style: '/build/bundle.css'
-    block_editor_script: '/blocks.js'
+    #block_editor_style: '/build/bundle.css'
+    #block_editor_script: '/blocks.js'
     render_template: 'blocks/{name}.html.twig'
     preview_image: true
 
@@ -109,7 +109,7 @@ wordpress:
     #  - video
     #  - gallery
 
-  ## Use Wordpress as a headless cms
+  ## Use WordPress as a headless cms
   #headless:
   #  mapping: true
 
@@ -127,6 +127,7 @@ wordpress:
   ###############
 
   acf:
+    json_path: '/config/packages/acf'
     settings:
       use_entity: true #add new optimised return format
       autoload: true #autoload options
