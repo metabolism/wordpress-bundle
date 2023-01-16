@@ -5,9 +5,7 @@ namespace Metabolism\WordpressBundle\Entity;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\TermFactory;
-use Metabolism\WordpressBundle\Helper\BlockHelper;
 use Metabolism\WordpressBundle\Repository\PostRepository;
-use function Metabolism\WordpressBundle\Helper\BlockHelper;
 
 /**
  * Class Post

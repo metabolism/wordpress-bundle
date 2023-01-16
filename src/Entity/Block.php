@@ -74,6 +74,9 @@ class Block extends Entity
 		if( empty($block['blockName']??'') )
 			return false;
 
+        if( substr($block['blockName'], 0, 4) !== 'acf/')
+            return $block;
+
 		if( class_exists('ACF') && !empty($block['attrs']) ){
 
             if( $block = acf_prepare_block($block['attrs']) ){
