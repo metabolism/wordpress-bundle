@@ -45,12 +45,14 @@ class EditorPlugin {
             update_option('stylesheet', 'void');
         }
 
-        remove_submenu_page('themes.php', 'themes.php' );
+        add_action('admin_menu', function (){
+            remove_submenu_page('themes.php', 'themes.php' );
+        });
     }
 
 
     /**
-     * ConfigPlugin constructor.
+     * Constructor.
      */
     public function __construct()
     {
