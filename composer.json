@@ -1,13 +1,14 @@
 {
   "name":"metabolism/wordpress-bundle",
   "type": "symfony-bundle",
-  "version": "2.0.3",
-  "description": "Use Wordpress as a backend for a Symfony application",
+  "version": "2.1.0",
+  "description": "Build enterprise solutions with WordPress",
   "license": "GPL-3.0-or-later",
   "keywords": [
     "framework",
     "symfony",
     "wordpress",
+    "bundle",
     "plugin"
   ],
   "require": {
@@ -31,7 +32,7 @@
     "symfony/http-client": "^4.0|^5.0",
     "metabolism/wordpress-core-installer": "^1.0",
     "metabolism/package-actions": "^1.0",
-    "metabolism/wp-steroids": "1.0.x-dev",
+    "metabolism/wp-steroids": "^1.1.0",
     "metabolism/void": "^2.0",
     "johnpbloch/wordpress-core": "^5.0|^6.0",
     "ifsnop/mysqldump-php":"^2.0",
@@ -90,7 +91,8 @@
     },
     "branch-alias": {
       "dev-1.4.x": "1.4.x-dev",
-      "dev-2.0.x": "2.0.x-dev"
+      "dev-2.0.x": "2.0.x-dev",
+      "dev-2.1.x": "2.1.x-dev"
     }
   },
   "autoload" : {

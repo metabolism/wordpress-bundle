@@ -22,7 +22,6 @@ __Example :__
 /**
  * @param Post $post
  * @param PostRepository $postRepository
- * @param BreadcrumbService $breadcrumbService
  * @return Response
  */
 public function pageAction(Post $post, PostRepository $postRepository)
@@ -32,8 +31,8 @@ public function pageAction(Post $post, PostRepository $postRepository)
     // get current post
     $context['post'] = $post;
     
-    // find 10 "brands" ordered by title
-    $context['brands'] = $postRepository->findBy(['post_type'=>'brand'], ['title'=>'ASC'], 10);
+    // find 10 "guide" ordered by title
+    $context['guides'] = $postRepository->findBy(['post_type'=>'guide'], ['title'=>'ASC'], 10);
 
     return $this->render('page.html.twig', $context);
 }
@@ -64,8 +63,8 @@ public function pageAction(Post $post, PostRepository $postRepository)
     
     <small>{{ post.custom_fields.mention }}</small>
     
-    {% for brand in brands %}
-        {% include 'brand.html.twig' %}
+    {% for guide in guides %}
+        {% include 'guide.html.twig' with {props:guide} %}
     {% endfor %}
 
 </article>
@@ -76,8 +75,6 @@ public function pageAction(Post $post, PostRepository $postRepository)
 
 Full documentation is available on [Gitbook](https://metabolism.gitbook.io/symfony-wordpress-bundle/)
 
-[![Doc - Gitbook](https://img.shields.io/badge/Doc-Gitbook-346ddb?style=for-the-badge&logo=gitbook&logoColor=fff)](https://metabolism.gitbook.io/symfony-wordpress-bundle/)
-
 ## Features
 
 Using Composer :
@@ -85,7 +82,7 @@ Using Composer :
 * Install/update plugins via composer
 
 Using Symfony :
-* Template engine
+* Twig template engine
 * Folder structure
 * Http Cache
 * Routing
@@ -96,16 +93,15 @@ Using Symfony :
 * MVC
 
 Using WordPress Bundle :
-* Post/Term Repository
-* Controller argument resolver for post(s), term and user
+* Post/Term/User Repository
+* Controller argument resolver for post(s), term, user and blog
 * Symfony Cache invalidation on update ( Varnish compatible )
 * Post/PostCollection/Image/Menu/Term/User/Comment/Blog/Block entity
-* WordPress predefined routes
+* Possible use of WordPress predefined routes
 * Site health checker url
-* Static site export command
 
 Using [WP Steroids](https://github.com/wearemetabolism/wp-steroids) WordPress plugin :
-* WordPress configuration using yml ( [view sample](config/wordpress.yaml) )
+* WordPress' configuration using yml ( [view sample](config/wordpress.yaml) )
 * Permalink configuration for custom post type and taxonomy
 * Maintenance mode
 * Backup download in dev mode
@@ -113,14 +109,33 @@ Using [WP Steroids](https://github.com/wearemetabolism/wp-steroids) WordPress pl
 * Disabled automatic update
 * Enhanced Security
 * Better guid using RFC 4122 compliant UUID version 5
-* Multisite images sync ( for multisite as multi-langue )
+* Multisite images sync ( for multisite as multilangue )
 * SVG Support
 * Better Performance
 * WordPress Bugfix
 * CSS Fix
-* Relative urls
 * Multisite post deep copy ( with multisite-language-switcher plugin )
 * Custom datatable support with view and delete actions in admin
+* Google translate or Deepl integration
+* Optimisations
+
+YML file allows to configure :
+* Image options
+* Maintenance support
+* Admin pages removal
+* WYSIWYG MCE Editor
+* Feature Support
+* Multi-site configuration
+* ACF configuration
+* Menu
+* Custom Post type
+* Custom Taxonomy
+* Block
+* Page, post, taxonomy template
+* Page state
+* Post format
+* External table viewer
+* Advanced roles
 
 ## Installation
 
@@ -197,20 +212,16 @@ This is an implementation of the Twenty Nineteen WordPress theme for wordpress-b
 * More samples
 * Global maintenance mode for multi-site
 * Unit tests
+* Better type hinting
 
 ## Drawbacks
 
-WordPress's functions are available in the global namespace.
+WordPress' functions are available in the global namespace.
 
-Some plugins may not work ( ex : Woocommerce ).
+Some WordPress plugins may not work ( ex : Woocommerce ) or require extra works.
 
 ## Licence
 
 GPL 3.0 or later
 
 This package is [Treeware](https://treeware.earth). If you use it in production, then we ask that you [**buy the world a tree**](https://plant.treeware.earth/metabolism/wordpress-bundle) to thank us for our work. By contributing to the Treeware forest you’ll be creating employment for local families and restoring wildlife habitats.
-    
-## Maintainers
-
-Current maintainers:
- * Jérôme Barbato - jerome@akhela.fr
