@@ -293,6 +293,7 @@ wordpress:
       #order: ASC
       #radio: true #display terms selection as radio instead of checkbox
       #publicly_queryable: false
+      show_in_rest: true
       object_type:
         - guide
       #capabilities:

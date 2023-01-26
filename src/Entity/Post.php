@@ -23,6 +23,7 @@ class Post extends Entity
 
 	protected $taxonomies;
 	protected $blocks;
+	protected $blocks_list;
 	protected $slug;
 	protected $status;
 	protected $type;
@@ -223,14 +224,19 @@ class Post extends Entity
             $_blocks = parse_blocks($this->post->post_content);
 
             $blocks = [];
+            $blocks_list = [];
 
             foreach ($_blocks as $_block){
 
-                if( !empty($_block['blockName']) )
+                if( !empty($_block['blockName']) ){
+
                     $blocks[] = new Block($_block);
+                    $blocks_list[] = $_block['blockName'];
+                }
             }
 
             $this->blocks = $blocks;
+            $this->blocks_list = array_unique($blocks_list);
         }
 
 		return $this->blocks;
@@ -406,6 +412,17 @@ class Post extends Entity
     public function hasBlocks(){
 
         return has_blocks( $this->post->post_content );
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasBlock($name){
+
+        if( is_null($this->blocks_list) )
+            $this->getBlocks();
+
+        return in_array($name, $this->blocks_list);
     }
 
 	/**

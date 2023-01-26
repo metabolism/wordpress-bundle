@@ -707,7 +707,7 @@ class Image extends Entity
             if( $sources && is_array($sources) ){
 
                 foreach ($sources as $media=>$size)
-                    $html .='<source media="('.$media.')" srcset="'.$this->placeholder($size[0], count($size)>1?$size[1]:0).'" type="image/jpeg"/>';
+                    $html .='<source media="('.$media.')" srcset="'.$this->placeholder($size[0], $size[1]??0).'" type="image/jpeg"/>';
             }
 
             $html .= '<img src="'.$this->placeholder($w, $h).'" alt="'.$this->alt.'" loading="'.$loading.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
@@ -723,7 +723,7 @@ class Image extends Entity
 
         if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' ){
 
-            $html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="'.$loading.'" type="'.$this->mime_type.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
+            $html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="'.$loading.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
         }
         else{
 

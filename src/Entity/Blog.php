@@ -316,7 +316,15 @@ class Blog extends Entity
 		if( is_null($this->is_archive) ){
 
 			$queried_object = $this->getQueriedObject();
-			$this->is_archive = is_object($queried_object) && get_class($queried_object) == 'WP_Post_Type' ? $queried_object->name : false;
+
+            $type = is_object($queried_object) ? get_class($queried_object) : false;
+
+            if( $type == 'WP_Post_Type')
+                $this->is_archive = $queried_object->name;
+            elseif( $type == 'WP_Term')
+                $this->is_archive = $queried_object->taxonomy;
+            else
+                $this->is_archive = false;
 		}
 
 		return $this->is_archive;
