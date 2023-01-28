@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
+use Intervention\Image\Exception\NotSupportedException;
 use Intervention\Image\ImageManagerStatic;
 
 /**
@@ -552,7 +553,9 @@ class Image extends Entity
         }
 
         $image = ImageManagerStatic::make($this->src);
-        $image->orientate();
+
+        try{ $image->orientate(); }
+        catch (NotSupportedException $e){}
 
         foreach ($params as $type=>$param){
 
