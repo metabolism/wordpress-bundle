@@ -29,13 +29,20 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 	 * @param Request $request
 	 * @return void
 	 */
-	private function fixServerVars(Request $request){
+    private function fixServerVars(Request $request){
 
-		$_SERVER['REQUEST_METHOD'] = $request->getMethod();
-		$_SERVER['REQUEST_URI'] = $request->getRequestUri();
-		$_SERVER['PHP_SELF'] = $request->getScriptName();
-		$_SERVER['PATH_INFO'] = $request->getPathInfo();
-	}
+        if( empty($_SERVER['REQUEST_METHOD']??'') )
+            $_SERVER['REQUEST_METHOD'] = $request->getMethod();
+
+        if( empty($_SERVER['REQUEST_URI']??'') )
+            $_SERVER['REQUEST_URI'] = $request->getRequestUri();
+
+        if( empty($_SERVER['PHP_SELF']??'') )
+            $_SERVER['PHP_SELF'] = $request->getScriptName();
+
+        if( empty($_SERVER['PATH_INFO']??'') )
+            $_SERVER['PATH_INFO'] = $request->getPathInfo();
+    }
 
     /**
      * @param ControllerEvent $event
