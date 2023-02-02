@@ -1,7 +1,7 @@
 {
   "name":"metabolism/wordpress-bundle",
   "type": "symfony-bundle",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "Build enterprise solutions with WordPress",
   "license": "GPL-3.0-or-later",
   "keywords": [
