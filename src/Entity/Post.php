@@ -728,19 +728,34 @@ class Post extends Entity
     }
     
     /**
+     * @param null $public
      * @return \WP_Taxonomy[]
      */
-    public function getTaxonomies(){
-        
-        if( is_null($this->taxonomies) )
-            $this->taxonomies = get_object_taxonomies( $this->type );
+    public function getTaxonomies($public=null){
+
+        if( is_null($this->taxonomies) || !is_null($public) ){
+
+            $taxonomies = get_object_taxonomies( $this->type, 'objects' );
+
+            if( $public === true )
+                $taxonomies = array_filter($taxonomies, function ($taxonomy){ return $taxonomy->public; });
+            elseif( $public === false )
+                $taxonomies = array_filter($taxonomies, function ($taxonomy){ return !$taxonomy->public; });
+
+            $taxonomies = array_map(function ($taxonomy){ return $taxonomy->name; }, $taxonomies);
+
+            if( !is_null($public) )
+                return $taxonomies;
+
+            $this->taxonomies = $taxonomies;
+        }
         
         return $this->taxonomies;
     }
     
     /**
      * Get primary term
-     * See: https://codex.wordpress.org/Function_Reference/wp_get_post_terms
+     * See: https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
      *
      * @param string $tax
      * @param array $args
@@ -769,6 +784,12 @@ class Post extends Entity
      */
     public function getTerms( $tax='', $args=[] ) {
         
+        if( is_array($tax) ){
+
+            $args = array_merge($tax, $args);
+            $tax = $args['taxonomy']??'';
+        }
+
         $return = 'fields';
         
         if( empty($args['fields']??'') ){
@@ -785,7 +806,7 @@ class Post extends Entity
         if ( is_string($tax) ) {
             
             if ( in_array($tax, ['all', 'any', '']) )
-                $taxonomies = $this->getTaxonomies();
+                $taxonomies = $this->getTaxonomies($args['public']??null);
             else
                 $taxonomies = [$tax];
         }
@@ -803,15 +824,8 @@ class Post extends Entity
             //todo: use TermRepository
             $terms = wp_get_post_terms($this->ID, $taxonomy, $args);
             
-            if( is_wp_error($terms) ){
-                
-                if( (!isset($args['hierarchical']) || $args['hierarchical']) && count($taxonomies)>1 )
-                    $term_array[$taxonomy][] = $terms->get_error_message();
-                else
-                    $term_array[] = $terms->get_error_message();
-            }
-            else
-            {
+            if( !is_wp_error($terms) ){
+
                 if( $return != 'entities')
                     return $terms;
                 

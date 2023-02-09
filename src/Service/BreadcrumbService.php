@@ -41,6 +41,16 @@ class BreadcrumbService
                     if( $link = $blog->getArchiveLink( $post->getType() ) )
                         $breadcrumb[] = ['title' => $blog->getArchiveTitle( $post->getType() ), 'link' => $link];
                     
+                    if( $term = $post->getTerm(['public'=>true]) ){
+
+                        $ancestors = $term->getAncestors();
+
+                        foreach ($ancestors as $ancestor)
+                            $breadcrumb[] = ['title' => $ancestor->getTitle(), 'link'=>$ancestor->getLink()];
+
+                        $breadcrumb[] = ['title' => $term->getTitle(), 'link' => $term->getLink()];
+                    }
+
                     if( $post->getParent() ){
                         
                         $parents = $post->getAncestors();
