@@ -123,7 +123,7 @@ class SiteHealthHelper {
 
 	private function getStatus($label, $url=''){
 
-		if( is_wp_error($url) )
+		if( is_wp_error($url) || !$url )
 			return;
 
 		$time_start = microtime(true);
@@ -185,7 +185,8 @@ class SiteHealthHelper {
                 continue;
 
 			$page = str_replace('_', ' ', str_replace('page_on_', '', $option));
-			$url = get_page_link($value);
+            $url = get_permalink($value);
+
 			$this->getStatus(ucfirst($page), $url);
 		}
 	}
