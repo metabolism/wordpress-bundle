@@ -578,6 +578,10 @@ class Post extends Entity
         if( is_null($this->children) || $orderBy != 'menu_order' ){
             
             $postRepository = new PostRepository();
+
+            if( is_string($orderBy) )
+                $orderBy = [$orderBy=>'ASC'];
+
             $this->children = $postRepository->findBy(['post_parent'=>$this->ID, 'post_type'=>$this->type], $orderBy, -1);
         }
         
