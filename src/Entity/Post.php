@@ -742,9 +742,9 @@ class Post extends Entity
             $taxonomies = get_object_taxonomies( $this->type, 'objects' );
 
             if( $public === true )
-                $taxonomies = array_filter($taxonomies, function ($taxonomy){ return $taxonomy->public; });
+                $taxonomies = array_filter($taxonomies, function ($taxonomy){ return is_taxonomy_viewable($taxonomy); });
             elseif( $public === false )
-                $taxonomies = array_filter($taxonomies, function ($taxonomy){ return !$taxonomy->public; });
+                $taxonomies = array_filter($taxonomies, function ($taxonomy){ return !is_taxonomy_viewable($taxonomy); });
 
             $taxonomies = array_map(function ($taxonomy){ return $taxonomy->name; }, $taxonomies);
 
