@@ -5,6 +5,7 @@ namespace Metabolism\WordpressBundle\Entity;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\TermFactory;
 use Metabolism\WordpressBundle\Repository\PostRepository;
+use Metabolism\WordpressBundle\Repository\TermRepository;
 
 /**
  * Class Term
@@ -13,267 +14,276 @@ use Metabolism\WordpressBundle\Repository\PostRepository;
  */
 class Term extends Entity
 {
-	public $entity = 'term';
+    public $entity = 'term';
 
-	protected $current;
-	protected $count;
-	protected $taxonomy;
-	protected $slug;
-	protected $title;
-	protected $group;
-	protected $content;
-	protected $children;
-	protected $depth;
-	protected $excerpt;
-	protected $link;
-	protected $parent;
-	protected $template;
-	protected $thumbnail;
-	protected $ancestors;
-	protected $path;
-	protected $public;
+    protected $current;
+    protected $count;
+    protected $taxonomy;
+    protected $slug;
+    protected $title;
+    protected $group;
+    protected $content;
+    protected $children;
+    protected $depth;
+    protected $excerpt;
+    protected $link;
+    protected $parent;
+    protected $template;
+    protected $thumbnail;
+    protected $ancestors;
+    protected $path;
+    protected $public;
     protected $post_types;
 
-	/** @var \WP_Term|bool */
-	protected $term;
+    /** @var \WP_Term|bool */
+    protected $term;
 
-	public function __toString(): string
+    public function __toString(): string
     {
 
-		return $this->title??'Invalid term';
-	}
+        return $this->title??'Invalid term';
+    }
 
-	/**
-	 * Post constructor.
-	 *
-	 * @param null $id
-	 */
-	public function __construct($id){
+    /**
+     * Post constructor.
+     *
+     * @param null $id
+     */
+    public function __construct($id){
 
         if( is_array($id) ) {
 
-			if( empty($id) || isset($id['invalid_taxonomy']) )
-				return;
+            if( empty($id) || isset($id['invalid_taxonomy']) )
+                return;
 
-			$id = $id[0];
-		}
+            $id = $id[0];
+        }
 
-		if( $term = $this->get($id) ) {
+        if( $term = $this->get($id) ) {
 
-			$this->ID = $term->term_id;
-			$this->taxonomy = $term->taxonomy;
-			$this->count = $term->count;
-			$this->slug = $term->slug;
-			$this->title = $term->name;
-			$this->group = $term->term_group;
-			$this->content = $term->description;
+            $this->ID = $term->term_id;
+            $this->taxonomy = $term->taxonomy;
+            $this->count = $term->count;
+            $this->slug = $term->slug;
+            $this->title = $term->name;
+            $this->group = $term->term_group;
+            $this->content = $term->description;
 
-			$this->loadMetafields($this->ID, 'term');
-		}
-	}
-
-
-	/**
-	 * Has parent term
-	 *
-	 * @return bool
-	 */
-	public function hasParent() {
-
-		return $this->term->parent > 0;
-	}
+            $this->loadMetafields($this->ID, 'term');
+        }
+    }
 
 
-	/**
-	 * Get attached post types
-	 *
+    /**
+     * Has parent term
+     *
+     * @return bool
+     */
+    public function hasParent() {
+
+        return $this->term->parent > 0;
+    }
+
+
+    /**
+     * Get attached post types
+     *
      * @return array
-	 */
-	public function getPostTypes() {
+     */
+    public function getPostTypes() {
 
         if( is_null($this->post_types) ){
 
             global $wp_taxonomies;
-            $this->post_types = $wp_taxonomies[$this->getTaxonomy()]->object_type;
+            $this->post_types = $wp_taxonomies[$this->taxonomy]->object_type;
         }
 
-		return $this->post_types;
-	}
+        return $this->post_types;
+    }
 
 
-	/**
-	 * @param $pid
-	 * @return \WP_Term|false
-	 */
-	protected function get($pid ) {
+    /**
+     * @param $pid
+     * @return \WP_Term|false
+     */
+    protected function get($pid ) {
 
-		if( $term = get_term($pid) ) {
+        if( $term = get_term($pid) ) {
 
-            if( is_wp_error($term) || !$term )
-				return false;
+            if( is_wp_error($term) )
+                return false;
 
-			$this->term = $term;
-		}
+            $this->term = $term;
+        }
 
-		return $term;
-	}
+        return $term;
+    }
 
-	/**
-	 * Get term path
-	 *
-	 * @return false|string
-	 */
-	public function getPath(){
+    /**
+     * Get term path
+     *
+     * @return false|string
+     */
+    public function getPath(){
 
-		if( is_null($this->path) && $this->isPublic() ){
+        if( is_null($this->path) && $this->isPublic() ){
 
-			$taxonomy_object = get_taxonomy($this->taxonomy);
+            $taxonomy_object = get_taxonomy($this->taxonomy);
 
-			if( $rewrite_slug = $taxonomy_object->rewrite['slug']??false )
-				$this->path = str_replace(get_home_url().'/'.$rewrite_slug.'/', '', $this->getLink());
-			else
-				$this->path = str_replace(get_home_url().'/', '', $this->getLink());
-		}
+            if( $rewrite_slug = $taxonomy_object->rewrite['slug']??false )
+                $this->path = str_replace(get_home_url().'/'.$rewrite_slug.'/', '', $this->getLink());
+            else
+                $this->path = str_replace(get_home_url().'/', '', $this->getLink());
+        }
 
-		return $this->path;
-	}
+        return $this->path;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isPublic(): bool
-	{
-		if( is_null($this->public) )
-			$this->public = is_taxonomy_viewable($this->taxonomy);
+    /**
+     * @return bool
+     */
+    public function isPublic(): bool
+    {
+        if( is_null($this->public) )
+            $this->public = is_taxonomy_viewable($this->taxonomy);
 
-		return $this->public;
-	}
+        return $this->public;
+    }
 
-	/**
-	 * Get term children
-	 *
-	 * @return Term[]
-	 */
-	protected function getChildren( ) {
+    /**
+     * Get term children
+     *
+     * @return TermCollection
+     */
+    protected function getChildren($args=[]) {
 
-		if( is_null($this->children) ){
+        if( is_null($this->children) || !empty($args) ){
 
-			$terms_id = get_term_children( $this->ID, $this->taxonomy );
+            $termRepository = new TermRepository();
 
-			foreach ($terms_id as $term_id)
-				$this->children[] = TermFactory::create($term_id);
-		}
+            $criteria = array_merge($args, [
+                'taxonomy' => $this->taxonomy,
+                'parent' => $this->ID
+            ]);
 
-		return $this->children;
-	}
+            $children = $termRepository->findBy($criteria);
 
-	/**
-	 * @return bool
-	 */
-	public function isCurrent(): bool
-	{
-		if( is_null($this->current) )
-			$this->current = $this->ID == get_queried_object_id();
+            if( !empty($args) )
+                return $children;
 
-		return $this->current;
-	}
+            $this->children = $children;
+        }
 
-	/**
-	 * @return int
-	 */
-	public function getCount(): int
-	{
-		return $this->count;
-	}
+        return $this->children;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getTaxonomy(): string
-	{
-		return $this->taxonomy;
-	}
+    /**
+     * @return bool
+     */
+    public function isCurrent(): bool
+    {
+        if( is_null($this->current) )
+            $this->current = $this->ID == get_queried_object_id();
 
-	/**
-	 * @return string
-	 */
-	public function getSlug(): string
-	{
-		return $this->slug;
-	}
+        return $this->current;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getTitle(): string
-	{
-		return $this->title;
-	}
+    /**
+     * @return int
+     */
+    public function getCount(): int
+    {
+        return $this->count;
+    }
 
-	/**
-	 * @return int|string
-	 */
-	public function getGroup()
-	{
-		return $this->group;
-	}
+    /**
+     * @return string
+     */
+    public function getTaxonomy(): string
+    {
+        return $this->taxonomy;
+    }
 
-	/**
-	 * @param bool $nl2br
-	 * @return string
-	 */
-	public function getContent(?bool $nl2br=true): string
-	{
-		return $nl2br?nl2br($this->content):$this->content;
-	}
+    /**
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
 
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
 
-	/**
-	 * Get term posts
-	 *
-	 * @return PostCollection
-	 */
-	public function getPosts($post_type='post', $orderBy=null, $limit=null, $offset=null) {
+    /**
+     * @return int|string
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
 
-		$postRepository = new PostRepository();
-
-		return $postRepository->findBy([
-			'post_type'=>$post_type,
-			'tax_query' => [[
-				'taxonomy' => $this->taxonomy,
-				'field' => 'slug',
-				'terms' => [$this->slug],
-				'operator' => 'IN'
-			]]
-		], $orderBy, $limit, $offset);
-	}
+    /**
+     * @param bool $nl2br
+     * @return string
+     */
+    public function getContent(?bool $nl2br=true): string
+    {
+        return $nl2br?nl2br($this->content):$this->content;
+    }
 
 
-	/**
-	 * Get parent term
-	 *
-	 * @return Term|false
-	 */
-	public function getParent() {
+    /**
+     * Get term posts
+     *
+     * @return PostCollection
+     */
+    public function getPosts($post_type='post', $orderBy=null, $limit=null, $offset=null) {
 
-		if( is_null($this->parent) )
-			$this->parent = TermFactory::create($this->term->parent);
+        $postRepository = new PostRepository();
 
-		return $this->parent;
-	}
+        return $postRepository->findBy([
+            'post_type'=>$post_type,
+            'tax_query' => [[
+                'taxonomy' => $this->taxonomy,
+                'field' => 'slug',
+                'terms' => [$this->slug],
+                'operator' => 'IN'
+            ]]
+        ], $orderBy, $limit, $offset);
+    }
+
+
+    /**
+     * Get parent term
+     *
+     * @return Term|false
+     */
+    public function getParent() {
+
+        if( is_null($this->parent) )
+            $this->parent = TermFactory::create($this->term->parent);
+
+        return $this->parent;
+    }
 
     /**
      * Get term link
      *
      * @return false|string
      */
-	public function getLink(){
+    public function getLink(){
 
-		if( is_null($this->link) )
-			$this->link = get_term_link( $this->term );
+        if( is_null($this->link) )
+            $this->link = get_term_link( $this->term );
 
-		return $this->link;
-	}
+        return $this->link;
+    }
 
 
     /**
@@ -290,94 +300,94 @@ class Term extends Entity
      *
      * @return int
      */
-	public function getDepth(){
+    public function getDepth(){
 
-		if( is_null($this->depth) )
-			$this->depth = count(get_ancestors( $this->ID, $this->taxonomy ));
+        if( is_null($this->depth) )
+            $this->depth = count(get_ancestors( $this->ID, $this->taxonomy ));
 
-		return $this->depth;
-	}
+        return $this->depth;
+    }
 
-	/**
-	 * Get term ancestors
-	 *
-	 * @param $reverse
-	 * @return array|Term[]
-	 */
-	public function getAncestors($reverse=true){
+    /**
+     * Get term ancestors
+     *
+     * @param $reverse
+     * @return array|Term[]
+     */
+    public function getAncestors($reverse=true){
 
-		if( is_null($this->ancestors) ){
+        if( is_null($this->ancestors) ){
 
-			$parents_id = get_ancestors($this->ID, $this->taxonomy);
+            $parents_id = get_ancestors($this->ID, $this->taxonomy);
 
-			if( $reverse )
-				$parents_id = array_reverse($parents_id);
+            if( $reverse )
+                $parents_id = array_reverse($parents_id);
 
-			$ancestors = [];
+            $ancestors = [];
 
-			foreach ($parents_id as $term_id)
-				$ancestors[] = TermFactory::create($term_id);
+            foreach ($parents_id as $term_id)
+                $ancestors[] = TermFactory::create($term_id);
 
-			$this->ancestors = $ancestors;
-		}
+            $this->ancestors = $ancestors;
+        }
 
-		return $this->ancestors;
-	}
+        return $this->ancestors;
+    }
 
     /**
      * Get term template
      *
      * @return string
      */
-	public function getTemplate(){
+    public function getTemplate(){
 
-		if( is_null($this->template) )
-			$this->template =  get_term_meta($this->ID, 'template', true);
+        if( is_null($this->template) )
+            $this->template =  get_term_meta($this->ID, 'template', true);
 
-		return $this->template;
-	}
+        return $this->template;
+    }
 
     /**
      * Get term excerpt
      *
      * @return string
      */
-	public function getExcerpt(){
+    public function getExcerpt(){
 
-		if( is_null($this->excerpt) )
-			$this->excerpt = strip_tags(term_description($this->ID),'<b><i><strong><em><br>');
+        if( is_null($this->excerpt) )
+            $this->excerpt = strip_tags(term_description($this->ID),'<b><i><strong><em><br>');
 
-		return $this->excerpt;
-	}
+        return $this->excerpt;
+    }
 
-	/**
-	 * @param $width
-	 * @param $height
-	 * @param $args
-	 * @return bool|Entity|mixed
-	 */
-	public function getThumbnail($width=0, $height=0, $args=[]){
+    /**
+     * @param $width
+     * @param $height
+     * @param $args
+     * @return bool|Entity|mixed
+     */
+    public function getThumbnail($width=0, $height=0, $args=[]){
 
-		//todo: move to ACFHelper Provider using action
-		if( is_null($this->thumbnail) && function_exists('get_field_object') ){
+        //todo: move to ACFHelper Provider using action
+        if( is_null($this->thumbnail) && function_exists('get_field_object') ){
 
-			$object = get_field_object('thumbnail', $this->taxonomy.'_'.$this->ID);
+            $object = get_field_object('thumbnail', $this->taxonomy.'_'.$this->ID);
 
-			if( $object && $object['value'] ){
+            if( $object && $object['value'] ){
 
-				$id = $object['return_format'] == 'array' ? $object['value']['id'] : $object['value'];
-				$this->thumbnail = Factory::create( $id, 'image');
-			}
-		}
+                $id = $object['return_format'] == 'array' ? $object['value']['id'] : $object['value'];
+                $this->thumbnail = Factory::create( $id, 'image');
+            }
+        }
 
-		if( !func_num_args() || !$this->thumbnail ){
+        if( !func_num_args() || !$this->thumbnail ){
 
-			return $this->thumbnail;
-		}
-		else{
+            return $this->thumbnail;
+        }
+        else{
 
-			$args['resize'] = [$width, $height];
-			return $this->thumbnail->edit($args);
-		}
-	}
+            $args['resize'] = [$width, $height];
+            return $this->thumbnail->edit($args);
+        }
+    }
 }
