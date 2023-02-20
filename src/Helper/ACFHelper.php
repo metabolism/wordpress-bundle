@@ -629,6 +629,7 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
                             break;
                         
                         $objects[$object['name']] = [
+                            'url'=>$object['value']['url'],
                             'link'=>$object['value']['url'],
                             'target'=>$object['value']['target'],
                             'title'=>$object['value']['title']
