@@ -461,6 +461,12 @@ class Image extends Entity
             $params['resize'] = (array)$params['resize'];
             $w = $params['resize'][0];
             $h = count($params['resize'])>1?$params['resize'][1]:0;
+
+            if( !($params['enlarge']??true) && $image_size = getimagesize($this->src) ){
+
+                $w = min($image_size[0], $w);
+                $h = min($image_size[1], $h);
+            }
         }
         else{
 

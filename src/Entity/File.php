@@ -145,6 +145,15 @@ class File extends Entity
         return $this->getLink();
     }
 
+    /**
+     * @deprecated
+     * @return string|null
+     */
+    public function getTarget(){
+
+        return '_blank';
+    }
+
 	/**
 	 * @return string
 	 */
