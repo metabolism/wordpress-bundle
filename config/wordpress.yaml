@@ -15,6 +15,7 @@ wordpress:
   gutenberg:
     replace_reset_styles: true
     remove_core_block: true
+    disable_classic_theme_styles: true
     remove_block_library: true
     load_remote_block_patterns: false
     #block_editor_style: '/build/bundle.css'
@@ -104,6 +105,7 @@ wordpress:
   ## Add theme support
   ## https://developer.wordpress.org/reference/functions/add_theme_support/
   theme_support:
+    - disable-layout-styles
     - thumbnail #add thumbnails to post
     #- post-formats:
     #  - video

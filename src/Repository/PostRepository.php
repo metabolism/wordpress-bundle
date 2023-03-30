@@ -169,7 +169,7 @@ class PostRepository
         global $wpdb;
         $in = implode(',', array_fill(0, count($ids), '%s') );
 
-        $ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE guid IN ($in)", $ids ), ARRAY_A );
+        $ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE guid IN ($in) ORDER BY FIELD(guid, $in)", array_merge($ids,$ids) ), ARRAY_A );
         $ids = array_map(function ($item){ return $item['ID']; }, $ids);
 
         $postCollection->setPosts($ids);
