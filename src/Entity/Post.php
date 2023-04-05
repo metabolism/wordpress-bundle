@@ -288,6 +288,10 @@ class Post extends Entity
                 
                 $this->excerpt = nl2br($this->post->post_excerpt);
             }
+            elseif( $this->hasBlocks() ){
+
+                $this->excerpt = false;
+            }
             else{
                 
                 $excerpt_length = (int) apply_filters( 'excerpt_length', 55 );
