@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Metabolism\WordpressBundle\Helper;
 
 use ArrayAccess;
@@ -141,7 +140,7 @@ class MetaHelper implements ArrayAccess
 	 * @param $offset
 	 * @return bool
 	 */
-	public function offsetExists($offset)
+	public function offsetExists($offset): bool
     {
        return $this->has($offset);
     }
@@ -160,7 +159,7 @@ class MetaHelper implements ArrayAccess
 	 * @param $value
 	 * @return void
 	 */
-	public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value): void
     {
         $this->setValue($offset, $value);
     }
@@ -169,7 +168,7 @@ class MetaHelper implements ArrayAccess
 	 * @param $offset
 	 * @return void
 	 */
-	public function offsetUnset($offset)
+	public function offsetUnset($offset): void
     {
         if( $this->has($offset) )
             unset($this->objects[$offset]);

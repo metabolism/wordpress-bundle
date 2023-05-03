@@ -61,7 +61,7 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	/**
 	 * @return ArrayIterator|Term[]
 	 */
-	public function getIterator() {
+	public function getIterator(): \Traversable {
 
 		return new ArrayIterator($this->items);
 	}
@@ -81,7 +81,7 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 *
 	 * @return int
 	 */
-	public function count()
+	public function count(): int
 	{
 		return $this->query ? wp_count_terms($this->query->query_vars) : count($this->items);
 	}
@@ -90,7 +90,7 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $offset
 	 * @return bool
 	 */
-	public function offsetExists($offset)
+	public function offsetExists($offset): bool
 	{
 		return isset($this->items[$offset]);
 	}
@@ -109,7 +109,7 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $value
 	 * @return void
 	 */
-	public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value): void
 	{
 		$this->items[$offset] = $value;
 	}
@@ -118,7 +118,7 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $offset
 	 * @return void
 	 */
-	public function offsetUnset($offset)
+	public function offsetUnset($offset): void
 	{
 		unset($this->items[$offset]);
 	}

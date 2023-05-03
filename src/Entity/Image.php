@@ -88,7 +88,7 @@ class Image extends Entity
      */
     public function exist()
     {
-        return $this->ID === 0 || file_exists( $this->src );
+        return $this->ID === 0 || ($this->src && file_exists( $this->src ));
     }
 
 

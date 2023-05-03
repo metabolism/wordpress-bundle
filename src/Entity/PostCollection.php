@@ -83,7 +83,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	/**
 	 * @return ArrayIterator|Post[]
 	 */
-	public function getIterator() {
+	public function getIterator(): \Traversable {
 
 		return new ArrayIterator($this->items);
 	}
@@ -103,7 +103,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 *
 	 * @return int
 	 */
-	public function count()
+	public function count(): int
 	{
 		return $this->query ? $this->query->found_posts : count($this->items);
 	}
@@ -112,7 +112,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $offset
 	 * @return bool
 	 */
-	public function offsetExists($offset)
+	public function offsetExists($offset): bool
 	{
 		return isset($this->items[$offset]);
 	}
@@ -131,7 +131,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $value
 	 * @return void
 	 */
-	public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value): void
 	{
 		$this->items[$offset] = $value;
 	}
@@ -140,7 +140,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $offset
 	 * @return void
 	 */
-	public function offsetUnset($offset)
+	public function offsetUnset($offset): void
 	{
 		unset($this->items[$offset]);
 	}

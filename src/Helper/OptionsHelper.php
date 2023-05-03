@@ -49,7 +49,8 @@ class OptionsHelper implements ArrayAccess
 	 * @param $id
 	 * @return bool
 	 */
-	public function has($id){
+	public function has($id): bool
+    {
 
         return (bool)$this->getValue($id);
 	}
@@ -99,7 +100,7 @@ class OptionsHelper implements ArrayAccess
 	 * @param $offset
 	 * @return bool
 	 */
-	public function offsetExists($offset)
+	public function offsetExists($offset): bool
     {
        return $this->has($offset);
     }
@@ -118,7 +119,7 @@ class OptionsHelper implements ArrayAccess
 	 * @param $value
 	 * @return void
 	 */
-	public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value): void
     {
         $this->setValue($offset, $value);
     }
@@ -127,7 +128,7 @@ class OptionsHelper implements ArrayAccess
 	 * @param $offset
 	 * @return void
 	 */
-	public function offsetUnset($offset)
+	public function offsetUnset($offset): void
     {
         if( $this->has($offset) )
             unset($this->objects[$offset]);

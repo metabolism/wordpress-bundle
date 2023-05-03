@@ -4,6 +4,7 @@
 namespace Metabolism\WordpressBundle\Helper;
 
 use ArrayAccess;
+use ArrayObject;
 use Metabolism\WordpressBundle\Entity\Entity;
 
 use Metabolism\WordpressBundle\Factory\Factory,
@@ -116,7 +117,7 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
     
     /**
      * @param $id
-     * @return null|string|array|object
+     * @return mixed
      */
     public function getValue($id){
         
@@ -651,7 +652,7 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
      * @param $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->has($offset);
     }
@@ -670,7 +671,7 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
      * @param $value
      * @return void
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->setValue($offset, $value);
     }
@@ -679,17 +680,17 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
      * @param $offset
      * @return void
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         if( $this->has($offset) )
             unset($this->objects[$offset]);
     }
     
     /**
-     * @return \ArrayObject
+     * @return ArrayObject
      */
-    public function getIterator()
+    public function getIterator(): ArrayObject
     {
-        return new \ArrayObject($this->getValues());
+        return new ArrayObject($this->getValues());
     }
 }

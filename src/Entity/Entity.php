@@ -153,7 +153,7 @@ abstract class Entity implements ArrayAccess
      * todo: to be deprecated
 	 *
 	 * @param $id
-	 * @return string
+	 * @return mixed
 	 */
 	public function __get($id) {
 
@@ -172,7 +172,7 @@ abstract class Entity implements ArrayAccess
 	 *
 	 * @param $id
 	 * @param $args
-	 * @return string
+	 * @return mixed
 	 */
 	public function __call($id, $args) {
 
@@ -255,17 +255,18 @@ abstract class Entity implements ArrayAccess
 	 * @param $offset
 	 * @return bool
 	 */
-	public function offsetExists($offset){
+	public function offsetExists($offset): bool
+    {
 
         return $this->__isset($offset);
     }
 
 	/**
 	 * @param $offset
-	 * @return mixed
-	 */
-	public function offsetGet($offset){
-
+	 * @return string|null
+     */
+	public function offsetGet($offset)
+    {
         return $this->__get($offset);
     }
 
@@ -274,11 +275,11 @@ abstract class Entity implements ArrayAccess
 	 * @param $value
 	 * @return void
 	 */
-	public function offsetSet($offset, $value){}
+	public function offsetSet($offset, $value): void{}
 
 	/**
 	 * @param $offset
 	 * @return void
 	 */
-	public function offsetUnset($offset){}
+	public function offsetUnset($offset): void{}
 }
