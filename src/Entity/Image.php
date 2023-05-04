@@ -112,7 +112,7 @@ class Image extends Entity
         $filename =  $this->uploadDir('basedir').$filepath;
         $relative_filename =  $this->uploadDir('relative').$filepath;
 
-        if( file_exists($filename) ){
+        if( is_readable($filename) ){
 
             $cachetime = filemtime($filename) + $ttl;
 
@@ -137,6 +137,9 @@ class Image extends Entity
 
         if( !is_dir($folderpath) )
             mkdir($folderpath, 0755, true);
+
+        if( file_exists($filename) && !is_readable($filename) )
+            return false;
 
         rename($tmpfile, $filename);
 
@@ -180,7 +183,7 @@ class Image extends Entity
 
                 $filename = $this->uploadDir('basedir').'/'.$attachment_metadata['file'];
 
-                if( !file_exists( $filename) )
+                if( !is_readable( $filename) )
                     return;
 
                 $this->ID = $post->ID;
@@ -209,7 +212,7 @@ class Image extends Entity
 
             $filename = BASE_URI.PUBLIC_DIR.$id;
 
-            if( !file_exists( $filename) || is_dir( $filename ) )
+            if( is_dir( $filename ) || !is_readable($filename) )
                 return;
 
             $this->ID = 0;
@@ -400,7 +403,7 @@ class Image extends Entity
 
         $image = $this->edit($params, $ext, 'object');
 
-        $image_info = file_exists($image['src'])?getimagesize($image['src']):[0,0, 'mime'=>''];
+        $image_info = is_readable($image['src'])?getimagesize($image['src']):[0,0, 'mime'=>''];
 
         if( $name ){
 
@@ -470,7 +473,7 @@ class Image extends Entity
         }
         else{
 
-            if( file_exists($this->src) && $image_size = getimagesize($this->src) ){
+            if( is_readable($this->src) && $image_size = getimagesize($this->src) ){
                 $w = $image_size[0];
                 $h = $image_size[1];
             }
@@ -482,7 +485,7 @@ class Image extends Entity
 
         if( isset($params['gcd']) ){
 
-            if( ($w == 0 || $h == 0) && file_exists($this->src) && $image_size = getimagesize($this->src) ){
+            if( ($w == 0 || $h == 0) && is_readable($this->src) && $image_size = getimagesize($this->src) ){
 
                 $ratio = $image_size[0]/$image_size[1];
 
@@ -498,7 +501,7 @@ class Image extends Entity
 
 
         //return placeholder if image is empty
-        if( empty($this->src) || !file_exists($this->src) )
+        if( empty($this->src) || !is_readable($this->src) )
             return ['src'=>$this->placeholder($w, $h), 'width'=>$w, 'height'=>$h];
 
         //remove focus point if invalid
@@ -550,7 +553,7 @@ class Image extends Entity
             $dest = $path.'/'.pathinfo($dest, PATHINFO_BASENAME);
         }
 
-        if( file_exists($dest) ){
+        if( is_readable($dest) ){
 
             if( filemtime($dest) > filemtime($this->src) )
                 return ['src'=>$dest, 'width'=>$w, 'height'=>$h];
@@ -710,7 +713,7 @@ class Image extends Entity
      */
     public function picture($w, $h=0, $sources=false, $alt=false, $loading='lazy', $params=[]){
 
-        if( empty($this->src) || !file_exists($this->src) ){
+        if( empty($this->src) || !is_readable($this->src) ){
 
             $html = '<picture>';
             if( $sources && is_array($sources) ){

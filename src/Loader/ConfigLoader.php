@@ -38,7 +38,7 @@ class ConfigLoader{
         $wp_path = 'pubic/edition/';
 
         // get Wordpress path
-        if( !is_dir(BASE_URI.'/'.$wp_path) && file_exists($composer) ){
+        if( !is_dir(BASE_URI.'/'.$wp_path) && is_readable($composer) ){
 
             $composer = json_decode(file_get_contents($composer), true);
             $installer_paths= $composer['extra']['installer-paths']??[];

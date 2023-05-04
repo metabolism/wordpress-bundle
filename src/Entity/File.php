@@ -78,7 +78,7 @@ class File extends Entity
                 $file = get_post_meta($id, '_wp_attached_file', true);
                 $filename = $this->uploadDir('basedir').'/'.$file;
 
-                if( !file_exists( $filename) )
+                if( !is_readable( $filename) )
                     return;
 
                 $this->ID = $post->ID;
@@ -95,7 +95,7 @@ class File extends Entity
 
             $filename = BASE_URI.PUBLIC_DIR.$id;
 
-            if( !file_exists( $filename) || is_dir( $filename ) )
+            if( is_dir( $filename ) || !is_readable($filename) )
                 return;
 
             $this->ID = 0;
@@ -227,7 +227,7 @@ class File extends Entity
 	 */
 	public function getFileContent(){
 
-		if( file_exists($this->src) )
+		if( is_readable($this->src) )
 			return file_get_contents($this->src);
 		else
 			return 'File does not exist';
