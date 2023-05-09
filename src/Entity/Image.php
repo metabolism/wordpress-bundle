@@ -401,16 +401,19 @@ class Image extends Entity
         $params = array_merge(['resize'=>[$w, $h]], $params);
         unset($params['name']);
 
-        $image = $this->edit($params, $ext, 'object');
+        if( !$w && !$h )
+            $file = ['src'=>$this->src, 'url'=>$this->file];
+        else
+            $file = $this->edit($params, $ext, 'object');
 
-        $image_info = is_readable($image['src'])?getimagesize($image['src']):[0,0, 'mime'=>''];
+        $image_info = is_readable($file['src'])?getimagesize($file['src']):[0,0, 'mime'=>''];
 
         if( $name ){
 
             unset($params['resize']);
 
             $this->sizes[$name][] = array_merge([
-                'file'=>$image['url'],
+                'file'=>$file['url'],
                 'extension'=>$ext,
                 'mime-type'=>$image_info['mime'],
                 'width'=>$image_info[0],
@@ -418,7 +421,7 @@ class Image extends Entity
             ], $params);
         }
 
-        return $image['url'];
+        return $file['url'];
     }
 
 

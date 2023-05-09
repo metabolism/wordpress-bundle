@@ -162,9 +162,7 @@ class WordpressTwigExtension extends AbstractExtension{
         if( !$image instanceof Image )
             $image = new Image();
 
-        $params['resize'] = [$width, $height];
-
-        return $image->edit($params);
+        return $image->resize($width, $height, $params['ext']??null, $params);
     }
 
 
