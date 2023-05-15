@@ -622,6 +622,19 @@ class Post extends Entity
     
     
     /**
+     * Post has children
+     *
+     * @return bool
+     */
+    public function hasChildren() {
+
+        $children = get_posts(['post_parent' => $this->ID, 'posts_per_page' => 1, 'fields'=>'ids', 'post_type'=>$this->type]);
+
+        return count($children) > 0;
+    }
+    
+    
+    /**
      * Get parent post
      *
      * @return Post|false
