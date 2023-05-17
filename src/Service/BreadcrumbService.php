@@ -22,7 +22,7 @@ class BreadcrumbService
             return false;
         
         if( $args['add_home']??true )
-            $breadcrumb[] = ['title' => 'Home', 'link' => $blog->getHomeLink()];
+            $breadcrumb[] = ['title' => __('Home'), 'link' => $blog->getHomeLink()];
         
         if( ($args['data']??false) && is_array($args['data']) )
             $breadcrumb = array_merge($breadcrumb, $args['data']);
@@ -85,6 +85,18 @@ class BreadcrumbService
             }
         }
         
+        // Replace Yoast entries
+        add_filter( 'wpseo_breadcrumb_links', function ($links) use ($breadcrumb){
+
+            $links = [];
+
+            foreach ($breadcrumb as $item)
+                $links[] = ['url'=>$item['link'], 'text'=>$item['title']];
+
+            print_r($links);
+            return $links;
+        });
+
         return $breadcrumb;
     }
 }

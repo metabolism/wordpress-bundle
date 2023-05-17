@@ -428,8 +428,8 @@ class Blog extends Entity
     {
         if(is_null($this->breadcrumb) ){
 
-            $breadcrumbServcie = new BreadcrumbService();
-            $this->breadcrumb = $breadcrumbServcie->build();
+            $breadcrumbService = new BreadcrumbService();
+            $this->breadcrumb = $breadcrumbService->build();
         }
 
         return $this->breadcrumb;
