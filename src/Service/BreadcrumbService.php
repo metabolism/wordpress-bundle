@@ -93,7 +93,6 @@ class BreadcrumbService
             foreach ($breadcrumb as $item)
                 $links[] = ['url'=>$item['link'], 'text'=>$item['title']];
 
-            print_r($links);
             return $links;
         });
 
