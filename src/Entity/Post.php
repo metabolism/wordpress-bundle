@@ -183,11 +183,16 @@ class Post extends Entity
     }
     
     /**
+     * @param bool|string $property
      * @return string
      */
-    public function getType(): string
+    public function getType($property=false): string
     {
-        return $this->type;
+        if( !$property )
+            return $this->type;
+
+        $type = get_post_type_object($this->type);
+        return $type->$property??false;
     }
     
     /**
