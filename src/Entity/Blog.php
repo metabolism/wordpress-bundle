@@ -24,7 +24,7 @@ class Blog extends Entity
 {
     use SingletonTrait;
 
-	public $entity = 'blog';
+    public $entity = 'blog';
 
     protected $debug;
     protected $environment;
@@ -65,142 +65,142 @@ class Blog extends Entity
         return $this->getTitle();
     }
 
-	/**
-	 * Blog constructor.
-	 *
-	 */
-	public function __construct()
-	{
+    /**
+     * Blog constructor.
+     *
+     */
+    public function __construct()
+    {
         $this->ID = get_current_blog_id();
-		$this->options = new OptionsHelper();
+        $this->options = new OptionsHelper();
 
-		$this->loadMetafields('options', 'blog');
-	}
+        $this->loadMetafields('options', 'blog');
+    }
 
-	/**
-	 * @return \WP_Term|\WP_Post_Type|\WP_Post|\WP_User|null The queried object.
-	 */
-	public function getQueriedObject(){
+    /**
+     * @return \WP_Term|\WP_Post_Type|\WP_Post|\WP_User|null The queried object.
+     */
+    public function getQueriedObject(){
 
-		if( is_null($this->queried_object) ){
+        if( is_null($this->queried_object) ){
 
-			global $wp_query;
-			$this->queried_object = $wp_query->get_queried_object();
-		}
+            global $wp_query;
+            $this->queried_object = $wp_query->get_queried_object();
+        }
 
-		return $this->queried_object;
-	}
+        return $this->queried_object;
+    }
 
-	/**
-	 * @param $criteria
-	 * @param array|null $orderBy
-	 * @param $limit
-	 * @param $offset
-	 * @return UserCollection
-	 */
-	public function getUsers($criteria=[], array $orderBy = null, $limit = null, $offset = null){
+    /**
+     * @param $criteria
+     * @param array|null $orderBy
+     * @param $limit
+     * @param $offset
+     * @return UserCollection
+     */
+    public function getUsers($criteria=[], array $orderBy = null, $limit = null, $offset = null){
 
-		if( is_string($criteria) )
-			$criteria = ['role'=>$criteria];
+        if( is_string($criteria) )
+            $criteria = ['role'=>$criteria];
 
-		$userRepository = new UserRepository();
+        $userRepository = new UserRepository();
 
-		return $userRepository->findBy($criteria, $orderBy, $limit, $offset);
-	}
+        return $userRepository->findBy($criteria, $orderBy, $limit, $offset);
+    }
 
-	/**
-	 * @param $criteria
-	 * @param array|null $orderBy
-	 * @param $limit
-	 * @param $offset
-	 * @return PostCollection
-	 */
-	public function getPosts($criteria=[], array $orderBy = null, $limit = null, $offset = null){
+    /**
+     * @param $criteria
+     * @param array|null $orderBy
+     * @param $limit
+     * @param $offset
+     * @return PostCollection
+     */
+    public function getPosts($criteria=[], array $orderBy = null, $limit = null, $offset = null){
 
-		if( is_string($criteria) )
-			$criteria = ['post_type'=>$criteria];
+        if( is_string($criteria) )
+            $criteria = ['post_type'=>$criteria];
 
-		$postRepository = new PostRepository();
+        $postRepository = new PostRepository();
 
-		return $postRepository->findBy($criteria, $orderBy, $limit, $offset);
-	}
+        return $postRepository->findBy($criteria, $orderBy, $limit, $offset);
+    }
 
-	/**
-	 * @param $criteria
-	 * @param array|null $orderBy
-	 * @param $limit
-	 * @param $offset
-	 * @return TermCollection
-	 */
-	public function getTerms($criteria=[], array $orderBy = null, $limit = null, $offset = null){
+    /**
+     * @param $criteria
+     * @param array|null $orderBy
+     * @param $limit
+     * @param $offset
+     * @return TermCollection
+     */
+    public function getTerms($criteria=[], array $orderBy = null, $limit = null, $offset = null){
 
-		if( is_string($criteria) )
-			$criteria = ['taxonomy'=>$criteria];
+        if( is_string($criteria) )
+            $criteria = ['taxonomy'=>$criteria];
 
-		$termRepository = new TermRepository();
+        $termRepository = new TermRepository();
 
-		return $termRepository->findBy($criteria, $orderBy, $limit, $offset);
-	}
+        return $termRepository->findBy($criteria, $orderBy, $limit, $offset);
+    }
 
-	/**
-	 * @return OptionsHelper
-	 */
-	public function getOptions(): OptionsHelper
-	{
-		return $this->options;
-	}
+    /**
+     * @return OptionsHelper
+     */
+    public function getOptions(): OptionsHelper
+    {
+        return $this->options;
+    }
 
-	/**
-	 * @param $key
-	 * @return array|object|string|null
-	 */
-	public function getOption($key){
+    /**
+     * @param $key
+     * @return array|object|string|null
+     */
+    public function getOption($key){
 
-		return $this->options->getValue($key);
-	}
+        return $this->options->getValue($key);
+    }
 
-	/**
-	 * @param $key
-	 * @param $value
-	 * @return array|object|string|null
-	 */
-	public function setOption($key, $value){
+    /**
+     * @param $key
+     * @param $value
+     * @return array|object|string|null
+     */
+    public function setOption($key, $value){
 
-		return $this->options->setValue($key, $value);
-	}
+        return $this->options->setValue($key, $value);
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getLanguage(): string
-	{
-		if( is_null($this->language) )
-			$this->language = get_bloginfo('language');
+    /**
+     * @return string
+     */
+    public function getLanguage(): string
+    {
+        if( is_null($this->language) )
+            $this->language = get_bloginfo('language');
 
-		return $this->language;
-	}
+        return $this->language;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getCharset(): string
-	{
-		if( is_null($this->charset) )
-			$this->charset = get_bloginfo('charset');
+    /**
+     * @return string
+     */
+    public function getCharset(): string
+    {
+        if( is_null($this->charset) )
+            $this->charset = get_bloginfo('charset');
 
-		return $this->charset;
-	}
+        return $this->charset;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getDescription(): string
-	{
-		if( is_null($this->description) )
-			$this->description = get_bloginfo('description');
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        if( is_null($this->description) )
+            $this->description = get_bloginfo('description');
 
-		return $this->description;
-	}
+        return $this->description;
+    }
 
     /**
      * @param string $post_type
@@ -258,19 +258,19 @@ class Blog extends Entity
         return wp_login_url($redirect, $force_reauth);
     }
 
-	/**
-	 * @return string
-	 */
-	public function getLocale(): string
-	{
-		if( is_null($this->locale) ){
+    /**
+     * @return string
+     */
+    public function getLocale(): string
+    {
+        if( is_null($this->locale) ){
 
-			$language = explode('-', $this->getLanguage());
-			$this->locale = count($language) ? $language[0] : 'en';
-		}
+            $language = explode('-', $this->getLanguage());
+            $this->locale = count($language) ? $language[0] : 'en';
+        }
 
-		return $this->locale;
-	}
+        return $this->locale;
+    }
 
     /**
      * return lang attribute
@@ -280,42 +280,42 @@ class Blog extends Entity
         return 'lang="'.$this->getLocale().'"';
     }
 
-	/**
-	 * @return string
-	 */
-	public function isSingle(): string
-	{
-		if( is_null($this->is_single) ){
+    /**
+     * @return string
+     */
+    public function isSingle(): string
+    {
+        if( is_null($this->is_single) ){
 
-			$queried_object = $this->getQueriedObject();
-			$this->is_single = $queried_object->post_type??false;
-		}
+            $queried_object = $this->getQueriedObject();
+            $this->is_single = $queried_object->post_type??false;
+        }
 
-		return $this->is_single;
-	}
+        return $this->is_single;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function isTax(): string
-	{
-		if( is_null($this->is_tax) ){
+    /**
+     * @return string
+     */
+    public function isTax(): string
+    {
+        if( is_null($this->is_tax) ){
 
-			$queried_object = $this->getQueriedObject();
-			$this->is_tax = $queried_object->taxonomy??false;
-		}
+            $queried_object = $this->getQueriedObject();
+            $this->is_tax = $queried_object->taxonomy??false;
+        }
 
-		return $this->is_tax;
-	}
+        return $this->is_tax;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function isArchive(): string
-	{
-		if( is_null($this->is_archive) ){
+    /**
+     * @return string
+     */
+    public function isArchive(): string
+    {
+        if( is_null($this->is_archive) ){
 
-			$queried_object = $this->getQueriedObject();
+            $queried_object = $this->getQueriedObject();
 
             $type = is_object($queried_object) ? get_class($queried_object) : false;
 
@@ -325,93 +325,93 @@ class Blog extends Entity
                 $this->is_archive = $queried_object->taxonomy;
             else
                 $this->is_archive = false;
-		}
+        }
 
-		return $this->is_archive;
-	}
+        return $this->is_archive;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isFrontPage(): bool
-	{
-		if( is_null($this->is_front_page) )
-			$this->is_front_page = is_front_page();
+    /**
+     * @return bool
+     */
+    public function isFrontPage(): bool
+    {
+        if( is_null($this->is_front_page) )
+            $this->is_front_page = is_front_page();
 
-		return $this->is_front_page;
-	}
+        return $this->is_front_page;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isCustomizePreview(): bool
-	{
-		if( is_null($this->is_customize_preview) )
-			$this->is_customize_preview = is_customize_preview();
+    /**
+     * @return bool
+     */
+    public function isCustomizePreview(): bool
+    {
+        if( is_null($this->is_customize_preview) )
+            $this->is_customize_preview = is_customize_preview();
 
-		return $this->is_customize_preview;
-	}
+        return $this->is_customize_preview;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isAdmin(): bool
-	{
-		if( is_null($this->is_admin) )
-			$this->is_admin = current_user_can('manage_options');
+    /**
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        if( is_null($this->is_admin) )
+            $this->is_admin = current_user_can('manage_options');
 
-		return $this->is_admin;
-	}
+        return $this->is_admin;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getPaged(): int
-	{
-		if( is_null($this->paged) )
-			$this->paged = max(1, get_query_var('paged', 0));
+    /**
+     * @return int
+     */
+    public function getPaged(): int
+    {
+        if( is_null($this->paged) )
+            $this->paged = max(1, get_query_var('paged', 0));
 
-		return $this->paged;
-	}
+        return $this->paged;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function getMaintenanceMode(): bool
-	{
-		if( is_null($this->maintenance_mode) )
-			$this->maintenance_mode = function_exists('wp_maintenance_mode') && wp_maintenance_mode();
+    /**
+     * @return bool
+     */
+    public function getMaintenanceMode(): bool
+    {
+        if( is_null($this->maintenance_mode) )
+            $this->maintenance_mode = function_exists('wp_maintenance_mode') && wp_maintenance_mode();
 
-		return $this->maintenance_mode;
-	}
+        return $this->maintenance_mode;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function getDebug(): bool
-	{
-		if( is_null($this->debug) )
-			$this->debug = WP_DEBUG;
+    /**
+     * @return bool
+     */
+    public function getDebug(): bool
+    {
+        if( is_null($this->debug) )
+            $this->debug = WP_DEBUG;
 
-		return $this->debug;
-	}
+        return $this->debug;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function getEnvironment(): bool
-	{
-		if( is_null($this->environment) )
-			$this->environment = WP_ENV;
+    /**
+     * @return bool
+     */
+    public function getEnvironment(): bool
+    {
+        if( is_null($this->environment) )
+            $this->environment = WP_ENV;
 
-		return $this->environment;
-	}
+        return $this->environment;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getVersion(): ?string
-	{
+    /**
+     * @return string
+     */
+    public function getVersion(): ?string
+    {
         if(is_null($this->version) && file_exists(BASE_URI.'/composer.json')){
 
             $composer = json_decode(file_get_contents(BASE_URI.'/composer.json'), true);
@@ -421,10 +421,10 @@ class Blog extends Entity
         return $this->version;
     }
 
-	/**
-	 * @return array
-	 */
-	public function getBreadcrumb()
+    /**
+     * @return array
+     */
+    public function getBreadcrumb()
     {
         if(is_null($this->breadcrumb) ){
 
@@ -435,10 +435,10 @@ class Blog extends Entity
         return $this->breadcrumb;
     }
 
-	/**
-	 * @return array
-	 */
-	public function getPagination(): array
+    /**
+     * @return array
+     */
+    public function getPagination(): array
     {
         if(is_null($this->pagination) ){
 
@@ -449,10 +449,10 @@ class Blog extends Entity
         return $this->pagination;
     }
 
-	/**
-	 * @return User|false
-	 */
-	public function getUser(){
+    /**
+     * @return User|false
+     */
+    public function getUser(){
 
         if( is_null($this->user) ){
 
@@ -465,17 +465,17 @@ class Blog extends Entity
         return $this->user;
     }
 
-	/**
-	 * @param string|null $location
-	 * @return ClassHelper|Menu
-	 */
-	public function getMenu(?string $location=null){
+    /**
+     * @param string|null $location
+     * @return ClassHelper|Menu
+     */
+    public function getMenu(?string $location=null){
 
-		if( is_null($this->menu) )
-			$this->menu = new ClassHelper(Menu::class);
+        if( is_null($this->menu) )
+            $this->menu = new ClassHelper(Menu::class);
 
         if( !$location )
-	        return $this->menu;
+            return $this->menu;
 
         return $this->menu->__call($location);
     }
@@ -490,10 +490,10 @@ class Blog extends Entity
         return $this->getTitle();
     }
 
-	/**
-	 * @return string
-	 */
-	public function getTitle(): string
+    /**
+     * @return string
+     */
+    public function getTitle(): string
     {
         if(is_null($this->title) ){
 
@@ -504,10 +504,10 @@ class Blog extends Entity
         return $this->title;
     }
 
-	/**
-	 * @return string
-	 */
-	public function getBodyClass(): string
+    /**
+     * @return string
+     */
+    public function getBodyClass(): string
     {
         if(is_null($this->body_class) ){
 
@@ -518,73 +518,73 @@ class Blog extends Entity
         return $this->body_class;
     }
 
-	/**
-	 * @deprecated
-	 */
-	public function getHomeUrl($path = '', $scheme = null): string
+    /**
+     * @deprecated
+     */
+    public function getHomeUrl($path = '', $scheme = null): string
     {
         return $this->getHomeLink($path, $scheme);
     }
 
-	/**
-	 * @param string $path
-	 * @param null $scheme
-	 * @return string
-	 */
-	public function getHomeLink($path = '', $scheme = null): string
+    /**
+     * @param string $path
+     * @param null $scheme
+     * @return string
+     */
+    public function getHomeLink($path = '', $scheme = null): string
     {
-	    if( !empty($path) )
-		    return home_url($path, $scheme);
+        if( !empty($path) )
+            return home_url($path, $scheme);
 
-	    if( is_null($this->home_url) )
+        if( is_null($this->home_url) )
             $this->home_url = home_url();
 
         return $this->home_url;
     }
 
-	/**
-	 * @deprecated
-	 */
-	public function getSearchUrl($query=''): string
+    /**
+     * @deprecated
+     */
+    public function getSearchUrl($query=''): string
     {
         return $this->getSearchLink($query);
     }
 
-	/**
-	 * @param string $query
-	 * @return string
-	 */
-	public function getSearchLink($query=''): string
+    /**
+     * @param string $query
+     * @return string
+     */
+    public function getSearchLink($query=''): string
     {
-		if( !empty($query) )
-			return get_search_link($query);
+        if( !empty($query) )
+            return get_search_link($query);
 
         if(is_null($this->search_url) ){
 
-	        $search_url = get_search_link();
-	        $search_query = get_search_query( false );
+            $search_url = get_search_link();
+            $search_query = get_search_query( false );
 
-			if( !empty($search_query) )
-				$this->search_url = str_replace('/'.$search_query, '', $search_url);
-			else
-				$this->search_url = $search_url;
+            if( !empty($search_query) )
+                $this->search_url = str_replace('/'.$search_query, '', $search_url);
+            else
+                $this->search_url = $search_url;
         }
 
         return $this->search_url;
     }
 
-	/**
-	 * @deprecated
-	 */
-	public function getPrivacyPolicyUrl(): string
+    /**
+     * @deprecated
+     */
+    public function getPrivacyPolicyUrl(): string
     {
         return $this->getPrivacyPolicyLink();
     }
 
-	/**
-	 * @return string
-	 */
-	public function getPrivacyPolicyLink(): string
+    /**
+     * @return string
+     */
+    public function getPrivacyPolicyLink(): string
     {
         if(is_null($this->privacy_policy_url) )
             $this->privacy_policy_url = get_privacy_policy_url();
@@ -592,37 +592,37 @@ class Blog extends Entity
         return $this->privacy_policy_url;
     }
 
-	/**
-	 * @return string
-	 */
-	public function getPrivacyPolicyTitle(): string
+    /**
+     * @return string
+     */
+    public function getPrivacyPolicyTitle(): string
     {
         if(is_null($this->privacy_policy_title) ){
 
-	        $policy_page_id = (int) get_option( 'wp_page_for_privacy_policy' );
-	        $this->privacy_policy_title = ( $policy_page_id ) ? get_the_title( $policy_page_id ) : '';
+            $policy_page_id = (int) get_option( 'wp_page_for_privacy_policy' );
+            $this->privacy_policy_title = ( $policy_page_id ) ? get_the_title( $policy_page_id ) : '';
         }
 
         return $this->privacy_policy_title;
     }
 
-	/**
-	 * @deprecated
-	 */
-	public function getNetworkHomeUrl($path = '', $scheme = null): string
-	{
+    /**
+     * @deprecated
+     */
+    public function getNetworkHomeUrl($path = '', $scheme = null): string
+    {
         return $this->getNetworkHomeLink($path, $scheme);
     }
 
-	/**
-	 * @param string $path
-	 * @param null $scheme
-	 * @return string
-	 */
-	public function getNetworkHomeLink($path = '', $scheme = null): string
-	{
-		if( !empty($path) )
-			return network_home_url($path, $scheme);
+    /**
+     * @param string $path
+     * @param null $scheme
+     * @return string
+     */
+    public function getNetworkHomeLink($path = '', $scheme = null): string
+    {
+        if( !empty($path) )
+            return network_home_url($path, $scheme);
 
         if(is_null($this->network_home_url) )
             $this->network_home_url = trim(network_home_url(), '/');
@@ -630,35 +630,35 @@ class Blog extends Entity
         return $this->network_home_url;
     }
 
-	/**
-	 * @param string $name
-	 * @deprecated use getInfo
-	 * @return mixed|string|null
-	 */
-	public function getBloginfo(string $name){
+    /**
+     * @param string $name
+     * @deprecated use getInfo
+     * @return mixed|string|null
+     */
+    public function getBloginfo(string $name){
 
         return $this->getInfo($name);
     }
 
-	/**
-	 * @param string|null $name
-	 * @return mixed|string|null
-	 */
-	public function getInfo(?string $name=null){
+    /**
+     * @param string|null $name
+     * @return mixed|string|null
+     */
+    public function getInfo(?string $name=null){
 
-		if(is_null($this->info) )
-			$this->info = new FunctionHelper('get_bloginfo');
+        if(is_null($this->info) )
+            $this->info = new FunctionHelper('get_bloginfo');
 
-		if( !$name )
-			return $this->info;
+        if( !$name )
+            return $this->info;
 
-		return $this->info->__call($name);
+        return $this->info->__call($name);
     }
 
-	/**
-	 * @return int
-	 */
-	public function getPostsPerPage(): int
+    /**
+     * @return int
+     */
+    public function getPostsPerPage(): int
     {
         if(is_null($this->posts_per_page) )
             $this->posts_per_page = intval(get_option( 'posts_per_page' ));
@@ -666,11 +666,11 @@ class Blog extends Entity
         return $this->posts_per_page;
     }
 
-	/**
-	 * @return string
-	 */
-	public function getDomain(): string
-	{
+    /**
+     * @return string
+     */
+    public function getDomain(): string
+    {
         if(is_null($this->domain) )
             $this->domain = strtok(preg_replace('/https?:\/\//', '', home_url('')),':');
 
@@ -681,19 +681,19 @@ class Blog extends Entity
      * Get multisite multilingual data
      * @return array
      */
-	public function getLanguages(): array
+    public function getLanguages(): array
     {
-	    if( !is_null($this->languages) )
-			return $this->languages;
+        if( !is_null($this->languages) )
+            return $this->languages;
 
-	    $this->languages = [];
+        $this->languages = [];
 
-	    if( !is_multisite() )
-			return $this->languages;
+        if( !is_multisite() )
+            return $this->languages;
 
-	    if( defined('ICL_LANGUAGE_CODE') )
-	    {
-		    $this->languages = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc' );
+        if( defined('ICL_LANGUAGE_CODE') )
+        {
+            $this->languages = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc' );
         }
         elseif( defined('MSLS_PLUGIN_VERSION') && is_multisite() )
         {
@@ -713,10 +713,10 @@ class Blog extends Entity
 
                 $alternate = $current_blog_id != $site->blog_id ? $this->getAlternativeLink($mslsOptions, $site, $locale) : false;
 
-	            $this->languages[] = [
-                    'id' => $site->blog_id,
-                    'active' => $current_blog_id==$site->blog_id,
-                    'name' => format_code_lang($lang),
+                $this->languages[] = [
+                    'id'            => $site->blog_id,
+                    'active'        => $current_blog_id==$site->blog_id,
+                    'name'          => format_code_lang($lang),
                     'home_url'      => get_home_url($site->blog_id, '/'),
                     'language_code' => $lang,
                     'url'           => $alternate
@@ -731,17 +731,11 @@ class Blog extends Entity
      * @param MslsOptions $mslsOptions
      * @param \WP_Site $site
      * @param string $locale
-     * @return false|string
+     * @return string
      */
     protected function getAlternativeLink(MslsOptions $mslsOptions, \WP_Site $site, string $locale)
     {
         switch_to_blog($site->blog_id);
-
-        if ( MslsOptions::class != get_class( $mslsOptions ) && ( is_null( $mslsOptions ) || ! $mslsOptions->has_value( $locale ) ) ) {
-
-            restore_current_blog();
-            return false;
-        }
 
         $alternate = $mslsOptions->get_permalink( $locale );
 
