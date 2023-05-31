@@ -1,6 +1,10 @@
 CHANGELOG
 ---------
 
+## 1.4.16
+#### Bugfix
+- Fix absolute url in sitemap
+
 ## 1.4.15
 #### Bugfix
 - Prevent cache purge on non public post type
