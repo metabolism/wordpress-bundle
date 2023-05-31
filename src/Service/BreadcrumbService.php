@@ -28,7 +28,7 @@ class BreadcrumbService
             $breadcrumb = array_merge($breadcrumb, $args['data']);
         
         if( !($args['data']??false) && !($args['add_home']??false) && !($args['add_current']??false) && is_array($args) )
-            $breadcrumb = array_merge($breadcrumb, $args);
+            $breadcrumb = array_merge($breadcrumb, array_filter($args));
         
         if( $args['add_current']??true ){
             
