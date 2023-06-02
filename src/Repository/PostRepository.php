@@ -31,7 +31,10 @@ class PostRepository
      */
     public function findPostTypes($args=[], $output='names', $operator='and'){
 
-        return get_post_types($args, $output, $operator);
+        $post_types = get_post_types($args, $output, $operator);
+        unset($post_types['attachment']);
+
+        return $post_types;
     }
 
 
@@ -41,7 +44,7 @@ class PostRepository
      */
     public function findAll(array $orderBy = null, $public=true)
     {
-        $post_types = $this->findPostTypes(['public'=> $public, 'publicly_queryable'=>$public]);
+        $post_types = $this->findPostTypes(['public'=>$public]);
 
         $criteria = [
             'post_type' => $post_types
