@@ -470,6 +470,7 @@ class Post extends Entity
                 
                 $this->content = array_unique(array_filter($this->content));
                 $this->content = implode("\n", $this->content);
+                $this->content = preg_replace("/[\r\n]+/", "\n", $this->content);
             }
             else{
                 
