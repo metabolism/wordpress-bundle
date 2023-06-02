@@ -444,6 +444,7 @@ wordpress:
     xmlrpc: false
     pings: false
     disable_update: true
+    unfiltered_html: false
 
   ##################
   ##    Search    ##

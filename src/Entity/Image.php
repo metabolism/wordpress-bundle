@@ -171,10 +171,19 @@ class Image extends Entity
                     if( $post->post_mime_type != 'image/svg' && $post->post_mime_type != 'image/svg+xml' )
                         return;
 
+                    $filename = $this->uploadDir('basedir').'/'.$post_meta['_wp_attached_file'][0];
+
+                    if( !$xmlget = @simplexml_load_file($filename) )
+                        return;
+
+                    $xmlattributes = $xmlget->attributes();
+                    $width = $xmlattributes->width??'';
+                    $height = $xmlattributes->height??'';
+
                     $attachment_metadata = [
                         'file' => $post_meta['_wp_attached_file'][0],
-                        'width' =>  '',
-                        'height' =>  '',
+                        'width' =>  $width,
+                        'height' =>  $height,
                         'image_meta' =>  []
                     ];
 
