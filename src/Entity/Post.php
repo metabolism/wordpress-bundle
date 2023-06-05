@@ -442,9 +442,10 @@ class Post extends Entity
     /**
      * Get filtered content
      *
+     * @param bool $index
      * @return string
      */
-    public function getContent(){
+    public function getContent($index=false){
         
         if( is_null($this->content) ){
             
@@ -482,6 +483,24 @@ class Post extends Entity
             }
         }
         
+        if( $index ){
+
+            // normalize
+            $content = html_entity_decode(strtolower(strip_tags($this->content)));
+            // keep only words > 3 char
+            $content = preg_replace("/\b\w{1,3}\b/u", '', $content);
+            //remove punctuation
+            $content = preg_replace("/[\(\)\*\.:\+%;\[\],'’#\-\/\?\!]/u", '', $content);
+            //remove multiple space
+            $content = preg_replace("/\s+/u", ' ', $content);
+
+            //keep unique words
+            $content = preg_split('/\s+/', $content);
+            $content = array_unique($content);
+
+            return implode(' ', $content);
+        }
+
         return $this->content;
         
     }
@@ -858,7 +877,7 @@ class Post extends Entity
                 
                 foreach ($terms as $term){
                     
-                    if( (!isset($args['hierarchical']) || $args['hierarchical']) && count($taxonomies)>1 )
+                    if( (!isset($args['group']) || $args['group']) && count($taxonomies)>1 )
                         $term_array[$taxonomy][] = TermFactory::create($term);
                     else
                         $term_array[] = TermFactory::create($term);
