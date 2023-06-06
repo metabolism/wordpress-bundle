@@ -85,13 +85,17 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         global $wp;
         
         $wp->init();
-        $wp->parse_request();
-        $wp->query_posts();
-        $wp->register_globals();
-        
+
+        if( $wp->parse_request() ){
+
+            $wp->query_posts();
+            $wp->register_globals();
+        }
+
         do_action_ref_array( 'wp', array( &$wp ) );
         do_action( 'template_redirect' );
-        
+        do_action( 'kernel_loaded' );
+
         //Wordpress override $request, so restore it for Kernel shutdown
         global $request;
         $request = $event->getRequest();
@@ -110,13 +114,13 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         global $wpdb;
         
         $default_uri = php_sapi_name() == 'cli' ? env('DEFAULT_URI') : get_home_url();
-        $default_uri = rtrim('/', $default_uri);
+        $default_uri = rtrim($default_uri, '/');
 
         $home_url = $wpdb->get_row( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", 'home' ) );
         
         $base_url = is_multisite() ? network_home_url() : $home_url->option_value;
-        $base_url = rtrim('/', $base_url);
-            
+        $base_url = rtrim($base_url, '/');
+
         if( $base_url != $default_uri ){
 
             $content = str_replace($base_url, $default_uri, $response->getContent());
