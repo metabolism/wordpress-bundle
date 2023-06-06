@@ -48,6 +48,7 @@ class Post extends Entity
     protected $current;
     protected $state;
     protected $path;
+    protected $parameters;
     
     /** @var \WP_Post|bool */
     protected $post;
@@ -184,9 +185,9 @@ class Post extends Entity
     
     /**
      * @param bool|string $property
-     * @return string
+     * @return mixed
      */
-    public function getType($property=false): string
+    public function getType($property=false)
     {
         if( !$property )
             return $this->type;
@@ -405,12 +406,15 @@ class Post extends Entity
         if( is_null($this->path) && $this->isPublic() ){
             
             $post_type_object = get_post_type_object($this->type);
-            
-            if( $rewrite_slug = $post_type_object->rewrite['slug']??false )
-                $path = str_replace(get_home_url().'/'.$rewrite_slug, '', $this->getLink());
-            else
+
                 $path = str_replace(get_home_url(), '', $this->getLink());
             
+            if( $rewrite_slug = $post_type_object->rewrite['slug']??false ){
+
+                $rewrite_slug = preg_replace('/{([^%]+)}/m', '([^\/]+)', str_replace('/','\/', '/'.$rewrite_slug));
+                $path = preg_replace('/'.$rewrite_slug.'/m', '', $path);
+            }
+
             if( substr($path, 0, 1) == '/')
                 $this->path = substr($path, 1);
             else
@@ -420,6 +424,42 @@ class Post extends Entity
         return $this->path;
     }
     
+    /**
+     * Get post url parameters
+     *
+     * @return array
+     */
+    public function getParameters(){
+
+        if( is_null($this->parameters) && $this->isPublic() ){
+
+            $parameters = [];
+            $rewrite = $this->getType('rewrite');
+
+            if( $rewrite_slug = $rewrite['slug']??false ){
+
+                preg_match_all('/{([^%]+)}/m', $rewrite_slug, $matches, PREG_SET_ORDER);
+
+                foreach ($matches as $match){
+
+                    if( $term = $this->getTerm($match[1]) )
+                        $parameters[$match[1]] = $term->getSlug();
+                    else
+                        $parameters[$match[1]] = 'default';
+                }
+            }
+
+            if( $this->getType() == 'page' )
+                $parameters['pagename'] = $this->getPath();
+            else
+                $parameters[$this->getType()] = $this->getPath();
+
+            $this->parameters = $parameters;
+        }
+
+        return $this->parameters;
+    }
+
     /**
      * @return bool
      */

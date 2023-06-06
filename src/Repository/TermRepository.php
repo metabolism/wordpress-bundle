@@ -112,9 +112,6 @@ class TermRepository
 
         $criteria['number'] = max(0, $limit?:0);
 
-		if( !isset($criteria['parent']) )
-			$criteria['parent'] = 0;
-
         if( $offset )
             $criteria['offset'] = $offset;
 

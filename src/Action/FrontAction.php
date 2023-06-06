@@ -39,12 +39,19 @@ class FrontAction {
 	public function init(){}
 
 
+	/**
+	 * Loaded placeholder
+	 */
+	public function loaded(){}
+
+
 	public function __construct()
 	{
 		if( defined('WP_INSTALLING') && WP_INSTALLING )
 			return;
 
-        add_action( 'kernel_loaded', [$this, 'init']);
+        add_action( 'kernel_loaded', [$this, 'loaded']);
+        add_action( 'init', [$this, 'init']);
 		add_action( 'init', [$this, 'redirect']);
 		add_action( 'init', '_wp_admin_bar_init', 0 );
 	}

@@ -109,16 +109,15 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelResponse(ResponseEvent $event)
     {
+        if( php_sapi_name() != 'cli' )
+            return;
+
         $response = $event->getResponse();
         
-        global $wpdb;
-        
-        $default_uri = php_sapi_name() == 'cli' ? env('DEFAULT_URI') : get_home_url();
+        $default_uri = env('DEFAULT_URI');
         $default_uri = rtrim($default_uri, '/');
 
-        $home_url = $wpdb->get_row( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", 'home' ) );
-        
-        $base_url = is_multisite() ? network_home_url() : $home_url->option_value;
+        $base_url = is_multisite() ? network_home_url() : get_home_url();
         $base_url = rtrim($base_url, '/');
 
         if( $base_url != $default_uri ){

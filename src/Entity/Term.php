@@ -32,6 +32,7 @@ class Term extends Entity
     protected $thumbnail;
     protected $ancestors;
     protected $path;
+    protected $parameters;
     protected $public;
     protected $post_types;
 
@@ -130,13 +131,55 @@ class Term extends Entity
 
             $taxonomy_object = get_taxonomy($this->taxonomy);
 
-            if( $rewrite_slug = $taxonomy_object->rewrite['slug']??false )
-                $this->path = str_replace(get_home_url().'/'.$rewrite_slug.'/', '', $this->getLink());
+            $path = str_replace(get_home_url(), '', $this->getLink());
+
+            if( $rewrite_slug = $taxonomy_object->rewrite['slug']??false ){
+
+                $rewrite_slug = preg_replace('/{([^%]+)}/m', '([^\/]+)', str_replace('/','\/', '/'.$rewrite_slug));
+                $path = preg_replace('/'.$rewrite_slug.'/m', '', $path);
+            }
+
+            if( substr($path, 0, 1) == '/')
+                $this->path = substr($path, 1);
             else
-                $this->path = str_replace(get_home_url().'/', '', $this->getLink());
+                $this->path = false;
         }
 
         return $this->path;
+    }
+
+    /**
+     * Get term url parameters
+     *
+     * @return array
+     */
+    public function getParameters(){
+
+        if( is_null($this->parameters) && $this->isPublic() ){
+
+            $parameters = [];
+            $taxonomy_object = get_taxonomy($this->taxonomy);
+
+            if( $rewrite_slug = $taxonomy_object->rewrite['slug']??false ){
+
+                preg_match_all('/{([^%]+)}/m', $rewrite_slug, $matches, PREG_SET_ORDER);
+
+                foreach ($matches as $match){
+
+                    if( $match[1] == 'parent' ){
+
+                        $parent = $this->getParent();
+                        $parameters[$match[1]] = $parent?$parent->getSlug():false;
+                    }
+                }
+            }
+
+            $parameters[$this->getTaxonomy()] = $this->getPath();
+
+            $this->parameters = $parameters;
+        }
+
+        return $this->parameters;
     }
 
     /**
