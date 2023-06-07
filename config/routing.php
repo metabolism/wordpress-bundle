@@ -37,7 +37,7 @@ class Permastruct{
      */
     public function addRoutes(){
         
-        if( empty($locale) ){
+        if( empty($this->locale) ){
             
             $this->addRoute('_site_health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealthHelper::check');
             $this->addRoute('_cache_purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::purge');
