@@ -47,4 +47,15 @@ trait SingletonTrait {
 
         return static::$_instance;
     }
+
+    /**
+     * @param $instance
+     * @return SingletonTrait
+     */
+    final public static function setInstance($instance)
+    {
+        static::$_instance = $instance;
+
+        return static::$_instance;
+    }
 }

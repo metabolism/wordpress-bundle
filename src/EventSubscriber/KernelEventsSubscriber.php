@@ -69,20 +69,32 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         if( defined('REST_REQUEST') )
             return;
         
+        global $wp, $locale;
+
         $request = $event->getRequest();
         
         $this->fixServerVars($request);
         
         // using cli,
-        if( is_multisite() && !is_admin() && php_sapi_name() == 'cli' ){
+        if( is_multisite() && php_sapi_name() == 'cli' ){
             
             $site = get_site_by_path( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] );
             
-            if( $site && get_current_blog_id() != $site->blog_id )
+            if( $site && get_current_blog_id() != $site->blog_id ){
+
                 switch_to_blog($site->blog_id);
+
+                //reload locale
+                unset($GLOBALS['locale']);
+
+                load_default_textdomain();
+                $locale = get_locale();
+
+                $GLOBALS['wp_locale'] = new \WP_Locale();
+                $GLOBALS['wp_locale_switcher'] = new \WP_Locale_Switcher();
+                $GLOBALS['wp_locale_switcher']->init();
+            }
         }
-        
-        global $wp;
         
         $wp->init();
 
