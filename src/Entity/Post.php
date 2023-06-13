@@ -412,7 +412,7 @@ class Post extends Entity
             if( $rewrite_slug = $post_type_object->rewrite['slug']??false ){
 
                 $rewrite_slug = preg_replace('/{([^%]+)}/m', '([^\/]+)', str_replace('/','\/', '/'.$rewrite_slug));
-                $path = preg_replace('/'.$rewrite_slug.'/m', '', $path);
+                $path = preg_replace('/^'.$rewrite_slug.'/m', '', $path);
             }
 
             if( substr($path, 0, 1) == '/')

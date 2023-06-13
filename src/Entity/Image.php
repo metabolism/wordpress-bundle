@@ -159,7 +159,7 @@ class Image extends Entity
 
             if( $post = get_post($id) ) {
 
-                if( is_wp_error($post) || !$post )
+                if( is_wp_error($post) )
                     return;
 
                 $post_meta = get_post_meta($id);

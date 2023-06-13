@@ -136,7 +136,7 @@ class Term extends Entity
             if( $rewrite_slug = $taxonomy_object->rewrite['slug']??false ){
 
                 $rewrite_slug = preg_replace('/{([^%]+)}/m', '([^\/]+)', str_replace('/','\/', '/'.$rewrite_slug));
-                $path = preg_replace('/'.$rewrite_slug.'/m', '', $path);
+                $path = preg_replace('/^'.$rewrite_slug.'/m', '', $path);
             }
 
             if( substr($path, 0, 1) == '/')
