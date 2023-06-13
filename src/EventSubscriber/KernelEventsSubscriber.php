@@ -126,18 +126,27 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $response = $event->getResponse();
         
-        $default_uri = env('DEFAULT_URI');
-        $default_uri = rtrim($default_uri, '/');
+        $default_uri = rtrim(env('DEFAULT_URI'), '/');
 
         $base_url = is_multisite() ? network_home_url() : get_home_url();
         $base_url = rtrim($base_url, '/');
 
+        $content = $response->getContent();
+
         if( $base_url != $default_uri ){
 
-            $content = str_replace($base_url, $default_uri, $response->getContent());
+            $content = str_replace($base_url, $default_uri, $content);
             $content = str_replace(substr(json_encode($base_url), 1 , -1), substr(json_encode($default_uri), 1 , -1), $content);
-            
-            $response->setContent($content);
         }
+
+        $base_url = 'http://localhost';
+
+        if( $base_url != $default_uri ){
+
+            $content = str_replace($base_url, $default_uri, $content);
+            $content = str_replace(substr(json_encode($base_url), 1 , -1), substr(json_encode($default_uri), 1 , -1), $content);
+        }
+
+        $response->setContent($content);
     }
 }
