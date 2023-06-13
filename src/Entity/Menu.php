@@ -28,7 +28,7 @@ class Menu extends Entity
 
     /**
      * Menu constructor.
-     * @param int $id
+     * @param int|string $id
      */
 	public function __construct($id) {
 
@@ -69,6 +69,51 @@ class Menu extends Entity
 		return $this->title;
 	}
 
+    /**
+     * @param $item
+     * @return bool
+     */
+    private function isVisible($item){
+
+        $is_user_logged_in = is_user_logged_in();
+        $read_private_posts = current_user_can( 'read_private_posts' );
+        $edit_posts = current_user_can( 'edit_posts' );
+
+        if( $item->type == 'post_type' ){
+
+            $post_status = get_post_status( $item->object_id );
+
+            switch($post_status){
+
+                case '':
+                case false:
+                case 'trash':
+                case 'auto-draft':
+
+                    return false;
+
+                case 'private':
+
+                    if( !$is_user_logged_in || !$read_private_posts )
+                        return false;
+
+                    break;
+
+                case 'draft':
+                case 'pending':
+                case 'inherit':
+                case 'future':
+
+                    if( !$is_user_logged_in || !$edit_posts )
+                        return false;
+
+                    break;
+            }
+        }
+
+        return true;
+    }
+
 	/**
 	 * @return false|MenuItem[]
 	 */
@@ -86,8 +131,11 @@ class Menu extends Entity
 
 			_wp_menu_item_classes_by_context($menu_items);
 
-			foreach ($menu_items as $item)
+			foreach ($menu_items as $item){
+
+                if( $this->isVisible($item) )
 				$this->items[] = new $this->itemClass($item);
+            }
 
 			$this->items = $this->addDepth();
 		}

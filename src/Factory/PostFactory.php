@@ -67,7 +67,7 @@ class PostFactory {
 
 			case 'private':
 
-				if( (!is_user_logged_in() || !current_user_can( 'read_private_posts' )) && !in_array($post_status, $args['post_status']??[]) )
+				if( (!is_user_logged_in() || !current_user_can( 'read_private_posts' )) )
 					return false;
 				break;
 
@@ -76,7 +76,7 @@ class PostFactory {
 			case 'inherit':
 			case 'future':
 
-			if( (!is_user_logged_in() || !current_user_can( 'edit_posts' ))  && !in_array($post_status, $args['post_status']??[]) )
+			if( (!is_user_logged_in() || !current_user_can( 'edit_posts' )) )
 				return false;
 			break;
 		}
