@@ -4,6 +4,7 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use Intervention\Image\Exception\NotSupportedException;
 use Intervention\Image\ImageManagerStatic;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class Image
@@ -74,7 +75,7 @@ class Image extends Entity
      * @param $field
      * @return mixed|string
      */
-    protected function uploadDir($field)
+    public static function uploadDir($field)
     {
         if ( !self::$wp_upload_dir )
             self::$wp_upload_dir = wp_upload_dir();
@@ -93,6 +94,65 @@ class Image extends Entity
 
 
     /**
+     * @param bool $force
+     * @return bool
+     */
+    public static function invalidateCache($url, $force=false){
+
+        $filename =  self::getCachePath($url);
+
+        if( !$filename || !file_exists($filename) )
+            return false;
+
+        $filepath = dirname($filename);
+
+        $filesystem = new Filesystem();
+
+        if( $force ){
+
+            $filesystem->remove($filepath);
+            return true;
+        }
+        else{
+
+            $ch = curl_init($url);
+
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_NOBODY, false);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_exec($ch);
+
+            $size = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+
+            curl_close($ch);
+
+            if( $size == -1 || $size != filesize($filename) ){
+
+                $filesystem->remove($filepath);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @return false|string
+     */
+    public static function getCachePath($url){
+
+        if( !$url )
+            return false;
+
+        $basename = strtolower(pathinfo($url, PATHINFO_BASENAME));
+        $folder = '/cache/'.md5($url);
+
+        return self::uploadDir('basedir').$folder.'/'.$basename;
+    }
+
+    /**
      * Download image
      *
      * @param $url
@@ -104,13 +164,10 @@ class Image extends Entity
         if( !$ttl )
             $ttl = 2592000;
 
-        $basename = strtolower(pathinfo($url, PATHINFO_BASENAME));
-        $folder = '/cache/'.md5($url);
-        $filepath = $folder.'/'.$basename;
+        $filename = self::getCachePath($url);
 
-        $folderpath =  $this->uploadDir('basedir').$folder;
-        $filename =  $this->uploadDir('basedir').$filepath;
-        $relative_filename =  $this->uploadDir('relative').$filepath;
+        $folderpath = dirname($filename);
+        $relative_filename =  str_replace(self::uploadDir('basedir'), self::uploadDir('relative'), $filename);
 
         if( is_readable($filename) ){
 
@@ -171,7 +228,7 @@ class Image extends Entity
                     if( $post->post_mime_type != 'image/svg' && $post->post_mime_type != 'image/svg+xml' )
                         return;
 
-                    $filename = $this->uploadDir('basedir').'/'.$post_meta['_wp_attached_file'][0];
+                    $filename = self::uploadDir('basedir').'/'.$post_meta['_wp_attached_file'][0];
 
                     if( !$xmlget = @simplexml_load_file($filename) )
                         return;
@@ -190,7 +247,7 @@ class Image extends Entity
                     $this->focus_point = false;
                 }
 
-                $filename = $this->uploadDir('basedir').'/'.$attachment_metadata['file'];
+                $filename = self::uploadDir('basedir').'/'.$attachment_metadata['file'];
 
                 if( !is_readable( $filename) )
                     return;
@@ -198,7 +255,7 @@ class Image extends Entity
                 $this->ID = $post->ID;
                 $this->caption = $post->post_excerpt;
                 $this->description = $post->post_content;
-                $this->file = $this->uploadDir('relative').'/'.$attachment_metadata['file'];
+                $this->file = self::uploadDir('relative').'/'.$attachment_metadata['file'];
                 $this->src = $filename;
                 $this->post = $post;
 
@@ -214,7 +271,7 @@ class Image extends Entity
         else{
 
             if( substr($id,0, 7) == 'http://' || substr($id,0, 8) == 'https://' )
-                $id = $this->getRemoteImage($id, $this->args['ttl']??false);
+               $id = $this->getRemoteImage($id, $this->args['ttl']??false);
 
             if( !$id )
                 return;
@@ -443,7 +500,7 @@ class Image extends Entity
 
         $file = $this->process($params, $ext);
 
-        $file['url'] = str_replace($this->uploadDir('basedir'), $this->uploadDir('baseurl'), $file['src']);
+        $file['url'] = str_replace(self::uploadDir('basedir'), self::uploadDir('baseurl'), $file['src']);
         $file['url'] = str_replace(BASE_URI.PUBLIC_DIR, '', $file['url']);
 
         if( $output == 'url')
