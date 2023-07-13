@@ -1,7 +1,7 @@
 {
   "name":"metabolism/wordpress-bundle",
   "type": "symfony-bundle",
-  "version": "2.1.8",
+  "version": "2.2.0",
   "description": "Build enterprise solutions with WordPress",
   "license": "GPL-3.0-or-later",
   "keywords": [
@@ -40,6 +40,17 @@
     "enshrined/svg-sanitize": "^0.15",
     "intervention/image": "^2.0"
   },
+  "require-dev": {
+    "symfony/console": "5.4.*",
+    "symfony/dotenv": "5.4.*",
+    "symfony/flex": "^1.17|^2",
+    "symfony/framework-bundle": "5.4.*",
+    "symfony/yaml": "5.4.*",
+    "symfony/runtime": "5.4.*",
+    "wpackagist-plugin/advanced-custom-fields": "^6.0.6",
+    "wpackagist-plugin/wordpress-seo": "^19.0",
+    "wpackagist-plugin/wp-smartcrop": "2.*"
+  },
   "suggest": {
     "metabolism/acf-extensions": "Extensions for ACF",
     "wpackagist-plugin/advanced-custom-fields": "Customise WordPress with powerful, professional and intuitive fields.",
@@ -55,6 +66,12 @@
 
   },
   "extra": {
+    "installer-paths": {
+      "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+      "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
+      "public/wp-bundle/themes/{$name}/": ["type:wordpress-theme"],
+      "public/edition/": ["type:wordpress-core"]
+    },
     "post-package-install": {
       "create": {
         "metabolism/wordpress-bundle": {

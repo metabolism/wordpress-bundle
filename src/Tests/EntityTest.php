@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests;
+namespace Metabolism\WordpressBundle\Tests;
 
 use Metabolism\WordpressBundle\Entity\File;
 use Metabolism\WordpressBundle\Entity\Image;

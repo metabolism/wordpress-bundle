@@ -1,6 +1,6 @@
 <?php
 
-namespace src\Tests;
+namespace Metabolism\WordpressBundle\Tests;
 
 use Metabolism\WordpressBundle\Entity\Blog;
 use Metabolism\WordpressBundle\Repository\PostRepository;
