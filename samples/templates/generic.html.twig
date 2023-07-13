@@ -36,7 +36,7 @@
                     <section>
                         <h3><a href="{{ post.link }}">{{ post.title }}</a></h3>
                         {% if post.thumbnail %}
-                            <img src="{{ post.thumbnail.resize(120,120) }}" alt="{{ post.thumbnail.alt }}" loading="lazy">
+                            <img src="{{ post.thumbnail|resize(120,120) }}" alt="{{ post.thumbnail.alt }}" loading="lazy">
                         {% endif %}
                         <div>{{ post.excerpt|raw }}</div>
                     </section>
@@ -45,7 +45,7 @@
         {% elseif post|default() %}
             <section>
                 <h2>{{ post.title }}</h2>
-                {% set categories = post.getTerms('category') %}
+                {% set categories = post.terms('category') %}
                 {% if categories %}
                     <nav>
                         {% for category in categories %}
@@ -54,7 +54,7 @@
                     </nav>
                 {% endif %}
                 {% if post.thumbnail %}
-                    <img src="{{ post.thumbnail.resize(640,480) }}" alt="{{ post.thumbnail.alt }}" loading="lazy">
+                    <img src="{{ post.thumbnail|resize(640,480) }}" alt="{{ post.thumbnail.alt }}" loading="lazy">
                 {% endif %}
                 <div>{{ post.content|raw }}</div>
             </section>
