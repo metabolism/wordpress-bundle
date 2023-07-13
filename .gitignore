@@ -10,7 +10,7 @@ node_modules
 debug*
 *.debug
 
-tests/*
-!tests/src/Tests
-!tests/composer.json
-!tests/phpunit.xml.dist
+/tests/*
+!/tests/src/Tests/*
+!/tests/composer.json
+!/tests/phpunit.xml.dist
