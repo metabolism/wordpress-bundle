@@ -11,8 +11,16 @@ use Metabolism\WordpressBundle\WordpressBundle;
 
 WordpressBundle::loadPlugins();
 
-if( WordpressBundle::isLoginUrl() )
+if( WordpressBundle::isLoginUrl() ){
+
+    //load login only action
+    if( class_exists('App\Action\LoginAction') )
+        new App\Action\LoginAction();
+    else
+        new Metabolism\WordpressBundle\Action\LoginAction();
+
     return;
+}
 
 if( is_admin() )
 {

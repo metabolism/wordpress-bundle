@@ -9,6 +9,7 @@
 
 namespace Metabolism\WordpressBundle\Twig;
 
+use Metabolism\WordpressBundle\Entity\Blog;
 use Metabolism\WordpressBundle\Entity\Image;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
@@ -52,6 +53,8 @@ class WordpressTwigExtension extends AbstractExtension{
      */
     public function getFunctions(): array
     {
+        $blog = Blog::getInstance();
+
         return [
             new TwigFunction( 'placeholder', [$this, 'generatePlaceholder'] ),
             new TwigFunction( 'pixel', [$this, 'generatePixel'] ),
@@ -62,7 +65,8 @@ class WordpressTwigExtension extends AbstractExtension{
             new TwigFunction( 'login_url', 'wp_login_url' ),
             new TwigFunction( 'home_url', 'get_home_url' ),
             new TwigFunction( 'search_form', 'get_search_form' ),
-            new TwigFunction( 'archive_url', 'get_post_type_archive_link' ),
+            new TwigFunction( 'archive_url', [$blog, 'getArchiveLink'] ),
+            new TwigFunction( 'archive_title', [$blog, 'getArchiveTitle'] ),
             new TwigFunction( 'attachment_url', 'wp_get_attachment_url' ),
             new TwigFunction( 'post_url', [$this, 'getPermalink'] ),
             new TwigFunction( 'term_url', [$this, 'getTermLink'] ),

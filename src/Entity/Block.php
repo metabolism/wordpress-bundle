@@ -69,7 +69,7 @@ class Block extends Entity
 	 * @param $block
 	 * @return bool|array
 	 */
-	public function get($block){
+	private function get($block){
 
 		if( empty($block['blockName']??'') )
 			return false;

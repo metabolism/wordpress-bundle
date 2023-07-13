@@ -13,12 +13,11 @@ class File extends Entity
 
 	public static $wp_upload_dir = false;
 
-	public $file;
-	public $mime_type;
-	public $title;
-	public $caption;
-	public $description;
-
+    protected $file;
+    protected $mime_type;
+    protected $title;
+    protected $caption;
+    protected $description;
 	protected $extension;
 	protected $size;
 	protected $link;
@@ -113,9 +112,58 @@ class File extends Entity
     }
 
 	/**
+	 * @return string
+	 */
+	public function getFile(){
+
+		return $this->file;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getMimeType(){
+
+		return $this->mime_type;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTitle(){
+
+		return $this->title;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCaption(){
+
+		return $this->caption;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDescription(){
+
+		return $this->description;
+	}
+
+	/**
+     * @deprecated
 	 * @return float|int
 	 */
 	public function getSize(){
+
+		return $this->getFilesize();
+	}
+
+	/**
+	 * @return float|int
+	 */
+	public function getFilesize(){
 
 		if( is_null($this->size) && $this->src )
 			$this->size = filesize($this->src)/1024;

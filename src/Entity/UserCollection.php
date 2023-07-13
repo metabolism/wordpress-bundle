@@ -12,6 +12,8 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 	private $query=false;
 
+	private $args=[];
+
     protected $items=[];
 
 	protected $pagination;
@@ -19,39 +21,63 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	/**
 	 * @param array|\WP_User_Query|null $query
 	 */
-	public function __construct($query=null)
+	public function __construct($args=null)
 	{
-        if( $query ){
+        if( $args ){
 
-			if( $query instanceof \WP_User_Query )
-				$this->query = $query;
-			else
-				$this->query = new \WP_User_Query( $query );
+			if( $args instanceof \WP_User_Query ){
+
+                $this->query = $args;
+            }
+			else{
+
+                $this->args = $args;
+
+                if( !isset($args['fields']) )
+                    $args['fields'] = 'ID';
+
+                $this->query = new \WP_User_Query( $args );
+            }
 
 			if( $users  = $this->query->get_results() )
-				$this->setUsers( $users );
+				$this->setItems( $users );
         }
     }
 
-	/**
-	 * @return int[]
-	 */
-	public function getUsers(){
+    /**
+     * @return array
+     */
+    public function getArgs(){
 
-		return $this->query->get_results();
+        return $this->args;
+    }
+
+	/**
+	 * @return array
+	 */
+	public function getItems(){
+
+		return $this->items;
 	}
 
     /**
      * @param array $users
      * @return void
      */
-    public function setUsers(array $users){
+    public function setItems(array $users){
 
-	    $users = array_unique(array_filter($users));
+        $users = array_unique(array_filter($users));
         $items = [];
 
-        foreach ($users as $user)
-            $items[] = Factory::create( $user, 'user' );
+        if( !isset($this->args['fields']) ){
+
+            foreach ($users as $user)
+                $items[] = Factory::create( $user, 'user' );
+        }
+        else{
+
+            $items = $users;
+        }
 
         $this->items = array_filter($items);
     }
@@ -80,7 +106,7 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 *
 	 * @return int
 	 */
-	public function count()
+	public function count() : int
 	{
 		return $this->query ? $this->query->get_total() : count($this->items);
 	}
@@ -89,7 +115,7 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $offset
 	 * @return bool
 	 */
-	public function offsetExists($offset)
+	public function offsetExists($offset) : bool
 	{
 		return isset($this->items[$offset]);
 	}
@@ -108,7 +134,7 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $value
 	 * @return void
 	 */
-	public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value) : void
 	{
 		$this->items[$offset] = $value;
 	}
@@ -117,7 +143,7 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $offset
 	 * @return void
 	 */
-	public function offsetUnset($offset)
+	public function offsetUnset($offset) : void
 	{
 		unset($this->items[$offset]);
 	}

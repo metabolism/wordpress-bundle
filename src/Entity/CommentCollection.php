@@ -3,30 +3,29 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use ArrayIterator;
-use Metabolism\WordpressBundle\Factory\PostFactory;
-use Metabolism\WordpressBundle\Service\PaginationService;
+use Metabolism\WordpressBundle\Factory\Factory;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
+class CommentCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 	private $query=false;
 
-	private $args=[];
+    private $args=[];
 
     protected $items=[];
 
 	protected $pagination;
 
 	/**
-	 * @param array|\WP_Query|null $args
+	 * @param array|\WP_Comment_Query|null $args
 	 */
 	public function __construct($args=null)
 	{
         if( $args ){
 
-			if( $args instanceof \WP_Query ){
+			if( $args instanceof \WP_Comment_Query ){
 
                 $this->query = $args;
             }
@@ -37,11 +36,11 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
                 if( !isset($args['fields']) )
                     $args['fields'] = 'ids';
 
-                $this->query = new \WP_Query( $args );
+                $this->query = new \WP_Comment_Query($args);
             }
 
-			if( $this->query->posts )
-				$this->setItems($this->query->posts);
+			if( $comments = $this->query->get_comments() )
+				$this->setItems( $comments );
         }
     }
 
@@ -62,22 +61,22 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	}
 
     /**
-     * @param array $posts
+     * @param array $comments
      * @return void
      */
-    public function setItems(array $posts){
+    public function setItems(array $comments){
 
-        $posts = array_filter($posts);
+        $comments = array_unique(array_filter($comments));
         $items = [];
 
         if( !isset($this->args['fields']) ){
 
-            foreach ($posts as $post)
-                $items[] = PostFactory::create( $post );
+            foreach ($comments as $comment)
+                $items[] = Factory::create( $comment, 'comment' );
         }
         else{
 
-            $items = $posts;
+            $items = $comments;
         }
 
         $this->items = array_filter($items);
@@ -85,38 +84,16 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 
 	/**
-	 * @param $args
-	 * @return array
+	 * @return ArrayIterator|Comment[]
 	 */
-	public function getPagination($args=[]){
-
-		if( !empty($args) ){
-
-			$paginationService = new PaginationService();
-			return $paginationService->build($args, $this->query);
-		}
-
-		if( is_null($this->pagination) ){
-
-			$paginationService = new PaginationService();
-			$this->pagination = $paginationService->build($args, $this->query);
-		}
-
-		return $this->pagination;
-	}
-
-
-	/**
-	 * @return ArrayIterator|Post[]
-	 */
-	public function getIterator(): \Traversable {
+	public function getIterator() {
 
 		return new ArrayIterator($this->items);
 	}
 
 
 	/**
-	 * @return \WP_Query
+	 * @return \WP_Comment_Query
 	 */
 	public function getQuery() {
 
@@ -125,13 +102,22 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 
 	/**
-	 * Get total post count
+	 * Get total comment count
 	 *
 	 * @return int
 	 */
-	public function count(): int
+	public function count() : int
 	{
-		return $this->query ? $this->query->found_posts : count($this->items);
+        if( $args = $this->getArgs() ){
+
+            $args['count'] = true;
+
+            return $this->query->query($args);
+        }
+        else{
+
+            return count($this->items);
+        }
 	}
 
 	/**
@@ -145,7 +131,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 	/**
 	 * @param $offset
-	 * @return Post|null
+	 * @return User|null
 	 */
 	public function offsetGet($offset)
 	{
@@ -157,7 +143,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $value
 	 * @return void
 	 */
-	public function offsetSet($offset, $value): void
+	public function offsetSet($offset, $value) : void
 	{
 		$this->items[$offset] = $value;
 	}
@@ -166,7 +152,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $offset
 	 * @return void
 	 */
-	public function offsetUnset($offset): void
+	public function offsetUnset($offset) : void
 	{
 		unset($this->items[$offset]);
 	}

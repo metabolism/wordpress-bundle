@@ -93,12 +93,10 @@ class PostRepository
      * @param array|string|null $orderBy
      * @param $limit
      * @param $offset
-     * @return PostCollection
+     * @return PostCollection|array
      */
     public function findBy(array $criteria, $orderBy = null, $limit = null, $offset = null)
     {
-        $criteria['fields'] = 'ids';
-
         if( $limit )
             $criteria['posts_per_page'] = $limit;
 
@@ -113,7 +111,12 @@ class PostRepository
                 $criteria = array_merge($criteria, ['orderby' => (array_keys($orderBy)[0]), 'order' => (array_values($orderBy)[0])]);
         }
 
-        return new PostCollection($criteria);
+        $collection = new PostCollection($criteria);
+
+        if( isset($criteria['fields']) )
+            return $collection->getItems();
+
+        return $collection;
     }
 
 
@@ -175,7 +178,7 @@ class PostRepository
         $ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE guid IN ($in) ORDER BY FIELD(guid, $in)", array_merge($ids,$ids) ), ARRAY_A );
         $ids = array_map(function ($item){ return $item['ID']; }, $ids);
 
-        $postCollection->setPosts($ids);
+        $postCollection->setItems($ids);
 
         return $postCollection;
     }

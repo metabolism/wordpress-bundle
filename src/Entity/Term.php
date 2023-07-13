@@ -30,6 +30,7 @@ class Term extends Entity
     protected $parent;
     protected $template;
     protected $thumbnail;
+    protected $ancestor;
     protected $ancestors;
     protected $path;
     protected $parameters;
@@ -41,7 +42,6 @@ class Term extends Entity
 
     public function __toString(): string
     {
-
         return $this->title??'Invalid term';
     }
 
@@ -111,7 +111,7 @@ class Term extends Entity
 
         if( $term = get_term($pid) ) {
 
-            if( is_wp_error($term) )
+            if( is_wp_error($term) || !taxonomy_exists( $term->taxonomy ) )
                 return false;
 
             $this->term = $term;
@@ -352,6 +352,28 @@ class Term extends Entity
     }
 
     /**
+     * Get term root ancestor
+     *
+     * @return bool|Term
+     */
+    public function getAncestor(){
+
+        if( is_null($this->ancestor) ){
+
+            $parents_id = get_ancestors($this->ID, $this->taxonomy);
+
+            $parents_id = array_reverse($parents_id);
+
+            if( count($parents_id) )
+                $this->ancestor = TermFactory::create($parents_id[0]);
+            else
+                $this->ancestor = false;
+        }
+
+        return $this->ancestor;
+    }
+
+    /**
      * Get term ancestors
      *
      * @param $reverse
@@ -398,7 +420,7 @@ class Term extends Entity
     public function getExcerpt(){
 
         if( is_null($this->excerpt) )
-            $this->excerpt = strip_tags(term_description($this->ID),'<b><i><strong><em><br>');
+            $this->excerpt = strip_tags($this->content,'<b><i><strong><em><br>');
 
         return $this->excerpt;
     }

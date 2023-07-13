@@ -74,8 +74,6 @@ class UserRepository
      */
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
-        $criteria['fields'] = 'ID';
-
         if( $limit || !isset($criteria['number']) )
             $criteria['number'] = $limit?:get_option( 'posts_per_page' );
 

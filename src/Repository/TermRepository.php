@@ -87,12 +87,11 @@ class TermRepository
      */
     public function count(array $criteria)
     {
-        $criteria['fields'] = 'ID';
-        $criteria['number'] = 0;
+        $criteria['fields'] = 'count';
 
-        $query = new \WP_Term_Query($criteria);
+        $count = new \WP_Term_Query($criteria);
 
-        return count($query->terms);
+        return intval($count);
     }
 
 
@@ -104,13 +103,12 @@ class TermRepository
      *
      * @see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
      *
-     * @return TermCollection
+     * @return TermCollection|array
      */
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
-        $criteria['fields'] = 'ids';
-
-        $criteria['number'] = max(0, $limit?:0);
+        if( $limit && $limit > 0 )
+            $criteria['number'] = $limit;
 
         if( $offset )
             $criteria['offset'] = $offset;
@@ -118,7 +116,12 @@ class TermRepository
         if( $orderBy )
             $criteria = ['orderby' => $orderBy[0], 'order' => $orderBy[1]??'DESC'];
 
-        return new TermCollection($criteria);
+        $collection = new TermCollection($criteria);
+
+        if( isset($criteria['fields']) )
+            return $collection->getItems();
+
+        return $collection;
     }
 
     /**
