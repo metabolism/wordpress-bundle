@@ -9,3 +9,30 @@ vendor
 node_modules
 debug*
 *.debug
+
+###> symfony/framework-bundle ###
+symfony.lock
+composer.lock
+/.env
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/packages
+/config/routes
+/config/bundles.php
+/config/preload.php
+/config/routes.yaml
+/config/secrets/prod/prod.decrypt.private.php
+/public
+!/public/wp-config.php
+!/public/.htaccess
+!/public/wp-bundle/mu-plugins/wp-bundle.php
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/tests
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###

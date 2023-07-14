@@ -11,6 +11,11 @@
     "bundle",
     "plugin"
   ],
+  "repositories": [
+    {
+      "type":"composer", "url":"https://wpackagist.org"
+    }
+  ],
   "require": {
     "php" : ">=7.2.5",
     "ext-gd": "*",
@@ -47,6 +52,10 @@
     "symfony/framework-bundle": "5.4.*",
     "symfony/yaml": "5.4.*",
     "symfony/runtime": "5.4.*",
+    "phpunit/phpunit": "^9.5",
+    "symfony/browser-kit": "5.4.*",
+    "symfony/css-selector": "5.4.*",
+    "symfony/phpunit-bridge": "5.4.*",
     "wpackagist-plugin/advanced-custom-fields": "^6.0.6",
     "wpackagist-plugin/wordpress-seo": "^19.0",
     "wpackagist-plugin/wp-smartcrop": "2.*"
@@ -66,6 +75,10 @@
 
   },
   "extra": {
+    "symfony": {
+      "allow-contrib": false,
+      "require": "5.4.*"
+    },
     "installer-paths": {
       "public/wp-bundle/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
       "public/wp-bundle/plugins/{$name}/": ["type:wordpress-plugin"],
@@ -83,10 +96,10 @@
       },
       "copy": {
         "metabolism/wordpress-bundle": {
-          "samples/public/.htaccess": "public/.htaccess",
-          "samples/public/wp-config.php": "public/wp-config.php",
+          "public/.htaccess": "public/.htaccess",
+          "public/wp-config.php": "public/wp-config.php",
           "config/wordpress.yaml": "config/packages/wordpress.yaml",
-          "samples/public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php",
+          "public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php",
           "README.md": "docs/wordpress_bundle.md"
         }
       }
@@ -100,8 +113,8 @@
       },
       "copy": {
         "metabolism/wordpress-bundle": {
-          "samples/public/wp-config.php": "public/wp-config.php",
-          "samples/public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php",
+          "public/wp-config.php": "public/wp-config.php",
+          "public/wp-bundle/mu-plugins/wp-bundle.php": "public/wp-bundle/mu-plugins/wp-bundle.php",
           "README.md": "docs/wordpress_bundle.md"
         }
       }
@@ -115,6 +128,21 @@
   "autoload" : {
     "psr-4" : {
       "Metabolism\\WordpressBundle\\" : "src/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true,
+      "symfony/flex": true,
+      "metabolism/package-actions": true,
+      "metabolism/wordpress-core-installer": true,
+      "symfony/runtime": true
+    }
+  },
+  "scripts": {
+    "auto-scripts": {
+      "cache:clear": "symfony-cmd",
+      "assets:install %PUBLIC_DIR%": "symfony-cmd"
     }
   }
 }

@@ -7,7 +7,7 @@
  *
  */
 
-namespace App\Twig;
+namespace Metabolism\WordpressBundle\Twig;
 
 use Twig\Extension\AbstractExtension,
 	Twig\TwigFilter,

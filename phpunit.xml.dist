@@ -16,6 +16,11 @@
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
         <server name="SYMFONY_PHPUNIT_VERSION" value="9.5" />
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
+
+        <!-- ###+ symfony/framework-bundle ### -->
+        <env name="APP_ENV" value="dev"/>
+        <env name="APP_SECRET" value="b251b61c27b874555d0125ab971f5225"/>
+        <!-- ###- symfony/framework-bundle ### -->
     </php>
 
     <testsuites>
