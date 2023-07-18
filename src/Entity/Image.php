@@ -66,6 +66,8 @@ class Image extends Entity
         else {
 
             $this->get($id);
+
+            $this->loadMetafields($this->ID, 'post');
         }
     }
 

@@ -25,6 +25,7 @@ composer.lock
 /config/secrets/prod/prod.decrypt.private.php
 /public
 !/public/wp-config.php
+!/public/uploads
 !/public/.htaccess
 !/public/wp-bundle/mu-plugins/wp-bundle.php
 /var/
@@ -36,3 +37,8 @@ composer.lock
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###

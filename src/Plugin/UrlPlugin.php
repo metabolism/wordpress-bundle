@@ -158,6 +158,38 @@ class UrlPlugin {
         }
     }
 
+    /**
+     * This function is to replace PHP's extremely buggy realpath().
+     * @param string $path The original path, can be relative etc.
+     * @param string $separator The separator.
+     * @return string The resolved path, it might not exist.
+     */
+    private function realpath($path, $separator=DIRECTORY_SEPARATOR){
+
+        $paths = explode($separator, $path);
+
+        foreach ($paths as $key=>$path){
+            if( $path == '..'){
+                unset($paths[$key-1]);
+                unset($paths[$key]);
+            }
+        }
+
+        return implode($separator, $paths);
+    }
+
+
+    public function uploadDir( $arr )
+    {
+        $arr['path'] = $this->realpath($arr['path']);
+        $arr['basedir'] = $this->realpath($arr['basedir']);
+
+        $arr['url'] =  $this->realpath($arr['url'], '/');
+        $arr['baseurl'] =  $this->realpath($arr['baseurl'], '/');
+
+        return $arr;
+    }
+
 
     /**
      * UrlPlugin constructor.
@@ -170,5 +202,6 @@ class UrlPlugin {
         add_filter('home_url', [$this, 'homeURL'] );
 
         add_action('init', [$this, 'init'], 99);
+        add_filter('upload_dir', [$this, 'uploadDir'], 10, 2);
     }
 }

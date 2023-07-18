@@ -37,7 +37,7 @@ class ConfigLoader{
 
         $wp_path = 'pubic/edition/';
 
-        // get Wordpress path
+        // get WordPress path
         if( !is_dir(BASE_URI.'/'.$wp_path) && is_readable($composer) ){
 
             $composer = json_decode(file_get_contents($composer), true);
@@ -153,7 +153,7 @@ class ConfigLoader{
 
 
         /**
-         * Redefine cookie name without wordpress
+         * Redefine cookie name without WordPress
          */
         define( 'COOKIEHASH', md5( WP_SITEURL )    );
 

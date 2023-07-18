@@ -65,7 +65,7 @@ class EntityTest extends KernelTestCase
 
         $this->assertCount(3, $terms);
 
-        $this->assertEquals($this->base_url.'/uploads/2023/01/placeholder-50x50-c-30x46.png', $post->getThumbnail(50,50));
+        $this->assertEquals($this->base_url.'/uploads/2023/07/placeholder-50x50-c-28x45.png', $post->getThumbnail(50,50));
 
         $this->assertEquals('Lorem ipsum', $post->getCustomField('text'));
         $this->assertInstanceOf(Image::class, $post->getCustomField('image'));
@@ -77,35 +77,35 @@ class EntityTest extends KernelTestCase
     {
         self::bootKernel();
 
-        $thumbnail = new Image(26);
+        $thumbnail = new Image(41);
 
         $this->assertEquals('alt text', $thumbnail->getAlt());
         $this->assertEquals('placeholder', $thumbnail->getTitle());
         $this->assertEquals('image/png', $thumbnail->getMimeType());
         $this->assertEquals('png', $thumbnail->getExtension());
-        $this->assertEquals(6.52734375, $thumbnail->getFilesize());
-        $this->assertEquals('2023-06-28', $thumbnail->getDate('Y-m-d'));
+        $this->assertEquals(6.3466796875, $thumbnail->getFilesize());
+        $this->assertEquals('2023-07-18', $thumbnail->getDate('Y-m-d'));
         $this->assertEquals(800, $thumbnail->getHeight());
         $this->assertEquals(1200, $thumbnail->getWidth());
-        $this->assertEquals($this->base_url.'/uploads/2023/01/placeholder.png', $thumbnail->getLink());
-        $this->assertEquals($this->base_url.'/uploads/2023/01/placeholder-50x50-c-30x46.png', $thumbnail->resize(50,50));
+        $this->assertEquals($this->base_url.'/uploads/2023/07/placeholder.png', $thumbnail->getLink());
+        $this->assertEquals($this->base_url.'/uploads/2023/07/placeholder-50x50-c-28x45.png', $thumbnail->resize(50,50));
         $this->assertEquals('https://placehold.jp/50x50.png', $thumbnail->placeholder(50,50));
-        $this->assertEquals('<picture><source srcset="'.$this->base_url.'/uploads/2023/01/placeholder-50x50-c-30x46.webp" type="image/webp"/><img src="'.$this->base_url.'/uploads/2023/01/placeholder-50x50-c-30x46.png" alt="alt text" loading="lazy" width="50" height="50"/></picture>', $thumbnail->picture(50,50));
-        $this->assertEquals('<picture><source media="(max-width:600px)" srcset="'.$this->base_url.'/uploads/2023/01/placeholder-20x20-c-30x46.webp" type="image/webp"/><source media="(max-width:600px)" srcset="'.$this->base_url.'/uploads/2023/01/placeholder-20x20-c-30x46.png" type="image/png"/><source srcset="'.$this->base_url.'/uploads/2023/01/placeholder-50x50-c-30x46.webp" type="image/webp"/><img src="'.$this->base_url.'/uploads/2023/01/placeholder-50x50-c-30x46.png" alt="alt text" loading="lazy" width="50" height="50"/></picture>', $thumbnail->picture(50,50,['max-width:600px'=>[20,20]]));
+        $this->assertEquals('<picture><source srcset="'.$this->base_url.'/uploads/2023/07/placeholder-50x50-c-28x45.webp" type="image/webp"/><img src="'.$this->base_url.'/uploads/2023/07/placeholder-50x50-c-28x45.png" alt="alt text" loading="lazy" width="50" height="50"/></picture>', $thumbnail->picture(50,50));
+        $this->assertEquals('<picture><source media="(max-width:600px)" srcset="'.$this->base_url.'/uploads/2023/07/placeholder-20x20-c-28x45.webp" type="image/webp"/><source media="(max-width:600px)" srcset="'.$this->base_url.'/uploads/2023/07/placeholder-20x20-c-28x45.png" type="image/png"/><source srcset="'.$this->base_url.'/uploads/2023/07/placeholder-50x50-c-28x45.webp" type="image/webp"/><img src="'.$this->base_url.'/uploads/2023/07/placeholder-50x50-c-28x45.png" alt="alt text" loading="lazy" width="50" height="50"/></picture>', $thumbnail->picture(50,50,['max-width:600px'=>[20,20]]));
         $this->assertEquals('Lorem ipsum', $thumbnail->getCustomField('text'));
     }
     public function testFile()
     {
         self::bootKernel();
 
-        $file = new File(37);
+        $file = new File(42);
 
         $this->assertEquals('sample', $file->getTitle());
         $this->assertEquals('application/pdf', $file->getMimeType());
         $this->assertEquals('pdf', $file->getExtension());
         $this->assertEquals(2.95703125, $file->getFilesize());
-        $this->assertEquals('2023-06-28', $file->getDate('Y-m-d'));
-        $this->assertEquals($this->base_url.'/uploads/2023/01/sample.pdf', $file->getLink());
+        $this->assertEquals('2023-07-18', $file->getDate('Y-m-d'));
+        $this->assertEquals($this->base_url.'/uploads/2023/07/sample.pdf', $file->getLink());
         $this->assertEquals('Lorem ipsum', $file->getCustomField('text'));
     }
 }

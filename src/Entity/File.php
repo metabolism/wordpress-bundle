@@ -39,6 +39,8 @@ class File extends Entity
 	public function __construct($id=null) {
 
 		$this->get($id);
+
+        $this->loadMetafields($this->ID, 'post');
     }
 
 
