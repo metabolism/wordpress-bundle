@@ -73,7 +73,8 @@ class PostRepository
             }
             elseif( $id = get_the_ID() ){
 
-                return $this->find($id);
+                if( $post = $this->find($id) )
+                    return $post;
             }
 
             throw new \Exception('Post not found', 404);

@@ -40,7 +40,8 @@ class UserRepository
                 if( !$id = $wp_query->query_vars['author'] )
                     throw new \Exception('Author not found', 404);
 
-                return $this->find($id);
+                if( $user = $this->find($id) )
+                    return $user;
             }
 
             throw new \Exception('Author not found', 404);

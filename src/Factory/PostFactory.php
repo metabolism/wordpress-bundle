@@ -62,21 +62,31 @@ class PostFactory {
 			case '':
 			case false:
 			case 'trash':
-			case 'auto-draft':
+            case 'inherit':
+            case 'auto-draft':
 				return false;
 
 			case 'private':
 
-				if( (!is_user_logged_in() || !current_user_can( 'read_private_posts' )) )
+				if( !current_user_can( 'read_private_posts' ) && !current_user_can( 'edit_posts' ) )
 					return false;
 				break;
 
 			case 'draft':
+
+                if( !current_user_can( 'read_draft_posts' ) && !current_user_can( 'edit_posts' ) )
+                    return false;
+                break;
+
 			case 'pending':
-			case 'inherit':
+
+                if( !current_user_can( 'read_pending_posts' ) && !current_user_can( 'edit_posts' ) )
+                    return false;
+                break;
+
 			case 'future':
 
-			if( (!is_user_logged_in() || !current_user_can( 'edit_posts' )) )
+			if( !current_user_can( 'read_future_posts' ) && !current_user_can( 'edit_posts' ) )
 				return false;
 			break;
 		}
