@@ -39,7 +39,8 @@ class TermRepository
                 if( !$id = get_queried_object_id() )
                     throw new \Exception('Term not found', 404);
 
-                return $this->find($id);
+                if( $term = $this->find($id) )
+                    return $term;
             }
 
             throw new \Exception('Term not found', 404);
