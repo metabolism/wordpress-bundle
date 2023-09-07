@@ -496,22 +496,30 @@ class Post extends Entity
                 $this->content = [];
                 
                 $blocks = parse_blocks( $this->post->post_content );
-                
+
                 foreach ($blocks as $block){
-                    
-                    $data = $block['attrs']['data']??[];
-                    $content = [];
-                    
-                    foreach ($data as $key=>$value){
-                        
-                        if( substr($key, 0,1 ) != '_' && is_string($value) && !is_numeric($value) && $value != 'none' )
-                            $content[] = $value;
+
+                    if( !empty($block['innerContent']??'') ){
+
+                        $this->content = array_merge($this->content, $block['innerContent']);
                     }
-                    
-                    $this->content = array_merge($this->content, $content);
+                    else{
+
+                        $data = $block['attrs']['data']??[];
+                        $content = [];
+
+                        foreach ($data as $key=>$value){
+
+                            if( substr($key, 0,1 ) != '_' && is_string($value) && !is_numeric($value) && $value != 'none' )
+                                $content[] = $value;
+                        }
+
+                        $this->content = array_merge($this->content, $content);
+                        $this->content = array_unique($this->content);
+                    }
                 }
-                
-                $this->content = array_unique(array_filter($this->content));
+
+                $this->content = array_filter($this->content);
                 $this->content = implode("\n", $this->content);
                 $this->content = preg_replace("/[\r\n]+/", "\n", $this->content);
             }

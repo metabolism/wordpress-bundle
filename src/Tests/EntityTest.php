@@ -60,6 +60,8 @@ class EntityTest extends KernelTestCase
 
         $this->assertEquals('Test', $post->getTitle());
         $this->assertEquals('post', $post->getType());
+        $this->assertEquals('This is the excerpt', $post->getExcerpt());
+        $this->assertEquals("\n<p></p>\n<p class=\"has-luminous-vivid-orange-to-vivid-red-gradient-background has-background has-small-font-size\">Hello</p>\n", $post->getContent());
 
         $this->assertEquals('Primary', $term->getTitle());
 
