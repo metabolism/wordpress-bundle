@@ -32,6 +32,7 @@ class WordpressTwigExtension extends AbstractExtension{
             new TwigFilter( 'more', [$this, 'more'] ),
             new TwigFilter( 'resize', [$this, 'resize'] ),
             new TwigFilter( 'picture', [$this, 'picture'] ),
+            new TwigFilter( 'blurhash', [$this, 'blurhash'] ),
             new TwigFilter( 'figure', [$this, 'figure'] ),
             new TwigFilter( 'stripshortcodes','strip_shortcodes' ),
             new TwigFilter( 'trim_words','wp_trim_words' ),
@@ -110,6 +111,24 @@ class WordpressTwigExtension extends AbstractExtension{
     public function fileExists($path ) {
 
         return substr($path, 0, 4) == 'http' || file_exists(BASE_URI . PUBLIC_DIR . $path);
+    }
+
+
+    /**
+     * Generate blurhash
+     * @return string
+     */
+    public function blurhash($image) {
+
+        if( is_string($image) )
+            $image = new Image($image);
+        elseif( is_array($image) && isset($image['url']) )
+            $image = new Image($image['url']);
+
+        if( !$image instanceof Image )
+            $image = new Image();
+
+        return $image->getBlurhash();
     }
 
 

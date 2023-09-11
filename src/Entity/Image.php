@@ -4,6 +4,7 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use Intervention\Image\Exception\NotSupportedException;
 use Intervention\Image\ImageManagerStatic;
+use kornrunner\Blurhash\Blurhash;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -22,6 +23,7 @@ class Image extends Entity
     public $file;
     public $width;
     public $height;
+    public $ratio;
     public $mime_type;
     public $sizes = [];
     public $title;
@@ -264,6 +266,7 @@ class Image extends Entity
 
                 $this->width = $attachment_metadata['width'];
                 $this->height = $attachment_metadata['height'];
+                $this->ratio = $this->width/$this->height;
                 $this->metadata = $attachment_metadata['image_meta'];
                 $this->mime_type = $post->post_mime_type;
             }
@@ -297,6 +300,7 @@ class Image extends Entity
             $image_size = getimagesize($filename);
             $this->width = $image_size[0]??false;
             $this->height = $image_size[1]??false;
+            $this->ratio = $this->width/$this->height;
 
             $this->metadata = false;
             $this->mime_type = mime_content_type($filename);
@@ -454,6 +458,52 @@ class Image extends Entity
 
 
     /**
+     * @return mixed
+     */
+    public function getBlurhash(){
+
+        if( $this->mime_type == 'image/svg' || $this->mime_type == 'image/svg+xml' )
+            return false;
+
+        if( !($this->metadata['blurhash']??false) ){
+
+            $components_x = 4;
+            $components_y = 3;
+
+            $image = ImageManagerStatic::make($this->src);
+            $image = $image->fit(
+                $this->width >= $this->height ? 64 : null,
+                $this->height >= $this->width ? 64 : null
+            );
+
+            $height = $image->height();
+            $width = $image->width();
+
+            $pixels = [];
+
+            for ($y = 0; $y < $height; ++$y) {
+                $row = [];
+                for ($x = 0; $x < $width; ++$x) {
+                    $colors = $image->pickColor($x, $y);
+
+                    $row[] = [$colors[0], $colors[1], $colors[2]];
+                }
+                $pixels[] = $row;
+            }
+
+            $this->metadata['blurhash'] = Blurhash::encode($pixels, $components_x, $components_y);
+
+            $attachment_metadata = maybe_unserialize(get_post_meta(  $this->ID, '_wp_attachment_metadata', true ));
+            $attachment_metadata['blurhash'] = $this->metadata['blurhash'];
+
+            update_post_meta($this->ID, '_wp_attachment_metadata', $attachment_metadata);
+        }
+
+        return $this->metadata['blurhash'];
+    }
+
+
+    /**
      * @param $w
      * @param int $h
      * @param null $ext
@@ -534,17 +584,17 @@ class Image extends Entity
             $w = $params['resize'][0];
             $h = count($params['resize'])>1?$params['resize'][1]:0;
 
-            if( !($params['enlarge']??true) && $image_size = getimagesize($this->src) ){
+            if( !($params['enlarge']??true) ){
 
-                $w = min($image_size[0], $w);
-                $h = min($image_size[1], $h);
+                $w = min($this->width, $w);
+                $h = min($this->height, $h);
             }
         }
         else{
 
-            if( is_readable($this->src) && $image_size = getimagesize($this->src) ){
-                $w = $image_size[0];
-                $h = $image_size[1];
+            if( is_readable($this->src) ){
+                $w = $this->width;
+                $h = $this->height;
             }
             else{
                 $w = 800;
@@ -554,14 +604,12 @@ class Image extends Entity
 
         if( isset($params['gcd']) ){
 
-            if( ($w == 0 || $h == 0) && is_readable($this->src) && $image_size = getimagesize($this->src) ){
-
-                $ratio = $image_size[0]/$image_size[1];
+            if( ($w == 0 || $h == 0) && is_readable($this->src) ){
 
                 if( $w == 0 )
-                    $w = round($h*$ratio);
+                    $w = round($h*$this->ratio);
                 else
-                    $h = round($w/$ratio);
+                    $h = round($w/$this->ratio);
             }
 
             $w = round($w/10);
