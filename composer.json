@@ -38,7 +38,8 @@
     "ifsnop/mysqldump-php":"^2.0",
     "dflydev/dot-access-data":"^3.0",
     "enshrined/svg-sanitize": "^0.15",
-    "intervention/image": "^2.0"
+    "intervention/image": "^2.0",
+    "kornrunner/blurhash": "^1.2.2"
   },
   "suggest": {
     "metabolism/acf-extensions": "Extensions for ACF",
