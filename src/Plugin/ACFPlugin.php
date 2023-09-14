@@ -60,6 +60,6 @@ class ACFPlugin {
     public function __construct()
     {
         add_filter('acf/validate_field', [$this, 'validateField']);
-		add_filter('block_render_callback', function (){ return [self::class, 'renderBlock']; });
+		add_filter('block_render_callback', [$this, 'renderBlock']);
     }
 }
