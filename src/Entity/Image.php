@@ -839,7 +839,7 @@ class Image extends Entity
                     $html .='<source media="('.$media.')" srcset="'.$this->placeholder($size[0], $size[1]??0).'" type="image/jpeg"/>';
             }
 
-            $html .= '<img src="'.$this->placeholder($w, $h).'" alt="'.$this->alt.'" loading="'.$loading.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
+            $html .= '<img loading="'.$loading.'" src="'.$this->placeholder($w, $h).'" alt="'.$this->alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
             $html .='</picture>';
 
             return $html;
@@ -852,7 +852,7 @@ class Image extends Entity
 
         if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' ){
 
-            $html .= '<img src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" loading="'.$loading.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
+            $html .= '<img loading="'.$loading.'" src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
         }
         else{
 
@@ -884,7 +884,7 @@ class Image extends Entity
 
             $image_info = getimagesize($file['src']);
 
-            $html .= '<img src="'.$file['url'].'" alt="'.($alt?:$this->alt).'" loading="'.$loading.'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[1]?'height="'.$image_info[1].'"':'').'/>';
+            $html .= '<img loading="'.$loading.'" src="'.$file['url'].'" alt="'.($alt?:$this->alt).'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[1]?'height="'.$image_info[1].'"':'').'/>';
         }
 
         $html .='</picture>';

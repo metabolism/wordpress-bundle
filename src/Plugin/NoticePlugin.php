@@ -18,15 +18,7 @@ class NoticePlugin {
         
         if( !current_user_can('administrator') || $currentScreen->base != 'dashboard' )
             return;
-        
-        global $wpdb, $table_prefix;
-        
-        if( ($_GET['fix']??false) == 'database' ){
-            
-            $wpdb->update($table_prefix."options", ['option_value' => WP_SITEURL], ['option_name' => 'siteurl']);
-            $wpdb->update($table_prefix."options", ['option_value' => WP_HOME], ['option_name' => 'home']);
-        }
-        
+
         if( ($_GET['fix']??false) == 'controller' ){
             
             $controller = BASE_URI.'/src/Controller/BlogController.php';
@@ -41,24 +33,6 @@ class NoticePlugin {
         
         $notices = [];
         $errors = [];
-        
-        $siteurl = $wpdb->get_var("SELECT option_value FROM `".$table_prefix."options` WHERE `option_name` = 'siteurl'");
-        $homeurl = $wpdb->get_var("SELECT option_value FROM `".$table_prefix."options` WHERE `option_name` = 'home'");
-        
-        if( str_replace('/edition','', $siteurl) !== str_replace('/edition','', $homeurl) )
-            $errors[] = 'Site url host and Home url host are different, please check your database configuration';
-        
-        if( strpos($homeurl, '/edition' ) !== false )
-            $errors[] = 'Home url must not contain /edition, please check your database configuration';
-        
-        if( strpos($homeurl, WP_HOME ) === false )
-            $errors[] = 'Home url host is different from current host, please check your database configuration';
-        
-        if( strpos($siteurl, WP_HOME ) === false )
-            $errors[] = 'Site url host is different from current host, please check your database configuration';
-        
-        if( !empty($errors))
-            $errors[] = '<a href="?fix=database">Fix database now</a>';
         
         //check folder right
         $folders = [PUBLIC_DIR.'/wp-bundle/languages', PUBLIC_DIR.'/uploads', PUBLIC_DIR.'/wp-bundle/upgrade', '/var/cache', '/var/log'];
