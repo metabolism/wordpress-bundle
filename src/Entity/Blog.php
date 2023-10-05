@@ -738,15 +738,21 @@ class Blog extends Entity
     {
         switch_to_blog($site->blog_id);
 
-        $id = (int) apply_filters('msls_options_get_id', $mslsOptions->__get( $locale ), $locale);
-        $url = $mslsOptions->get_permalink( $locale );
-        $entity = false;
+        $postlink = $mslsOptions->get_postlink( $locale );
 
-        if( $id && $url ){
+        $id = (int) apply_filters('msls_options_get_id', $mslsOptions->__get( $locale ), $locale);
+        $permalink = (string) apply_filters('msls_options_get_permalink', $postlink, $locale);
+
+        $alternate = [
+            'entity'=>false,
+            'url'=> empty($permalink) ? home_url( '/' ) : $permalink
+        ];
+
+        if( $id && $postlink ){
 
             if( $mslsOptions instanceof MslsOptionsPost && $post = get_post($id) ){
 
-                $entity = [
+                $alternate['entity'] = [
                     'id'=> $id,
                     'title'=> $post->post_title,
                     'slug'=> $post->post_name,
@@ -755,7 +761,7 @@ class Blog extends Entity
             }
             elseif( $mslsOptions instanceof MslsOptionsTax && $term = get_term($id) ){
 
-                $entity = [
+                $alternate['entity'] = [
                     'id'=> $id,
                     'title'=> $term->name,
                     'slug'=> $term->slug,
@@ -766,10 +772,7 @@ class Blog extends Entity
 
         restore_current_blog();
 
-        return [
-            'entity'=>$entity,
-            'url'=>$url
-        ];
+        return $alternate;
     }
 
     /**
