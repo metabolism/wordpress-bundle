@@ -3,6 +3,8 @@
 namespace Metabolism\WordpressBundle\Entity;
 
 use lloc\Msls\MslsOptions;
+use lloc\Msls\MslsOptionsPost;
+use lloc\Msls\MslsOptionsTax;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Helper\ClassHelper;
 use Metabolism\WordpressBundle\Helper\FunctionHelper;
@@ -711,16 +713,15 @@ class Blog extends Entity
                 $locale    = empty($locale)? 'en_US' : $locale;
                 $lang      = explode('_', $locale)[0];
 
-                $alternate = $current_blog_id != $site->blog_id ? $this->getAlternativeLink($mslsOptions, $site, $locale) : false;
+                $alternate = $current_blog_id != $site->blog_id ? $this->getAlternative($mslsOptions, $site, $locale) : ['url'=>false];
 
-                $this->languages[] = [
+                $this->languages[] = array_merge([
                     'id'            => $site->blog_id,
                     'active'        => $current_blog_id==$site->blog_id,
                     'name'          => format_code_lang($lang),
                     'home_url'      => get_home_url($site->blog_id, '/'),
-                    'language_code' => $lang,
-                    'url'           => $alternate
-                ];
+                    'language_code' => $lang
+                ], $alternate);
             }
         }
 
@@ -731,17 +732,44 @@ class Blog extends Entity
      * @param MslsOptions $mslsOptions
      * @param \WP_Site $site
      * @param string $locale
-     * @return string
+     * @return array
      */
-    protected function getAlternativeLink(MslsOptions $mslsOptions, \WP_Site $site, string $locale)
+    protected function getAlternative(MslsOptions $mslsOptions, \WP_Site $site, string $locale)
     {
         switch_to_blog($site->blog_id);
 
-        $alternate = $mslsOptions->get_permalink( $locale );
+        $id = (int) apply_filters('msls_options_get_id', $mslsOptions->__get( $locale ), $locale);
+        $url = $mslsOptions->get_permalink( $locale );
+        $entity = false;
+
+        if( $id && $url ){
+
+            if( $mslsOptions instanceof MslsOptionsPost && $post = get_post($id) ){
+
+                $entity = [
+                    'id'=> $id,
+                    'title'=> $post->post_title,
+                    'slug'=> $post->post_name,
+                    'type'=> 'post'
+                ];
+            }
+            elseif( $mslsOptions instanceof MslsOptionsTax && $term = get_term($id) ){
+
+                $entity = [
+                    'id'=> $id,
+                    'title'=> $term->name,
+                    'slug'=> $term->slug,
+                    'type'=> 'term'
+                ];
+            }
+        }
 
         restore_current_blog();
 
-        return $alternate;
+        return [
+            'entity'=>$entity,
+            'url'=>$url
+        ];
     }
 
     /**
