@@ -274,7 +274,7 @@ class Image extends Entity
         else{
 
             if( substr($id,0, 7) == 'http://' || substr($id,0, 8) == 'https://' )
-               $id = $this->getRemoteImage($id, $this->args['ttl']??false);
+                $id = $this->getRemoteImage($id, $this->args['ttl']??false);
 
             if( !$id )
                 return;
@@ -830,6 +830,8 @@ class Image extends Entity
      */
     public function picture($w, $h=0, $sources=false, $alt=false, $loading='lazy', $params=[]){
 
+        $alt = htmlspecialchars($alt?:$this->alt, ENT_QUOTES, 'UTF-8');
+
         if( empty($this->src) || !is_readable($this->src) ){
 
             $html = '<picture>';
@@ -839,7 +841,7 @@ class Image extends Entity
                     $html .='<source media="('.$media.')" srcset="'.$this->placeholder($size[0], $size[1]??0).'" type="image/jpeg"/>';
             }
 
-            $html .= '<img loading="'.$loading.'" src="'.$this->placeholder($w, $h).'" alt="'.$this->alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
+            $html .= '<img loading="'.$loading.'" src="'.$this->placeholder($w, $h).'" alt="'.$alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
             $html .='</picture>';
 
             return $html;
@@ -852,7 +854,7 @@ class Image extends Entity
 
         if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' ){
 
-            $html .= '<img loading="'.$loading.'" src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$this->alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
+            $html .= '<img loading="'.$loading.'" src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
         }
         else{
 
@@ -884,7 +886,7 @@ class Image extends Entity
 
             $image_info = getimagesize($file['src']);
 
-            $html .= '<img loading="'.$loading.'" src="'.$file['url'].'" alt="'.($alt?:$this->alt).'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[1]?'height="'.$image_info[1].'"':'').'/>';
+            $html .= '<img loading="'.$loading.'" src="'.$file['url'].'" alt="'.$alt.'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[1]?'height="'.$image_info[1].'"':'').'/>';
         }
 
         $html .='</picture>';
