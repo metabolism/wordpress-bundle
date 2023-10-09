@@ -13,71 +13,71 @@ use Metabolism\WordpressBundle\Repository\PostRepository;
  */
 class Block extends Entity
 {
-	public $entity = 'block';
+    public $entity = 'block';
 
-	protected $name;
+    protected $name;
 
-	protected $block;
+    protected $block;
 
-	/**
-	 * @param $block
-	 */
-	public function __construct($block)
-	{
-		if( $block = $this->get($block) ){
+    /**
+     * @param $block
+     */
+    public function __construct($block)
+    {
+        if( $block = $this->get($block) ){
 
             $this->block = $block;
 
-			$this->name = $block['blockName'];
-			$this->ID = $block['id']??null;
-		}
-	}
+            $this->name = $block['blockName'];
+            $this->ID = $block['id']??null;
+        }
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getName(){
+    /**
+     * @return mixed
+     */
+    public function getName(){
 
-		return $this->name;
-	}
+        return $this->name;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getAlign(){
+    /**
+     * @return mixed
+     */
+    public function getAlign(){
 
-		return $this->block['align']??'full';
-	}
+        return $this->block['align']??'full';
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getAlignText(){
+    /**
+     * @return mixed
+     */
+    public function getAlignText(){
 
-		return $this->block['align_text']??'left';
-	}
+        return $this->block['align_text']??'left';
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getAlignContent(){
+    /**
+     * @return mixed
+     */
+    public function getAlignContent(){
 
-		return $this->block['align_content']??'top';
-	}
+        return $this->block['align_content']??'top';
+    }
 
-	/**
-	 * @param $block
-	 * @return bool|array
-	 */
-	public function get($block){
+    /**
+     * @param $block
+     * @return bool|array
+     */
+    private function get($block){
 
-		if( empty($block['blockName']??'') )
-			return false;
+        if( empty($block['blockName']??'') )
+            return false;
 
         if( substr($block['blockName'], 0, 4) !== 'acf/')
             return $block;
 
-		if( class_exists('ACF') && !empty($block['attrs']) ){
+        if( class_exists('ACF') && !empty($block['attrs']) ){
 
             if( $block = acf_prepare_block($block['attrs']) ){
 
@@ -86,54 +86,54 @@ class Block extends Entity
 
                 $block['blockName'] = $block['name'];
 
-				acf_setup_meta( $block['data']??[], $block['id'], true );
+                acf_setup_meta( $block['data']??[], $block['id'], true );
 
-				$this->loadMetafields($block['id'], 'block');
+                $this->loadMetafields($block['id'], 'block');
 
-				$this->custom_fields->getFieldObjects();
-				$this->custom_fields->setData($block['data']??[]);
-			}
-		}
+                $this->custom_fields->getFieldObjects();
+                $this->custom_fields->setData($block['data']??[]);
+            }
+        }
 
-		return $block;
-	}
+        return $block;
+    }
 
-	/**
-	 * @return string|ACFHelper
-	 */
-	public function getContent(){
+    /**
+     * @return string|ACFHelper
+     */
+    public function getContent(){
 
-		if( !empty($this->block['innerHTML']??'') )
-			return $this->block['innerHTML'];
-		else
-			return $this->custom_fields;
-	}
+        if( !empty($this->block['innerHTML']??'') )
+            return $this->block['innerHTML'];
+        else
+            return $this->custom_fields;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function render(){
+    /**
+     * @return string
+     */
+    public function render(){
 
-		$twig = TwigHelper::getEnvironment();
+        $twig = TwigHelper::getEnvironment();
 
-		try {
+        try {
 
-			$template = $twig->load($this->block['render_template']);
+            $template = $twig->load($this->block['render_template']);
 
-		} catch (\Throwable $t) {
+        } catch (\Throwable $t) {
 
-			return $t->getMessage();
-		}
+            return $t->getMessage();
+        }
 
-		$blog = Blog::getInstance();
+        $blog = Blog::getInstance();
 
-		$postRepository = new PostRepository();
+        $postRepository = new PostRepository();
 
-		try {
+        try {
 
-			$post = $postRepository->findQueried();
+            $post = $postRepository->findQueried();
 
-			return $template->render([
+            return $template->render([
                 'props'=>$this->getContent(),
                 'post'=>$post,
                 'block'=>$this,
@@ -141,9 +141,9 @@ class Block extends Entity
                 'is_component_preview'=>true
             ]);
 
-		} catch (\Throwable $t) {
+        } catch (\Throwable $t) {
 
-			return $t->getMessage();
-		}
-	}
+            return $t->getMessage();
+        }
+    }
 }

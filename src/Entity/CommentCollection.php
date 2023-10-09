@@ -8,24 +8,24 @@ use Metabolism\WordpressBundle\Factory\Factory;
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
+class CommentCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 	private $query=false;
 
-	private $args=[];
+    private $args=[];
 
     protected $items=[];
 
 	protected $pagination;
 
 	/**
-	 * @param array|\WP_User_Query|null $query
+	 * @param array|\WP_Comment_Query|null $args
 	 */
 	public function __construct($args=null)
 	{
         if( $args ){
 
-			if( $args instanceof \WP_User_Query ){
+			if( $args instanceof \WP_Comment_Query ){
 
                 $this->query = $args;
             }
@@ -34,23 +34,23 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
                 $this->args = $args;
 
                 if( !isset($args['fields']) )
-                    $args['fields'] = 'ID';
+                    $args['fields'] = 'ids';
 
-                $this->query = new \WP_User_Query( $args );
+                $this->query = new \WP_Comment_Query($args);
             }
 
-			if( $users  = $this->query->get_results() )
-				$this->setItems( $users );
+			if( $comments = $this->query->get_comments() )
+				$this->setItems( $comments );
         }
     }
 
 	/**
-     * @return array
+	 * @return array
 	 */
-    public function getArgs(){
+	public function getArgs(){
 
-        return $this->args;
-    }
+		return $this->args;
+	}
 
 	/**
 	 * @return array
@@ -61,22 +61,22 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	}
 
     /**
-     * @param array $users
+     * @param array $comments
      * @return void
      */
-    public function setItems(array $users){
+    public function setItems(array $comments){
 
-	    $users = array_unique(array_filter($users));
+        $comments = array_unique(array_filter($comments));
         $items = [];
 
         if( !isset($this->args['fields']) ){
 
-        foreach ($users as $user)
-            $items[] = Factory::create( $user, 'user' );
+            foreach ($comments as $comment)
+                $items[] = Factory::create( $comment, 'comment' );
         }
         else{
 
-            $items = $users;
+            $items = $comments;
         }
 
         $this->items = array_filter($items);
@@ -84,7 +84,7 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 
 	/**
-	 * @return ArrayIterator|User[]
+	 * @return ArrayIterator|Comment[]
 	 */
 	public function getIterator() {
 
@@ -93,7 +93,7 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 
 	/**
-	 * @return \WP_User_Query
+	 * @return \WP_Comment_Query
 	 */
 	public function getQuery() {
 
@@ -102,20 +102,29 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 
 	/**
-	 * Get total user count
+	 * Get total comment count
 	 *
 	 * @return int
 	 */
 	public function count() : int
 	{
-		return $this->query ? $this->query->get_total() : count($this->items);
+        if( $args = $this->getArgs() ){
+
+            $args['count'] = true;
+
+            return $this->query->query($args);
+        }
+        else{
+
+            return count($this->items);
+        }
 	}
 
 	/**
 	 * @param $offset
 	 * @return bool
 	 */
-	public function offsetExists($offset) : bool
+	public function offsetExists($offset): bool
 	{
 		return isset($this->items[$offset]);
 	}

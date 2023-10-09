@@ -109,6 +109,7 @@ class OptionsHelper implements ArrayAccess
 	 * @param $offset
 	 * @return mixed
 	 */
+    #[\ReturnTypeWillChange]
 	public function offsetGet($offset)
     {
         return $this->getValue($offset);

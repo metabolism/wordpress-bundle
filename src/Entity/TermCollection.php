@@ -12,33 +12,52 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 	private $query=false;
 
+	private $args=[];
+
     protected $items=[];
 
 	protected $pagination;
 
 	/**
-	 * @param array|\WP_Term_Query|null $query
+	 * @param array|\WP_Term_Query|null $args
 	 */
-	public function __construct($query=null)
+	public function __construct($args=null)
 	{
-        if( $query ){
+        if( $args ){
 
-			if( $query instanceof \WP_Term_Query )
-				$this->query = $query;
-			else
-				$this->query = new \WP_Term_Query( $query );
+			if( $args instanceof \WP_Term_Query ){
+
+                $this->query = $args;
+            }
+			else{
+
+                $this->args = $args;
+
+                if( !isset($args['fields']) )
+                    $args['fields'] = 'ids';
+
+                $this->query = new \WP_Term_Query( $args );
+            }
 
 			if( $this->query->terms )
-				$this->setTerms($this->query->terms);
+				$this->setItems($this->query->terms);
         }
     }
 
 	/**
-	 * @return int[]
+     * @return array
 	 */
-	public function getTerms(){
+    public function getArgs(){
 
-		return $this->query->terms;
+        return $this->args;
+    }
+
+	/**
+	 * @return array
+	 */
+	public function getItems(){
+
+		return $this->items;
 	}
 
 
@@ -46,13 +65,20 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
      * @param array $terms
      * @return void
      */
-    public function setTerms(array $terms){
+    public function setItems(array $terms){
 
 	    $terms = array_unique(array_filter($terms));
         $items = [];
 
+        if( !isset($this->args['fields']) ){
+
         foreach ($terms as $term)
             $items[] = TermFactory::create( $term );
+        }
+        else{
+
+            $items = $terms;
+        }
 
         $this->items = array_filter($items);
     }
@@ -83,7 +109,15 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 */
 	public function count(): int
 	{
-		return $this->query ? wp_count_terms($this->query->query_vars) : count($this->items);
+        if( $this->query ){
+
+            $count = wp_count_terms($this->query->query_vars);
+
+            if( !is_wp_error($count) )
+                return $count;
+        }
+
+        return count($this->items);
 	}
 
 	/**
@@ -99,6 +133,7 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $offset
 	 * @return Term|null
 	 */
+    #[\ReturnTypeWillChange]
 	public function offsetGet($offset)
 	{
 		return $this->items[$offset]??null;

@@ -88,6 +88,8 @@ class MetaHelper implements ArrayAccess
             $this->objects = get_term_meta($this->id);
         elseif( $this->type == 'user' )
             $this->objects = get_user_meta($this->id);
+        elseif( $this->type == 'blog' )
+            $this->objects = get_site_meta($this->id);
 
         return $this->objects;
 	}
@@ -108,6 +110,8 @@ class MetaHelper implements ArrayAccess
             $this->objects[$key] = get_term_meta($this->id, $key, true);
         elseif( $this->type == 'user' )
             $this->objects[$key] = get_user_meta($this->id, $key, true);
+        elseif( $this->type == 'blog' )
+            $this->objects[$key] = get_site_meta($this->id, $key, true);
         else
             $this->objects[$key] = false;
 
@@ -133,6 +137,8 @@ class MetaHelper implements ArrayAccess
                 update_term_meta($this->id, $id, $value);
             elseif( $this->type == 'user' )
                 update_user_meta($this->id, $id, $value);
+            elseif( $this->type == 'blog' )
+                update_site_meta($this->id, $id, $value);
         }
     }
 
@@ -149,6 +155,7 @@ class MetaHelper implements ArrayAccess
 	 * @param $offset
 	 * @return mixed
 	 */
+    #[\ReturnTypeWillChange]
 	public function offsetGet($offset)
     {
         return $this->getValue($offset);

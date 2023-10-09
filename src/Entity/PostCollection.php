@@ -13,46 +13,72 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
 	private $query=false;
 
+	private $args=[];
+
     protected $items=[];
 
 	protected $pagination;
 
 	/**
-	 * @param array|\WP_Query|null $query
+	 * @param array|\WP_Query|null $args
 	 */
-	public function __construct($query=null)
+	public function __construct($args=null)
 	{
-        if( $query ){
+        if( $args ){
 
-			if( $query instanceof \WP_Query )
-				$this->query = $query;
-			else
-				$this->query = new \WP_Query( $query );
+			if( $args instanceof \WP_Query ){
+
+                $this->query = $args;
+            }
+			else{
+
+                $this->args = $args;
+
+                if( !isset($args['fields']) )
+                    $args['fields'] = 'ids';
+
+                $this->query = new \WP_Query( $args );
+            }
 
 			if( $this->query->posts )
-				$this->setPosts($this->query->posts);
+				$this->setItems($this->query->posts);
         }
     }
 
 	/**
-	 * @return int[]
+	 * @return array
 	 */
-	public function getPosts(){
+	public function getArgs(){
 
-		return $this->query->posts;
+		return $this->args;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getItems(){
+
+		return $this->items;
 	}
 
     /**
      * @param array $posts
      * @return void
      */
-    public function setPosts(array $posts){
+    public function setItems(array $posts){
 
         $posts = array_filter($posts);
         $items = [];
 
+        if( !isset($this->args['fields']) ){
+
         foreach ($posts as $post)
             $items[] = PostFactory::create( $post );
+        }
+        else{
+
+            $items = $posts;
+        }
 
         $this->items = array_filter($items);
     }
@@ -121,6 +147,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 * @param $offset
 	 * @return Post|null
 	 */
+    #[\ReturnTypeWillChange]
 	public function offsetGet($offset)
 	{
 		return $this->items[$offset]??null;

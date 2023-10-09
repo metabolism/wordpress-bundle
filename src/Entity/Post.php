@@ -4,8 +4,9 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
-use Metabolism\WordpressBundle\Factory\TermFactory;
+use Metabolism\WordpressBundle\Repository\CommentRepository;
 use Metabolism\WordpressBundle\Repository\PostRepository;
+use Metabolism\WordpressBundle\Repository\TermRepository;
 
 /**
  * Class Post
@@ -91,7 +92,7 @@ class Post extends Entity
         
         if( $post = get_post($pid) ) {
             
-            if( is_wp_error($post) || !$post )
+            if( is_wp_error($post) || !post_type_exists($post->post_type) )
                 return false;
             
             $this->post = $post;
@@ -497,18 +498,25 @@ class Post extends Entity
                 
                 foreach ($blocks as $block){
                     
-                    $data = $block['attrs']['data']??[];
-                    $content = [];
-                    
-                    foreach ($data as $key=>$value){
-                        
-                        if( substr($key, 0,1 ) != '_' && is_string($value) && !is_numeric($value) && $value != 'none' )
-                            $content[] = $value;
+                    if( !empty($block['innerContent']??'') ){
+
+                        $this->content = array_merge($this->content, $block['innerContent']);
                     }
-                    
-                    $this->content = array_merge($this->content, $content);
+                    else{
+
+                        $data = $block['attrs']['data']??[];
+                        $content = [];
+
+                        foreach ($data as $key=>$value){
+
+                            if( substr($key, 0,1 ) != '_' && is_string($value) && !is_numeric($value) && $value != 'none' )
+                                $content[] = $value;
+                        }
+
+                        $this->content = array_merge($this->content, $content);
+                    }
                 }
-                
+
                 $this->content = array_unique(array_filter($this->content));
                 $this->content = implode("\n", $this->content);
                 $this->content = preg_replace("/[\r\n]+/", "\n", $this->content);
@@ -764,35 +772,27 @@ class Post extends Entity
     /**
      * Get post comments
      *
-     * @param array $args
-     * @return Comment[]|[]
+     * @param array $criteria
+     * @param array|null $orderBy
+     * @param null $limit
+     * @param null $offset
+     * @return CommentCollection
      */
-    public function getComments($args=[]) {
+    public function getComments($criteria=[], array $orderBy = null, $limit = null, $offset = null) {
         
         $default_args = [
             'status'=> 'approve',
-            'number' => '5'
         ];
         
-        $args = array_merge($default_args, $args);
+        $args = array_merge($default_args, $criteria);
         
         $args['post_id'] = $this->ID;
         $args['type'] = 'comment';
         $args['parent'] = 0;
-        $args['fields'] = 'ids';
         
-        $comments_id = get_comments($args);
+        $commentRepository = new CommentRepository();
         
-        $comments = [];
-        
-        foreach ($comments_id as $comment_id)
-        {
-            /** @var Comment $comment */
-            $comment = Factory::create($comment_id, 'comment');
-            $comments[$comment_id] = $comment;
-        }
-        
-        return $comments;
+        return $commentRepository->findBy($args, $orderBy, $limit, $offset);
     }
     
     
@@ -850,12 +850,11 @@ class Post extends Entity
     public function getTerm( $tax='', $args=[] ) {
         
         $args['number'] = 1;
-        $args['group'] = false;
         $args['hierarchical'] = false;
         
         $terms = $this->getTerms($tax, $args);
         
-        if( is_array($terms) && count($terms) )
+        if( count($terms) )
             return $terms[0];
         else
             return false;
@@ -866,73 +865,33 @@ class Post extends Entity
      * See : https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
      *
      * @param string $tax
-     * @param array $args
-     * @return Term[]|[]
+     * @param array $criteria
+     * @param array|null $orderBy
+     * @param null $limit
+     * @param null $offset
+     * @return TermCollection
      */
-    public function getTerms( $tax='', $args=[] ) {
-        
-        if( is_array($tax) ){
-
-            $args = array_merge($tax, $args);
-            $tax = $args['taxonomy']??'';
-        }
-
-        $return = 'fields';
-        
-        if( empty($args['fields']??'') ){
-            
-            $return = 'entities';
-            $args['fields'] = 'ids';
-        }
-        
-        $taxonomies = [];
+    public function getTerms( $tax='', $criteria=[], array $orderBy = null, $limit = null, $offset = null ) {
         
         if ( is_array($tax) )
-            $taxonomies = $tax;
+            $criteria = $tax;
+        elseif( !empty($tax) )
+            $criteria['taxonomy'] = $tax;
         
-        if ( is_string($tax) ) {
-            
-            if ( in_array($tax, ['all', 'any', '']) )
-                $taxonomies = $this->getTaxonomies($args['public']??null);
-            else
-                $taxonomies = [$tax];
-        }
-        
-        $term_array = [];
-        
-        foreach ( $taxonomies as $taxonomy )
-        {
-            if ( in_array($taxonomy, ['tag', 'tags']) )
-                $taxonomy = 'post_tag';
-            
-            if ( $taxonomy == 'categories' )
-                $taxonomy = 'category';
-            
-            //todo: use TermRepository
-            $terms = wp_get_post_terms($this->ID, $taxonomy, $args);
-            
-            if( !is_wp_error($terms) ){
+        if ( !isset($criteria['taxonomy']) )
+            $criteria['taxonomy'] = $this->getTaxonomies($criteria['public']??null);
 
-                if( $return != 'entities')
-                    return $terms;
+        $criteria['object_ids'] = $this->ID;
                 
-                foreach ($terms as $term){
+        $termRepository = new TermRepository();
                     
-                    if( (!isset($args['group']) || $args['group']) && count($taxonomies)>1 )
-                        $term_array[$taxonomy][] = TermFactory::create($term);
-                    else
-                        $term_array[] = TermFactory::create($term);
-                }
-            }
-        }
-        
-        return $term_array;
+        return $termRepository->findBy($criteria, $orderBy, $limit, $offset);
     }
     
     /**
      * @param string $tax
      * @param bool $args
-     * @return Term[]
+     * @return TermCollection
      * @deprecated
      */
     public function get_terms( $tax='', $args=false ) { return $this->getTerms($tax, $args); }

@@ -740,7 +740,7 @@ class Blog extends Entity
 
         $postlink = $mslsOptions->get_postlink( $locale );
 
-        $id = (int) apply_filters('msls_options_get_id', $mslsOptions->__get( $locale ), $locale);
+        $id = apply_filters('msls_options_get_id', $mslsOptions->__get( $locale ), $locale);
         $permalink = (string) apply_filters('msls_options_get_permalink', $postlink, $locale);
 
         $alternate = [
@@ -748,7 +748,7 @@ class Blog extends Entity
             'url'=> empty($permalink) ? home_url( '/' ) : $permalink
         ];
 
-        if( $id && $postlink ){
+        if( is_int($id) && $postlink ){
 
             if( $mslsOptions instanceof MslsOptionsPost && $post = get_post($id) ){
 

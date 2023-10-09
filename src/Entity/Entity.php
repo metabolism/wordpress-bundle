@@ -265,6 +265,7 @@ abstract class Entity implements ArrayAccess
 	 * @param $offset
 	 * @return string|null
      */
+    #[\ReturnTypeWillChange]
 	public function offsetGet($offset)
     {
         return $this->__get($offset);

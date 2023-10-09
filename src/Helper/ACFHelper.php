@@ -661,6 +661,7 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
      * @param $offset
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->getValue($offset);

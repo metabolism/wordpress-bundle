@@ -18,17 +18,15 @@ class Image extends Entity
 
     public static $wp_upload_dir = false;
 
-    public $caption;
-    public $description;
-    public $file;
-    public $width;
-    public $height;
-    public $ratio;
-    public $mime_type;
-    public $sizes = [];
-    public $title;
-    public $alt;
-
+    protected $caption;
+    protected $description;
+    protected $file;
+    protected $width;
+    protected $height;
+    protected $mime_type;
+    protected $sizes = [];
+    protected $title;
+    protected $alt;
     protected $link;
     protected $extension;
     protected $size;
@@ -36,6 +34,7 @@ class Image extends Entity
     protected $metadata;
     protected $src;
     protected $post;
+    protected $ratio;
 
     protected $compression;
     protected $args;
@@ -69,6 +68,8 @@ class Image extends Entity
         else {
 
             $this->get($id);
+
+            $this->loadMetafields($this->ID, 'post');
         }
     }
 
@@ -324,6 +325,78 @@ class Image extends Entity
     }
 
     /**
+     * @return string
+     */
+    public function getCaption(){
+
+        return $this->caption;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(){
+
+        return $this->description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile(){
+
+        return $this->file;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWidth(){
+
+        return $this->width;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHeight(){
+
+        return $this->height;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMimeType(){
+
+        return $this->mime_type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(){
+
+        return $this->title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlt(){
+
+        return $this->alt;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSizes(){
+
+        return $this->sizes;
+    }
+
+    /**
      * @deprecated
      * @return string|null
      */
@@ -344,9 +417,18 @@ class Image extends Entity
     }
 
     /**
+     * @deprecated
      * @return float|int
      */
     public function getSize(){
+
+        return $this->getFilesize();
+    }
+
+    /**
+     * @return float|int
+     */
+    public function getFilesize(){
 
         if( is_null($this->size) && $this->src )
             $this->size = filesize($this->src)/1024;
