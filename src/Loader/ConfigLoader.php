@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\Loader;
 
 use Env\Env;
+use Metabolism\WordpressBundle\Helper\PathHelper;
 use Symfony\Component\HttpFoundation\Request;
 use function Env\env;
 
@@ -30,25 +31,9 @@ class ConfigLoader{
             define('WPS_YAML_TRANSLATION_FILES', BASE_URI.'/translations');
 
         /**
-         * Load Composer
+         * Get paths
          */
-
-        $composer = BASE_URI.'/composer.json';
-
-        $wp_path = 'pubic/edition/';
-
-        // get Wordpress path
-        if( !is_dir(BASE_URI.'/'.$wp_path) && is_readable($composer) ){
-
-            $composer = json_decode(file_get_contents($composer), true);
-            $installer_paths= $composer['extra']['installer-paths']??[];
-
-            foreach ($installer_paths as $installer_path=>$types){
-
-                if( in_array("type:wordpress-core", $types) )
-                    $wp_path = $installer_path;
-            }
-        }
+        $wp_path = PathHelper::getWordpressRoot(BASE_URI);
 
         $folders = array_filter(explode('/', $wp_path));
 
