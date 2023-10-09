@@ -36,6 +36,9 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
                 if( !isset($args['fields']) )
                     $args['fields'] = 'ids';
 
+                if( ($args['public']??false) && empty($args['taxonomy']??[]) )
+                    return;
+
                 $this->query = new \WP_Term_Query( $args );
             }
 

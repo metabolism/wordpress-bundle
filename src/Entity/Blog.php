@@ -748,7 +748,7 @@ class Blog extends Entity
             'url'=> empty($permalink) ? home_url( '/' ) : $permalink
         ];
 
-        if( is_int($id) && $postlink ){
+        if( is_numeric($id) && $postlink ){
 
             if( $mslsOptions instanceof MslsOptionsPost && $post = get_post($id) ){
 
