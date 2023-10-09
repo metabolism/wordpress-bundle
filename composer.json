@@ -1,7 +1,7 @@
 {
   "name":"metabolism/wordpress-bundle",
   "type": "symfony-bundle",
-  "version": "2.1.8",
+  "version": "2.2.0",
   "description": "Build enterprise solutions with WordPress",
   "license": "GPL-3.0-or-later",
   "keywords": [
@@ -93,7 +93,8 @@
     "branch-alias": {
       "dev-1.4.x": "1.4.x-dev",
       "dev-2.0.x": "2.0.x-dev",
-      "dev-2.1.x": "2.1.x-dev"
+      "dev-2.1.x": "2.1.x-dev",
+      "dev-2.2.x": "2.2.x-dev"
     }
   },
   "autoload" : {

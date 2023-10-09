@@ -2,9 +2,8 @@
 /**
  * Plugin Name: Symfony Wordpress Bundle Loader
  * Description: Load Wordpress in Symfony
- * Version: 2.0.0
+ * Version: 2.2.0
  * Author: Metabolism
- * Author URI: http://www.metabolism.fr
  */
 
 use Metabolism\WordpressBundle\WordpressBundle;

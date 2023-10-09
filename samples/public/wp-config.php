@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Wordpress configuration file
+ * WordPress' configuration file
  *
  * You may want to edit config/packages/wordpress.yaml to change :
  *   Authentication Keys
