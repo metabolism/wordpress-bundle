@@ -9,10 +9,13 @@ Build enterprise solutions with WordPress.
 [![Buy us a tree](https://img.shields.io/badge/Treeware-%F0%9F%8C%B3-lightgreen)](https://plant.treeware.earth/metabolism/wordpress-bundle)
 [![Doc - Gitbook](https://img.shields.io/badge/Doc-Gitbook-346ddb?logo=gitbook&logoColor=fff)](https://metabolism.gitbook.io/symfony-wordpress-bundle/)
 
+The Symfony WordPress Backoffice Bundle is a powerful library that seamlessly combines the flexibility of Symfony, a robust PHP framework, with the user-friendliness of WordPress, a popular content management system (CMS). 
+
+This bundle enables you to harness Symfony's structure to develop highly customized web applications while using WordPress as the backend for content management. It simplifies the integration of WordPress into your Symfony project, allowing you to leverage the best of both worlds.
+
 ## How does it work ?
 
-When the WordPress bundle is loaded, it includes the minimal amount of WordPress Core files to allow usage of WordPress functions and plugins
-inside Symfony.
+When the WordPress bundle is loaded, it selectively includes the essential WordPress Core files required for utilizing WordPress functions and plugins within Symfony.
 
 __Example :__
 
