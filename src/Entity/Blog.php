@@ -539,7 +539,7 @@ class Blog extends Entity
             return home_url($path, $scheme);
 
         if( is_null($this->home_url) )
-            $this->home_url = home_url();
+            $this->home_url = home_url('/');
 
         return $this->home_url;
     }
