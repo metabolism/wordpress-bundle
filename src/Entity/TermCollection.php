@@ -116,8 +116,8 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
             $count = wp_count_terms($this->query->query_vars);
 
-            if( !is_wp_error($count) )
-                return $count;
+            if( !is_wp_error($count) && $count )
+                return intval($count);
         }
 
         return count($this->items);
