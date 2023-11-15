@@ -7,7 +7,7 @@ namespace Metabolism\WordpressBundle\Plugin;
  */
 class CachePlugin
 {
-	private $noticeMessage,  $errorMessage, $debug;
+	private $noticeMessage,  $errorMessage;
 	private $home_url;
 
 
@@ -157,7 +157,7 @@ class CachePlugin
 	 */
 	private function purge($url=false)
 	{
-		if( $this->debug || strpos($url, $this->home_url) === false )
+		if( WP_DEBUG || strpos($url, $this->home_url) === false )
 			return;
 
 		$results = self::purgeUrl($url);
@@ -264,11 +264,9 @@ class CachePlugin
 	 */
 	public function __construct()
 	{
-		$env = $_SERVER['APP_ENV'] ?? 'dev';
-		$this->debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env));
 		$this->home_url = home_url();
 
-		if( !$this->debug ) {
+		if( !WP_DEBUG ) {
 
 			if( isset($_GET['cache']) && $_GET['cache'] == 'purge' )
 				$this->purge();

@@ -43,15 +43,17 @@ class ConfigLoader{
         /**
          * Set env default
          */
-        $env = env('APP_ENV')?:(env('WP_ENV')?:'dev');
+        $env = env('APP_ENV')?:(env('WP_ENV')?:'development');
+        $env =  $env === 'dev' ? 'development' : $env;
 
         /**
          * Define basic environment
          */
         define( 'WP_ENV', $env);
-        define( 'WP_DEBUG', $env === 'dev');
+        define( 'WP_DEBUG', $env === 'development');
         define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
         define( 'SCRIPT_DEBUG', WP_DEBUG);
+        define( 'WP_ENVIRONMENT_TYPE', $env);
 
         /**
          * Enable multisite
@@ -60,10 +62,10 @@ class ConfigLoader{
         {
             define( 'MULTISITE', true );
             define( 'SUBDOMAIN_INSTALL', env('SUBDOMAIN_INSTALL') );
-            //define( 'DOMAIN_CURRENT_SITE', $_SERVER['HTTP_HOST']);
-            //define( 'SITE_ID_CURRENT_SITE', env('SITE_ID_CURRENT_SITE')?:1);
-            //define( 'BLOG_ID_CURRENT_SITE', env('BLOG_ID_CURRENT_SITE')?:1);
-            //define( 'PATH_CURRENT_SITE', env('PATH_CURRENT_SITE')?:'/');
+            define( 'DOMAIN_CURRENT_SITE', $_SERVER['HTTP_HOST']);
+            define( 'SITE_ID_CURRENT_SITE', env('SITE_ID_CURRENT_SITE')?:1);
+            define( 'BLOG_ID_CURRENT_SITE', env('BLOG_ID_CURRENT_SITE')?:1);
+            define( 'PATH_CURRENT_SITE', env('PATH_CURRENT_SITE')?:'/');
         }
         else
         {
@@ -138,7 +140,7 @@ class ConfigLoader{
 
 
         /**
-         * Redefine cookie name without wordpress
+         * Redefine cookie name without WordPress
          */
         define( 'COOKIEHASH', md5( WP_SITEURL )    );
 
@@ -185,6 +187,9 @@ class ConfigLoader{
 
         if (!defined('DISALLOW_FILE_EDIT'))
             define( 'DISALLOW_FILE_EDIT', true);
+
+        if (!defined('DISALLOW_FILE_MODS'))
+            define( 'DISALLOW_FILE_MODS', true);
 
         if (!defined('EMPTY_TRASH_DAYS'))
             define('EMPTY_TRASH_DAYS', 7);

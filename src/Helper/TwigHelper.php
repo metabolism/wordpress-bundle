@@ -25,7 +25,7 @@ class TwigHelper {
 
 	    $options = [];
 
-	    if( WP_ENV != 'dev' && is_dir( BASE_URI.'/var/cache') )
+	    if( !WP_DEBUG && is_dir( BASE_URI.'/var/cache') )
 		    $options['cache'] = BASE_URI.'/var/cache/'.WP_ENV.'/twig';
 
 	    $twig = new Environment($loader, $options);

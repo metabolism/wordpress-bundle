@@ -61,7 +61,7 @@ class Image extends Entity
         else
             $this->compression = $_config ? $_config->get('image.compression', 90) : 90;
 
-        if (!$id || ($_REQUEST['debug']??false == 'image' && WP_ENV == 'dev')) {
+        if (!$id || ($_REQUEST['debug']??false == 'image' && WP_DEBUG)) {
 
             $this->ID = 0;
         }

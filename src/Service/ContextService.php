@@ -489,7 +489,7 @@ class ContextService
 	{
 		$this->add('environment', $_SERVER['APP_ENV']);
 
-		if( isset($_GET['debug']) && $_GET['debug'] == 'context' && $_SERVER['APP_ENV'] == 'dev' )
+		if( isset($_GET['debug']) && $_GET['debug'] == 'context' && WP_DEBUG )
 			$this->debug();
 
 		return is_array($this->data) ? $this->data : [];
