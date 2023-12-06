@@ -15,6 +15,8 @@ class Block extends Entity
 {
     public $entity = 'block';
 
+    protected $post;
+
     protected $name;
 
     protected $block;
@@ -110,6 +112,21 @@ class Block extends Entity
     }
 
     /**
+     * @return Post
+     * @throws \Exception
+     */
+    public function getPost(){
+
+        if( is_null($this->post) ){
+
+            $postRepository = new PostRepository();
+            $this->post = $postRepository->findQueried();
+        }
+
+        return $this->post;
+    }
+
+    /**
      * @return string
      */
     public function render(){
@@ -127,19 +144,21 @@ class Block extends Entity
 
         $blog = Blog::getInstance();
 
-        $postRepository = new PostRepository();
-
         try {
 
-            $post = $postRepository->findQueried();
+            $post = $this->getPost();
 
-            return $template->render([
-                'props'=>$this->getContent(),
+            $props = apply_filters('render_block_content', $this->getContent(), $this);
+
+            $html = $template->render([
+                'props'=>$props,
                 'post'=>$post,
                 'block'=>$this,
                 'blog'=>$blog,
                 'is_component_preview'=>true
             ]);
+
+            return apply_filters('render_block_template', $html, $props, $this);
 
         } catch (\Throwable $t) {
 

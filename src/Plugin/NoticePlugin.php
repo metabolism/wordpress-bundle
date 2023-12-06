@@ -36,7 +36,7 @@ class NoticePlugin {
         
         //check folder right
         $folders = [PUBLIC_DIR.'/wp-bundle/languages', PUBLIC_DIR.'/uploads', PUBLIC_DIR.'/wp-bundle/upgrade', '/var/cache', '/var/log'];
-        $folders = apply_filters('wp-bundle/admin_notices', $folders);
+        $folders = apply_filters('folders_admin_notices', $folders);
         
         foreach ($folders as $folder ){
             

@@ -912,7 +912,8 @@ class Image extends Entity
      */
     public function picture($w, $h=0, $sources=false, $alt=false, $loading='lazy', $params=[]){
 
-        $alt = htmlspecialchars($alt?:$this->alt, ENT_QUOTES, 'UTF-8');
+        $alt = $alt?:$this->alt;
+        $alt = htmlspecialchars($alt?:'', ENT_QUOTES, 'UTF-8');
 
         if( empty($this->src) || !is_readable($this->src) ){
 
