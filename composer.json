@@ -1,7 +1,7 @@
 {
   "name":"metabolism/wordpress-bundle",
   "type": "symfony-bundle",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "Build enterprise solutions with WordPress",
   "license": "GPL-3.0-or-later",
   "keywords": [
@@ -37,7 +37,7 @@
     "johnpbloch/wordpress-core": "^5.0|^6.0",
     "ifsnop/mysqldump-php":"^2.0",
     "dflydev/dot-access-data":"^3.0",
-    "enshrined/svg-sanitize": "^0.15",
+    "enshrined/svg-sanitize": "^0.16",
     "intervention/image": "^2.0",
     "kornrunner/blurhash": "^1.2.2"
   },

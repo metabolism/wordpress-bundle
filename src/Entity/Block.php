@@ -120,7 +120,7 @@ class Block extends Entity
         if( is_null($this->post) ){
 
             $postRepository = new PostRepository();
-            $this->post = $postRepository->findQueried();
+            $this->post = $postRepository->findQueried(true);
         }
 
         return $this->post;
