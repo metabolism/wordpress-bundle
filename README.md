@@ -76,7 +76,14 @@ public function pageAction(Post $post, PostRepository $postRepository)
 
 ## Documentation
 
-Full documentation is available on [Gitbook](https://metabolism.gitbook.io/symfony-wordpress-bundle/)
+- [WordPress Bundle Documentation](https://metabolism.gitbook.io/symfony-wordpress-bundle/)
+- [WP Steroids WordPress plugin](https://metabolism.gitbook.io/symfony-wordpress-bundle/guides/wp-steroids-plugin)
+- [Installation / Getting started](https://metabolism.gitbook.io/symfony-wordpress-bundle/getting-started/installation)
+- [Twig Cookbook](https://metabolism.gitbook.io/symfony-wordpress-bundle/guides/twig-cookbook)
+
+## Changelog
+
+Please see [Changelog](https://metabolism.gitbook.io/symfony-wordpress-bundle/extras/changelog) for more information on what has changed recently.
 
 ## Features
 
@@ -103,7 +110,7 @@ Using WordPress Bundle :
 * Possible use of WordPress predefined routes
 * Site health checker url
 
-Using [WP Steroids](https://github.com/wearemetabolism/wp-steroids) WordPress plugin :
+Using [WP Steroids](https://github.com/metabolism/wp-steroids) WordPress plugin :
 * WordPress' configuration using yml ( [view sample](config/wordpress.yaml) )
 * Permalink configuration for custom post type and taxonomy
 * Maintenance mode
@@ -192,7 +199,7 @@ Please read the full [bundle installation guide](https://metabolism.gitbook.io/s
 
 ## Demo
 
-https://github.com/wearemetabolism/wordpress-bundle-demo
+https://github.com/metabolism/wordpress-bundle-demo
 
 This is an implementation of the Twenty Nineteen WordPress theme for wordpress-bundle.
 
@@ -201,7 +208,7 @@ This is an implementation of the Twenty Nineteen WordPress theme for wordpress-b
 ## Recommended / tested plugins
 
 - [Advanced custom fields](https://wordpress.org/plugins/advanced-custom-fields) Customise WordPress with powerful, professional and intuitive fields.
-- [ACF extensions](https://github.com/wearemetabolism/acf-extensions) Extensions for ACF
+- [ACF extensions](https://github.com/metabolism/acf-extensions) Extensions for ACF
 - [Classic editor](https://wordpress.org/plugins/classic-editor) Restores the previous (« classic ») WordPress editor and the « Edit Post » screen.
 - [WP smartcrop](https://wordpress.org/plugins/wp-smartcrop) Set the 'focal point' of any image, right from the media library
 - [Multisite language switcher](https://wordpress.org/plugins/multisite-language-switcher) Add multilingual support using a WordPress multisite
@@ -223,8 +230,10 @@ WordPress' functions are available in the global namespace.
 
 Some WordPress plugins may not work ( ex : Woocommerce ) or require extra works.
 
-## Licence
-
-GPL 3.0 or later
+## Treeware
 
 This package is [Treeware](https://treeware.earth). If you use it in production, then we ask that you [**buy the world a tree**](https://plant.treeware.earth/metabolism/wordpress-bundle) to thank us for our work. By contributing to the Treeware forest you’ll be creating employment for local families and restoring wildlife habitats.
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE) for more information.

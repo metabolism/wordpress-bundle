@@ -39,6 +39,7 @@ class Blog extends Entity
     protected $is_customize_preview;
     protected $is_single;
     protected $is_tax;
+    protected $is_main;
     protected $is_archive;
     protected $paged;
     protected $languages;
@@ -180,6 +181,17 @@ class Blog extends Entity
             $this->language = get_bloginfo('language');
 
         return $this->language;
+    }
+
+    /**
+     * @return string
+     */
+    public function isMain(): string
+    {
+        if( is_null($this->is_main) )
+            $this->is_main = is_main_site($this->ID);
+
+        return $this->is_main;
     }
 
     /**
@@ -717,6 +729,7 @@ class Blog extends Entity
 
                 $this->languages[] = array_merge([
                     'id'            => $site->blog_id,
+                    'is_main'       => is_main_site($site->blog_id),
                     'active'        => $current_blog_id==$site->blog_id,
                     'name'          => format_code_lang($lang),
                     'home_url'      => get_home_url($site->blog_id, '/'),

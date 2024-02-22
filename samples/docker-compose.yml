@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "8000:80"
+    depends_on:
+      - php
+      - mysql
+    volumes:
+      -  root:/var/www/html
+      -  ./public/uploads:/var/www/html/public/uploads
+      - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./logs/nginx/:/var/log/nginx
+
+  php:
+    volumes:
+      - root:/var/www/html
+      - ./public/uploads:/var/www/html/public/uploads
+      - /var/www/html/public/build
+      - /var/www/html/public/wp-bundle/plugins
+      - /var/www/html/public/edition
+      - /var/www/html/vendor
+    restart: always
+    depends_on:
+      - mysql
+    build:
+      context: .
+      dockerfile: .docker/php/Dockerfile
+    environment:
+      DB_HOST: mysql:3306
+      DB_USER: wordpress
+      DB_PASSWORD: not-so-secure
+      DB_NAME: wordpress
+      WP_HOME: http://localhost:8000
+      WP_SITEURL: http://localhost:8000/edition
+      WP_ENV: development
+      AUTH_KEY: "generateme"
+      SECURE_AUTH_KEY: "generateme"
+      LOGGED_IN_KEY: "generateme"
+      NONCE_KEY: "generateme"
+      AUTH_SALT: "generateme"
+      SECURE_AUTH_SALT: "generateme"
+      LOGGED_IN_SALT: "generateme"
+      NONCE_SALT: "generateme"
+
+  mysql:
+    image: mysql:latest
+    restart: always
+    ports:
+      - "9906:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: not-so-secure
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: not-so-secure
+    volumes:
+      - my-db:/var/lib/mysql
+
+volumes:
+  my-db:
+  root:
