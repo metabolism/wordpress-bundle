@@ -441,19 +441,16 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
                     if( empty($object['value']) )
                         break;
                 
-                    if( is_array($object['value']) ){
+                    if( is_iterable($object['value']) ){
                         
                         $objects[$object['name']] = [];
-                        
-                        if( isset($object['value']) && is_iterable($object['value']) ){
-                            
-                            foreach ($object['value'] as $value){
-                                
-                                if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'array'))
-                                    $objects[$object['name']][] = $this->load('image', $value, $object);
-                                else
-                                    $objects[$object['name']][] = $value;
-                            }
+
+                        foreach ($object['value'] as $value){
+
+                            if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'array'))
+                                $objects[$object['name']][] = $this->load('image', $value, $object);
+                            else
+                                $objects[$object['name']][] = $value;
                         }
                     }
                 
@@ -666,7 +663,7 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
     {
         return $this->getValue($offset);
     }
-    
+
     /**
      * @param $offset
      * @param $value

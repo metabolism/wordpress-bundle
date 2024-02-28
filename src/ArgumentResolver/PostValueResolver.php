@@ -28,7 +28,7 @@ class PostValueResolver implements ArgumentValueResolverInterface {
      * @param ArgumentMetadata $argument
      * @return bool
      */
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         if(is_null($argument->getType()) || !class_exists($argument->getType()))
             return false;
@@ -42,7 +42,7 @@ class PostValueResolver implements ArgumentValueResolverInterface {
      * @return \Generator
      * @throws \Exception
      */
-    public function resolve(Request $request, ArgumentMetadata $argument)
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         yield $this->postRepository->findQueried($argument->isNullable());
     }

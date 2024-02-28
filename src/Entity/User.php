@@ -67,7 +67,7 @@ class User extends Entity
 
 		if( $user = get_userdata($pid) ){
 
-			if( is_wp_error($user) || !$user )
+			if( is_wp_error($user) )
 				return false;
 
 			$this->user = $user;

@@ -246,8 +246,8 @@ class WordpressTwigExtension extends AbstractExtension{
 
             $html = '<figure>'.$html;
 
-            if( !empty($image->caption) and $image->caption != 'default' )
-                $html  .= '<figcaption>'.$image->caption.'</figcaption>';
+            if( !empty($image->getCaption()) and $image->getCaption() != 'default' )
+                $html  .= '<figcaption>'.$image->getCaption().'</figcaption>';
 
             $html .= '</figure>';
         }

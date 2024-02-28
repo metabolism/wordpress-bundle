@@ -19,7 +19,7 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	protected $pagination;
 
 	/**
-	 * @param array|\WP_User_Query|null $query
+	 * @param array|\WP_User_Query|null $args
 	 */
 	public function __construct($args=null)
 	{

@@ -61,7 +61,7 @@ class SiteHealthHelper {
 
         if( !$output ){
 
-            $content =$status['has_error'] ? '0' : '1';
+            $content = $status['has_error'] ? '0' : '1';
             $response = new Response($content);
         }
         else{

@@ -4,8 +4,10 @@
 .map
 .DS_Store
 npm-debug.log
+composer.lock
 cache
 vendor
+wp-content
 node_modules
 debug*
 *.debug

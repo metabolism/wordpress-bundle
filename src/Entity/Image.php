@@ -2,8 +2,10 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
-use Intervention\Image\Exception\NotSupportedException;
-use Intervention\Image\ImageManagerStatic;
+use Intervention\Image\Geometry\Factories\CircleFactory;
+use Intervention\Image\Geometry\Factories\RectangleFactory;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Typography\FontFactory;
 use kornrunner\Blurhash\Blurhash;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -552,10 +554,11 @@ class Image extends Entity
             $components_x = 4;
             $components_y = 3;
 
-            $image = ImageManagerStatic::make($this->src);
-            $image = $image->fit(
-                $this->width >= $this->height ? 64 : null,
-                $this->height >= $this->width ? 64 : null
+            $manager = ImageManager::gd();
+            $image = $manager->read($this->src);
+            $image = $image->cover(
+                $this->width >= $this->height ? 64 : 0,
+                $this->height >= $this->width ? 64 : 0
             );
 
             $height = $image->height();
@@ -760,10 +763,8 @@ class Image extends Entity
                 unlink($dest);
         }
 
-        $image = ImageManagerStatic::make($this->src);
-
-        try{ $image->orientate(); }
-        catch (NotSupportedException $e){}
+        $manager = ImageManager::gd();
+        $image = $manager->read($this->src);
 
         foreach ($params as $type=>$param){
 
@@ -772,23 +773,32 @@ class Image extends Entity
             switch ($type){
 
                 case 'resize':
+                case 'crop':
                     $this->crop($image, $w, $h);
                     break;
 
                 case 'insert':
-                    $image->insert(BASE_URI.$param[0], count($param)>1?$param[1]:'top-left', count($param)>2?$param[2]:0, count($param)>3?$param[3]:0);
+                case 'place':
+                    $image->place(BASE_URI.$param[0], count($param)>1?$param[1]:'top-left', $param[2]??0, $param[3]??0, $param[4]??100);
                     break;
 
                 case 'colorize':
-                    $image->colorize($param[0], $param[1], $param[2]);
+                    $image->colorize($param[0]??0, $param[1]??0, $param[2]??0);
                     break;
 
                 case 'blur':
-                    $image->blur(count($param)?$param[0]:1);
+                    $image->blur($param[0]??5);
                     break;
 
                 case 'flip':
-                    $image->flip(count($param)?$param[0]:'v');
+                    if( $param[0]??'v')
+                        $image->flop();
+                    else
+                        $image->flip();
+                    break;
+
+                case 'flop':
+                    $image->flop();
                     break;
 
                 case 'brightness':
@@ -799,25 +809,21 @@ class Image extends Entity
                     $image->invert();
                     break;
 
-                case 'mask':
-                    $image->mask(BASE_URI.$param[0], count($param)>1?$param[1]:false);
-                    break;
-
                 case 'gamma':
                     $image->gamma($param[0]);
                     break;
 
                 case 'rotate':
-                    $image->rotate($param[0]);
+                    $image->rotate($param[0], $param[1]??'ffffff');
                     break;
 
                 case 'text':
-                    $image->text($param[0], count($param)>1?$param[1]:0, count($param)>2?$param[2]:0, function($font) use($param) {
+                    $image->text($param[0], $param[1]??0, $param[2]??0, function(FontFactory $font) use($param) {
 
-                        $params = count($param)>3?$param[3]:[];
+                        $params = $param[3]??[];
 
                         if( isset($params['file']) )
-                            $font->file(BASE_URI.$params['file']);
+                            $font->filename(BASE_URI.$params['file']);
 
                         if( isset($params['size']) )
                             $font->size($params['size']);
@@ -833,6 +839,12 @@ class Image extends Entity
 
                         if( isset($params['angle']) )
                             $font->angle($params['angle']);
+
+                        if( isset($params['lineHeight']) )
+                            $font->lineHeight($params['lineHeight']);
+
+                        if( isset($params['wrap']) )
+                            $font->wrap($params['wrap']);
                     });
 
                     break;
@@ -846,7 +858,11 @@ class Image extends Entity
                     break;
 
                 case 'rectangle':
-                    $image->rectangle($param[0], $param[1], $param[2], $param[3], function ($draw) use($param) {
+                case 'drawRectangle':
+                    $image->drawRectangle($param[0], $param[1], function (RectangleFactory $draw) use($param) {
+
+                        if( count($param) > 3 )
+                            $draw->size($param[2], $param[3]);
 
                         if( count($param) > 4 )
                             $draw->background($param[4]);
@@ -857,7 +873,11 @@ class Image extends Entity
                     break;
 
                 case 'circle':
-                    $image->circle($param[0], $param[1], $param[2], function ($draw) use($param) {
+                case 'drawCircle':
+                    $image->drawCircle($param[0], $param[1], function (CircleFactory $draw) use($param) {
+
+                        if( count($param) > 2 )
+                            $draw->radius($param[2]);
 
                         if( count($param) > 3 )
                             $draw->background($param[3]);
@@ -868,7 +888,8 @@ class Image extends Entity
                     break;
 
                 case 'limitColors':
-                    $image->limitColors($param[0], count($param)>1?$param[1]:null);
+                case 'reduceColors':
+                    $image->reduceColors($param[0], $param[1]??'transparent');
                     break;
             }
         }
@@ -986,22 +1007,10 @@ class Image extends Entity
      */
     protected function crop($image, $w, $h=0){
 
-        if(!$w){
+        if($this->focus_point){
 
-            $image->resize(null, $h, function ($constraint) {
-                $constraint->aspectRatio();
-            });
-        }
-        elseif(!$h){
-
-            $image->resize($w, null, function ($constraint) {
-                $constraint->aspectRatio();
-            });
-        }
-        elseif($this->focus_point){
-
-            $src_width = $image->getWidth();
-            $src_height = $image->getHeight();
+            $src_width = $image->width();
+            $src_height = $image->height();
             $src_ratio = $src_width/$src_height;
             $dest_ratio = $w/$h;
 
@@ -1033,12 +1042,9 @@ class Image extends Entity
             list($cropY1, $cropY2) = $this->calculateCrop($src_height, $dest_height, $this->focus_point['y']/100);
 
             $image->crop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
-            $image->fit($w, $h);
         }
-        else{
 
-            $image->fit($w, $h);
-        }
+        $image->cover($w, $h);
     }
 
     /**
@@ -1054,9 +1060,12 @@ class Image extends Entity
         $cropEnd = $cropStart + $newSize;
 
         if ($cropStart < 0) {
+
             $cropEnd -= $cropStart;
             $cropStart = 0;
-        } else if ($cropEnd > $origSize) {
+        }
+        else if ($cropEnd > $origSize) {
+
             $cropStart -= ($cropEnd - $origSize);
             $cropEnd = $origSize;
         }

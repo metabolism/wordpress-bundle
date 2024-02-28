@@ -669,7 +669,7 @@ class Post extends Entity
     /**
      * Get siblings
      *
-     * @return PostCollection|false
+     * @return PostCollection|null
      */
     public function getSiblings($orderBy='menu_order') {
         
@@ -690,7 +690,7 @@ class Post extends Entity
      */
     public function hasParent() {
         
-        return $this->post->post_parent;
+        return $this->post->post_parent != 0;
     }
     
     

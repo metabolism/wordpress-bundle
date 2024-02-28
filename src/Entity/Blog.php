@@ -714,7 +714,7 @@ class Blog extends Entity
             $sites = get_sites(['public'=>1]);
             $current_blog_id = get_current_blog_id();
 
-            if( !function_exists('format_code_lang') )
+            if( !function_exists('format_code_lang') && file_exists(ABSPATH . 'wp-admin/includes/ms.php'))
                 require_once(ABSPATH . 'wp-admin/includes/ms.php');
 
             $mslsOptions = MslsOptions::create();

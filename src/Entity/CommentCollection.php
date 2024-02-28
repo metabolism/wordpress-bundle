@@ -131,7 +131,7 @@ class CommentCollection implements \IteratorAggregate, \Countable, \ArrayAccess 
 
 	/**
 	 * @param $offset
-	 * @return User|null
+	 * @return Comment|null
 	 */
 	public function offsetGet($offset)
 	{

@@ -28,7 +28,7 @@ class PostCollectionValueResolver implements ArgumentValueResolverInterface {
      * @param ArgumentMetadata $argument
      * @return bool
      */
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         return (PostCollection::class === $argument->getType() && in_array($argument->getName(), ['posts','pages']));
     }
@@ -39,7 +39,7 @@ class PostCollectionValueResolver implements ArgumentValueResolverInterface {
      * @return \Generator
      * @throws \Exception
      */
-    public function resolve(Request $request, ArgumentMetadata $argument)
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         yield $this->postRepository->findQueried($argument->isNullable());
     }

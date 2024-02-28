@@ -17,7 +17,7 @@ class BlogValueResolver implements ArgumentValueResolverInterface {
      * @param ArgumentMetadata $argument
      * @return bool
      */
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         return Blog::class === $argument->getType();
     }
@@ -27,7 +27,7 @@ class BlogValueResolver implements ArgumentValueResolverInterface {
      * @param ArgumentMetadata $argument
      * @return \Generator
      */
-    public function resolve(Request $request, ArgumentMetadata $argument)
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         yield Blog::getInstance();
     }

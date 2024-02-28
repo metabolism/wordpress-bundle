@@ -67,7 +67,7 @@ class Comment extends Entity
 
 		if( $comment = get_comment($pid) ){
 
-			if( is_wp_error($comment) || !$comment )
+			if( is_wp_error($comment) )
 				return false;
 
 			$this->comment = $comment;

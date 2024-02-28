@@ -28,7 +28,7 @@ class UserValueResolver implements ArgumentValueResolverInterface {
      * @param ArgumentMetadata $argument
      * @return bool
      */
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         return User::class === $argument->getType();
     }
@@ -39,7 +39,7 @@ class UserValueResolver implements ArgumentValueResolverInterface {
      * @return \Generator
      * @throws \Exception
      */
-    public function resolve(Request $request, ArgumentMetadata $argument)
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         yield $this->userRepository->findQueried($argument->isNullable());
     }

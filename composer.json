@@ -1,7 +1,7 @@
 {
   "name":"metabolism/wordpress-bundle",
   "type": "symfony-bundle",
-  "version": "2.2.6",
+  "version": "2.3.0",
   "description": "Build enterprise solutions with WordPress",
   "license": "MIT",
   "keywords": [
@@ -14,6 +14,7 @@
   "require": {
     "php" : ">=7.1.3",
     "ext-gd": "*",
+    "ext-curl": "*",
     "ext-mysqli": "*",
     "ext-openssl" : "*",
     "ext-zip" : "*",
@@ -37,8 +38,8 @@
     "johnpbloch/wordpress-core": "^5.0|^6.0",
     "ifsnop/mysqldump-php":"^2.0",
     "dflydev/dot-access-data":"^3.0",
-    "enshrined/svg-sanitize": "^0.16",
-    "intervention/image": "^2.0",
+    "enshrined/svg-sanitize": "^0.18",
+    "intervention/image": "^3.4.0",
     "kornrunner/blurhash": "^1.2.2"
   },
   "suggest": {
@@ -100,6 +101,13 @@
   "autoload" : {
     "psr-4" : {
       "Metabolism\\WordpressBundle\\" : "src/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true,
+      "metabolism/package-actions": true,
+      "metabolism/wordpress-core-installer": true
     }
   }
 }

@@ -70,6 +70,9 @@ class UrlPlugin {
 
         $filter = $post->filter ?? false;
 
+        if( !function_exists('get_sample_permalink') && file_exists(ABSPATH . 'wp-admin/includes/post.php') )
+            require_once(ABSPATH . 'wp-admin/includes/post.php');
+
         list($permalink, $post_name) = get_sample_permalink($post);
         $preview_permalink = str_replace( array( '%pagename%', '%postname%' ), $post_name, esc_html( urldecode( $permalink ) ) );
 
@@ -98,8 +101,6 @@ class UrlPlugin {
             unset($query_args['s']);
         }
         else{
-
-            require_once(ABSPATH . 'wp-admin/includes/post.php');
 
             $id = $_GET['p'] ?? $_GET['page_id'];
             $permalink = $this->getPreviewPermalink($id);

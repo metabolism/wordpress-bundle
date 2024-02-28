@@ -28,7 +28,7 @@ class TermValueResolver implements ArgumentValueResolverInterface {
      * @param ArgumentMetadata $argument
      * @return bool
      */
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         return Term::class === $argument->getType();
     }
@@ -39,7 +39,7 @@ class TermValueResolver implements ArgumentValueResolverInterface {
      * @return \Generator
      * @throws \Exception
      */
-    public function resolve(Request $request, ArgumentMetadata $argument)
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         yield $this->termRepository->findQueried($argument->isNullable());
     }
