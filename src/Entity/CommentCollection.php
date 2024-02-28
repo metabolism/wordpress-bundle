@@ -86,7 +86,7 @@ class CommentCollection implements \IteratorAggregate, \Countable, \ArrayAccess 
 	/**
 	 * @return ArrayIterator|Comment[]
 	 */
-	public function getIterator() {
+	public function getIterator(): \Traversable {
 
 		return new ArrayIterator($this->items);
 	}
@@ -133,6 +133,7 @@ class CommentCollection implements \IteratorAggregate, \Countable, \ArrayAccess 
 	 * @param $offset
 	 * @return Comment|null
 	 */
+    #[\ReturnTypeWillChange]
 	public function offsetGet($offset)
 	{
 		return $this->items[$offset]??null;

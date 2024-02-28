@@ -774,13 +774,13 @@ class Image extends Entity
 
                 case 'resize':
                 case 'crop':
-                    $this->crop($image, $w, $h);
-                    break;
+                $this->crop($image, $w, $h);
+                break;
 
                 case 'insert':
                 case 'place':
-                    $image->place(BASE_URI.$param[0], count($param)>1?$param[1]:'top-left', $param[2]??0, $param[3]??0, $param[4]??100);
-                    break;
+                $image->place(BASE_URI.$param[0], count($param)>1?$param[1]:'top-left', $param[2]??0, $param[3]??0, $param[4]??100);
+                break;
 
                 case 'colorize':
                     $image->colorize($param[0]??0, $param[1]??0, $param[2]??0);
@@ -859,38 +859,38 @@ class Image extends Entity
 
                 case 'rectangle':
                 case 'drawRectangle':
-                    $image->drawRectangle($param[0], $param[1], function (RectangleFactory $draw) use($param) {
+                $image->drawRectangle($param[0], $param[1], function (RectangleFactory $draw) use($param) {
 
-                        if( count($param) > 3 )
-                            $draw->size($param[2], $param[3]);
+                    if( count($param) > 3 )
+                        $draw->size($param[2], $param[3]);
 
-                        if( count($param) > 4 )
-                            $draw->background($param[4]);
+                    if( count($param) > 4 )
+                        $draw->background($param[4]);
 
-                        if( count($param) > 6 )
-                            $draw->border($param[5], $param[6]);
-                    });
-                    break;
+                    if( count($param) > 6 )
+                        $draw->border($param[5], $param[6]);
+                });
+                break;
 
                 case 'circle':
                 case 'drawCircle':
-                    $image->drawCircle($param[0], $param[1], function (CircleFactory $draw) use($param) {
+                $image->drawCircle($param[0], $param[1], function (CircleFactory $draw) use($param) {
 
-                        if( count($param) > 2 )
-                            $draw->radius($param[2]);
+                    if( count($param) > 2 )
+                        $draw->radius($param[2]);
 
-                        if( count($param) > 3 )
-                            $draw->background($param[3]);
+                    if( count($param) > 3 )
+                        $draw->background($param[3]);
 
-                        if( count($param) > 5 )
-                            $draw->border($param[4], $param[5]);
-                    });
-                    break;
+                    if( count($param) > 5 )
+                        $draw->border($param[4], $param[5]);
+                });
+                break;
 
                 case 'limitColors':
                 case 'reduceColors':
-                    $image->reduceColors($param[0], $param[1]??'transparent');
-                    break;
+                $image->reduceColors($param[0], $param[1]??'transparent');
+                break;
             }
         }
 
@@ -1007,33 +1007,35 @@ class Image extends Entity
      */
     protected function crop($image, $w, $h=0){
 
-        if($this->focus_point){
+        $src_width = $image->width();
+        $src_height = $image->height();
+        $src_ratio = $src_width/$src_height;
 
-            $src_width = $image->width();
-            $src_height = $image->height();
-            $src_ratio = $src_width/$src_height;
+        if($this->focus_point && $w && $h){
+
             $dest_ratio = $w/$h;
-
             $ratio_height = $src_height/$h;
             $ratio_width = $src_width/$w;
 
-            if( $src_ratio >= 1 && $dest_ratio <= 1)
-            {
+            if( $src_ratio >= 1 && $dest_ratio <= 1) {
+
                 $dest_width = $w*$ratio_height;
                 $dest_height = $src_height;
             }
-            else
-            {
+            else {
+
                 $dest_width = $src_width;
                 $dest_height = $h*$ratio_width;
             }
 
             if( $dest_width > $src_width ){
+
                 $dest_width = $src_width;
                 $dest_height = $h*$ratio_width;
             }
 
             if( $dest_height > $src_height ){
+
                 $dest_height = $src_height;
                 $dest_width = $w*$ratio_height;
             }
@@ -1043,6 +1045,12 @@ class Image extends Entity
 
             $image->crop($cropX2 - $cropX1, $cropY2 - $cropY1, $cropX1, $cropY1);
         }
+
+        if( !$w )
+            $w = $h*$src_ratio;
+
+        if( !$h )
+            $h = $w/$src_ratio;
 
         $image->cover($w, $h);
     }
