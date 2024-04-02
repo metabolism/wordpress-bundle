@@ -144,23 +144,30 @@ class WordpressTwigExtension extends AbstractExtension{
      */
     public function generatePixel($w = 1, $h = 1) {
 
-        ob_start();
+        try{
 
-        if( $h == 0 )
-            $h = $w;
-        elseif( $w == 0 )
-            $w = $h;
+            ob_start();
 
-        $img = imagecreatetruecolor($w, $h);
-        imagetruecolortopalette($img, false, 1);
-        imagesavealpha($img, true);
-        $color = imagecolorallocatealpha($img, 0, 0, 0, 127);
-        imagefill($img, 0, 0, $color);
-        imagepng($img, null, 9);
-        imagedestroy($img);
+            if( $h == 0 )
+                $h = $w;
+            elseif( $w == 0 )
+                $w = $h;
 
-        $imagedata = ob_get_contents();
-        ob_end_clean();
+            $img = imagecreatetruecolor($w, $h);
+            imagetruecolortopalette($img, false, 1);
+            imagesavealpha($img, true);
+            $color = imagecolorallocatealpha($img, 0, 0, 0, 127);
+            imagefill($img, 0, 0, $color);
+            imagepng($img, null, 9);
+            imagedestroy($img);
+
+            $imagedata = ob_get_contents();
+            ob_end_clean();
+        }
+        catch (\Throwable $t){
+
+            $imagedata = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+        }
 
         return 'data:image/png;base64,' . base64_encode($imagedata);
     }

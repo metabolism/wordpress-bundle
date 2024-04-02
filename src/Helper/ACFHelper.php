@@ -625,13 +625,9 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
                         
                         if( empty($object['value']['url']??'') )
                             break;
-                        
-                        $objects[$object['name']] = [
-                            'url'=>$object['value']['url'],
-                            'link'=>$object['value']['url'],
-                            'target'=>$object['value']['target'],
-                            'title'=>$object['value']['title']
-                        ];
+
+                        $objects[$object['name']] = $object['value'];
+                        $objects[$object['name']]['link'] = $object['value']['url'];
                     }
                 
                     break;
