@@ -729,7 +729,10 @@ class Image extends Entity
         if( is_string($w))
             $w = intval($w);
 
-        $suffix = '-'.round($w).'x'.round($h);
+        $w = round($w);
+        $h = round($h);
+
+        $suffix = '-'.$w.'x'.$h;
 
         // add focus point
         if( $this->focus_point )
