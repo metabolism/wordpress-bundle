@@ -40,7 +40,7 @@ class PostRepository
 
     /**
      *
-     * @return PostCollection
+     * @return PostCollection|Post[]
      */
     public function findAll(array $orderBy = null, $public=true)
     {
@@ -56,7 +56,7 @@ class PostRepository
 
     /**
      *
-     * @return PostCollection|Post
+     * @return PostCollection|Post[]|Post
      * @throws \Exception
      */
     public function findQueried($allowNull=false)
@@ -94,7 +94,7 @@ class PostRepository
      * @param array|string|null $orderBy
      * @param $limit
      * @param $offset
-     * @return PostCollection|array
+     * @return PostCollection|Post[]|array
      */
     public function findBy(array $criteria, $orderBy = null, $limit = null, $offset = null)
     {
@@ -164,7 +164,7 @@ class PostRepository
 
     /**
      * @param array $ids
-     * @return PostCollection
+     * @return PostCollection|Post[]
      */
     public function findByGuid(array $ids)
     {

@@ -58,7 +58,7 @@ class UserRepository
 
     /**
      *
-     * @return UserCollection
+     * @return UserCollection|User[]
      */
     public function findAll(array $orderBy = null)
     {
@@ -71,7 +71,7 @@ class UserRepository
      * @param array|null $orderBy
      * @param $limit
      * @param $offset
-     * @return UserCollection
+     * @return UserCollection|User[]
      */
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {

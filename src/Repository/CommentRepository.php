@@ -25,7 +25,7 @@ class CommentRepository
 
     /**
      *
-     * @return CommentCollection
+     * @return CommentCollection|Comment[]
      */
     public function findAll(array $orderBy = null)
     {
@@ -38,7 +38,7 @@ class CommentRepository
      * @param array|null $orderBy
      * @param $limit
      * @param $offset
-     * @return CommentCollection
+     * @return CommentCollection|Comment[]
      */
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {

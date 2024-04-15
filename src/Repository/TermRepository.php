@@ -68,7 +68,7 @@ class TermRepository
 
 
     /**
-     * @return TermCollection
+     * @return TermCollection|Term[]
      */
     public function findAll(array $orderBy = null, $public=true)
     {
@@ -104,7 +104,7 @@ class TermRepository
      *
      * @see https://developer.wordpress.org/reference/classes/wp_term_query/__construct/
      *
-     * @return TermCollection|array
+     * @return TermCollection|Term[]|array
      */
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
