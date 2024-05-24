@@ -556,9 +556,11 @@ class Image extends Entity
 
             $manager = ImageManager::gd();
             $image = $manager->read($this->src);
+            $src_ratio = $this->width/$this->height;
+
             $image = $image->cover(
-                $this->width >= $this->height ? 64 : 0,
-                $this->height >= $this->width ? 64 : 0
+                $this->width >= $this->height ? 64 : 64*$src_ratio,
+                $this->width >= $this->height ? 64/$src_ratio : 64
             );
 
             $height = $image->height();
@@ -571,7 +573,7 @@ class Image extends Entity
                 for ($x = 0; $x < $width; ++$x) {
                     $colors = $image->pickColor($x, $y);
 
-                    $row[] = [$colors[0], $colors[1], $colors[2]];
+                    $row[] = $colors->toArray();
                 }
                 $pixels[] = $row;
             }
