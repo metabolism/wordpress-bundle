@@ -136,7 +136,7 @@ YML file allows to configure :
 * WYSIWYG MCE Editor
 * Feature Support
 * Multi-site configuration
-* ACF configuration
+* ACF/Carbon Fields configuration
 * Menu
 * Custom Post type
 * Custom Taxonomy
