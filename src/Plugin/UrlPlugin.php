@@ -95,7 +95,7 @@ class UrlPlugin {
 
         if( isset($_GET['s']) ){
 
-            $permalink = get_search_link(remove_accents(sanitize_text_field($_GET['s'])));
+            $permalink = get_search_link(sanitize_title($_GET['s']));
 
             $query_args = $_GET;
             unset($query_args['s']);
