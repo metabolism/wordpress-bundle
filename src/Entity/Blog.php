@@ -178,7 +178,7 @@ class Blog extends Entity
     public function getLanguage(): string
     {
         if( is_null($this->language) )
-            $this->language = get_bloginfo('language');
+            $this->language = str_replace('_', '-', get_locale());
 
         return $this->language;
     }
