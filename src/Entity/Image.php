@@ -728,8 +728,14 @@ class Image extends Entity
         if( is_string($h))
             $h = intval($h);
 
+        if( !is_numeric($h) )
+            $h = 0;
+
         if( is_string($w))
             $w = intval($w);
+
+        if( !is_numeric($w) )
+            $w = 0;
 
         $w = round($w);
         $h = round($h);
