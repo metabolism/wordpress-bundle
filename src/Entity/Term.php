@@ -281,6 +281,15 @@ class Term extends Entity
         return $nl2br?nl2br($this->content):$this->content;
     }
 
+    /**
+     * @param bool $nl2br
+     * @return string
+     */
+    public function getDescription(?bool $nl2br=true): string
+    {
+        return $this->getContent($nl2br);
+    }
+
 
     /**
      * Get term posts
