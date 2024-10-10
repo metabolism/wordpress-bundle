@@ -9,6 +9,8 @@ class MetaHelper implements ArrayAccess
 	private $objects;
 	private $id;
 	private $type;
+	private $blog_id;
+	private $network_id;
 
     /**
      * MetaHelper constructor.
@@ -22,6 +24,8 @@ class MetaHelper implements ArrayAccess
 		if( !$id )
 			return;
 
+        $this->blog_id = get_current_blog_id();
+        $this->network_id = get_current_network_id();
         $this->id = $id;
 		$this->type = $type;
 
@@ -88,8 +92,8 @@ class MetaHelper implements ArrayAccess
             $this->objects = get_term_meta($this->id);
         elseif( $this->type == 'user' )
             $this->objects = get_user_meta($this->id);
-        elseif( $this->type == 'blog' )
-            $this->objects = get_site_meta($this->id);
+        elseif( $this->type == 'blog' && !is_multisite() )
+            $this->objects = get_site_meta($this->blog_id);
 
         return $this->objects;
 	}
@@ -110,8 +114,13 @@ class MetaHelper implements ArrayAccess
             $this->objects[$key] = get_term_meta($this->id, $key, true);
         elseif( $this->type == 'user' )
             $this->objects[$key] = get_user_meta($this->id, $key, true);
-        elseif( $this->type == 'blog' )
-            $this->objects[$key] = get_site_meta($this->id, $key, true);
+        elseif( $this->type == 'blog' ){
+
+            if( is_multisite() )
+                $this->objects[$key] = get_network_option($this->network_id, $key);
+            else
+                $this->objects[$key] = get_site_meta($this->blog_id, $key, true);
+        }
         else
             $this->objects[$key] = false;
 
@@ -137,8 +146,13 @@ class MetaHelper implements ArrayAccess
                 update_term_meta($this->id, $id, $value);
             elseif( $this->type == 'user' )
                 update_user_meta($this->id, $id, $value);
-            elseif( $this->type == 'blog' )
-                update_site_meta($this->id, $id, $value);
+            elseif( $this->type == 'blog' ){
+
+                if( is_multisite() )
+                    update_network_option($this->network_id, $id, $value);
+                else
+                    update_site_meta($this->blog_id, $id, $value);
+            }
         }
     }
 
