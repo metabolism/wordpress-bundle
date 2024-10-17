@@ -267,8 +267,8 @@ class Image extends Entity
                 $this->title = $post->post_title;
                 $this->alt = trim(strip_tags($post_meta['_wp_attachment_image_alt'][0]??''));
 
-                $this->width = $attachment_metadata['width'];
-                $this->height = $attachment_metadata['height'];
+                $this->width = intval($attachment_metadata['width']);
+                $this->height = intval($attachment_metadata['height']);
                 $this->ratio = $this->width/$this->height;
                 $this->metadata = $attachment_metadata['image_meta'];
                 $this->mime_type = $post->post_mime_type;
