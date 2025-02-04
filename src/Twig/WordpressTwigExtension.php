@@ -69,6 +69,7 @@ class WordpressTwigExtension extends AbstractExtension{
             new TwigFunction( 'archive_url', [$blog, 'getArchiveLink'] ),
             new TwigFunction( 'archive_title', [$blog, 'getArchiveTitle'] ),
             new TwigFunction( 'attachment_url', 'wp_get_attachment_url' ),
+            new TwigFunction( 'get_archives', 'wp_get_archives' ),
             new TwigFunction( 'post_url', [$this, 'getPermalink'] ),
             new TwigFunction( 'term_url', [$this, 'getTermLink'] ),
             new TwigFunction( 'bloginfo', 'get_bloginfo' ),
