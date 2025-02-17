@@ -133,6 +133,7 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
             acf_setup_meta($this->data, $this->id, true);
         
         $value = acf_get_value( $this->entity_id, $field );
+
         $field['value'] = acf_format_value( $value, $this->entity_id, $field );
         
         $data = $this->format([$field]);
