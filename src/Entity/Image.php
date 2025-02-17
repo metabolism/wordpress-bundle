@@ -228,17 +228,23 @@ class Image extends Entity
 
                 $attachment_metadata = apply_filters( 'wp_get_attachment_metadata', maybe_unserialize($post_meta['_wp_attachment_metadata'][0]??''), $id );
 
-                if( !is_array($attachment_metadata) )
-                    $attachment_metadata = [];
+                if( !is_array($attachment_metadata) ){
 
-                $attachment_metadata['file'] = $post_meta['_wp_attached_file'][0]??'';
+                    $attachment_metadata = [
+                        'width' => 0,
+                        'height' => 0,
+                        'image_meta' =>  []
+                    ];
+                }
+
+                $file = $post_meta['_wp_attached_file'][0]??'';
 
                 if( !isset($attachment_metadata['width'], $attachment_metadata['height']) ){
 
                     if( $post->post_mime_type != 'image/svg' && $post->post_mime_type != 'image/svg+xml' )
                         return;
 
-                    $filename = self::uploadDir('basedir').'/'.$attachment_metadata['file'];
+                    $filename = self::uploadDir('basedir').'/'.$file;
 
                     if( !$xmlget = @simplexml_load_file($filename) )
                         return;
@@ -256,8 +262,7 @@ class Image extends Entity
                     $this->focus_point = false;
                 }
 
-
-                $filename = self::uploadDir('basedir').'/'.$attachment_metadata['file'];
+                $filename = self::uploadDir('basedir').'/'.$file;
 
                 if( !is_readable( $filename) )
                     return;
@@ -265,7 +270,7 @@ class Image extends Entity
                 $this->ID = $post->ID;
                 $this->caption = $post->post_excerpt;
                 $this->description = $post->post_content;
-                $this->file = self::uploadDir('relative').'/'.$attachment_metadata['file'];
+                $this->file = self::uploadDir('relative').'/'.$file;
                 $this->src = $filename;
                 $this->post = $post;
 
