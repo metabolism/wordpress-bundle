@@ -413,8 +413,7 @@ class Post extends Entity
 
             if( !str_contains($link, $home_url) ){
 
-                $url = parse_url($link);
-                $path = $url['host'].$url['path'];
+                $this->path = false;
             }
             else{
 
@@ -425,12 +424,12 @@ class Post extends Entity
                     $rewrite_slug = preg_replace('/{([^%]+)}/m', '([^\/]+)', str_replace('/','\/', '/'.$rewrite_slug));
                     $path = preg_replace('/^'.$rewrite_slug.'/m', '', $path);
                 }
-            }
 
-            if( str_starts_with($path, '/') )
-                $this->path = substr($path, 1);
-            else
-                $this->path = false;
+                if( str_starts_with($path, '/') )
+                    $this->path = substr($path, 1);
+                else
+                    $this->path = false;
+            }
         }
         
         return $this->path;
