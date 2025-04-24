@@ -72,7 +72,7 @@ class TermRepository
      */
     public function findAll(array $orderBy = null, $public=true)
     {
-        $taxonomies = $this->findTaxonomies(['public'=> $public]);
+        $taxonomies = $this->findTaxonomies(['publicly_queryable'=> $public]);
 
         $criteria = [
             'taxonomy' => $taxonomies
