@@ -110,8 +110,5 @@
       "metabolism/package-actions": true,
       "metabolism/wordpress-core-installer": true
     }
-  },
-  "require-dev": {
-    "rector/rector": "^2.0"
   }
 }
