@@ -22,20 +22,20 @@ class AppExtension extends AbstractExtension{
 	public function getFilters()
 	{
 		return [
-			new TwigFilter( 'clean_id', [$this,'cleanID'] ),
-			new TwigFilter( 'format_number', [$this,'formatNumber'] ),
-			new TwigFilter( 'll_CC', [$this,'llCC'] ),
-			new TwigFilter( 'br_to_space', [$this,'brToSpace'] ),
-			new TwigFilter( 'remove_accent', [$this,'removeAccent'] ),
-			new TwigFilter( 'typeOf', [$this,'typeOf'] ),
-			new TwigFilter( 'bind', [$this,'bind'] ),
-			new TwigFilter( 'implode', [$this,'implode'] ),
-			new TwigFilter( 'striptag', [$this, 'striptag']),
-			new TwigFilter( 'br_to_line', [$this, 'brToLine']),
-			new TwigFilter( 'remove_br', [$this, 'removeBr']),
-			new TwigFilter( 'file_content', [$this, 'getFileContent']),
-			new TwigFilter( 'wrap_embed', [$this, 'wrapEmbed']),
-			new TwigFilter( 'truncate', [$this, 'truncate'])		];
+			new TwigFilter( 'clean_id', $this->cleanID(...) ),
+			new TwigFilter( 'format_number', $this->formatNumber(...) ),
+			new TwigFilter( 'll_CC', $this->llCC(...) ),
+			new TwigFilter( 'br_to_space', $this->brToSpace(...) ),
+			new TwigFilter( 'remove_accent', $this->removeAccent(...) ),
+			new TwigFilter( 'typeOf', $this->typeOf(...) ),
+			new TwigFilter( 'bind', $this->bind(...) ),
+			new TwigFilter( 'implode', $this->implode(...) ),
+			new TwigFilter( 'striptag', $this->striptag(...)),
+			new TwigFilter( 'br_to_line', $this->brToLine(...)),
+			new TwigFilter( 'remove_br', $this->removeBr(...)),
+			new TwigFilter( 'file_content', $this->getFileContent(...)),
+			new TwigFilter( 'wrap_embed', $this->wrapEmbed(...)),
+			new TwigFilter( 'truncate', $this->truncate(...))		];
 	}
 
 	/**
@@ -44,7 +44,7 @@ class AppExtension extends AbstractExtension{
 	public function getFunctions()
 	{
 		return [
-			new TwigFunction( 'blank', [$this,'blank'] )
+			new TwigFunction( 'blank', $this->blank(...) )
 		];
 	}
 

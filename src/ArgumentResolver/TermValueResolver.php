@@ -4,14 +4,13 @@ namespace Metabolism\WordpressBundle\ArgumentResolver;
 
 use Metabolism\WordpressBundle\Entity\Term;
 use Metabolism\WordpressBundle\Repository\TermRepository;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class TermValueResolver implements ArgumentValueResolverInterface {
+class TermValueResolver implements BCValueResolverInterface {
 
     private $termRepository;
 
@@ -41,6 +40,10 @@ class TermValueResolver implements ArgumentValueResolverInterface {
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        if (!$this->supports($request, $argument)) {
+            return [];
+        }
+
         yield $this->termRepository->findQueried($argument->isNullable());
     }
 }

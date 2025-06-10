@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class UserValueResolver implements ArgumentValueResolverInterface {
+class UserValueResolver implements BCValueResolverInterface {
 
     private $userRepository;
 
@@ -41,6 +41,10 @@ class UserValueResolver implements ArgumentValueResolverInterface {
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        if (!$this->supports($request, $argument)) {
+            return [];
+        }
+
         yield $this->userRepository->findQueried($argument->isNullable());
     }
 }

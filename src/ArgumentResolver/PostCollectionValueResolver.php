@@ -4,14 +4,13 @@ namespace Metabolism\WordpressBundle\ArgumentResolver;
 
 use Metabolism\WordpressBundle\Entity\PostCollection;
 use Metabolism\WordpressBundle\Repository\PostRepository;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class PostCollectionValueResolver implements ArgumentValueResolverInterface {
+class PostCollectionValueResolver implements BCValueResolverInterface {
 
     private $postRepository;
 
@@ -41,6 +40,10 @@ class PostCollectionValueResolver implements ArgumentValueResolverInterface {
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        if (!$this->supports($request, $argument)) {
+            return [];
+        }
+
         yield $this->postRepository->findQueried($argument->isNullable());
     }
 }
