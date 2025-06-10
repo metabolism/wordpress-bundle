@@ -27,7 +27,7 @@ class TwigGlobalSubscriber implements EventSubscriberInterface {
         $this->twig->addGlobal( 'subsidiaries', $subsidiaries );
     }
 
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array {
         return [ KernelEvents::CONTROLLER =>  'injectGlobalVariables' ];
     }
 }

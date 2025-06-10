@@ -6,7 +6,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 
 /**
  * Class Metabolism\WordpressBundle Framework
@@ -32,13 +32,5 @@ class WordpressExtension extends Extension implements PrependExtensionInterface
     public function prepend(ContainerBuilder $container)
     {
         // TODO: Implement prepend() method.
-    }
-
-    /**
-     * @return string
-     */
-    public function getAlias()
-    {
-        return parent::getAlias();
     }
 }

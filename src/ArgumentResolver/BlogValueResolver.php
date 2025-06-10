@@ -3,14 +3,13 @@
 namespace Metabolism\WordpressBundle\ArgumentResolver;
 
 use Metabolism\WordpressBundle\Entity\Blog;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * Class Metabolism\WordpressBundle Framework
  */
-class BlogValueResolver implements ArgumentValueResolverInterface {
+class BlogValueResolver implements BCValueResolverInterface {
 
     /**
      * @param Request $request
@@ -29,6 +28,10 @@ class BlogValueResolver implements ArgumentValueResolverInterface {
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        if (!$this->supports($request, $argument)) {
+            return [];
+        }
+
         yield Blog::getInstance();
     }
 }
