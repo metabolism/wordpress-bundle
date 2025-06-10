@@ -71,6 +71,7 @@ class WordpressTwigExtension extends AbstractExtension{
             new TwigFunction( 'attachment_url', 'wp_get_attachment_url' ),
             new TwigFunction( 'post_url', $this->getPermalink(...) ),
             new TwigFunction( 'term_url', $this->getTermLink(...) ),
+            new TwigFunction( 'get_archives', 'wp_get_archives' ),
             new TwigFunction( 'bloginfo', 'get_bloginfo' ),
             new TwigFunction( 'dynamic_sidebar', function($id){ return $this->getOutput('dynamic_sidebar', [$id]); }, ['is_safe' => array('html')]  ),
             new TwigFunction( 'comment_form', function($post_id, $args=[]){ return $this->getOutput('comment_form', [$args, $post_id]); }, ['is_safe' => array('html')]  ),

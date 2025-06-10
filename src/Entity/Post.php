@@ -408,18 +408,28 @@ class Post extends Entity
             
             $post_type_object = get_post_type_object($this->type);
 
-                $path = str_replace(get_home_url(), '', $this->getLink());
-            
-            if( $rewrite_slug = $post_type_object->rewrite['slug']??false ){
+            $link = $this->getLink();
+            $home_url = get_home_url();
 
-                $rewrite_slug = preg_replace('/{([^%]+)}/m', '([^\/]+)', str_replace('/','\/', '/'.$rewrite_slug));
-                $path = preg_replace('/^'.$rewrite_slug.'/m', '', $path);
-            }
+            if( !str_contains($link, $home_url) ){
 
-            if( substr($path, 0, 1) == '/')
-                $this->path = substr($path, 1);
-            else
                 $this->path = false;
+            }
+            else{
+
+                $path = str_replace($home_url, '', $link);
+
+                if( $rewrite_slug = $post_type_object->rewrite['slug']??false ){
+
+                    $rewrite_slug = preg_replace('/{([^%]+)}/m', '([^\/]+)', str_replace('/','\/', '/'.$rewrite_slug));
+                    $path = preg_replace('/^'.$rewrite_slug.'/m', '', $path);
+                }
+
+                if( str_starts_with($path, '/') )
+                    $this->path = substr($path, 1);
+                else
+                    $this->path = false;
+            }
         }
         
         return $this->path;

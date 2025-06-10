@@ -61,7 +61,7 @@ class Image extends Entity
         if (isset($this->args['compression']))
             $this->compression = $this->args['compression'];
         else
-            $this->compression = $_config ? $_config->get('image.compression', 90) : 90;
+            $this->compression = $_config ? $_config->get('image.compression', 98) : 98;
 
         if (!$id || ($_REQUEST['debug']??false == 'image' && WP_DEBUG)) {
 
@@ -228,12 +228,23 @@ class Image extends Entity
 
                 $attachment_metadata = apply_filters( 'wp_get_attachment_metadata', maybe_unserialize($post_meta['_wp_attachment_metadata'][0]??''), $id );
 
-                if( !$attachment_metadata || !isset($attachment_metadata['file']) ){
+                if( !is_array($attachment_metadata) ){
+
+                    $attachment_metadata = [
+                        'width' => 0,
+                        'height' => 0,
+                        'image_meta' =>  []
+                    ];
+                }
+
+                $file = $post_meta['_wp_attached_file'][0]??'';
+
+                if( !isset($attachment_metadata['width'], $attachment_metadata['height']) ){
 
                     if( $post->post_mime_type != 'image/svg' && $post->post_mime_type != 'image/svg+xml' )
                         return;
 
-                    $filename = self::uploadDir('basedir').'/'.$post_meta['_wp_attached_file'][0];
+                    $filename = self::uploadDir('basedir').'/'.$file;
 
                     if( !$xmlget = @simplexml_load_file($filename) )
                         return;
@@ -243,16 +254,15 @@ class Image extends Entity
                     $height = $xmlattributes->height??'';
 
                     $attachment_metadata = [
-                        'file' => $post_meta['_wp_attached_file'][0],
-                        'width' =>  $width,
-                        'height' =>  $height,
+                        'width' => (int)$width,
+                        'height' => (int)$height,
                         'image_meta' =>  []
                     ];
 
                     $this->focus_point = false;
                 }
 
-                $filename = self::uploadDir('basedir').'/'.$attachment_metadata['file'];
+                $filename = self::uploadDir('basedir').'/'.$file;
 
                 if( !is_readable( $filename) )
                     return;
@@ -260,7 +270,7 @@ class Image extends Entity
                 $this->ID = $post->ID;
                 $this->caption = $post->post_excerpt;
                 $this->description = $post->post_content;
-                $this->file = self::uploadDir('relative').'/'.$attachment_metadata['file'];
+                $this->file = self::uploadDir('relative').'/'.$file;
                 $this->src = $filename;
                 $this->post = $post;
 
@@ -269,7 +279,7 @@ class Image extends Entity
 
                 $this->width = intval($attachment_metadata['width']);
                 $this->height = intval($attachment_metadata['height']);
-                $this->ratio = $this->width/$this->height;
+                $this->ratio = $this->height?$this->width/$this->height:1;
                 $this->metadata = $attachment_metadata['image_meta'];
                 $this->mime_type = $post->post_mime_type;
             }

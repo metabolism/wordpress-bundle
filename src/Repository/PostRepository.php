@@ -44,10 +44,10 @@ class PostRepository
      */
     public function findAll(array $orderBy = null, $public=true)
     {
-        $post_types = $this->findPostTypes(['public'=>$public]);
+        $post_types = $this->findPostTypes(['publicly_queryable'=>$public]);
 
         $criteria = [
-            'post_type' => $post_types
+            'post_type' => $post_types,
         ];
 
         return $this->findBy($criteria, $orderBy, -1);

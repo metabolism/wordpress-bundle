@@ -15,6 +15,7 @@ wordpress:
   gutenberg:
     replace_reset_styles: true
     remove_core_block: true
+    remove_plugin_block: false
     remove_core_block_patterns: true
     disable_classic_theme_styles: true
     remove_block_library: true
@@ -31,6 +32,7 @@ wordpress:
 
   image:
     compression: 95 #on the fly compression ratio
+    max_size: 2 #Max image file size on upload
     resize: #resize image on upload to save server space
       max_width: 1920
       max_height: 2160
@@ -67,7 +69,9 @@ wordpress:
 
   ## Customize WYSIWYG Editor TinyMCE Buttons
   ##https://www.tiny.cloud/docs/advanced/editor-control-identifiers/
-  mce_buttons:
+  mce:
+    #css: '/static/editor_style.css'
+    buttons:
     - formatselect
     - bold
     - italic
@@ -239,6 +243,10 @@ wordpress:
   ##########################
   ##       New block      ##
   ##########################
+
+  #block_categories:
+  #  media : Media
+
 
   block:
     title-text:

@@ -39,20 +39,20 @@ class Permastruct{
         
         if( empty($this->locale) ){
             
-            $this->addRoute('_site_health', '_site-health', [], false, 'Metabolism\WordpressBundle\Helper\SiteHealthHelper::check');
-            $this->addRoute('_cache_purge', '_cache/purge', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::purge');
-            $this->addRoute('_cache_clear', '_cache/clear', [], false, 'Metabolism\WordpressBundle\Helper\CacheHelper::clear');
+            $this->addRoute('_site_health', '_site-health', [], ['_controller'=>'Metabolism\WordpressBundle\Helper\SiteHealthHelper::check']);
+            $this->addRoute('_cache_purge', '_cache/purge', [], ['_controller'=>'Metabolism\WordpressBundle\Helper\CacheHelper::purge']);
+            $this->addRoute('_cache_clear', '_cache/clear', [], ['_controller'=>'Metabolism\WordpressBundle\Helper\CacheHelper::clear']);
             
-            $this->addRoute('robots', 'robots.txt', [], false, 'Metabolism\WordpressBundle\Helper\RobotsHelper::doAction');
+            $this->addRoute('robots', 'robots.txt', [], ['_controller'=>'Metabolism\WordpressBundle\Helper\RobotsHelper::doAction']);
         }
         
         global $_config;
         $remove_rewrite_rules = $_config ? $_config->get('rewrite_rules.remove', []) : [];
         
         if( !in_array('feed', $remove_rewrite_rules) )
-            $this->addRoute('feed', '{feed}', ['feed'=>'feed|rdf|rss|rss2|atom'], false, 'Metabolism\WordpressBundle\Helper\FeedHelper::doAction');
+            $this->addRoute('feed', '{feed}', ['feed'=>'feed|rdf|rss|rss2|atom'], ['_controller'=>'Metabolism\WordpressBundle\Helper\FeedHelper::doAction']);
         
-        $this->addRoute('home', '', [], get_option('show_on_front') == 'posts');
+        $this->addRoute('home', '', [], [], get_option('show_on_front') == 'posts');
         
         global $wp_post_types;
         
@@ -64,7 +64,7 @@ class Permastruct{
                 $translated_slug = get_option( $post_type->name. '_rewrite_archive' );
                 $struct = empty($translated_slug) ? $base_struct : $translated_slug;
                 
-                $this->addRoute($post_type->name.'_archive', $struct, [], true);
+                $this->addRoute($post_type->name.'_archive', $struct, [], [], true);
             }
         }
         
@@ -85,7 +85,7 @@ class Permastruct{
                     $requirements[$match[1]] = $this->wp_rewrite->rewritereplace[$position];
             }
             
-            $this->addRoute($name, $params['struct'], $requirements, $params['paged']);
+            $this->addRoute($name, $params['struct'], $requirements, [], $params['paged']);
         }
         
         if( isset($this->wp_rewrite->author_structure) && !in_array('author', $remove_rewrite_rules) )
@@ -93,13 +93,26 @@ class Permastruct{
         
         if( isset($this->wp_rewrite->search_structure) ){
             
-            $this->addRoute('search', $this->wp_rewrite->search_structure, [], true);
-            $this->addRoute('empty_search', str_replace('/%search%', '', $this->wp_rewrite->search_structure), [], false, $this->getControllerName('search'));
+            $this->addRoute('search', $this->wp_rewrite->search_structure, [], [], true);
+            $this->addRoute('empty_search', str_replace('/%search%', '', $this->wp_rewrite->search_structure), [], ['_controller'=>$this->getControllerName('search')]);
         }
         
+        if( isset($this->wp_rewrite->date_structure) ){
+
+            $controllerName = $this->getControllerName('date');
+            $structure =  $this->wp_rewrite->date_structure;
+            $this->addRoute('daily', $structure, ['year'=>'[0-9]{4}', 'monthnum'=>'[0-9]{2}', 'day'=>'[0-9]{2}'], ['_controller'=>$controllerName], true);
+
+            $structure = str_replace('/%day%', '', $structure);
+            $this->addRoute('monthly', $structure, ['year'=>'[0-9]{4}', 'monthnum'=>'[0-9]{2}'], ['_controller'=>$controllerName], true);
+
+            $structure = str_replace('/%monthnum%', '', $structure);
+            $this->addRoute('yearly', $structure, ['year'=>'[0-9]{4}'], ['_controller'=>$controllerName], true);
+        }
+
         if( isset($this->wp_rewrite->page_structure) )
             $this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
-        
+
         if( isset($this->wp_rewrite->permalink_structure) && substr($this->wp_rewrite->page_structure??'', 0, 1) != '%' )
             $this->addRoute('post', $this->wp_rewrite->permalink_structure, ['postname'=>'[a-zA-Z0-9]{2}[^/].*']);
     }
@@ -130,34 +143,35 @@ class Permastruct{
         
         return ['singular'=>$path, 'archive'=>$path.(substr($path, -1, 1)=='/'?'':'/').$this->wp_rewrite->pagination_base.'/{page}'];
     }
-    
+
     /**
      * @param $name
      * @param $struct
      * @param array $requirements
+     * @param array $defaults
      * @param bool $paginate
-     * @param bool $controllerName
      */
-    public function addRoute( $name, $struct, $requirements=[], $paginate=false, $controllerName=false )
+    public function addRoute( $name, $struct, $requirements=[], $defaults=[], $paginate=false )
     {
         $struct = apply_filters('routing_struct', $struct, $name);
         $requirements = apply_filters('routing_requirements', $requirements, $struct, $name);
         
         $name = str_replace('_structure', '', $name);
-        
-        $controller = $controllerName ?: $this->getControllerName($name);
         $paths = $this->getPaths($struct);
         
         $locale = $this->locale?'.'.$this->locale:'';
-        
-        $route = new Route( $paths['singular'], ['_controller'=>$controller], $requirements);
+
+        if( !isset($defaults['_controller']) )
+            $defaults['_controller'] = $this->getControllerName($name);
+
+        $route = new Route( $paths['singular'], $defaults, $requirements);
         $route->setMethods('GET');
         
         $this->collection->add($name.$locale, $route);
         
         if( $paginate && !empty($paths['archive']) )
         {
-            $route = new Route( $paths['archive'], ['_controller'=>$controller], $requirements);
+            $route = new Route( $paths['archive'], $defaults, $requirements);
             $route->setMethods('GET');
             
             $this->collection->add($name.'_paged'.$locale, $route);
