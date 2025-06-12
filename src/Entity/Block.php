@@ -108,7 +108,7 @@ class Block extends Entity
         if( !empty($this->block['innerHTML']??'') )
             return $this->block['innerHTML'];
         else
-            return $this->custom_fields;
+            return $this->render();
     }
 
     /**
@@ -129,7 +129,7 @@ class Block extends Entity
     /**
      * @return string
      */
-    public function render(){
+    public function render($is_preview=false){
 
         $twig = TwigHelper::getEnvironment();
 
@@ -148,14 +148,16 @@ class Block extends Entity
 
             $post = $this->getPost();
 
-            $props = apply_filters('render_block_content', $this->getContent(), $this);
+            $props = apply_filters('render_block_content', $this->custom_fields, $this);
 
             $html = $template->render([
                 'props'=>$props,
                 'post'=>$post,
                 'block'=>$this,
                 'blog'=>$blog,
-                'is_component_preview'=>true
+                'is_preview'=>$is_preview,
+                'is_admin'=>is_admin(),
+                'is_front_page'=>is_front_page()
             ]);
 
             return apply_filters('render_block_template', $html, $props, $this);

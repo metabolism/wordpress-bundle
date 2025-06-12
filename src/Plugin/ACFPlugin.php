@@ -35,7 +35,7 @@ class ACFPlugin {
      * @param $acf_block
      * @return void
      */
-    public static function renderBlock($acf_block){
+    public static function renderBlock($acf_block, $content = '', $is_preview = false){
 
         $block = [
             'blockName'=>$acf_block['name'],
@@ -49,8 +49,9 @@ class ACFPlugin {
         }
 
         $block = new Block($block);
+        $is_preview = $_REQUEST['query']['preview']??false;
 
-        echo $block->render();
+        echo $block->render($is_preview);
     }
 
 
@@ -60,6 +61,6 @@ class ACFPlugin {
     public function __construct()
     {
         add_filter('acf/validate_field', [$this, 'validateField']);
-		add_filter('block_render_callback', [$this, 'renderBlock']);
+		add_filter('block_render_callback', [$this, 'renderBlock'], 10 , 3);
     }
 }
