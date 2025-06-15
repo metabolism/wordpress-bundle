@@ -67,25 +67,6 @@ class NoticePlugin {
     
     
     /**
-     * Add debug info
-     */
-    public function debugInfo(){
-        
-        add_action( 'admin_bar_menu', function( $wp_admin_bar )
-        {
-            $args = [
-                'id'    => 'debug',
-                'title' => '<span style="position: fixed; left: 0; top: 0; width: 100%; background: #df0f0f; height: 2px; z-index: 99999"></span>',
-                'href' => '#'
-            ];
-            
-            $wp_admin_bar->add_node( $args );
-            
-        }, 9999 );
-    }
-    
-    
-    /**
      * remove wpdb error
      */
     public function suppressError(){
@@ -103,9 +84,6 @@ class NoticePlugin {
         if( is_admin() )
         {
             add_action( 'admin_notices', [$this, 'adminNotices']);
-            
-            if( WP_DEBUG )
-                add_action( 'init', [$this, 'debugInfo']);
         }
         else{
             

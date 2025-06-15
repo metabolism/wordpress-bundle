@@ -28,6 +28,7 @@ class WordpressTwigExtension extends AbstractExtension{
     public function getFilters(): array
     {
         return [
+            new TwigFilter('preview_text', [$this, 'previewText']),
             new TwigFilter( 'handle', 'sanitize_title' ),
             new TwigFilter( 'placeholder', [$this, 'placeholder'] ),
             new TwigFilter( 'more', [$this, 'more'] ),
@@ -93,6 +94,17 @@ class WordpressTwigExtension extends AbstractExtension{
             new TwigFunction( 'Term', function($id){ return TermFactory::create($id); } ),
             new TwigFunction( 'Image', function($id){ return Factory::create($id, 'image'); } )
         ];
+    }
+
+    
+    /**
+     * @param $text
+     * @param $preview_text
+     * @return string
+     */
+    public function previewText($text, $preview_text) {
+
+        return ((is_preview() || is_admin()) && empty($text)) ? $preview_text : $text;
     }
 
 

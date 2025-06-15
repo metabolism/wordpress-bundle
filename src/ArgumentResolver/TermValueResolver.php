@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\ArgumentResolver;
 
 use Metabolism\WordpressBundle\Entity\Term;
+use Metabolism\WordpressBundle\Interface\BCValueResolverInterface;
 use Metabolism\WordpressBundle\Repository\TermRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\ArgumentResolver;
 
 use Metabolism\WordpressBundle\Entity\Blog;
+use Metabolism\WordpressBundle\Interface\BCValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 

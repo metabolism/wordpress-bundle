@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\ArgumentResolver;
 
 use Metabolism\WordpressBundle\Entity\PostCollection;
+use Metabolism\WordpressBundle\Interface\BCValueResolverInterface;
 use Metabolism\WordpressBundle\Repository\PostRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

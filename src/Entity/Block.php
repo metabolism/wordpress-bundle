@@ -112,6 +112,14 @@ class Block extends Entity
     }
 
     /**
+     * @return string|ACFHelper
+     */
+    public function getProps(){
+
+        return $this->custom_fields;
+    }
+
+    /**
      * @return Post
      * @throws \Exception
      */
@@ -148,7 +156,7 @@ class Block extends Entity
 
             $post = $this->getPost();
 
-            $props = apply_filters('render_block_content', $this->custom_fields, $this);
+            $props = apply_filters('render_block_content', $this->getProps(), $this);
 
             $html = $template->render([
                 'props'=>$props,

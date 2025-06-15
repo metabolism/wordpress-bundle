@@ -3,6 +3,7 @@
 namespace Metabolism\WordpressBundle\ArgumentResolver;
 
 use Metabolism\WordpressBundle\Entity\User;
+use Metabolism\WordpressBundle\Interface\BCValueResolverInterface;
 use Metabolism\WordpressBundle\Repository\UserRepository;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
