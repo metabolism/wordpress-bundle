@@ -73,7 +73,9 @@ class Factory {
 	 * @param bool $default_class
 	 * @return Entity|mixed
 	 */
-	public static function create($id, $class, $default_class=false){
+	public static function create($data, $class, $default_class=false){
+
+        $id = is_array($data) ? ($data['id']??'') : $data;
 
 		if(empty($id))
 			return false;
@@ -84,6 +86,8 @@ class Factory {
             return $item;
 
 		$classname = self::getClassname($class);
+        print_r($class);
+        print_r($classname);
 
 		$app_classname = 'App\Entity\\'.$classname;
         $bundle_classname = $default_classname = 'Metabolism\WordpressBundle\Entity\\'.$classname;
@@ -93,14 +97,14 @@ class Factory {
 
 		if( class_exists($app_classname) && is_subclass_of($app_classname, $default_classname)  ){
 
-            $item = new $app_classname($id);
-		}
+            $item = new $app_classname($data);
+        }
 		else{
 
             if( class_exists($bundle_classname) )
-				$item = new $bundle_classname($id);
+				$item = new $bundle_classname($data);
 			elseif( $default_class )
-				$item = self::create($id, $default_class);
+				$item = self::create($data, $default_class);
 		}
 
 		if( is_wp_error($item) || !$item || !$item->exist() )
@@ -108,6 +112,6 @@ class Factory {
 
 		self::saveToCache($id, $item, $class);
 
-		return $item;
+        return $item;
 	}
 }

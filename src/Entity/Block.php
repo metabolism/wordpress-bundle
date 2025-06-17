@@ -36,6 +36,14 @@ class Block extends Entity
     }
 
     /**
+     * @return bool
+     */
+    public function exist(){
+
+        return str_starts_with( $this->ID, 'block_' );
+    }
+
+    /**
      * @return mixed
      */
     public function getName(){
@@ -72,12 +80,6 @@ class Block extends Entity
      * @return bool|array
      */
     private function get($block){
-
-        if( empty($block['blockName']??'') )
-            return false;
-
-        if( substr($block['blockName'], 0, 4) !== 'acf/')
-            return $block;
 
         if( class_exists('ACF') && !empty($block['attrs']) ){
 

@@ -4,6 +4,8 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
+use Metabolism\WordpressBundle\Factory\BlockFactory;
+
 use Metabolism\WordpressBundle\Repository\CommentRepository;
 use Metabolism\WordpressBundle\Repository\PostRepository;
 use Metabolism\WordpressBundle\Repository\TermRepository;
@@ -237,7 +239,7 @@ class Post extends Entity
                 
                 if( !empty($_block['blockName']) ){
                     
-                    $blocks[] = new Block($_block);
+                    $blocks[] = BlockFactory::create($_block);
                     $blocks_list[] = $_block['blockName'];
                 }
             }

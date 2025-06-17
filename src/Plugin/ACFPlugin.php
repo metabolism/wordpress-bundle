@@ -3,7 +3,7 @@
 namespace Metabolism\WordpressBundle\Plugin;
 
 use Metabolism\WordpressBundle\Entity\Block;
-
+use Metabolism\WordpressBundle\Factory\BlockFactory;
 
 /**
  * Class Metabolism\WordpressBundle Framework
@@ -48,7 +48,7 @@ class ACFPlugin {
             return;
         }
 
-        $block = new Block($block);
+        $block = BlockFactory::create($block);
         $is_preview = $_REQUEST['query']['preview']??false;
 
         echo $block->render($is_preview);
