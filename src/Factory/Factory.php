@@ -86,8 +86,6 @@ class Factory {
             return $item;
 
 		$classname = self::getClassname($class);
-        print_r($class);
-        print_r($classname);
 
 		$app_classname = 'App\Entity\\'.$classname;
         $bundle_classname = $default_classname = 'Metabolism\WordpressBundle\Entity\\'.$classname;
