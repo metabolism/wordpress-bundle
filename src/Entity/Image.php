@@ -662,6 +662,7 @@ class Image extends Entity
      * @param array $params
      * @param null $ext
      * @return array
+     * @throws \Exception
      */
     private function process($params, $ext=null){
 
@@ -784,7 +785,13 @@ class Image extends Entity
                 unlink($dest);
         }
 
-        $manager = ImageManager::gd();
+        if( extension_loaded('gd') )
+            $manager = ImageManager::gd();
+        elseif( extension_loaded('imagick') )
+            $manager = ImageManager::imagick();
+        else
+            throw new \Exception('No image manager is installed. Please install the GD or Imagick extension.');
+
         $image = $manager->read($this->src);
 
         foreach ($params as $type=>$param){

@@ -558,6 +558,14 @@ class Blog extends Entity
     }
 
     /**
+     * @alias
+     */
+    public function getLink($path = '', $scheme = null): string
+    {
+        return $this->getHomeLink($path, $scheme);
+    }
+
+    /**
      * @param string $path
      * @param null $scheme
      * @return string

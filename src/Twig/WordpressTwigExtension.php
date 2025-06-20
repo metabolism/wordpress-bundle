@@ -47,6 +47,7 @@ class WordpressTwigExtension extends AbstractExtension{
             new TwigFilter( 'wpautop','wpautop' ),
             new TwigFilter( 'array',[$this, 'toArray'] ),
             new TwigFilter( 'file_exists',[$this, 'fileExists'] ),
+            new TwigFilter( 'map_to_array',[$this, 'mapToArray'] ),
         ];
     }
 
@@ -97,6 +98,37 @@ class WordpressTwigExtension extends AbstractExtension{
     }
 
     
+    /**
+     * @param $text
+     * @param $preview_text
+     * @return string
+     */
+    public function mapToArray($items, $map) {
+
+        if ($items instanceof \Traversable)
+            $items = iterator_to_array($items);
+
+        return array_map(function ($item) use ($map) {
+
+            $result = [];
+
+            foreach ($map as $outputKey => $objectProperty) {
+
+                if (is_callable([$item, $objectProperty])) {
+                    $result[$outputKey] = $item->$objectProperty();
+                } elseif (isset($item->$objectProperty)) {
+                    $result[$outputKey] = $item->$objectProperty;
+                } else {
+                    $result[$outputKey] = null;
+                }
+            }
+
+            return $result;
+
+        }, $items);
+    }
+
+
     /**
      * @param $text
      * @param $preview_text
