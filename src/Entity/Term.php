@@ -265,6 +265,14 @@ class Term extends Entity
     }
 
     /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->getTitle();
+    }
+
+    /**
      * @return int|string
      */
     public function getGroup()

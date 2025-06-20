@@ -35,6 +35,7 @@ class Blog extends Entity
     protected $description;
     protected $is_admin;
     protected $language;
+    protected $language_code;
     protected $is_front_page;
     protected $is_customize_preview;
     protected $is_single;
@@ -177,10 +178,26 @@ class Blog extends Entity
      */
     public function getLanguage(): string
     {
-        if( is_null($this->language) )
-            $this->language = str_replace('_', '-', get_locale());
+        if( is_null($this->language) ){
+
+            if( !function_exists('format_code_lang') )
+                require_once ABSPATH . 'wp-admin/includes/ms.php';
+
+            $this->language = format_code_lang($this->getLanguageCode());
+        }
 
         return $this->language;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLanguageCode(): string
+    {
+        if( is_null($this->language_code) )
+            $this->language_code = str_replace('_', '-', get_locale());
+
+        return $this->language_code;
     }
 
     /**
@@ -279,7 +296,7 @@ class Blog extends Entity
     {
         if( is_null($this->locale) ){
 
-            $language = explode('-', $this->getLanguage());
+            $language = explode('-', $this->getLanguageCode());
             $this->locale = count($language) ? $language[0] : 'en';
         }
 

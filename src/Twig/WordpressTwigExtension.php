@@ -255,7 +255,7 @@ class WordpressTwigExtension extends AbstractExtension{
             if( !$height )
                 $height = $width;
 
-            $html = '<picture><img src="'.$this->generatePixel($width, $height).'" class="placeholder" width="'.$width.'" height="'.$height.'" alt="'.htmlspecialchars($alt, ENT_QUOTES, 'UTF-8').'"/></picture>';
+            $html = '<picture class="placeholder"><img src="'.$this->generatePixel($width, $height).'" width="'.$width.'" height="'.$height.'" alt="'.htmlspecialchars($alt, ENT_QUOTES, 'UTF-8').'"/></picture>';
         }
         else{
 

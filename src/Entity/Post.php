@@ -198,7 +198,6 @@ class Post extends Entity
         $type = get_post_type_object($this->type);
         return $type->$property??false;
     }
-    
     /**
      * @return bool
      */
@@ -206,8 +205,30 @@ class Post extends Entity
     {
         if( is_null($this->public) )
             $this->public = is_post_type_viewable($this->type);
-        
+
         return $this->public;
+    }
+
+    /**
+     * Get post date
+     *
+     * @param string|bool $format
+     * @return mixed|string|void
+     */
+    public function getPublished($format=true){
+
+        return $this->getDate($format);
+    }
+
+    /**
+     * Get post date
+     *
+     * @param string|bool $format
+     * @return mixed|string|void
+     */
+    public function getPublishedGmt($format=true){
+
+        return $this->getDateGmt($format);
     }
     
     /**
@@ -219,6 +240,18 @@ class Post extends Entity
     public function getDate($format=true){
         
         return $this->formatDate($this->post->post_date, $format);
+    }
+
+
+    /**
+     * Get post date gmt
+     *
+     * @param string|bool $format
+     * @return mixed|string|void
+     */
+    public function getDateGmt($format=true){
+
+        return $this->formatDate($this->post->post_date_gmt, $format);
     }
     
     /**
@@ -260,17 +293,6 @@ class Post extends Entity
     public function getModified($format=true){
         
         return $this->formatDate($this->post->post_modified, $format);
-    }
-    
-    /**
-     * Get post date gmt
-     *
-     * @param string|bool $format
-     * @return mixed|string|void
-     */
-    public function getDateGmt($format=true){
-        
-        return $this->formatDate($this->post->post_date_gmt, $format);
     }
     
     /**
