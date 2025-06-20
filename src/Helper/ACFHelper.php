@@ -166,7 +166,7 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
      * @return void
      */
     public function setValue($id, $value, $updateField=true){
-        
+
         $this->objects[$id]['value'] = $value;
         
         if( $updateField )
@@ -209,6 +209,10 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
         else{
             
             $this->objects = get_field_objects($this->entity_id, $load_value, $load_value);
+
+            if( !is_array($this->objects) )
+                $this->objects = [];
+
             wp_cache_set( $this->entity_id, $this->objects, 'acf_helper' );
         }
     }
