@@ -34,6 +34,12 @@ class TermRepository
             if( is_404() )
                 throw new \Exception('Term not found', 404);
 
+
+            if ( $taxonomy = get_query_var('taxonomy_listing') ){
+
+                return new TermCollection($taxonomy);
+            }
+
             if( is_archive() ){
 
                 if( !$id = get_queried_object_id() )

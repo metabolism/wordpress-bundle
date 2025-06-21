@@ -32,6 +32,9 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
             }
 			else{
 
+                if( is_string($args) )
+                    $args = ['post_type'=>$args];
+
                 $this->args = $args;
 
                 if( !isset($args['fields']) )

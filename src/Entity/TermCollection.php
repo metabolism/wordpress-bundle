@@ -31,6 +31,9 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
             }
 			else{
 
+                if( is_string($args) )
+                    $args = ['taxonomy'=>$args];
+
                 $this->args = $args;
 
                 if( !isset($args['fields']) )

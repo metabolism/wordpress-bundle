@@ -98,8 +98,13 @@ class PostRepository
      */
     public function findBy(array $criteria, $orderBy = null, $limit = null, $offset = null)
     {
-        if( $limit )
+        if( $limit ){
+
             $criteria['posts_per_page'] = $limit;
+
+            if( is_null($offset) )
+                $criteria['no_found_rows'] = true;
+        }
 
         if( $offset )
             $criteria['offset'] = $offset;

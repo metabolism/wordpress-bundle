@@ -25,7 +25,9 @@ class TwigGlobalSubscriber implements EventSubscriberInterface {
 		$blog = Blog::getInstance();
 
 		$this->twig->addGlobal('blog', $blog);
-		$this->twig->addGlobal('is_component_preview', false);
+		$this->twig->addGlobal('is_preview', false);
+        $this->twig->addGlobal('is_admin', false );
+        $this->twig->addGlobal('is_front_page', is_front_page() );
 
 		// retro-compatibility
 		if( env('MIGRATE_FROM_V1') )

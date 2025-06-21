@@ -54,10 +54,10 @@ class Permastruct{
         
         $this->addRoute('home', '', [], [], get_option('show_on_front') == 'posts');
         
-        global $wp_post_types;
+        $post_types = get_post_types([], 'object');
         
-        foreach ($wp_post_types as $post_type)
-        {
+        foreach ($post_types as $post_type) {
+
             if( $post_type->public && $post_type->publicly_queryable && $post_type->has_archive ){
                 
                 $base_struct = is_string($post_type->has_archive) ? $post_type->has_archive : $post_type->name;
@@ -65,6 +65,20 @@ class Permastruct{
                 $struct = empty($translated_slug) ? $base_struct : $translated_slug;
                 
                 $this->addRoute($post_type->name.'_archive', $struct, [], [], true);
+            }
+        }
+
+        $taxonomies = get_taxonomies([], 'object');
+
+        foreach ($taxonomies as $taxonomy) {
+
+            if( $taxonomy->public && $taxonomy->publicly_queryable && $taxonomy->has_archive??false ){
+
+                $base_struct = is_string($taxonomy->has_archive) ? $taxonomy->has_archive : $taxonomy->name;
+                $translated_slug = get_option( $taxonomy->name. '_rewrite_archive' );
+                $struct = empty($translated_slug) ? $base_struct : $translated_slug;
+
+                $this->addRoute($taxonomy->name.'_archive', $struct, [], [], true);
             }
         }
         
