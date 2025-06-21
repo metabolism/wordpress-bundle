@@ -72,7 +72,7 @@ class Permastruct{
 
         foreach ($taxonomies as $taxonomy) {
 
-            if( $taxonomy->public && $taxonomy->publicly_queryable && $taxonomy->has_archive??false ){
+            if( $taxonomy->public && $taxonomy->publicly_queryable && ($taxonomy->has_archive??false) ){
 
                 $base_struct = is_string($taxonomy->has_archive) ? $taxonomy->has_archive : $taxonomy->name;
                 $translated_slug = get_option( $taxonomy->name. '_rewrite_archive' );
