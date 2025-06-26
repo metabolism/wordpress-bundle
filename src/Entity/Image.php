@@ -961,6 +961,9 @@ class Image extends Entity
      */
     public function picture($w, $h=0, $sources=false, $alt=false, $loading='lazy', $params=[]){
 
+        if( !$w && !$h )
+            return '';
+
         $alt = $alt?:$this->alt;
         $alt = htmlspecialchars($alt?:'', ENT_QUOTES, 'UTF-8');
 
@@ -1018,7 +1021,12 @@ class Image extends Entity
 
             $image_info = getimagesize($file['src']);
 
-            $html .= '<img loading="'.$loading.'" src="'.$file['url'].'" alt="'.$alt.'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[1]?'height="'.$image_info[1].'"':'').'/>';
+            $focus_point = $this->getFocusPoint();
+
+            if( is_array($focus_point) )
+                $focus_point = 'style="--x:'.($focus_point['x']??50).'%;--y:'.($focus_point['y']??50).'%"';
+
+            $html .= '<img loading="'.$loading.'" src="'.$file['url'].'" '.$focus_point.' alt="'.$alt.'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[1]?'height="'.$image_info[1].'"':'').'/>';
         }
 
         $html .='</picture>';

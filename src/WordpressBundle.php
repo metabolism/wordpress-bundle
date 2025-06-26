@@ -19,7 +19,7 @@ class WordpressBundle extends Bundle
         return \dirname(__DIR__);
     }
 
-    public function boot()
+    public function boot(): void
     {
         Env::$options = Env::USE_ENV_ARRAY;
 
