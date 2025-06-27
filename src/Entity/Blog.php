@@ -5,6 +5,7 @@ namespace Metabolism\WordpressBundle\Entity;
 use lloc\Msls\MslsOptions;
 use lloc\Msls\MslsOptionsPost;
 use lloc\Msls\MslsOptionsTax;
+use Metabolism\WordpressBundle\Factory\BlogFactory;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Helper\ClassHelper;
 use Metabolism\WordpressBundle\Helper\FunctionHelper;
@@ -14,7 +15,6 @@ use Metabolism\WordpressBundle\Repository\TermRepository;
 use Metabolism\WordpressBundle\Repository\UserRepository;
 use Metabolism\WordpressBundle\Service\BreadcrumbService;
 use Metabolism\WordpressBundle\Service\PaginationService;
-use Metabolism\WordpressBundle\Traits\SingletonTrait;
 use Twig\Environment;
 
 /**
@@ -24,8 +24,6 @@ use Twig\Environment;
  */
 class Blog extends Entity
 {
-    use SingletonTrait;
-
     public $entity = 'blog';
 
     protected $debug;
@@ -64,6 +62,16 @@ class Blog extends Entity
 
     private $queried_object;
 
+    private static $instance;
+
+    public static function getInstance(){
+
+        if( is_null(self::$instance) )
+            self::$instance = BlogFactory::create();
+
+        return self::$instance;
+    }
+
     public function __toString(): string
     {
         return $this->getTitle();
@@ -73,9 +81,9 @@ class Blog extends Entity
      * Blog constructor.
      *
      */
-    public function __construct()
+    public function __construct($id)
     {
-        $this->ID = get_current_blog_id();
+        $this->ID = $id;
         $this->options = new OptionsHelper();
 
         $this->loadMetafields('options', 'blog');

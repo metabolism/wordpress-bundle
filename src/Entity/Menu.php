@@ -39,13 +39,14 @@ class Menu extends Entity
 		else
 			$this->itemClass = 'Metabolism\WordpressBundle\Entity\MenuItem';
 
-        if( is_string($id) )
+        if( !is_numeric($id) )
             $id = $this->getMenuIdFromLocations($id);
 
 		if ( $id && $menu = $this->get($id) ){
 
             $this->menu = $menu;
-            $this->ID = $id;
+
+            $this->ID = $menu->term_id;
             $this->title = $menu->name;
             $this->slug = $menu->slug;
 
