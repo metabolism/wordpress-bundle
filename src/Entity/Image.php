@@ -950,6 +950,43 @@ class Image extends Entity
         return $this->picture($w, $h, $sources, $alt, $loading);
     }
 
+
+    /**
+     * Generate transparent pixel base64 image
+     * @param $w
+     * @param $h
+     * @return string
+     */
+    private function generatePixel($w = 1, $h = 1) {
+
+        try{
+
+            ob_start();
+
+            if( $h == 0 )
+                $h = $w;
+            elseif( $w == 0 )
+                $w = $h;
+
+            $img = imagecreatetruecolor($w, $h);
+            imagetruecolortopalette($img, false, 1);
+            imagesavealpha($img, true);
+            $color = imagecolorallocatealpha($img, 0, 0, 0, 127);
+            imagefill($img, 0, 0, $color);
+            imagepng($img, null, 9);
+            imagedestroy($img);
+
+            $imagedata = ob_get_contents();
+            ob_end_clean();
+        }
+        catch (\Throwable $t){
+
+            $imagedata = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+        }
+
+        return 'data:image/png;base64,' . base64_encode($imagedata);
+    }
+
     /**
      * @param $w
      * @param int $h
@@ -969,14 +1006,14 @@ class Image extends Entity
 
         if( empty($this->src) || !is_readable($this->src) ){
 
-            $html = '<picture>';
+            $html = '<picture class="placeholder">';
             if( $sources && is_array($sources) ){
 
                 foreach ($sources as $media=>$size)
-                    $html .='<source media="('.$media.')" srcset="'.$this->placeholder($size[0], $size[1]??0).'" type="image/jpeg"/>';
+                    $html .='<source media="('.$media.')" srcset="'.$this->generatePixel($size[0], $size[1]??0).'" type="image/jpeg"/>';
             }
 
-            $html .= '<img loading="'.$loading.'" src="'.$this->placeholder($w, $h).'" alt="'.$alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
+            $html .= '<img loading="'.$loading.'" src="'.$this->generatePixel($w, $h).'" alt="'.$alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
             $html .='</picture>';
 
             return $html;

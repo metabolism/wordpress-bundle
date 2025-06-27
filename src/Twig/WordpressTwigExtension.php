@@ -46,6 +46,7 @@ class WordpressTwigExtension extends AbstractExtension{
             new TwigFilter( 'shortcodes', [$this, 'doShortcode'] ),
             new TwigFilter( 'wpautop','wpautop' ),
             new TwigFilter( 'array',[$this, 'toArray'] ),
+            new TwigFilter( 'nl2p',[$this, 'nl2p'], ['is_safe' => array('html')] ),
             new TwigFilter( 'file_exists',[$this, 'fileExists'] ),
             new TwigFilter( 'map_to_array',[$this, 'mapToArray'] ),
         ];
@@ -98,6 +99,21 @@ class WordpressTwigExtension extends AbstractExtension{
     }
 
     
+    /**
+     * @param $text
+     * @return string
+     */
+    public function nl2p($text) {
+
+        $blocks = explode("\n", str_replace(["\r\n", "\r"], "\n", $text));
+
+        $blocks = array_map(function ($block) {
+            return '<p>' . trim($block) . '</p>';
+        }, $blocks);
+
+        return implode("\n", $blocks);
+    }
+
     /**
      * @param $text
      * @param $preview_text
@@ -282,17 +298,10 @@ class WordpressTwigExtension extends AbstractExtension{
             $image = new Image($image['url']);
         }
 
-        if( !$image instanceof Image ){
+        if( !$image instanceof Image )
+            $image = new Image();
 
-            if( !$height )
-                $height = $width;
-
-            $html = '<picture class="placeholder"><img src="'.$this->generatePixel($width, $height).'" width="'.$width.'" height="'.$height.'" alt="'.htmlspecialchars($alt, ENT_QUOTES, 'UTF-8').'"/></picture>';
-        }
-        else{
-
-            $html = $image->picture($width, $height, $sources, $alt, $loading, $params);
-        }
+        $html = $image->picture($width, $height, $sources, $alt, $loading, $params);
 
         if( $params['figure']??false ){
 
