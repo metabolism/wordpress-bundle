@@ -290,6 +290,10 @@ class WordpressTwigExtension extends AbstractExtension{
 
             $image = new Image($image);
         }
+        elseif( is_array($image) && !empty($image['ID']??'') ){
+
+            $image = new Image($image['ID']);
+        }
         elseif( is_array($image) && !empty($image['url']??'') ){
 
             if( !$alt && isset($image['alt']) )

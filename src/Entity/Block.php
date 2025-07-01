@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
+use Metabolism\WordpressBundle\Factory\BlockFactory;
 use Metabolism\WordpressBundle\Helper\ACFHelper;
 use Metabolism\WordpressBundle\Helper\TwigHelper;
 use Metabolism\WordpressBundle\Repository\PostRepository;
@@ -20,6 +21,9 @@ class Block extends Entity
     protected $name;
 
     protected $block;
+
+    protected $inner_blocks;
+    protected $inner_blocks_list;
 
     /**
      * @param $block
@@ -70,6 +74,42 @@ class Block extends Entity
     /**
      * @return mixed
      */
+    public function getInnerBlocks(){
+
+        if( is_null($this->inner_blocks) ){
+
+            $blocks = $blocks_list = [];
+
+            foreach ($this->block['innerBlocks'] as $_block){
+
+                if( !empty($_block['blockName']) ){
+
+                    $blocks[] = BlockFactory::create($_block);
+                    $blocks_list[] = $_block['blockName'];
+                }
+            }
+
+            $this->inner_blocks = $blocks;
+            $this->inner_blocks_list = array_unique($blocks_list);
+        }
+
+        return $this->inner_blocks;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasInnerBlock($name){
+
+        if( is_null($this->inner_blocks_list) )
+            $this->getInnerBlocks();
+
+        return in_array($name, $this->inner_blocks_list);
+    }
+
+    /**
+     * @return mixed
+     */
     public function getAlignContent(){
 
         return $this->block['align_content']??'top';
@@ -79,7 +119,9 @@ class Block extends Entity
      * @param $block
      * @return bool|array
      */
-    private function get($block){
+    private function get($_block){
+
+        $block = $_block;
 
         if( class_exists('ACF') && !empty($block['attrs']) ){
 
@@ -89,7 +131,8 @@ class Block extends Entity
             if( $block = acf_prepare_block($attrs) ){
 
                 $block['blockName'] = $block['name'];
-                
+                $block['innerBlocks'] = $_block['innerBlocks']??[];
+
                 acf_setup_meta( $block['data']??[], $block['id'], true );
 
                 $this->loadMetafields($block['id'], 'block');

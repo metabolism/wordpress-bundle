@@ -264,14 +264,14 @@ class Post extends Entity
         if( is_null($this->blocks) ){
             
             $_blocks = parse_blocks($this->post->post_content);
-            
+
             $blocks = [];
             $blocks_list = [];
             
             foreach ($_blocks as $_block){
                 
                 if( !empty($_block['blockName']) ){
-                    
+
                     $blocks[] = BlockFactory::create($_block);
                     $blocks_list[] = $_block['blockName'];
                 }
