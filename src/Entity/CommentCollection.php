@@ -16,6 +16,8 @@ class CommentCollection implements \IteratorAggregate, \Countable, \ArrayAccess 
 
     protected $items=[];
 
+    protected $ids=[];
+
 	protected $pagination;
 
 	/**
@@ -60,6 +62,14 @@ class CommentCollection implements \IteratorAggregate, \Countable, \ArrayAccess 
 		return $this->items;
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getIds(){
+
+		return $this->ids;
+	}
+
     /**
      * @param array $comments
      * @return void
@@ -70,6 +80,8 @@ class CommentCollection implements \IteratorAggregate, \Countable, \ArrayAccess 
         $items = [];
 
         if( !isset($this->args['fields']) ){
+
+            $this->ids = $comments;
 
             foreach ($comments as $comment)
                 $items[] = Factory::create( $comment, 'comment' );

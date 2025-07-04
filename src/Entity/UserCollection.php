@@ -16,6 +16,8 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
     protected $items=[];
 
+    protected $ids=[];
+
 	protected $pagination;
 
 	/**
@@ -60,6 +62,14 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 		return $this->items;
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getIds(){
+
+		return $this->ids;
+	}
+
     /**
      * @param array $users
      * @return void
@@ -71,8 +81,10 @@ class UserCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
         if( !isset($this->args['fields']) ){
 
-        foreach ($users as $user)
-            $items[] = Factory::create( $user, 'user' );
+            $this->ids = $users;
+
+            foreach ($users as $user)
+                $items[] = Factory::create( $user, 'user' );
         }
         else{
 

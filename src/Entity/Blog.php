@@ -245,18 +245,26 @@ class Blog extends Entity
      * @param string $post_type
      * @return false|string
      */
-    public function getArchiveLink(string $post_type){
+    public function getArchiveLink(string $slug){
 
-        $post_type_obj = get_post_type_object( $post_type );
+        $post_type_obj = get_post_type_object( $slug );
+
+        if( $post_type_obj && $post_type_obj->has_archive??false )
+            return get_post_type_archive_link( $slug );
+
+        $taxonomy_type_obj = get_taxonomy( $slug );
+
+        if( function_exists('get_taxonomy_archive_link') && $taxonomy_type_obj && $taxonomy_type_obj->has_archive??false )
+            return get_taxonomy_archive_link( $slug );
 
         if( $post_type_obj->has_archive )
-            return get_post_type_archive_link($post_type);
+            return get_post_type_archive_link( $slug );
 
         if( function_exists('get_page_by_state') ){
 
-            if( $post = get_page_by_state('archive_'.$post_type) )
+            if( $post = get_page_by_state('archive_'.$slug) )
                 return get_permalink($post);
-            elseif( $post = get_page_by_state($post_type.'_archive') )
+            elseif( $post = get_page_by_state($slug.'_archive') )
                 return get_permalink($post);
         }
 

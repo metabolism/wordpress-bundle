@@ -16,6 +16,8 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
     protected $items=[];
 
+    protected $ids=[];
+
 	protected $pagination;
 
 	/**
@@ -61,6 +63,14 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	/**
 	 * @return array
 	 */
+	public function getIds(){
+
+		return $this->ids;
+	}
+
+	/**
+	 * @return array
+	 */
 	public function getItems(){
 
 		return $this->items;
@@ -78,8 +88,10 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
         if( !isset($this->args['fields']) ){
 
-        foreach ($terms as $term)
-            $items[] = TermFactory::create( $term );
+            $this->ids = $terms;
+
+            foreach ($terms as $term)
+                $items[] = TermFactory::create( $term );
         }
         else{
 

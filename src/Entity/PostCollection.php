@@ -17,6 +17,8 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
     protected $items=[];
 
+    protected $ids=[];
+
 	protected $pagination;
 
 	/**
@@ -64,6 +66,14 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 		return $this->items;
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getIds(){
+
+		return $this->ids;
+	}
+
     /**
      * @param array $posts
      * @return void
@@ -75,8 +85,10 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
         if( !isset($this->args['fields']) ){
 
-        foreach ($posts as $post)
-            $items[] = PostFactory::create( $post );
+            $this->ids = $posts;
+
+            foreach ($posts as $post)
+                $items[] = PostFactory::create( $post );
         }
         else{
 
