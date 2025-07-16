@@ -146,7 +146,7 @@ class PostRepository
      * @param array|null $orderBy
      * @return Post|null
      */
-    public function findOneBy(array $criteria, array $orderBy = null)
+    public function findOneBy(array $criteria, ?array $orderBy = null)
     {
         $posts = $this->findBy($criteria, $orderBy, 1);
 

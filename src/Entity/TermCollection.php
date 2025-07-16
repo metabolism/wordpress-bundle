@@ -4,6 +4,7 @@ namespace Metabolism\WordpressBundle\Entity;
 
 use ArrayIterator;
 use Metabolism\WordpressBundle\Factory\TermFactory;
+use Metabolism\WordpressBundle\Entity\Term;
 
 /**
  * Class Metabolism\WordpressBundle Framework
@@ -69,11 +70,25 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	}
 
 	/**
-	 * @return array
+	 * @return Term[]
 	 */
 	public function getItems(){
 
 		return $this->items;
+	}
+
+	/**
+	 * @return Term|false
+	 */
+	public function getCurrent(){
+
+        foreach ($this->getItems() as $term){
+
+            if( $term->isCurrent() )
+                return $term;
+        }
+
+        return false;
 	}
 
 

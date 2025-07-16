@@ -226,8 +226,11 @@ class Term extends Entity
      */
     public function isCurrent(): bool
     {
-        if( is_null($this->current) )
-            $this->current = $this->ID == get_queried_object_id();
+        if( is_null($this->current) ){
+
+            $query_var = get_query_var($this->taxonomy);
+            $this->current = $this->slug == $query_var;
+        }
 
         return $this->current;
     }

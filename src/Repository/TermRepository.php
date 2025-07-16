@@ -76,7 +76,7 @@ class TermRepository
     /**
      * @return TermCollection|Term[]
      */
-    public function findAll(array $orderBy = null, $public=true)
+    public function findAll(?array $orderBy = null, $public=true)
     {
         $taxonomies = $this->findTaxonomies(['publicly_queryable'=> $public]);
 
@@ -112,7 +112,7 @@ class TermRepository
      *
      * @return TermCollection|Term[]|array
      */
-    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function findBy(array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null)
     {
         if( $limit && $limit > 0 )
             $criteria['number'] = $limit;
@@ -136,7 +136,7 @@ class TermRepository
      * @param array|null $orderBy
      * @return Term
      */
-    public function findOneBy(array $criteria, array $orderBy = null)
+    public function findOneBy(array $criteria, ?array $orderBy = null)
     {
         $criteria['sort'] = false;
 

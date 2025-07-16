@@ -27,7 +27,7 @@ class CommentRepository
      *
      * @return CommentCollection|Comment[]
      */
-    public function findAll(array $orderBy = null)
+    public function findAll(?array $orderBy = null)
     {
         return $this->findBy([], $orderBy, -1);
     }
@@ -40,7 +40,7 @@ class CommentRepository
      * @param $offset
      * @return CommentCollection|Comment[]
      */
-    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function findBy(array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null)
     {
         if( $limit || !isset($criteria['number']) )
             $criteria['number'] = $limit?:5;
@@ -74,7 +74,7 @@ class CommentRepository
      * @param array|null $orderBy
      * @return Comment|null
      */
-    public function findOneBy(array $criteria, array $orderBy = null)
+    public function findOneBy(array $criteria, ?array $orderBy = null)
     {
         $comments = $this->findBy($criteria, $orderBy, 1);
 

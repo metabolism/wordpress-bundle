@@ -110,7 +110,7 @@ class Blog extends Entity
      * @param $offset
      * @return UserCollection
      */
-    public function getUsers($criteria=[], array $orderBy = null, $limit = null, $offset = null){
+    public function getUsers($criteria=[], ?array $orderBy = null, ?int $limit = null, ?int $offset = null){
 
         if( is_string($criteria) )
             $criteria = ['role'=>$criteria];
@@ -127,7 +127,7 @@ class Blog extends Entity
      * @param $offset
      * @return PostCollection
      */
-    public function getPosts($criteria=[], array $orderBy = null, $limit = null, $offset = null){
+    public function getPosts($criteria=[], ?array $orderBy = null, ?int $limit = null, ?int $offset = null){
 
         if( is_string($criteria) )
             $criteria = ['post_type'=>$criteria];
@@ -144,7 +144,7 @@ class Blog extends Entity
      * @param $offset
      * @return TermCollection
      */
-    public function getTerms($criteria=[], array $orderBy = null, $limit = null, $offset = null){
+    public function getTerms($criteria=[], ?array $orderBy = null, ?int $limit = null, ?int $offset = null){
 
         if( is_string($criteria) )
             $criteria = ['taxonomy'=>$criteria];

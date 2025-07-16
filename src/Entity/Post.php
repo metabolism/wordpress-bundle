@@ -812,7 +812,7 @@ class Post extends Entity
      * @param null $offset
      * @return CommentCollection
      */
-    public function getComments($criteria=[], array $orderBy = null, $limit = null, $offset = null) {
+    public function getComments($criteria=[], ?array $orderBy = null, ?int $limit = null, ?int $offset = null) {
         
         $default_args = [
             'status'=> 'approve',
@@ -905,7 +905,7 @@ class Post extends Entity
      * @param null $offset
      * @return TermCollection
      */
-    public function getTerms( $tax='', $criteria=[], array $orderBy = null, $limit = null, $offset = null ) {
+    public function getTerms( $tax='', $criteria=[], ?array $orderBy = null, ?int $limit = null, ?int $offset = null ) {
         
         if ( is_array($tax) )
             $criteria = $tax;
