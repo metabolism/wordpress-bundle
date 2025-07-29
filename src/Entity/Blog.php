@@ -64,6 +64,9 @@ class Blog extends Entity
 
     private static $instance;
 
+    /**
+     * @return Blog
+     */
     public static function getInstance(){
 
         if( is_null(self::$instance) )

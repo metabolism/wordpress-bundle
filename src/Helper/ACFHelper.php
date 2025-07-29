@@ -423,8 +423,10 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
             
                 if( isset($object['value']) && is_iterable($object['value']) ){
                     
-                    foreach($object['value'] as $post)
+                    foreach($object['value'] as $post){
+
                         $objects[$object['name']][] = $this->load('post', $post->ID);
+                    }
                 }
             
                 break;
@@ -434,11 +436,15 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
                     if( empty($object['value']) )
                         break;
                 
-                    if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'array'))
+                    if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'array')){
+
                         $objects[$object['name']] = $this->load('image', $object['value'], $object);
-                    else
+                    }
+                    else{
+
                         $objects[$object['name']] = $object['value'];
-                
+                    }
+
                     break;
                 
                 case 'gallery':
@@ -452,10 +458,15 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
 
                         foreach ($object['value'] as $value){
 
-                            if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'array'))
-                                $objects[$object['name']][] = $this->load('image', $value, $object);
-                            else
+                            if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'array')){
+
+                                $type = wp_attachment_is_image($value)?'image':'file';
+                                $objects[$object['name']][] = $this->load($type, $value, $object);
+                            }
+                            else{
+
                                 $objects[$object['name']][] = $value;
+                            }
                         }
                     }
                 
@@ -466,11 +477,15 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
                     if( empty($object['value']) )
                         break;
                 
-                    if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'array'))
+                    if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'array')){
+
                         $objects[$object['name']] = $this->load('file', $object['value'], $object);
-                    else
+                    }
+                    else{
+
                         $objects[$object['name']] = $object['value'];
-                
+                    }
+
                     break;
                 
                 case 'relationship':
@@ -481,13 +496,19 @@ class ACFHelper implements ArrayAccess, \IteratorAggregate
                         
                         foreach ($object['value'] as $value) {
                             
-                            if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'object'))
+                            if ($object['return_format'] == 'entity' || (!self::$use_entity && $object['return_format'] == 'object')){
+
                                 $item = $this->load('post', $value);
-                            else
+                            }
+                            else{
+
                                 $item = $value;
-                            
-                            if( $item )
+                            }
+
+                            if( $item ){
+
                                 $relationship[] = $item;
+                            }
                         }
                         
                         if( !empty($relationship) )
