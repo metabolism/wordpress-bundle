@@ -133,12 +133,15 @@ class Block extends Entity
                 $block['blockName'] = $block['name'];
                 $block['innerBlocks'] = $_block['innerBlocks']??[];
 
-                acf_setup_meta( $block['data']??[], $block['id'], true );
+                $data = $block['data']??[];
+                $data = !is_array($data)?[]:$data;
+
+                acf_setup_meta( $data, $block['id'], true );
 
                 $this->loadMetafields($block['id'], 'block');
 
                 $this->custom_fields->getFieldObjects();
-                $this->custom_fields->setData($block['data']??[]);
+                $this->custom_fields->setData($data);
             }
         }
 
