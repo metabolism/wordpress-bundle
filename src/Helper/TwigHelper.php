@@ -6,13 +6,17 @@ use App\Twig\AppExtension;
 use Metabolism\WordpressBundle\Twig\WordpressTwigExtension;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Symfony\Component\Asset\Package;
+use Symfony\Component\Asset\Packages;
+use Symfony\Bridge\Twig\Extension\AssetExtension;
+use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 
 class TwigHelper {
 
     private static $env;
 
 	/**
-	 * Todo: use real symfony twig env
+	 * Todo: use Micro Kernel with service autoload ( check perf )
 	 *
 	 * @return Environment
 	 */
@@ -29,6 +33,12 @@ class TwigHelper {
 		    $options['cache'] = BASE_URI.'/var/cache/'.WP_ENV.'/twig';
 
 	    $twig = new Environment($loader, $options);
+
+        if( class_exists('Symfony\Bridge\Twig\Extension\AssetExtension')){
+
+            $packages = new Packages(new Package(new EmptyVersionStrategy()));
+            $twig->addExtension(new AssetExtension($packages));
+        }
 
 	    if( class_exists('App\Twig\AppExtension'))
 		    $twig->addExtension(new AppExtension());
