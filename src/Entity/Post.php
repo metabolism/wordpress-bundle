@@ -568,19 +568,43 @@ class Post extends Entity
         if( $index ){
 
             // normalize
-            $content = html_entity_decode(strtolower(strip_tags($this->content)));
-            // keep only words > 3 char
-            $content = preg_replace("/\b\w{1,3}\b/u", '', $content);
-            //remove punctuation
-            $content = preg_replace("/[\(\)\*\.:\+%;\[\],'’#\-\/\?\!]/u", '', $content);
-            //remove multiple space
-            $content = preg_replace("/\s+/u", ' ', $content);
+            $content = html_entity_decode(strip_tags($this->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-            //keep unique words
-            $content = preg_split('/\s+/', $content);
-            $content = array_unique($content);
+            //remove url
+            $content = preg_replace('/https?:\/\/[^\s]+|www\.[^\s]+/i', '', $content);
 
-            return implode(' ', $content);
+            //normalize
+            if (class_exists('Normalizer'))
+                $content = Normalizer::normalize($content, Normalizer::FORM_C);
+
+            //to lower
+            $content = mb_strtolower($content, 'UTF-8');
+
+            //remove accents
+            if (class_exists('Transliterator')) {
+                $tr = Transliterator::create('NFD; [:Nonspacing Mark:] Remove; NFC');
+                if ($tr) $content = $tr->transliterate($content);
+            }
+
+            //keep letters only
+            $content = preg_replace('~[^\p{L}\s]+~u', ' ', $content);
+
+            //tokenize
+            $tokens = preg_split('~\s+~u', $content, -1, PREG_SPLIT_NO_EMPTY);
+
+            //remove short words
+            $tokens = array_filter($tokens, static function ($w) {
+                return mb_strlen($w, 'UTF-8') >= 4;
+            });
+
+            //dedups
+            $tokens = array_keys(array_flip($tokens));
+
+            //caps
+            if (count($tokens) > 250)
+                $tokens = array_slice($tokens, 0, 250);
+
+            return implode(' ', $tokens);
         }
 
         return $this->content;
