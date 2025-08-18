@@ -10,6 +10,8 @@ use Metabolism\WordpressBundle\Repository\CommentRepository;
 use Metabolism\WordpressBundle\Repository\PostRepository;
 use Metabolism\WordpressBundle\Repository\TermRepository;
 
+use StopWords\StopWords;
+
 /**
  * Class Post
  *
@@ -575,19 +577,25 @@ class Post extends Entity
 
             //normalize
             if (class_exists('Normalizer'))
-                $content = Normalizer::normalize($content, Normalizer::FORM_C);
+                $content = \Normalizer::normalize($content, \Normalizer::FORM_C);
 
             //to lower
             $content = mb_strtolower($content, 'UTF-8');
 
             //remove accents
             if (class_exists('Transliterator')) {
-                $tr = Transliterator::create('NFD; [:Nonspacing Mark:] Remove; NFC');
+                $tr = \Transliterator::create('NFD; [:Nonspacing Mark:] Remove; NFC');
                 if ($tr) $content = $tr->transliterate($content);
             }
 
             //keep letters only
             $content = preg_replace('~[^\p{L}\s]+~u', ' ', $content);
+
+            $locale = explode('_', get_locale())[0]??'en';
+
+            //remove stop words
+            $stopwords = new StopWords($locale);
+            $content = $stopwords->clean($content);
 
             //tokenize
             $tokens = preg_split('~\s+~u', $content, -1, PREG_SPLIT_NO_EMPTY);
@@ -601,8 +609,8 @@ class Post extends Entity
             $tokens = array_keys(array_flip($tokens));
 
             //caps
-            if (count($tokens) > 250)
-                $tokens = array_slice($tokens, 0, 250);
+            if (count($tokens) > 500)
+                $tokens = array_slice($tokens, 0, 500);
 
             return implode(' ', $tokens);
         }
