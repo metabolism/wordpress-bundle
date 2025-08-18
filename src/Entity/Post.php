@@ -33,6 +33,7 @@ class Post extends Entity
     protected $status;
     protected $type;
     protected $title;
+    protected $rewrite;
     protected $public;
     protected $thumbnail;
     protected $ancestor;
@@ -422,7 +423,21 @@ class Post extends Entity
         
         return $this->getLink();
     }
-    
+
+    /**
+     * @return bool
+     */
+    public function hasRewrite(): bool
+    {
+        if( is_null($this->rewrite) ){
+
+            $post_type = get_post_type_object($this->type);
+            $this->rewrite = is_array($post_type->rewrite)||$post_type->rewrite;
+        }
+
+        return $this->rewrite;
+    }
+
     /**
      * Get post path
      *

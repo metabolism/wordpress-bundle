@@ -35,6 +35,7 @@ class Term extends Entity
     protected $path;
     protected $parameters;
     protected $public;
+    protected $rewrite;
     protected $post_types;
 
     /** @var \WP_Term|bool */
@@ -195,6 +196,20 @@ class Term extends Entity
     }
 
     /**
+     * @return bool
+     */
+    public function hasRewrite(): bool
+    {
+        if( is_null($this->rewrite) ){
+
+            $taxonomy = get_taxonomy($this->taxonomy);
+            $this->rewrite = is_array($taxonomy->rewrite)||$taxonomy->rewrite;
+        }
+
+        return $this->rewrite;
+    }
+
+    /**
      * Get term children
      *
      * @return TermCollection
@@ -244,11 +259,14 @@ class Term extends Entity
     }
 
     /**
-     * @return string
+     * @return string|\WP_Taxonomy
      */
-    public function getTaxonomy(): string
+    public function getTaxonomy($return='name'): mixed
     {
-        return $this->taxonomy;
+        if( $return == 'object' )
+            return get_taxonomy($this->taxonomy);
+        else
+            return $this->taxonomy;
     }
 
     /**
