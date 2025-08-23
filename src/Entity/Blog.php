@@ -35,6 +35,7 @@ class Blog extends Entity
     protected $language;
     protected $language_code;
     protected $is_front_page;
+    protected $is_search;
     protected $is_customize_preview;
     protected $is_single;
     protected $is_tax;
@@ -389,6 +390,17 @@ class Blog extends Entity
             $this->is_front_page = is_front_page();
 
         return $this->is_front_page;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSearch(): bool
+    {
+        if( is_null($this->is_search) )
+            $this->is_search = is_search();
+
+        return $this->is_search;
     }
 
     /**
