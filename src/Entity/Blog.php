@@ -16,6 +16,7 @@ use Metabolism\WordpressBundle\Repository\UserRepository;
 use Metabolism\WordpressBundle\Service\BreadcrumbService;
 use Metabolism\WordpressBundle\Service\PaginationService;
 use Twig\Environment;
+use WP_Post;
 
 /**
  * Class Blog
@@ -60,8 +61,8 @@ class Blog extends Entity
     protected $title;
     protected $body_class;
     protected $menu;
-
-    private $queried_object;
+    protected $queried_object;
+    protected $queried_object_category;
 
     private static $instance;
 
@@ -105,6 +106,54 @@ class Blog extends Entity
         }
 
         return $this->queried_object;
+    }
+
+    /**
+     * @return string|null The queried object category.
+     */
+    public function getQueriedObjectCategory(){
+
+        if( is_null($this->queried_object) ){
+
+            $this->queried_object = '';
+
+            if( $this->isFrontPage() ){
+
+                $this->queried_object_category = 'homepage';
+            }
+            elseif( $post_type = $this->isSingle() ){
+
+                $this->queried_object_category = 'single-'.$post_type;
+
+                if( $post_type == 'page' ){
+
+                    $post = $this->getQueriedObject();
+                    $ancestors = get_post_ancestors( $post->ID );
+
+                    if( count($ancestors) ){
+
+                        $first = end($ancestors);
+
+                        $parent = get_post($first);
+                        $this->queried_object_category = $parent->post_name;
+                    }
+                }
+            }
+            elseif( $taxonomy = $this->isTax() ){
+
+                $this->queried_object_category = $taxonomy;
+            }
+            elseif( $archive = $this->isArchive() ){
+
+                $this->queried_object_category = $archive;
+            }
+            elseif( $taxonomy = $this->isSearch() ){
+
+                $this->queried_object_category = 'search';
+            }
+        }
+
+        return $this->queried_object_category;
     }
 
     /**
