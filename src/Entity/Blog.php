@@ -113,9 +113,9 @@ class Blog extends Entity
      */
     public function getQueriedObjectCategory(){
 
-        if( is_null($this->queried_object) ){
+        if( is_null($this->queried_object_category) ){
 
-            $this->queried_object = '';
+            $this->queried_object_category = '';
 
             if( $this->isFrontPage() ){
 
