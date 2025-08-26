@@ -41,8 +41,7 @@ class Term extends Entity
     /** @var \WP_Term|bool */
     protected $term;
 
-    public function __toString(): string
-    {
+    public function __toString(): string{
 
         return $this->title??'Invalid term';
     }

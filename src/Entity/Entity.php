@@ -15,7 +15,7 @@ use ReflectionMethod;
  *
  * @package Metabolism\WordpressBundle\Entity
  */
-abstract class Entity implements ArrayAccess
+abstract class Entity implements ArrayAccess, \JsonSerializable
 {
 	protected $ID;
 	protected $entity;
@@ -31,6 +31,11 @@ abstract class Entity implements ArrayAccess
      * @var bool|MetaHelper
      */
 	protected $meta = false;
+
+    public function jsonSerialize(): mixed {
+
+        return $this->__toString();
+    }
 
 	/**
 	 * @param $id
