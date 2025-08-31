@@ -17,7 +17,7 @@ class PaginationService
 		if( is_null($query) )
 			$query = $wp_query;
 
-	    $total = $query->max_num_pages ?? 1;
+	    $total = apply_filters('paginate_total', $query->max_num_pages ?? 1, $query);
 
 		if( $total <= 1 )
 			return false;
