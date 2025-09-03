@@ -271,20 +271,17 @@ class WordpressTwigExtension extends AbstractExtension{
      */
     public function picture($image, $width, $height=0, $sources=[], $alt=false, $loading='lazy', $params=[])
     {
-        if( is_array($alt) ){
-
+        if( is_array($alt) )
             $params = $alt;
-            $alt = $params['alt']??false;
-        }
 
-        if( is_array($loading) ){
-
+        if( is_array($loading) )
             $params = $loading;
-            $loading = $params['loading']??'lazy';
-        }
 
         if( !is_array($params) )
             $params = [];
+
+        $alt = $params['alt']??false;
+        $loading = $params['loading']??'lazy';
 
         if( is_string($image) && !empty($image) ){
 
