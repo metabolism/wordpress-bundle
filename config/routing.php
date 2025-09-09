@@ -11,6 +11,7 @@ class Permastruct{
     private $controller_name;
     private $wp_rewrite;
     private $locale;
+    private $structs;
     
     /**
      * Permastruct constructor.
@@ -72,13 +73,30 @@ class Permastruct{
 
         foreach ($taxonomies as $taxonomy) {
 
-            if( $taxonomy->public && $taxonomy->publicly_queryable && ($taxonomy->has_archive??false) ){
+            if( $taxonomy->public && $taxonomy->publicly_queryable ){
 
-                $base_struct = is_string($taxonomy->has_archive) ? $taxonomy->has_archive : $taxonomy->name;
-                $translated_slug = get_option( $taxonomy->name. '_rewrite_archive' );
-                $struct = empty($translated_slug) ? $base_struct : $translated_slug;
+                if( $taxonomy->has_archive??false ){
 
-                $this->addRoute($taxonomy->name.'_archive', $struct, [], [], true);
+                    $base_struct = is_string($taxonomy->has_archive) ? $taxonomy->has_archive : $taxonomy->name;
+                    $translated_slug = get_option( $taxonomy->name. '_rewrite_archive' );
+                    $struct = empty($translated_slug) ? $base_struct : $translated_slug;
+
+                    $this->addRoute($taxonomy->name.'_archive', $struct, [], [], true);
+                }
+
+                if( is_array($taxonomy->object_type) && count($taxonomy->object_type) > 1 ) {
+
+                    foreach ($taxonomy->object_type as $post_type) {
+
+                        $post_type_object = get_post_type_object($post_type);
+
+                        if( is_string($post_type_object->has_archive) ){
+
+                            $struct = $post_type_object->has_archive.'/'. $taxonomy->rewrite['slug'].'/%'.$taxonomy->name.'%';
+                            $this->addRoute($post_type_object->name.'_'.$taxonomy->name.'_archive', $struct, [], [], true);
+                        }
+                    }
+                }
             }
         }
         
@@ -165,8 +183,10 @@ class Permastruct{
      * @param array $defaults
      * @param bool $paginate
      */
-    public function addRoute( $name, $struct, $requirements=[], $defaults=[], $paginate=false )
-    {
+    public function addRoute( $name, $struct, $requirements=[], $defaults=[], $paginate=false ){
+
+        $this->structs[$struct] = $name;
+
         $struct = apply_filters('routing_struct', $struct, $name);
         $requirements = apply_filters('routing_requirements', $requirements, $struct, $name);
         

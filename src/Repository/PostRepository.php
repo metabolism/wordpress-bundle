@@ -42,7 +42,7 @@ class PostRepository
      *
      * @return PostCollection|Post[]
      */
-    public function findAll(array $orderBy = null, $public=true)
+    public function findAll(?array $orderBy, $public=true)
     {
         $post_types = $this->findPostTypes(['publicly_queryable'=>$public]);
 
