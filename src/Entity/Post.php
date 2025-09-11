@@ -260,7 +260,7 @@ class Post extends Entity
     /**
      * Get post blocks
      *
-     * @return array[]
+     * @return \App\Entity\Block[]
      */
     public function getBlocks(){
         

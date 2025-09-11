@@ -1063,7 +1063,7 @@ class Image extends Entity
             if( is_array($focus_point) )
                 $focus_point = 'style="--x:'.($focus_point['x']??50).'%;--y:'.($focus_point['y']??50).'%"';
 
-            $html .= '<img loading="'.$loading.'" src="'.$file['url'].'" '.$focus_point.' alt="'.$alt.'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[1]?'height="'.$image_info[1].'"':'').'/>';
+            $html .= '<img loading="'.$loading.'"'.(isset($params['fetchpriority'])?'fetchpriority="'.$params['fetchpriority'].'"':'').' src="'.$file['url'].'" '.$focus_point.' alt="'.$alt.'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[1]?'height="'.$image_info[1].'"':'').'/>';
         }
 
         $html .='</picture>';

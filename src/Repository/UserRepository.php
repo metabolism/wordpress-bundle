@@ -60,7 +60,7 @@ class UserRepository
      *
      * @return UserCollection|User[]
      */
-    public function findAll(?array $orderBy)
+    public function findAll(?array $orderBy = null)
     {
         return $this->findBy([], $orderBy, -1);
     }
@@ -73,7 +73,7 @@ class UserRepository
      * @param $offset
      * @return UserCollection|User[]
      */
-    public function findBy(array $criteria, ?array $orderBy, ?int $limit, ?int $offset)
+    public function findBy(array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null)
     {
         if( $limit || !isset($criteria['number']) )
             $criteria['number'] = $limit?:get_option( 'posts_per_page' );
@@ -107,7 +107,7 @@ class UserRepository
      * @param array|null $orderBy
      * @return User|null
      */
-    public function findOneBy(array $criteria, ?array $orderBy)
+    public function findOneBy(array $criteria, ?array $orderBy = null)
     {
         $users = $this->findBy($criteria, $orderBy, 1);
 
