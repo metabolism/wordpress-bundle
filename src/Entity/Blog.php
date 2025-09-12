@@ -453,7 +453,7 @@ class Blog extends Entity
 
             $base = str_replace('/%search%', '', $wp_rewrite->get_search_permastruct());
 
-            $this->is_search = is_search() || $wp_query->query['name']??'' == $base;
+            $this->is_search = is_search() || ($wp_query->query['name']??'' == $base);
         }
 
         return $this->is_search;

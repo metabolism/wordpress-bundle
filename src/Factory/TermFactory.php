@@ -25,7 +25,7 @@ class TermFactory {
 			else
 				return false;
 
-			if(  isset($id['taxonomy']))
+			if( isset($id['taxonomy']) )
 				$taxonomy_name = $id['taxonomy'];
 		}
 		if( is_object($id) ) {

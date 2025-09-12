@@ -19,6 +19,7 @@ class Term extends Entity
     protected $current;
     protected $count;
     protected $taxonomy;
+    protected $taxonomy_object;
     protected $slug;
     protected $title;
     protected $group;
@@ -122,6 +123,19 @@ class Term extends Entity
     }
 
     /**
+     * Get taxonomy object
+     *
+     * @return WP_Taxonomy|false
+     */
+    public function getTaxonomyObject(){
+
+        if( is_null($this->taxonomy_object) )
+            $this->taxonomy_object = get_taxonomy($this->taxonomy);
+
+        return $this->taxonomy_object;
+    }
+
+    /**
      * Get term path
      *
      * @return false|string
@@ -130,7 +144,7 @@ class Term extends Entity
 
         if( is_null($this->path) && $this->isPublic() ){
 
-            $taxonomy_object = get_taxonomy($this->taxonomy);
+            $taxonomy_object = $this->getTaxonomyObject();
 
             $path = str_replace(get_home_url(), '', $this->getLink());
 
@@ -159,7 +173,7 @@ class Term extends Entity
         if( is_null($this->parameters) && $this->isPublic() ){
 
             $parameters = [];
-            $taxonomy_object = get_taxonomy($this->taxonomy);
+            $taxonomy_object = $this->getTaxonomyObject();
 
             if( $rewrite_slug = $taxonomy_object->rewrite['slug']??false ){
 
@@ -201,7 +215,7 @@ class Term extends Entity
     {
         if( is_null($this->rewrite) ){
 
-            $taxonomy = get_taxonomy($this->taxonomy);
+            $taxonomy = $this->getTaxonomyObject();
             $this->rewrite = is_array($taxonomy->rewrite)||$taxonomy->rewrite;
         }
 
@@ -263,7 +277,7 @@ class Term extends Entity
     public function getTaxonomy($return='name'): mixed
     {
         if( $return == 'object' )
-            return get_taxonomy($this->taxonomy);
+            return $this->getTaxonomyObject();
         else
             return $this->taxonomy;
     }
@@ -358,7 +372,24 @@ class Term extends Entity
      *
      * @return false|string
      */
-    public function getLink(){
+    public function getLink($post_type=false){
+
+        if( $post_type ){
+
+            $taxonomy_object = $this->getTaxonomyObject();
+
+            if ( count($taxonomy_object->object_type) > 1 && $url = get_post_type_archive_link($post_type) ){
+
+                if( !$taxonomy_object->rewrite ){
+
+                    return add_query_arg($this->taxonomy, $this->slug, $url);
+                }
+                else{
+
+                    return $url.'/'.$taxonomy_object->rewrite['slug'].'/'.$this->slug;
+                }
+            }
+        }
 
         if( is_null($this->link) )
             $this->link = get_term_link( $this->term );

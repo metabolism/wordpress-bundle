@@ -105,8 +105,10 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
             $this->ids = $terms;
 
-            foreach ($terms as $term)
+            foreach ($terms as $term){
+
                 $items[] = TermFactory::create( $term );
+            }
         }
         else{
 
@@ -142,14 +144,6 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 */
 	public function count(): int
 	{
-        if( $this->query ){
-
-            $count = wp_count_terms($this->query->query_vars);
-
-            if( !is_wp_error($count) && $count )
-                return intval($count);
-        }
-
         return count($this->items);
 	}
 

@@ -203,8 +203,10 @@ class Permastruct{
         
         $this->collection->add($name.$locale, $route);
         
-        if( $paginate && !empty($paths['archive']) )
-        {
+        if( $paginate && !empty($paths['archive']) ) {
+
+            $requirements['page'] = '\d+';
+
             $route = new Route( $paths['archive'], $defaults, $requirements);
             $route->setMethods('GET');
             
