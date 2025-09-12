@@ -462,8 +462,16 @@ class Post extends Entity
 
                 if( $rewrite_slug = $post_type_object->rewrite['slug']??false ){
 
-                    $rewrite_slug = preg_replace('/{([^%]+)}/m', '([^\/]+)', str_replace('/','\/', '/'.$rewrite_slug));
-                    $path = preg_replace('/^'.$rewrite_slug.'/m', '', $path);
+                    $parts = explode('/', $rewrite_slug);
+                    $regexp = str_replace('/','\/', $rewrite_slug);
+
+                    foreach( $parts as $part ){
+
+                        $capture = preg_replace('/{([^%]+)}/m', '([^\/]+)', $part);
+                        $regexp = str_replace($part, $capture, $regexp);
+                    }
+
+                    $path = preg_replace('/'.$regexp.'/m', '', $path);
                 }
 
                 if( str_starts_with($path, '/') )
@@ -490,21 +498,26 @@ class Post extends Entity
 
             if( $rewrite_slug = $rewrite['slug']??false ){
 
-                preg_match_all('/{([^%]+)}/m', $rewrite_slug, $matches, PREG_SET_ORDER);
+                $parts = explode('/', $rewrite_slug);
 
-                foreach ($matches as $match){
+                foreach( $parts as $part ){
 
-                    if( $term = $this->getTerm($match[1]) )
-                        $parameters[$match[1]] = $term->getSlug();
+                    preg_match_all('/{([^%]+)}/m', $part, $matches, PREG_SET_ORDER);
+
+                    if( !$tax = $matches[0][1]??false )
+                        continue;
+
+                    if( $term = $this->getTerm($tax) )
+                        $parameters[$tax] = $term->getSlug();
                     else
-                        $parameters[$match[1]] = 'default';
+                        $parameters[$tax] = 'default';
                 }
             }
 
             if( $this->getType() == 'page' )
                 $parameters['pagename'] = $this->getPath();
             else
-                $parameters[$this->getType()] = $this->getPath();
+                $parameters[$this->getType()] = $this->getSlug();
 
             $this->parameters = $parameters;
         }
