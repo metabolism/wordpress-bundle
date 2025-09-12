@@ -432,7 +432,7 @@ class Post extends Entity
         if( is_null($this->rewrite) ){
 
             $post_type = get_post_type_object($this->type);
-            $this->rewrite = is_array($post_type->rewrite)||$post_type->rewrite;
+            $this->rewrite = $post_type->name==='page'||$post_type->name==='post'||is_array($post_type->rewrite)||$post_type->rewrite;
         }
 
         return $this->rewrite;
@@ -662,6 +662,15 @@ class Post extends Entity
     
     /**
      * Get thumbnail
+     * @return bool
+     */
+    public function hasThumbnail(){
+
+        return $this->getThumbnail() !== false;
+    }
+
+    /**
+     * Get thumbnail
      *
      * @param int $width
      * @param int $height
@@ -676,6 +685,8 @@ class Post extends Entity
             
             if( $post_thumbnail_id )
                 $this->thumbnail = Factory::create($post_thumbnail_id, 'image');
+            else
+                $this->thumbnail = false;
         }
         
         if( !func_num_args() || !$this->thumbnail ){

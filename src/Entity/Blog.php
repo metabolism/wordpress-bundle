@@ -446,8 +446,15 @@ class Blog extends Entity
      */
     public function isSearch(): bool
     {
-        if( is_null($this->is_search) )
-            $this->is_search = is_search();
+        if( is_null($this->is_search) ){
+
+            global $wp_query;
+            global $wp_rewrite;
+
+            $base = str_replace('/%search%', '', $wp_rewrite->get_search_permastruct());
+
+            $this->is_search = is_search() || $wp_query->query['name']??'' == $base;
+        }
 
         return $this->is_search;
     }

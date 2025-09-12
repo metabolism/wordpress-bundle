@@ -143,10 +143,10 @@ class Permastruct{
         }
 
         if( isset($this->wp_rewrite->page_structure) )
-            $this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9]{2}[^/].*']);
+            $this->addRoute('page', $this->wp_rewrite->page_structure, ['pagename'=>'[a-zA-Z0-9-_]{2}[^/].*']);
 
         if( isset($this->wp_rewrite->permalink_structure) && substr($this->wp_rewrite->page_structure??'', 0, 1) != '%' )
-            $this->addRoute('post', $this->wp_rewrite->permalink_structure, ['postname'=>'[a-zA-Z0-9]{2}[^/].*']);
+            $this->addRoute('post', $this->wp_rewrite->permalink_structure, ['postname'=>'[a-zA-Z0-9-_]{2}[^/].*']);
     }
     
     
