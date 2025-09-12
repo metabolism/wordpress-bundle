@@ -569,6 +569,8 @@ class Post extends Entity
                     else{
 
                         $data = $block['attrs']['data']??[];
+                        $data = is_array($data)?$data:[];
+
                         $content = [];
 
                         foreach ($data as $key=>$value){
