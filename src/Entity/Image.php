@@ -1001,7 +1001,7 @@ class Image extends Entity
         if( !$w && !$h )
             return '';
 
-        $alt = $alt?:$this->alt;
+        $alt = $alt?:($this->alt?:$this->title);
         $alt = htmlspecialchars($alt?:'', ENT_QUOTES, 'UTF-8');
 
         if( empty($this->src) || !is_readable($this->src) ){
