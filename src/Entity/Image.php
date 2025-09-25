@@ -550,7 +550,6 @@ class Image extends Entity
             return 'File does not exist';
     }
 
-
     /**
      * @return mixed
      */
@@ -1022,7 +1021,14 @@ class Image extends Entity
         $ext = function_exists('imagewebp') ? 'webp' : null;
         $mime = function_exists('imagewebp') ? 'image/webp' : $this->mime_type;
 
-        $html = '<picture>';
+        if( ($params['blurhash']??true) && $blurhash = $this->getBlurhash() ){
+
+            $html = '<picture data-hash="'.$blurhash.'">';
+        }
+        else{
+
+            $html = '<picture>';
+        }
 
         if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' ){
 
