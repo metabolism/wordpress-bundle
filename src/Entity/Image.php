@@ -1021,7 +1021,7 @@ class Image extends Entity
         $ext = function_exists('imagewebp') ? 'webp' : null;
         $mime = function_exists('imagewebp') ? 'image/webp' : $this->mime_type;
 
-        if( ($params['blurhash']??true) && $blurhash = $this->getBlurhash() ){
+        if( ($params['blurhash']??false) && $loading == 'lazy' && $blurhash = $this->getBlurhash() ){
 
             $html = '<picture data-hash="'.$blurhash.'">';
         }
