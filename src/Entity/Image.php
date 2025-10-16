@@ -1021,6 +1021,8 @@ class Image extends Entity
         $ext = function_exists('imagewebp') ? 'webp' : null;
         $mime = function_exists('imagewebp') ? 'image/webp' : $this->mime_type;
 
+        $max_retina = 960;
+
         if( ($params['blurhash']??false) && $loading == 'lazy' && $blurhash = $this->getBlurhash() ){
 
             $html = '<picture data-hash="'.$blurhash.'">';
@@ -1040,28 +1042,92 @@ class Image extends Entity
 
                 foreach ($sources as $media=>$size){
 
-                    $params['resize'] = $size;
+                    $target_width = $size[0] ?? 0;
+                    $target_height = $size[1] ?? 0;
 
                     if( is_int($media) )
                         $media = 'max-width: '.$media.'px';
 
-                    if( $ext == 'webp' )
-                        $html .='<source media="('.$media.')" srcset="'.$this->edit($params, $ext).'" type="'.$mime.'"/>';
+                    $params['resize'] = [$target_width, $target_height];
 
-                    $html .='<source media="('.$media.')" srcset="'.$this->edit($params).'" type="'.$this->mime_type.'"/>';
+                    if( $ext == 'webp' ){
+
+                        $url = $this->edit($params, $ext);
+
+                        if( ($target_width > 0 && $target_width < $max_retina && $target_height < $max_retina) || ($target_height > 0 && $target_height < $max_retina && $target_width < $max_retina) ) {
+
+                            $params['resize'] = [$target_width * 2, $target_height * 2];
+                            $url_2x = $this->edit($params, $ext);
+
+                            $html .= '<source media="(' . $media . ')" srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $mime . '"/>';
+                        }
+                        else{
+
+                            $html .= '<source media="(' . $media . ')" srcset="' . $url . '" type="' . $mime . '"/>';
+                        }
+                    }
+                    else{
+
+                        $url = $this->edit($params);
+
+                        if( ($target_width > 0 && $target_width < $max_retina && $target_height < $max_retina) || ($target_height > 0 && $target_height < $max_retina && $target_width < $max_retina) ) {
+
+                            $params['resize'] = [$target_width * 2, $target_height * 2];
+                            $url_2x = $this->edit($params);
+
+                            $html .= '<source media="(' . $media . ')" srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $this->mime_type . '"/>';
+                        }
+                        else{
+
+                            $html .= '<source media="(' . $media . ')" srcset="' . $url . '" type="' . $this->mime_type . '"/>';
+                        }
+                    }
                 }
             }
 
-            $params['resize'] = [$w, $h];
+            $size = [$w, $h];
 
-            if( $ext == 'webp' && ($w || $h) )
-                $html .='<source srcset="'.$this->edit($params, $ext).'" type="'.$mime.'"/>';
+            $target_width = $size[0] ?? 0;
+            $target_height = $size[1] ?? 0;
 
-            if( !$w && !$h )
-                $file = ['src'=>$this->src, 'url'=>$this->file];
-            else
-                $file = $this->edit($params, null, 'object');
+            $params['resize'] = [$target_width, $target_height];
 
+            if( $ext == 'webp' ){
+
+                $url = $this->edit($params, $ext);
+
+                if( ($target_width > 0 && $target_width < $max_retina && $target_height < $max_retina) || ($target_height > 0 && $target_height < $max_retina && $target_width < $max_retina) ) {
+
+                    $params['resize'] = [$target_width * 2, $target_height * 2];
+                    $url_2x = $this->edit($params, $ext);
+
+                    $html .= '<source srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $mime . '"/>';
+                }
+                else{
+
+                    $html .= '<source srcset="' . $url . '" type="' . $mime . '"/>';
+                }
+            }
+            else{
+
+                $url = $this->edit($params);
+
+                if( ($target_width > 0 && $target_width < $max_retina && $target_height < $max_retina) || ($target_height > 0 && $target_height < $max_retina && $target_width < $max_retina) ) {
+
+                    $params['resize'] = [$target_width * 2, $target_height * 2];
+                    $url_2x = $this->edit($params);
+
+                    $html .= '<source srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $this->mime_type . '"/>';
+                }
+                else{
+
+                    $html .= '<source srcset="' . $url . '" type="' . $this->mime_type . '"/>';
+                }
+            }
+
+            $params['resize'] = [$target_width, $target_height];
+
+            $file = $this->edit($params, null, 'object');
             $image_info = getimagesize($file['src']);
 
             $focus_point = $this->getFocusPoint();
