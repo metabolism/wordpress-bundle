@@ -79,7 +79,7 @@ class File extends Entity
                 $file = get_post_meta($id, '_wp_attached_file', true);
                 $filename = $this->uploadDir('basedir').'/'.$file;
 
-                if( !is_readable( $filename) )
+                if( !is_readable( $filename ) || !is_file($filename) )
                     return;
 
                 $this->ID = $post->ID;

@@ -266,7 +266,7 @@ class Image extends Entity
 
                 $filename = self::uploadDir('basedir').'/'.$file;
 
-                if( !is_readable( $filename) )
+                if( !is_readable( $filename) || !is_file($filename) )
                     return;
 
                 $this->ID = $post->ID;
@@ -296,7 +296,7 @@ class Image extends Entity
 
             $filename = BASE_URI.PUBLIC_DIR.$id;
 
-            if( is_dir( $filename ) || !is_readable($filename) )
+            if( !is_readable($filename) || !is_file( $filename ) )
                 return;
 
             $this->ID = 0;
@@ -648,9 +648,6 @@ class Image extends Entity
     public function edit($params, $ext=null, $output='url'){
 
         $file = $this->process($params, $ext);
-
-        if( !is_file($file['src']) )
-            throw new \Exception('Unable to open file, src is not a file.');
 
         $file['url'] = str_replace(self::uploadDir('basedir'), self::uploadDir('baseurl'), $file['src']);
         $file['url'] = str_replace(BASE_URI.PUBLIC_DIR, '', $file['url']);
@@ -1134,7 +1131,8 @@ class Image extends Entity
             $params['resize'] = [$target_width, $target_height];
 
             $file = $this->edit($params, null, 'object');
-            $image_info = getimagesize($file['src']);
+
+            $image_info = is_readable($file['src'])?getimagesize($file['src']):[0,0];
 
             $focus_point = $this->getFocusPoint();
 
