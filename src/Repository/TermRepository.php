@@ -120,8 +120,11 @@ class TermRepository
         if( $offset )
             $criteria['offset'] = $offset;
 
-        if( $orderBy )
-            $criteria = ['orderby' => $orderBy[0], 'order' => $orderBy[1]??'DESC'];
+        if( $orderBy ){
+
+            $criteria['orderby'] = $orderBy[0]??'name';
+            $criteria['order'] = $orderBy[1]??'ASC';
+        }
 
         $collection = new TermCollection($criteria);
 

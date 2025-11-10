@@ -643,10 +643,14 @@ class Image extends Entity
      * @param array $params
      * @param null $ext
      * @return string|array
+     * @throws \Exception
      */
     public function edit($params, $ext=null, $output='url'){
 
         $file = $this->process($params, $ext);
+
+        if( !is_file($file['src']) )
+            throw new \Exception('Unable to open file, src is not a file.');
 
         $file['url'] = str_replace(self::uploadDir('basedir'), self::uploadDir('baseurl'), $file['src']);
         $file['url'] = str_replace(BASE_URI.PUBLIC_DIR, '', $file['url']);
