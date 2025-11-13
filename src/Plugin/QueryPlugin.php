@@ -14,7 +14,7 @@ class QueryPlugin {
      */
     public function parse_query($query ) {
 
-        if( $query->is_main_query() && ($query->is_tax() || $query->is_single()) && !$query->is_404 ){
+        if( $query->is_main_query() && $query->is_tax() && !$query->is_404 ){
 
             if( !$query->get_queried_object_id() )
                 $query->set_404();
