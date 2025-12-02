@@ -87,7 +87,7 @@ class NoticePlugin {
         }
         else{
             
-            if( HEADLESS )
+            if( WP_HEADLESS )
                 add_action( 'init', [$this, 'suppressError']);
         }
     }

@@ -18,6 +18,14 @@ class ConfigLoader{
 
         Env::$options = Env::USE_ENV_ARRAY;
 
+        $symfony_env_vars = explode(',', $_ENV['SYMFONY_DOTENV_VARS']??'');
+
+        foreach ($symfony_env_vars as $var) {
+
+            if( str_starts_with($var, 'WP_') && !defined($var) )
+                define($var, env($var) );
+        }
+
         if (!defined('BASE_URI')) {
 
             $base_uri = realpath($root_dir);
@@ -25,10 +33,10 @@ class ConfigLoader{
         }
 
         if( !defined('WPS_YAML_FILE') )
-            define('WPS_YAML_FILE', BASE_URI.$yaml_filepath);
+            define( 'WPS_YAML_FILE', BASE_URI.$yaml_filepath);
 
         if( !defined('WPS_YAML_TRANSLATION_FILES') )
-            define('WPS_YAML_TRANSLATION_FILES', BASE_URI.'/translations');
+            define( 'WPS_YAML_TRANSLATION_FILES', BASE_URI.'/translations');
 
         /**
          * Get paths
@@ -49,11 +57,19 @@ class ConfigLoader{
         /**
          * Define basic environment
          */
-        define( 'WP_ENV', $env);
-        define( 'WP_DEBUG', $env === 'development');
-        define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
+        if (!defined('WP_ENV'))
+            define( 'WP_ENV', $env);
+
+        if (!defined('WP_DEBUG'))
+            define( 'WP_DEBUG', $env === 'development');
+
+        if (!defined('WP_DEBUG_DISPLAY'))
+            define( 'WP_DEBUG_DISPLAY', WP_DEBUG);
+
         define( 'SCRIPT_DEBUG', WP_DEBUG);
-        define( 'WP_ENVIRONMENT_TYPE', $env);
+
+        if (!defined('WP_ENVIRONMENT_TYPE'))
+            define( 'WP_ENVIRONMENT_TYPE', $env);
 
         /**
          * Enable multisite
@@ -71,8 +87,8 @@ class ConfigLoader{
                 define( 'PATH_CURRENT_SITE', env('PATH_CURRENT_SITE')?:'/');
             }
         }
-        else
-        {
+        elseif (!defined('WP_ALLOW_MULTISITE')){
+
             define( 'WP_ALLOW_MULTISITE', true );
         }
 
@@ -86,7 +102,8 @@ class ConfigLoader{
             $wp_home = $request->getSchemeAndHttpHost();
         }
 
-        define( 'WP_FOLDER', '/'.$wp_folder);
+        if (!defined('WP_FOLDER'))
+            define( 'WP_FOLDER', '/'.$wp_folder);
 
         if( !defined('WP_HOME') )
             define( 'WP_HOME', $wp_home);
@@ -94,7 +111,8 @@ class ConfigLoader{
         if( !$wp_siteurl = env('WP_SITEURL') )
             $wp_siteurl = WP_HOME.WP_FOLDER;
 
-        define( 'WP_SITEURL', $wp_siteurl);
+        if (!defined('WP_SITEURL'))
+            define( 'WP_SITEURL', $wp_siteurl);
 
         if(isset($_SERVER['SERVER_NAME']) && filter_var($_SERVER['SERVER_NAME'], FILTER_VALIDATE_IP) !== false)
             define('COOKIE_DOMAIN', '' );
@@ -150,12 +168,12 @@ class ConfigLoader{
 
         if( $cookie_prefix = env('COOKIE_PREFIX') ) {
 
-            define('USER_COOKIE', $cookie_prefix . '_user_' . COOKIEHASH);
-            define('PASS_COOKIE', $cookie_prefix . '_pass_' . COOKIEHASH);
-            define('AUTH_COOKIE', $cookie_prefix . '_' . COOKIEHASH);
-            define('SECURE_AUTH_COOKIE', $cookie_prefix . '_sec_' . COOKIEHASH);
-            define('LOGGED_IN_COOKIE', $cookie_prefix . '_logged_in_' . COOKIEHASH);
-            define('TEST_COOKIE', 'test_cookie_' . COOKIEHASH);
+            define( 'USER_COOKIE', $cookie_prefix . '_user_' . COOKIEHASH);
+            define( 'PASS_COOKIE', $cookie_prefix . '_pass_' . COOKIEHASH);
+            define( 'AUTH_COOKIE', $cookie_prefix . '_' . COOKIEHASH);
+            define( 'SECURE_AUTH_COOKIE', $cookie_prefix . '_sec_' . COOKIEHASH);
+            define( 'LOGGED_IN_COOKIE', $cookie_prefix . '_logged_in_' . COOKIEHASH);
+            define( 'TEST_COOKIE', 'test_cookie_' . COOKIEHASH);
         }
 
         /**
@@ -210,10 +228,13 @@ class ConfigLoader{
         if (!defined('WP_DEFAULT_THEME'))
             define('WP_DEFAULT_THEME', 'empty');
 
-        foreach (['HEADLESS', 'URL_MAPPING', 'BUILD_HOOK', 'BUILD_BADGE', 'GOOGLE_MAP_API_KEY', 'GOOGLE_TRANSLATE_KEY', 'DEEPL_KEY'] as $key){
+        /**
+         * Retro compatibility
+         */
+        foreach (['HEADLESS', 'URL_MAPPING', 'BUILD_HOOK', 'GOOGLE_MAP_API_KEY', 'GOOGLE_TRANSLATE_KEY', 'DEEPL_KEY'] as $key){
 
-            if (!defined($key))
-                define($key, env($key) );
+            if (!defined('WP_'.$key))
+                define('WP_'.$key, env($key) );
         }
 
         /**
