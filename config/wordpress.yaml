@@ -15,15 +15,21 @@ wordpress:
   gutenberg:
     replace_reset_styles: true
     remove_core_block: true
-    remove_plugin_block: false
+    remove_plugin_block:
+      - lloc/msls-widget-block
+      - yoast/faq-block
+      - yoast/how-to-block
+      - yoast-seo/breadcrumbs
     remove_core_block_patterns: true
     disable_classic_theme_styles: true
     remove_block_library: true
+    block_sorting: true
     load_remote_block_patterns: false
     #block_editor_style: '/build/bundle.css'
     #block_editor_script: '/blocks.js'
     render_template: 'blocks/{name}.html.twig'
     preview_image: '/app/blocks/{name}.png'
+    preview_width: 375
 
 
   #########################
@@ -33,6 +39,7 @@ wordpress:
   image:
     compression: 95 #on the fly compression ratio
     max_size: 2 #Max image file size on upload
+    svg: true
     resize: #resize image on upload to save server space
       max_width: 1920
       max_height: 2160
@@ -58,8 +65,9 @@ wordpress:
 
   ## Hide page from submenu
   remove_submenu_page:
+    - themes.php: site-editor.php
     - themes.php: site-editor.php?path=/patterns
-    #- themes.php: nav-menus.php
+  #  - themes.php: nav-menus.php
 
   ## Handle Customize experience on the server-side.
   ## https://developer.wordpress.org/reference/classes/wp_customize_manager/
@@ -72,29 +80,29 @@ wordpress:
   mce:
     #css: '/static/editor_style.css'
     buttons:
-    - formatselect
-    - bold
-    - italic
-    - underline
-    - sup
-    - strikethrough
-    - superscript
-    - subscript
-    - bullist
-    - numlist
-    - blockquote
-    - hr
-    - table
-    - alignleft
-    - aligncenter
-    - alignright
-    - alignjustify
-    - link
-    - unlink
-    - wp_more
-    - spellchecker
-    - wp_adv
-    - dfw
+      - formatselect
+      - bold
+      - italic
+      - underline
+      - sup
+      - strikethrough
+      - superscript
+      - subscript
+      - bullist
+      - numlist
+      - blockquote
+      - hr
+      - table
+      - alignleft
+      - aligncenter
+      - alignright
+      - alignjustify
+      - link
+      - unlink
+      - wp_more
+      - spellchecker
+      - wp_adv
+      - dfw
 
   #editor_style: backoffice.css
 
@@ -106,8 +114,8 @@ wordpress:
   support:
     - page #enable page
     #- post #enable post
-    - tag #enable tag taxonomy for post
-    - category #enable category taxonomy for post
+    #- tag #enable tag taxonomy for post
+    #- category #enable category taxonomy for post
 
   ## Add post type support
   ## https://developer.wordpress.org/reference/functions/post_type_supports/
@@ -118,7 +126,7 @@ wordpress:
   ## Add theme support
   ## https://developer.wordpress.org/reference/functions/add_theme_support/
   theme_support:
-    - disable-layout-styles
+    #- core-block-patterns
     - thumbnail #add thumbnails to post
     #- post-formats:
     #  - video
@@ -330,6 +338,8 @@ wordpress:
       #order: ASC
       #radio: true #display terms selection as radio instead of checkbox
       #publicly_queryable: false
+      #show_in_submenu: false
+      #show_in_menu: true
       show_in_rest: true
       #capability_type: true
       object_type:
@@ -374,6 +384,7 @@ wordpress:
   ## Add page states like "homepage"
   #page_states:
     #archive_guide: 'Guide archive'
+    #404: '404'
 
   #################################
   ##    Database table viewer    ##
@@ -457,6 +468,8 @@ wordpress:
   #plugins:
   #  redirection:
   #    redirection_role: edit_others_posts
+  #  relevanssi:
+  #    options_capability: edit_others_posts
 
   #########################
   ##    Optimisations    ##
@@ -469,7 +482,7 @@ wordpress:
       - embed
       - trackback
       - comment
-  #    - feed
+      - feed
 
   ####################
   ##    Security    ##
@@ -477,6 +490,9 @@ wordpress:
 
   security:
     rest_api: false
+    #rest_api:
+    #  remove_core: true
+    #  ip_whitelist: true #add coma separated ip in $_ENV['REST_API_IP_WHITELIST']
     xmlrpc: false
     pings: false
     disable_update: true

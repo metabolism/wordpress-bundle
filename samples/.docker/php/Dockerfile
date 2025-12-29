@@ -1,5 +1,5 @@
-FROM node:16 AS node
-FROM composer:2.5 AS composer
+FROM node:18 AS node
+FROM composer:2.7 AS composer
 FROM php:8.2-fpm
 
 # Set the working directory

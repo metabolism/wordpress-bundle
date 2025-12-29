@@ -10,25 +10,20 @@ services:
       - php
       - mysql
     volumes:
-      -  root:/var/www/html
-      -  ./public/uploads:/var/www/html/public/uploads
+      -  .:/var/www/html
       - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./logs/nginx/:/var/log/nginx
 
   php:
     volumes:
-      - root:/var/www/html
-      - ./public/uploads:/var/www/html/public/uploads
-      - /var/www/html/public/build
-      - /var/www/html/public/wp-bundle/plugins
-      - /var/www/html/public/edition
-      - /var/www/html/vendor
+      - .:/var/www/html
     restart: always
     depends_on:
       - mysql
     build:
       context: .
       dockerfile: .docker/php/Dockerfile
+      args:
+        ACF_PRO_KEY: ${ACF_PRO_KEY}
     environment:
       DB_HOST: mysql:3306
       DB_USER: wordpress
@@ -37,6 +32,10 @@ services:
       WP_HOME: http://localhost:8000
       WP_SITEURL: http://localhost:8000/edition
       WP_ENV: development
+      WP_INSTALLED: 1
+      DEFAULT_URI: http://localhost:8000
+      WP_MULTISITE: http://localhost:8000
+      PUBLIC_PATH: http://localhost:8000/build/
       AUTH_KEY: "generateme"
       SECURE_AUTH_KEY: "generateme"
       LOGGED_IN_KEY: "generateme"
@@ -45,6 +44,19 @@ services:
       SECURE_AUTH_SALT: "generateme"
       LOGGED_IN_SALT: "generateme"
       NONCE_SALT: "generateme"
+
+
+  node:
+    image: node:18
+    depends_on:
+      - nginx
+    working_dir: /home/node/app
+    command: bash -c "npm install && npm run dev-server"
+    volumes:
+      - .:/home/node/app
+    ports:
+      - 8080:8080
+    restart: unless-stopped
 
   mysql:
     image: mysql:latest
@@ -58,6 +70,7 @@ services:
       MYSQL_PASSWORD: not-so-secure
     volumes:
       - my-db:/var/lib/mysql
+      - .:/home
 
 volumes:
   my-db:

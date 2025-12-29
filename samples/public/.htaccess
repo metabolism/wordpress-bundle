@@ -1,18 +1,25 @@
-#
-# Implement HackRepair.com protection
-# Redirect * to index.php
-#
-
-# Begin HackRepair.com Blacklist
-
 <IfModule mod_headers.c>
 
     # Security related. May help against some types of drive-by-downloads
-    Header set X-Content-Type-Options nosniff
-    # Security related. May help against some types of cross-site scripting attacks
-    Header set X-XSS-Protection "1; mode=block"
+        Header set X-Content-Type-Options nosniff
+        # Security related. May help against some types of cross-site scripting attacks
+        Header set X-XSS-Protection "1; mode=block"
+        # Security related. Reduce token leaks
+        Header set Referrer-Policy "strict-origin-when-cross-origin"
+        # Security related. Page isolation
+        Header set Cross-Origin-Opener-Policy "same-origin"
+        # Security related. Resources leaking
+        Header set Cross-Origin-Resource-Policy "same-origin"
+        # Security related. Control browser api permissions
+        Header set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=(), usb=()"
+        # Security related. Strengthens your implementation of TLS
+        Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        # Security related. Preventing a browser from framing your site
+        Header set X-Frame-Options "SAMEORIGIN"
 
-    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+        SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
+        Header append Vary Accept-Encoding
 </IfModule>
 
 
@@ -34,7 +41,7 @@
     RewriteCond %{HTTP_USER_AGENT} ^.*(ia_archiver|IAArchiver-|ibuena|iCab|ICDS-Ingestion|ichiro|iCopyright\ Conductor|id-search|IDBot|IEAutoDiscovery|IECheck|iHWebChecker|IIITBOT|iim_405|IlseBot|IlTrovatore|Iltrovatore-Setaccio|ImageBot|imagefortress|ImagesHereImagesThereImagesEverywhere|ImageVisu|imds_monitor|imo-google-robot-intelink|IncyWincy|Industry\ Cortexcrawler|Indy\ Library|indylabs_marius|InelaBot|Inet32\ Ctrl|inetbot|InfoLink|INFOMINE|infomine.ucr.edu|InfoNaviRobot|Informant|Infoseek|InfoTekies|InfoUSABot|INGRID|Inktomi|InsightsCollector|InsightsWorksBot|InspireBot|InsumaScout|Intelix|InterGET|Internet\ Ninja|InternetLinkAgent|Interseek|IOI|ip-web-crawler.com|IPAdd|Ipselonbot|Iria|IRLbot|Iron33|Isara|iSearch|iSiloX|IsraeliSearch|IstellaBot|its-learning|IU_CSCI_B659_class_crawler|iVia|iVia\ Page\ Fetcher|JadynAve|JadynAveBot|Java|Jbot|JemmaTheTourist|JennyBot|Jetbot|JetBrains\ Omea\ Pro|JetCar|Jim|JoBo|JobSpider_BA|JOC|JoeDog|JoyScapeBot|JSpyda|JubiiRobot|jumpstation|Junut|JustView|Jyxobot|K.S.Bot|KakcleBot|kalooga|KaloogaBot|kanagawa|KATATUDO-Spider|Katipo|kbeta1|Kenjin.Spider|KeywenBot|Keyword.Density|Keyword\ Density|kinjabot|KIT-Fireball|Kitenga-crawler-bot|KiwiStatus|kmbot-|kmccrew|Knight|KnowItAll|Knowledge.com|Knowledge\ Engine|KoepaBot|Koninklijke|KrOWLer|KSbot|kuloko-bot|kulturarw3|KummHttp|Kurzor|Kyluka|L.webis|LabelGrab|Labhoo|labourunions411|lachesis|Lament|LamerExterminator|LapozzBot|larbin|LARBIN-EXPERIMENTAL|LBot|LeapTag|LeechFTP|LeechGet|LetsCrawl.com|LexiBot|LexxeBot|lftp|libcrawl|libiViaCore|libWeb|libwww|libwww-perl|likse|Linguee|link_checker|LinkAlarm|linkbot|LinkCheck\ by\ Siteimprove.com|LinkChecker|linkdex.com|LinkextractorPro|LinkLint|linklooker|Linkman|LinkScan|LinksCrawler|LinksManager.com_bot|LinkSweeper|linkwalker|LiteFinder|LitlrBot|Little\ Grabber\ at\ Skanktale.com|Livelapbot|LM\ Harvester|LMQueueBot|LNSpiderguy|LoadTimeBot|LocalcomBot|locust|LolongBot|LookBot|Lsearch|lssbot|LWP|lwp-request|lwp-trivial|LWP::Simple|Lycos_Spider|Lydia\ Entity|LynnBot|Lytranslate|Mag-Net|Magnet|magpie-crawler|Magus|Mail.Ru|Mail.Ru_Bot|MAINSEEK_BOT|Mammoth|MarkWatch|MaSagool|masidani_bot_|Mass|Mata.Hari|Mata\ Hari|matentzn\ at\ cs\ dot\ man\ dot\ ac\ dot\ uk|maxamine.com--robot|maxamine.com-robot|maxomobot|Maxthon$|McBot|MediaFox|medrabbit|Megite|MemacBot|Memo|MendeleyBot|Mercator-|mercuryboard_user_agent_sql_injection.nasl|MerzScope|metacarta|Metager2|metager2-verification-bot|MetaGloss|METAGOPHER|metal|metaquerier.cs.uiuc.edu|METASpider|Metaspinner|MetaURI|MetaURI\ API|MFC_Tear_Sample|MFcrawler|MFHttpScan|Microsoft.URL|MIIxpc|miner|mini-robot|minibot|miniRank|Mirror|Missigua\ Locator|Mister.PiX|Mister\ PiX|Miva|MJ12bot|mnoGoSearch|mod_accessibility|moduna.com|moget|MojeekBot|MOMspider|MonkeyCrawl|MOSES|Motor|mowserbot|MQbot|MSE360|MSFrontPage|MSIECrawler|MSIndianWebcrawl|MSMOBOT|Msnbot|msnbot-products|MSNPTC|MSRBOT|MT-Soft|MultiText|My_Little_SearchEngine_Project|my-heritrix-crawler|MyApp|MYCOMPANYBOT|mycrawler|MyEngines-US-Bot|MyFamilyBot|Myra|nabot|nabot_|Najdi.si|Nambu|NAMEPROTECT|NatchCVS|naver|naverbookmarkcrawler|NaverBot|Navroad|NearSite|NEC-MeshExplorer|NeoScioCrawler|NerdByNature.Bot|NerdyBot|Nerima-crawl-).*$ [OR]
     RewriteCond %{HTTP_USER_AGENT} ^.*(Nessus|NESSUS::SOAP|nestReader|Net::Trackback|NetAnts|NetCarta\ CyberPilot\ Pro|Netcraft|NetID.com|NetMechanic|Netprospector|NetResearchServer|NetScoop|NetSeer|NetShift=|NetSongBot|Netsparker|NetSpider|NetSrcherP|NetZip|NetZip-Downloader|NewMedhunt|news|News_Search_App|NewsGatherer|Newsgroupreporter|NewsTroveBot|NextGenSearchBot|nextthing.org|NHSEWalker|nicebot|NICErsPRO|niki-bot|NimbleCrawler|nimbus-1|ninetowns|Ninja|NjuiceBot|NLese|Nogate|Nomad-V2.x|NoteworthyBot|NPbot|NPBot-|NRCan\ intranet|NSDL_Search_Bot|nu_tch-princeton|nuggetize.com|nutch|nutch1|NutchCVS|NutchOrg|NWSpider|Nymesis|nys-crawler|ObjectsSearch|oBot|Obvius\ external\ linkcheck|Occam|Ocelli|Octopus|ODP\ entries|Offline.Explorer|Offline\ Explorer|Offline\ Navigator|OGspider|OmiExplorer_Bot|OmniExplorer_Bot|omnifind|OmniWeb|OnetSzukaj|online\ link\ validator|OOZBOT|Openbot|Openfind|Openfind\ data|OpenHoseBot|OpenIntelligenceData|OpenISearch|OpenSearchServer_Bot|OpiDig|optidiscover|OrangeBot|ORISBot|ornl_crawler_1|ORNL_Mercury|osis-project.jp|OsO|OutfoxBot|OutfoxMelonBot|OWLER-BOT|owsBot|ozelot|P3P\ Client|page_verifier|PageBitesHyperBot|Pagebull|PageDown|PageFetcher|PageGrabber|PagePeeker|PageRank\ Monitor|pamsnbot.htm|Panopy|panscient.com|Pansophica|Papa\ Foto|PaperLiBot|parasite|parsijoo|Pathtraq|Pattern|Patwebbot|pavuk|PaxleFramework|PBBOT|pcBrowser|pd-crawler|PECL::HTTP|penthesila|PeoplePal|perform_crawl|PerMan|PGP-KA|PHPCrawl|PhpDig|PicoSearch|pipBot|pipeLiner|Pita|pixfinder|PiyushBot|planetwork|PleaseCrawl|Plucker|Plukkie|Plumtree|Pockey|Pockey-GetHTML|PoCoHTTP|pogodak.ba|Pogodak.co.yu|Poirot|polybot|Pompos|Poodle\ predictor|PopScreenBot|PostPost|PrivacyFinder|ProjectWF-java-test-crawler|ProPowerBot|ProWebWalker|PROXY|psbot|psbot-page|PSS-Bot|psycheclone|pub-crawler|pucl|pulseBot\ \(pulse|Pump|purebot|PWeBot|pycurl|Python-urllib|pythonic-crawler|PythonWikipediaBot|QEAVis\ agent|QFKBot|qualidade|Qualidator.com|QuepasaCreep|QueryN.Metasearch|QueryN\ Metasearch|quest.durato|Quintura-Crw|QunarBot|Qweery_robot.txt_CheckBot|QweeryBot|r2iBot|R6_CommentReader|R6_FeedFetcher|R6_VoteReader|RaBot|Radian6|radian6_linkcheck|RAMPyBot|RankurBot|RcStartBot|RealDownload|Reaper|REBI-shoveler|Recorder|RedBot|RedCarpet|ReGet|RepoMonkey|RepoMonkey\ Bait|Riddler|RIIGHTBOT|RiseNetBot|RiverglassScanner|RoboPal|Robosourcer|robot|robotek|robots|Robozilla|rogerBot|Rome\ Client|Rondello|Rotondo|Roverbot|RPT-HTTPClient|rtgibot|RufusBot|Runnk\ online\ rss\ reader|s~stremor-crawler|S2Bot|SafariBookmarkChecker|SaladSpoon|Sapienti|SBIder|SBL-BOT|SCFCrawler|Scich|ScientificCommons.org|ScollSpider|ScooperBot|Scooter|ScoutJet|ScrapeBox|Scrapy|SCrawlTest|Scrubby|scSpider|Scumbot|SeaMonkey$|Search-Channel|Search-Engine-Studio|search.KumKie.com|search.msn.com|search.updated.com|search.usgs.gov|Search\ Publisher|Searcharoo.NET|SearchBlox|searchbot|searchengine|searchhippo.com|SearchIt-Bot|searchmarking|searchmarks|searchmee_v|SearchmetricsBot|searchmining|SearchnowBot_v1|searchpreview|SearchSpider.com|SearQuBot|Seekbot|Seeker.lookseek.com|SeeqBot|seeqpod-vertical-crawler|Selflinkchecker|Semager|semanticdiscovery|Semantifire1|semisearch|SemrushBot|Senrigan|SEOENGWorldBot|SeznamBot|ShablastBot|ShadowWebAnalyzer|Shareaza|Shelob|sherlock|ShopWiki|ShowLinks|ShowyouBot|siclab|silk|Siphon|SiteArchive|SiteCheck-sitecrawl|sitecheck.internetseer.com|SiteFinder|SiteGuardBot|SiteOrbiter|SiteSnagger|SiteSucker|SiteSweeper|SiteXpert|SkimBot|SkimWordsBot|SkreemRBot|skygrid|Skywalker|Sleipnir|slow-crawler|SlySearch|smart-crawler|SmartDownload|Smarte|smartwit.com|Snake|Snapbot|SnapPreviewBot|Snappy|snookit|Snooper|Snoopy|SocialSearcher|SocSciBot|SOFT411\ Directory|sogou|sohu-search|sohu\ agent|Sokitomi|Solbot|sootle|Sosospider|Space\ Bison|Space\ Fung|SpaceBison|SpankBot|spanner|Spatineo\ Monitor\ Controller|special_archiver|SpeedySpider|Sphider|Sphider2|spider|Spider.TerraNautic.net|SpiderEngine|SpiderKU|SpiderMan|Spinn3r|Spinne|sportcrew-Bot|spyder3.microsys.com|sqlmap|Squid-Prefetch|SquidClamAV_Redirector|Sqworm|SrevBot|sslbot|SSM\ Agent|StackRambler|StarDownloader|statbot|statcrawler|statedept-crawler|Steeler|STEGMANN-Bot|stero|Stripper|Stumbler|suchclip|sucker|SumeetBot|SumitBot|SummizeBot|SummizeFeedReader|SuperBot|superbot.com|SuperHTTP|SuperLumin|SuperPagesBot|Supybot|SURF|Surfbot|SurfControl|SurveyBot|suzuran|SWEBot|swish-e|SygolBot|SynapticWalker|Syntryx\ ANT\ Scout\ Chassis\ Pheromone|SystemSearch-robot|Szukacz).*$ [OR]
     RewriteCond %{HTTP_USER_AGENT} ^.*(T-H-U-N-D-E-R-S-T-O-N-E|Tailrank|tAkeOut|TAMU_CRAWLER|TapuzBot|Tarantula|targetblaster.com|TargetYourNews.com|TAUSDataBot|taxinomiabot|Tecomi|TeezirBot|Teleport|Teleport\ Pro|TeleportPro|Telesoft|Teradex\ Mapper|TERAGRAM_CRAWLER|TerrawizBot|testbot|testing\ of|TextBot|thatrobotsite.com|The.Intraformant|The\ Dyslexalizer|The\ Intraformant|TheNomad|Theophrastus|theusefulbot|TheUsefulbot_|ThumbBot|thumbshots-de-bot|tigerbot|TightTwatBot|TinEye|Titan|to-dress_ru_bot_|to-night-Bot|toCrawl|Topicalizer|topicblogs|Toplistbot|TopServer\ PHP|topyx-crawler|Touche|TourlentaScanner|TPSystem|TRAAZI|TranSGeniKBot|travel-search|TravelBot|TravelLazerBot|Treezy|TREX|TridentSpider|Trovator|True_Robot|tScholarsBot|TsWebBot|TulipChain|turingos|turnit|TurnitinBot|TutorGigBot|TweetedTimes|TweetmemeBot|TwengaBot|TwengaBot-Discover|Twiceler|Twikle|twinuffbot|Twisted\ PageGetter|Twitturls|Twitturly|TygoBot|TygoProwler|Typhoeus|U.S.\ Government\ Printing\ Office|uberbot|ucb-nutch|UCSD-Crawler|UdmSearch|UFAM-crawler-|Ultraseek|UnChaos|unchaos_crawler_|UnisterBot|UniversalSearch|UnwindFetchor|UofTDB_experiment|updated|URI::Fetch|url_gather|URL-Checker|URL\ Control|URLAppendBot|URLBlaze|urlchecker|urlck|UrlDispatcher|urllib|URLSpiderPro|URLy.Warning|USAF\ AFKN\|usasearch|USS-Cosmix|USyd-NLP-Spider|Vacobot|Vacuum|VadixBot|Vagabondo|Validator|Valkyrie|vBSEO|VCI|VerbstarBot|VeriCiteCrawler|Verifactrola|Verity-URL-Gateway|vermut|versus|versus.integis.ch|viasarchivinginformation.html|vikspider|VIP|VIPr|virus-detector|VisBot|Vishal\ For\ CLIA|VisWeb|vlad|vlsearch|VMBot|VocusBot|VoidEYE|VoilaBot|Vortex|voyager|voyager-hc|voyager-partner-deep|VSE|vspider).*$ [OR]
-    RewriteCond %{HTTP_USER_AGENT} ^.*(W3C_Unicorn|W3C-WebCon|w3m|w3search|wacbot|wastrix|Water\ Conserve|Water\ Conserve\ Portal|WatzBot|wauuu\ engine|Wavefire|Waypath|Wazzup|Wazzup1.0.4800|wbdbot|web-agent|Web-Sniffer|Web.Image.Collector|Web\ CEO\ Online|Web\ Image\ Collector|Web\ Link\ Validator|Web\ Magnet|webalta|WebaltBot|WebAuto|webbandit|webbot|webbul-bot|WebCapture|webcheck|Webclipping.com|webcollage|WebCopier|WebCopy|WebCorp|webcrawl.net|webcrawler|WebDownloader\ for|Webdup|WebEMailExtrac|WebEMailExtrac.*|WebEnhancer|WebFerret|webfetch|WebFetcher|WebGather|WebGo\ IS|webGobbler|WebImages|Webinator-search2.fasthealth.com|Webinator-WBI|WebIndex|WebIndexer|weblayers|WebLeacher|WeblexBot|WebLinker|webLyzard|WebmasterCoffee|WebmasterWorld|WebmasterWorldForumBot|WebMiner|WebMoose|WeBot|WebPix|WebReaper|WebRipper|WebSauger|Webscan|websearchbench|WebSite|websitemirror|WebSpear|websphinx.test|WebSpider|Webster|Webster.Pro|Webster\ Pro|WebStripper|WebTrafficExpress|WebTrends\ Link\ Analyzer|webvac|webwalk|WebWalker|Webwasher|WebWatch|WebWhacker|WebXM|WebZip|Weddings.info|wenbin|WEPA|WeRelateBot|Whacker|Widow|WikiaBot|Wikio|wikiwix-bot-|WinHttp.WinHttpRequest|WinHTTP\ Example|WIRE|wired-digital-newsbot|WISEbot|WISENutbot|wish-la|wish-project|wisponbot|WMCAI-robot|wminer|WMSBot|woriobot|worldshop|WorQmada|Wotbox|WPScan|wume_crawler|WWW-Mechanize|www.freeloader.com.|WWW\ Collector|WWWOFFLE|wwwrobot|wwwster|WWWWanderer|wwwxref|Wysigot|X-clawler|Xaldon|Xenu|Xenu's|Xerka\ MetaBot|XGET|xirq|XmarksFetch|XoviBot|xqrobot|Y!J|Y!TunnelPro|yacy.net|yacybot|yarienavoir.net|Yasaklibot|yBot|YebolBot|yellowJacket|YesupBot|Yeti|YioopBot|YisouSpider|yolinkBot|yoogliFetchAgent|yoono|Yoriwa|YottaCars_Bot|you-dir|Z-Add\ Link|zagrebin|Zao|zedzo.digest|zedzo.validate|zermelo|Zeus|Zeus\ Link\ Scout|zibber-v|zimeno|Zing-BottaBot|ZipppBot|zmeu|ZoomSpider|ZuiBot|ZumBot|Zyborg|Zyte).*$
+    RewriteCond %{HTTP_USER_AGENT} ^.*(W3C_Unicorn|W3C-WebCon|w3m|w3search|wacbot|wastrix|Water\ Conserve|Water\ Conserve\ Portal|WatzBot|wauuu\ engine|Wavefire|Waypath|Wazzup|Wazzup1.0.4800|wbdbot|web-agent|Web-Sniffer|Web.Image.Collector|Web\ CEO\ Online|Web\ Image\ Collector|Web\ Link\ Validator|Web\ Magnet|webalta|WebaltBot|WebAuto|webbandit|webbot|webbul-bot|WebCapture|webcheck|Webclipping.com|webcollage|WebCopier|WebCopy|WebCorp|webcrawl.net|webcrawler|WebDownloader\ for|Webdup|WebEMailExtrac|WebEMailExtrac.*|WebEnhancer|WebFerret|webfetch|WebFetcher|WebGather|WebGo\ IS|webGobbler|WebImages|Webinator-search2.fasthealth.com|Webinator-WBI|WebIndex|WebIndexer|weblayers|WebLeacher|WeblexBot|WebLinker|webLyzard|WebmasterCoffee|WebmasterWorld|WebmasterWorldForumBot|WebMiner|WebMoose|WeBot|WebPix|WebReaper|WebRipper|WebSauger|Webscan|websearchbench|WebSite|websitemirror|WebSpear|websphinx.test|WebSpider|Webster|Webster.Pro|Webster\ Pro|WebStripper|WebTrafficExpress|WebTrends\ Link\ Analyzer|webvac|webwalk|WebWalker|Webwasher|WebWatch|WebWhacker|WebXM|WebZip|Weddings.info|wenbin|WEPA|WeRelateBot|Whacker|Widow|WikiaBot|Wikio|wikiwix-bot-|WinHttp.WinHttpRequest|WinHTTP\ Example|WIRE|wired-digital-newsbot|WISEbot|WISENutbot|wish-la|wish-project|wisponbot|WMCAI-robot|wminer|WMSBot|woriobot|worldshop|WorQmada|Wotbox|WPScan|wume_crawler|WWW-Mechanize|www.freeloader.com.|WWW\ Collector|WWWOFFLE|wwwrobot|wwwster|WWWWanderer|wwwxref|Wysigot|X-clawler|Xaldon|Xenu|Xenu's|Xerka\ MetaBot|XGET|xirq|XmarksFetch|XoviBot|xqrobot|Y!TunnelPro|yacy.net|yacybot|yarienavoir.net|Yasaklibot|YebolBot|yellowJacket|YesupBot|Yeti|YioopBot|YisouSpider|yolinkBot|yoogliFetchAgent|yoono|Yoriwa|YottaCars_Bot|you-dir|Z-Add\ Link|zagrebin|Zao|zedzo.digest|zedzo.validate|zermelo|Zeus|Zeus\ Link\ Scout|zibber-v|zimeno|Zing-BottaBot|ZipppBot|zmeu|ZoomSpider|ZuiBot|ZumBot|Zyborg|Zyte).*$
 
     RewriteRule .* - [F,L]
 
@@ -56,6 +63,147 @@
     RewriteRule .* - [F,L]
 </IfModule>
 
+ # Apache Bad Bot Blocker IP list
+
+<RequireAll>
+    Require all granted
+    Require not ip 104.223.37.150
+    Require not ip 104.5.92.27
+    Require not ip 107.150.63.170
+    Require not ip 109.236.83.247
+    Require not ip 137.74.49.205
+    Require not ip 137.74.49.208
+    Require not ip 146.0.74.150
+    Require not ip 148.251.54.44
+    Require not ip 149.56.151.180
+    Require not ip 149.56.232.146
+    Require not ip 150.70.0.0/16
+    Require not ip 151.80.27.90
+    Require not ip 151.80.99.90
+    Require not ip 151.80.99.91
+    Require not ip 154.16.199.144
+    Require not ip 154.16.199.34
+    Require not ip 154.16.199.48
+    Require not ip 154.16.199.78
+    Require not ip 158.69.142.34
+    Require not ip 166.62.80.172
+    Require not ip 173.212.192.219
+    Require not ip 173.234.11.105
+    Require not ip 173.234.153.106
+    Require not ip 173.234.153.30
+    Require not ip 173.234.175.68
+    Require not ip 173.234.31.9
+    Require not ip 173.234.38.25
+    Require not ip 176.126.245.213
+    Require not ip 178.238.234.1
+    Require not ip 185.35.63.128
+    Require not ip 185.100.87.238
+    Require not ip 185.115.125.99
+    Require not ip 185.119.81.11
+    Require not ip 185.119.81.63
+    Require not ip 185.119.81.77
+    Require not ip 185.119.81.78
+    Require not ip 185.130.225.65
+    Require not ip 185.130.225.66
+    Require not ip 185.130.225.83
+    Require not ip 185.130.225.90
+    Require not ip 185.130.225.94
+    Require not ip 185.130.225.95
+    Require not ip 185.130.226.105
+    Require not ip 185.153.197.103
+    Require not ip 185.159.36.6
+    Require not ip 185.183.96.33
+    Require not ip 185.47.62.199
+    Require not ip 185.62.190.38
+    Require not ip 185.70.105.161
+    Require not ip 185.70.105.164
+    Require not ip 185.85.239.156
+    Require not ip 185.85.239.157
+    Require not ip 185.86.13.213
+    Require not ip 185.86.5.199
+    Require not ip 185.86.5.212
+    Require not ip 185.92.72.88
+    Require not ip 185.93.185.11
+    Require not ip 185.93.185.12
+    Require not ip 188.209.52.101
+    Require not ip 190.152.223.27
+    Require not ip 191.96.249.29
+    Require not ip 192.69.89.173
+    Require not ip 193.201.224.205
+    Require not ip 195.154.183.190
+    Require not ip 195.229.241.174
+    Require not ip 200.7.105.43
+    Require not ip 210.212.194.60
+    Require not ip 216.218.147.194
+    Require not ip 220.227.234.129
+    Require not ip 23.253.230.158
+    Require not ip 23.89.159.176
+    Require not ip 31.170.160.209
+    Require not ip 45.32.186.11
+    Require not ip 45.76.21.179
+    Require not ip 46.249.38.145
+    Require not ip 46.249.38.146
+    Require not ip 46.249.38.148
+    Require not ip 46.249.38.149
+    Require not ip 46.249.38.150
+    Require not ip 46.249.38.151
+    Require not ip 46.249.38.152
+    Require not ip 46.249.38.153
+    Require not ip 46.249.38.154
+    Require not ip 46.249.38.159
+    Require not ip 51.255.172.22
+    Require not ip 5.39.218.232
+    Require not ip 5.39.219.24
+    Require not ip 5.39.222.18
+    Require not ip 5.39.223.134
+    Require not ip 54.213.16.154
+    Require not ip 54.213.9.111
+    Require not ip 62.210.146.49
+    Require not ip 62.210.88.4
+    Require not ip 65.98.91.181
+    Require not ip 69.162.124.237
+    Require not ip 69.64.147.24
+    Require not ip 72.8.183.202
+    Require not ip 77.247.178.191
+    Require not ip 77.247.178.47
+    Require not ip 77.247.181.219
+    Require not ip 78.31.184.0/21
+    Require not ip 78.31.211.0/24
+    Require not ip 79.110.128.17
+    Require not ip 79.110.128.63
+    Require not ip 79.110.128.252
+    Require not ip 79.110.128.128
+    Require not ip 80.87.205.10
+    Require not ip 80.87.205.11
+    Require not ip 85.17.230.23
+    Require not ip 85.17.26.68
+    Require not ip 91.185.190.172
+    Require not ip 91.200.12.0/22
+    Require not ip 91.200.12.15
+    Require not ip 91.200.12.49
+    Require not ip 91.200.12.91
+    Require not ip 92.222.66.137
+    Require not ip 93.104.209.11
+    Require not ip 93.158.200.103
+    Require not ip 93.158.200.105
+    Require not ip 93.158.200.115
+    Require not ip 93.158.200.124
+    Require not ip 93.158.200.126
+    Require not ip 93.158.200.66
+    Require not ip 93.158.200.68
+    Require not ip 93.238.202.44
+    Require not ip 4.17.135.32/27
+    Require not ip 38.0.0.0/8
+    Require not ip 63.144.0.0/13
+    Require not ip 65.112.0.0/12
+    Require not ip 65.192.0.0/11
+    Require not ip 206.2.138.0/23
+    Require not ip 208.71.164.0/22
+    Require not ip 169.229.3.88/29
+    Require not ip 34.195.0.0
+    Require not ip 194.0.0.0
+</RequireAll>
+
 # End HackRepair.com Blacklist, http://pastebin.com/BPRv4TDd
 
 #php_value upload_max_filesize 8M
@@ -72,11 +220,19 @@ Options -Indexes
 	Deny From All
 </Files>
 
-<FilesMatch "\\.(ico|jpe?g|png|gif|swf|svg)$">
-    Header set Cache-Control "max-age=2592000, public"
+<FilesMatch "\\.(ico|jpe?g|png|gif|swf|svg|js|css|woff2?|webp|mp4|webmanifest)$">
+    Header unset Set-Cookie
+    Header set Cache-Control "public, max-age=31536000, immutable"
 </FilesMatch>
 
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain text/css text/html text/javascript application/javascript application/x-javascript application/json application/xml application/rss+xml image/svg+xml
+    AddOutputFilterByType DEFLATE font/ttf font/otf application/font-woff application/vnd.ms-fontobject
+</IfModule>
+
 <IfModule mod_rewrite.c>
+
+    RewriteEngine on
 
     RewriteCond %{HTTP:Authorization} ^(.*)
     RewriteRule ^(.*) - [E=HTTP_AUTHORIZATION:%1]
