@@ -105,9 +105,14 @@ class TermCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 
             $this->ids = $terms;
 
-            foreach ($terms as $term){
+            foreach ($terms as $term_id){
 
-                $items[] = TermFactory::create( $term );
+                $term = TermFactory::create( $term_id );
+
+                if( $this->args['post_type']??false )
+                    $term->setPostTypes($this->args['post_type']);
+
+                $items[] = $term;
             }
         }
         else{

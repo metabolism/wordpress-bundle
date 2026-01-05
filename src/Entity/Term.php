@@ -106,6 +106,17 @@ class Term extends Entity
 
 
     /**
+     * Set attached post types
+     *
+     * @return array
+     */
+    public function setPostTypes($post_types) {
+
+        $this->post_types = (array)$post_types;
+    }
+
+
+    /**
      * @param $pid
      * @return \WP_Term|false
      */
@@ -237,6 +248,9 @@ class Term extends Entity
                 'taxonomy' => $this->taxonomy,
                 'parent' => $this->ID
             ]);
+
+            if( !isset($args['post_type']) && $post_type = $this->post_types[0]??false )
+                $criteria['post_type'] = $post_type;
 
             $children = $termRepository->findBy($criteria);
 
