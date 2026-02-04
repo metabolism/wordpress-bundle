@@ -41,6 +41,8 @@ class Image extends Entity
     protected $compression;
     protected $args;
 
+    private $config;
+
     public function __toString(): string
     {
         return $this->getLink();
@@ -56,12 +58,13 @@ class Image extends Entity
     {
         global $_config;
 
+        $this->config = $_config;
         $this->args = $args;
 
         if (isset($this->args['compression']))
             $this->compression = $this->args['compression'];
         else
-            $this->compression = $_config ? $_config->get('image.compression', 98) : 98;
+            $this->compression = $this->config ? $this->config->get('image.compression', 98) : 98;
 
         $debug = $_REQUEST['debug']??false;
 
@@ -1015,7 +1018,7 @@ class Image extends Entity
                     $html .='<source media="('.$media.')" srcset="'.$this->generatePixel($size[0], $size[1]??0).'" type="image/jpeg"/>';
             }
 
-            $html .= '<img loading="'.$loading.'" src="'.$this->generatePixel($w, $h).'" alt="'.$alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
+            $html .= '<img aria-hidden="true" loading="'.$loading.'" src="'.$this->generatePixel($w, $h).'" alt="'.$alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
             $html .='</picture>';
 
             return $html;
@@ -1037,7 +1040,7 @@ class Image extends Entity
 
         if($this->mime_type == 'image/svg+xml' || $this->mime_type == 'image/svg' || $this->mime_type == 'image/gif' ){
 
-            $html .= '<img loading="'.$loading.'" src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
+            $html .= '<img loading="'.$loading.'"'.(isset($params['aria-hidden'])?' aria-hidden="true"':'').' src="'.$this->edit(['resize'=>[$w, $h]]).'" alt="'.$alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
         }
         else{
 
@@ -1136,10 +1139,12 @@ class Image extends Entity
 
             $focus_point = $this->getFocusPoint();
 
-            if( is_array($focus_point) )
+            if( is_array($focus_point) && $this->config && $this->config->get('image.inline_style', true) )
                 $focus_point = 'style="--x:'.($focus_point['x']??50).'%;--y:'.($focus_point['y']??50).'%"';
+            else
+                $focus_point = '';
 
-            $html .= '<img loading="'.$loading.'"'.(isset($params['fetchpriority'])?'fetchpriority="'.$params['fetchpriority'].'"':'').' src="'.$file['url'].'" '.$focus_point.' alt="'.$alt.'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[1]?'height="'.$image_info[1].'"':'').'/>';
+            $html .= '<img loading="'.$loading.'"'.(isset($params['fetchpriority'])?' fetchpriority="'.$params['fetchpriority'].'"':'').(isset($params['aria-hidden'])?' aria-hidden="true"':'').' src="'.$file['url'].'" '.$focus_point.' alt="'.$alt.'" '.($image_info[0]?'width="'.$image_info[0].'"':'').' '.($image_info[1]?'height="'.$image_info[1].'"':'').'/>';
         }
 
         $html .='</picture>';
