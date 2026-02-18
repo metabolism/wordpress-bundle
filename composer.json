@@ -1,7 +1,7 @@
 {
   "name":"metabolism/wordpress-bundle",
   "type": "symfony-bundle",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Build enterprise solutions with WordPress",
   "license": "MIT",
   "keywords": [

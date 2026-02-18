@@ -230,6 +230,7 @@ if( env('WP_MULTISITE') && !env('SUBDOMAIN_INSTALL') )
     foreach (get_sites() as $site)
     {
         switch_to_blog( $site->blog_id );
+        refresh_blog_details($site->blog_id);
         flush_rewrite_rules();
         
         $locale = trim($site->path, '/');
