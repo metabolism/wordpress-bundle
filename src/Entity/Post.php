@@ -846,8 +846,8 @@ class Post extends Entity
             
             foreach ($parents_id as $post_id)
                 $ancestors[] = PostFactory::create($post_id);
-            
-            $this->ancestors = $ancestors;
+
+            $this->ancestors = array_filter($ancestors);
         }
         
         return $this->ancestors;
