@@ -671,7 +671,7 @@ class Image extends Entity
      */
     private function process($params, $ext=null){
 
-        if( $this->src && !in_array($this->getExtension(), ['jpg','jpeg','png','gif','webp','avif']) )
+        if( $this->src && !in_array($this->getExtension(), ['jpg','jpeg','png','gif','webp']) )
             return ['src'=>$this->src];
 
         $this->getFocusPoint();
