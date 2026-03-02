@@ -1014,8 +1014,12 @@ class Image extends Entity
             $html = '<picture class="placeholder">';
             if( $sources && is_array($sources) ){
 
-                foreach ($sources as $media=>$size)
-                    $html .='<source media="('.$media.')" srcset="'.$this->generatePixel($size[0], $size[1]??0).'" type="image/jpeg"/>';
+                foreach ($sources as $media=>$size){
+
+                    $target_width = $size[0];
+                    $target_height = $size[1]??0;
+                    $html .='<source media="('.$media.')" srcset="'.$this->generatePixel($target_width, $target_height).'" type="image/jpeg" '.($target_width?'width="'.$target_width.'"':'').' '.($target_height?'height="'.$target_height.'"':'').'/>';
+                }
             }
 
             $html .= '<img aria-hidden="true" loading="'.$loading.'" src="'.$this->generatePixel($w, $h).'" alt="'.$alt.'" '.($w?'width="'.$w.'"':'').' '.($h?'height="'.$h.'"':'').'/>';
@@ -1065,11 +1069,11 @@ class Image extends Entity
                             $params['resize'] = [$target_width * 2, $target_height * 2];
                             $url_2x = $this->edit($params, $ext);
 
-                            $html .= '<source media="(' . $media . ')" srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $mime . '"/>';
+                            $html .= '<source media="(' . $media . ')" srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $mime . '" '.($target_width?'width="'.$target_width.'"':'').' '.($target_height?'height="'.$target_height.'"':'').'/>';
                         }
                         else{
 
-                            $html .= '<source media="(' . $media . ')" srcset="' . $url . '" type="' . $mime . '"/>';
+                            $html .= '<source media="(' . $media . ')" srcset="' . $url . '" type="' . $mime . '" '.($target_width?'width="'.$target_width.'"':'').' '.($target_height?'height="'.$target_height.'"':'').'/>';
                         }
                     }
                     else{
@@ -1081,11 +1085,11 @@ class Image extends Entity
                             $params['resize'] = [$target_width * 2, $target_height * 2];
                             $url_2x = $this->edit($params);
 
-                            $html .= '<source media="(' . $media . ')" srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $this->mime_type . '"/>';
+                            $html .= '<source media="(' . $media . ')" srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $this->mime_type . '" '.($target_width?'width="'.$target_width.'"':'').' '.($target_height?'height="'.$target_height.'"':'').'/>';
                         }
                         else{
 
-                            $html .= '<source media="(' . $media . ')" srcset="' . $url . '" type="' . $this->mime_type . '"/>';
+                            $html .= '<source media="(' . $media . ')" srcset="' . $url . '" type="' . $this->mime_type . '" '.($target_width?'width="'.$target_width.'"':'').' '.($target_height?'height="'.$target_height.'"':'').'/>';
                         }
                     }
                 }
@@ -1107,11 +1111,11 @@ class Image extends Entity
                     $params['resize'] = [$target_width * 2, $target_height * 2];
                     $url_2x = $this->edit($params, $ext);
 
-                    $html .= '<source srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $mime . '"/>';
+                    $html .= '<source srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $mime . '" '.($target_width?'width="'.$target_width.'"':'').' '.($target_height?'height="'.$target_height.'"':'').'/>';
                 }
                 else{
 
-                    $html .= '<source srcset="' . $url . '" type="' . $mime . '"/>';
+                    $html .= '<source srcset="' . $url . '" type="' . $mime . '" '.($target_width?'width="'.$target_width.'"':'').' '.($target_height?'height="'.$target_height.'"':'').'/>';
                 }
             }
             else{
@@ -1123,11 +1127,11 @@ class Image extends Entity
                     $params['resize'] = [$target_width * 2, $target_height * 2];
                     $url_2x = $this->edit($params);
 
-                    $html .= '<source srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $this->mime_type . '"/>';
+                    $html .= '<source srcset="' . $url . ' 1x, ' . $url_2x . ' 2x" type="' . $this->mime_type . '" '.($target_width?'width="'.$target_width.'"':'').' '.($target_height?'height="'.$target_height.'"':'').'/>';
                 }
                 else{
 
-                    $html .= '<source srcset="' . $url . '" type="' . $this->mime_type . '"/>';
+                    $html .= '<source srcset="' . $url . '" type="' . $this->mime_type . '" '.($target_width?'width="'.$target_width.'"':'').' '.($target_height?'height="'.$target_height.'"':'').'/>';
                 }
             }
 
