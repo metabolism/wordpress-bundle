@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
+use lloc\Msls\MslsOptionsTax;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\TermFactory;
 use Metabolism\WordpressBundle\Repository\PostRepository;
@@ -38,6 +39,7 @@ class Term extends Entity
     protected $public;
     protected $rewrite;
     protected $post_types;
+    protected $original_term;
 
     /** @var \WP_Term|bool */
     protected $term;
@@ -506,6 +508,40 @@ class Term extends Entity
             $this->excerpt = strip_tags($this->content,'<b><i><strong><em><br>');
 
         return $this->excerpt;
+    }
+
+    /**
+     * Get original term, only basic fields are available
+     *
+     * @return false|Post
+     */
+    public function getOriginalTerm(){
+
+        if( is_null($this->original_term) ){
+
+            $this->original_term = false;
+
+            if( defined('MSLS_PLUGIN_VERSION') && is_multisite() && !is_main_site() ){
+
+                $mslsOptions =  MslsOptionsTax::create($this->ID);
+                $main_site_id = get_main_site_id();
+
+                switch_to_blog($main_site_id);
+
+                $locale = get_blog_option($main_site_id, 'WPLANG');
+                $locale = empty($locale)? 'en_US' : $locale;
+
+                if( $id = apply_filters('msls_options_get_id', $mslsOptions->__get( $locale ), $locale) ){
+
+                    $this->original_term = TermFactory::create($id);
+                    $this->original_term->getLink();
+                }
+
+                restore_current_blog();
+            }
+        }
+
+        return $this->original_term;
     }
 
     /**

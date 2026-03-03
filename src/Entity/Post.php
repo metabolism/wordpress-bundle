@@ -2,6 +2,7 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
+use lloc\Msls\MslsOptionsPost;
 use Metabolism\WordpressBundle\Factory\Factory;
 use Metabolism\WordpressBundle\Factory\PostFactory;
 use Metabolism\WordpressBundle\Factory\BlockFactory;
@@ -55,7 +56,8 @@ class Post extends Entity
     protected $state;
     protected $path;
     protected $parameters;
-    
+    protected $original_post;
+
     /** @var \WP_Post|bool */
     protected $post;
     
@@ -851,6 +853,41 @@ class Post extends Entity
         }
         
         return $this->ancestors;
+    }
+
+
+    /**
+     * Get original post, only basic fields are available
+     *
+     * @return false|Post
+     */
+    public function getOriginalPost(){
+
+        if( is_null($this->original_post) ){
+
+            $this->original_post = false;
+
+            if( defined('MSLS_PLUGIN_VERSION') && is_multisite() && !is_main_site() ){
+
+                $mslsOptions = new MslsOptionsPost( $this->ID );
+                $main_site_id = get_main_site_id();
+
+                switch_to_blog($main_site_id);
+
+                $locale = get_blog_option($main_site_id, 'WPLANG');
+                $locale = empty($locale)? 'en_US' : $locale;
+
+                if( $id = apply_filters('msls_options_get_id', $mslsOptions->__get( $locale ), $locale) ){
+
+                    $this->original_post = PostFactory::create($id);
+                    $this->original_post->getLink();
+                }
+
+                restore_current_blog();
+            }
+        }
+
+        return $this->original_post;
     }
     
     /**
