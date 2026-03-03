@@ -32,10 +32,20 @@ class MenuItem extends Entity
     protected $current_item_parent;
     protected $object;
     protected $item;
+    protected $aria_label;
+    protected $anchor;
 
     public function __toString(): string
     {
-        return $this->title ? '<a href="' . $this->link . '" target="' . $this->target . '">' . $this->title . '</a>' : '';
+        $link = $this->link;
+
+        if( $anchor = $this->getAnchor() )
+            $link .= '#'.$anchor;
+
+        if( $aria_label = $this->getAriaLabel() )
+            $aria_label = ' aria-label="'.esc_attr($aria_label).'"';
+
+        return $this->title ? '<a href="' . $link . '" target="' . $this->target . '"'.$aria_label.'>' . $this->title . '</a>' : '';
     }
 
     /**
@@ -95,6 +105,28 @@ class MenuItem extends Entity
     }
 
     /**
+     * @return mixed
+     */
+    public function getAriaLabel()
+    {
+        if( is_null($this->aria_label) )
+            $this->aria_label = $this->getMeta('_menu_item_aria_label');
+
+        return $this->aria_label;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAnchor()
+    {
+        if( is_null($this->anchor) )
+            $this->anchor = ltrim($this->getMeta('_menu_item_anchor'), '#');
+
+        return $this->anchor;
+    }
+
+    /**
      * @return string
      */
     public function getClass(): string
@@ -119,7 +151,12 @@ class MenuItem extends Entity
      */
     public function getLink()
     {
-        return $this->link;
+        $link = $this->link;
+
+        if( $anchor = $this->getAnchor() )
+            $link .= '#'.$anchor;
+
+        return $link;
     }
 
     /**
