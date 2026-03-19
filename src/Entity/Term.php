@@ -158,19 +158,36 @@ class Term extends Entity
         if( is_null($this->path) && $this->isPublic() ){
 
             $taxonomy_object = $this->getTaxonomyObject();
+            $home_url = get_home_url();
+            $link = $this->getLink();
 
-            $path = str_replace(get_home_url(), '', $this->getLink());
+            if( !str_contains($link, $home_url) ){
 
-            if( $rewrite_slug = $taxonomy_object->rewrite['slug']??false ){
-
-                $rewrite_slug = preg_replace('/{([^%]+)}/m', '([^\/]+)', str_replace('/','\/', '/'.$rewrite_slug));
-                $path = preg_replace('/^'.$rewrite_slug.'/m', '', $path);
-            }
-
-            if( substr($path, 0, 1) == '/')
-                $this->path = substr($path, 1);
-            else
                 $this->path = false;
+            }
+            else{
+
+                $path = str_replace($home_url, '', $link);
+
+                if( $rewrite_slug = $taxonomy_object->rewrite['slug']??false ){
+
+                    $parts = explode('/', $rewrite_slug);
+                    $regexp = str_replace('/','\/', $rewrite_slug.'/');
+
+                    foreach( $parts as $part ){
+
+                        $capture = preg_replace('/{([^%]+)}/m', '([^\/]+)', $part);
+                        $regexp = str_replace($part, $capture, $regexp);
+                    }
+
+                    $path = preg_replace('/'.$regexp.'/m', '', $path);
+                }
+
+                if( str_starts_with($path, '/') )
+                    $this->path = substr($path, 1);
+                else
+                    $this->path = false;
+            }
         }
 
         return $this->path;

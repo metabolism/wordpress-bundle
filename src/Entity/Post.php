@@ -465,7 +465,7 @@ class Post extends Entity
                 if( $rewrite_slug = $post_type_object->rewrite['slug']??false ){
 
                     $parts = explode('/', $rewrite_slug);
-                    $regexp = str_replace('/','\/', $rewrite_slug);
+                    $regexp = str_replace('/','\/', $rewrite_slug.'/');
 
                     foreach( $parts as $part ){
 
@@ -473,7 +473,7 @@ class Post extends Entity
                         $regexp = str_replace($part, $capture, $regexp);
                     }
 
-                    $path = preg_replace('/'.$regexp.'/m', '', $path);
+                   $path = preg_replace('/'.$regexp.'/m', '', $path);
                 }
 
                 if( str_starts_with($path, '/') )
@@ -516,10 +516,8 @@ class Post extends Entity
                 }
             }
 
-            if( $this->getType() == 'page' )
-                $parameters['pagename'] = $this->getPath();
-            else
-                $parameters[$this->getType()] = $this->getSlug();
+            $type = $this->getType() == 'page' ? 'pagename' : $this->getType();
+            $parameters[$type] = ltrim($this->getPath(), '/');
 
             $this->parameters = $parameters;
         }
