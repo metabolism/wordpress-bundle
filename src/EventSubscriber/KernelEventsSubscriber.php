@@ -83,6 +83,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             if( $site && get_current_blog_id() != $site->blog_id ){
 
                 switch_to_blog($site->blog_id);
+                refresh_blog_details($site->blog_id);
 
                 //reload locale
                 unset($GLOBALS['locale']);
