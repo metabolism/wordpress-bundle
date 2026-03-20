@@ -146,7 +146,7 @@ class PostCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
 	 */
 	public function count(): int
 	{
-		return $this->query ? $this->query->found_posts : count($this->items);
+		return $this->query ? max($this->query->found_posts, $this->query->post_count) : count($this->items);
 	}
 
 	/**
