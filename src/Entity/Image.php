@@ -37,6 +37,7 @@ class Image extends Entity
     protected $src;
     protected $post;
     protected $ratio;
+    protected $debug;
 
     protected $compression;
     protected $args;
@@ -66,9 +67,9 @@ class Image extends Entity
         else
             $this->compression = $this->config ? $this->config->get('image.compression', 98) : 98;
 
-        $debug = $_REQUEST['debug']??false;
+        $this->debug = WP_DEBUG && 'image' == $_REQUEST['debug']??'';
 
-        if ( !$id || (WP_DEBUG && $debug == 'image')) {
+        if ( !$id || $this->debug) {
 
             $this->ID = 0;
         }
@@ -964,6 +965,9 @@ class Image extends Entity
      */
     private function generatePixel($w = 1, $h = 1) {
 
+        if( $this->debug )
+            return $this->placeholder($w, $h);
+
         try{
 
             ob_start();
@@ -1011,7 +1015,7 @@ class Image extends Entity
 
         if( empty($this->src) || !is_readable($this->src) ){
 
-            $html = '<picture class="placeholder">';
+            $html = '<picture class="placeholder'.($this->debug?' placeholder--debug':'').'">';
             if( $sources && is_array($sources) ){
 
                 foreach ($sources as $media=>$size){
