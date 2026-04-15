@@ -55,6 +55,8 @@ class WordpressBundle extends Bundle
                     $_SERVER['HTTP_HOST'] = $url['host']??'127.0.0.1'.($_SERVER['SERVER_PORT']!=443?':'.$_SERVER['SERVER_PORT']:'');
                 else
                     $_SERVER['HTTP_HOST'] = $url['host']??'127.0.0.1'.($_SERVER['SERVER_PORT']!=80?':'.$_SERVER['SERVER_PORT']:'');
+
+                $_SERVER['SERVER_NAME'] = $url['host']??'localhost';
             }
             else{
 
