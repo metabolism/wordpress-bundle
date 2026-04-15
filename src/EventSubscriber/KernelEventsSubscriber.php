@@ -140,6 +140,15 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             $content = str_replace(substr(json_encode($base_url), 1 , -1), substr(json_encode($default_uri), 1 , -1), $content);
         }
 
+        $parsed_url = parse_url($base_url);
+        $parsed_default_uri = parse_url($default_uri);
+
+        if( isset($parsed_url['host'], $parsed_default_uri['host']) && $parsed_url['host'] != $parsed_default_uri['host'] ){
+
+            $content = str_replace($parsed_url['host'], $parsed_default_uri['host'], $content);
+            $content = str_replace(substr(json_encode($parsed_url['host']), 1 , -1), substr(json_encode($parsed_default_uri['host']), 1 , -1), $content);
+        }
+
         $base_url = 'http://localhost';
 
         if( $base_url != $default_uri ){
