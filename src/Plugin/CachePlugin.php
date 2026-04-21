@@ -110,6 +110,12 @@ class CachePlugin
 		$varnish_ssl = $_SERVER['VARNISH_SSL'] ?? false;
 		$result = [];
 
+        if( !isset($_SERVER['HTTP_HOST'])) {
+
+            $parsed_url = parse_url($url);
+            $_SERVER['HTTP_HOST'] = $parsed_url['host']??'127.0.0.1';
+        }
+
 		$args = [
 			'method' => 'PURGE',
 			'headers' => [

@@ -656,6 +656,8 @@ class Image extends Entity
         $file['url'] = str_replace(self::uploadDir('basedir'), self::uploadDir('baseurl'), $file['src']);
         $file['url'] = str_replace(BASE_URI.PUBLIC_DIR, '', $file['url']);
 
+        $file['url'] = apply_filters('metabolism/image/url', $file['url'], $params);
+
         if( $output == 'url')
             return $file['url'];
         else
