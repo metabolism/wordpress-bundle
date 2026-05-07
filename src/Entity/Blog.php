@@ -797,8 +797,11 @@ class Blog extends Entity
      */
     public function getDomain(): string
     {
-        if(is_null($this->domain) )
-            $this->domain = strtok(preg_replace('/https?:\/\//', '', home_url('')),':');
+        if( is_null($this->domain) ){
+
+            $domain = trim(is_multisite() ? network_home_url() : home_url(), '/');
+            $this->domain = strtok(preg_replace('/https?:\/\//', '', $domain),':');
+        }
 
         return $this->domain;
     }
