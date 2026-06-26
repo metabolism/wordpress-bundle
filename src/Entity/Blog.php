@@ -63,6 +63,7 @@ class Blog extends Entity
     protected $menu;
     protected $queried_object;
     protected $queried_object_category;
+    protected $registered_blocks;
 
     private static $instance;
 
@@ -106,6 +107,17 @@ class Blog extends Entity
         }
 
         return $this->queried_object;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRegisteredBlocks(){
+
+        if( is_null($this->registered_blocks) )
+            $this->registered_blocks = get_allowed_block_types(false);
+
+        return $this->registered_blocks;
     }
 
     /**
