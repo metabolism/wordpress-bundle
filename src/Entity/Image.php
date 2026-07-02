@@ -2,6 +2,10 @@
 
 namespace Metabolism\WordpressBundle\Entity;
 
+use Intervention\Image\Color;
+use Intervention\Image\Direction;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Exceptions\AnalyzerException;
 use Intervention\Image\Geometry\Factories\CircleFactory;
 use Intervention\Image\Geometry\Factories\RectangleFactory;
 use Intervention\Image\ImageManager;
@@ -584,11 +588,13 @@ class Image extends Entity
             $pixels = [];
 
             for ($y = 0; $y < $height; ++$y) {
-                $row = [];
-                for ($x = 0; $x < $width; ++$x) {
-                    $colors = $image->pickColor($x, $y);
 
-                    $row[] = $colors->toArray();
+                $row = [];
+
+                for ($x = 0; $x < $width; ++$x) {
+
+                    $colors = $image->colorAt($x, $y);
+                    $row[] = [$colors->red()->value(), $colors->green()->value(), $colors->blue()->value(), $colors->alpha()->value()];
                 }
                 $pixels[] = $row;
             }
@@ -794,13 +800,13 @@ class Image extends Entity
         }
 
         if( extension_loaded('gd') )
-            $manager = ImageManager::gd();
+            $manager = ImageManager::usingDriver(\Intervention\Image\Drivers\Gd\Driver::class);
         elseif( extension_loaded('imagick') )
-            $manager = ImageManager::imagick();
+            $manager = ImageManager::usingDriver(\Intervention\Image\Drivers\Imagick\Driver::class);
         else
             throw new \Exception('No image manager is installed. Please install the GD or Imagick extension.');
 
-        $image = $manager->read($this->src);
+        $image = $manager->decode($this->src);
 
         foreach ($params as $type=>$param){
 
@@ -815,7 +821,7 @@ class Image extends Entity
 
                 case 'insert':
                 case 'place':
-                $image->place(BASE_URI.$param[0], count($param)>1?$param[1]:'top-left', $param[2]??0, $param[3]??0, $param[4]??100);
+                $image->insert(BASE_URI.$param[0], count($param)>1?$param[1]:'top-left', $param[2]??0, $param[3]??0, $param[4]??100);
                 break;
 
                 case 'colorize':
@@ -827,14 +833,11 @@ class Image extends Entity
                     break;
 
                 case 'flip':
-                    if( $param[0]??'v')
-                        $image->flop();
-                    else
-                        $image->flip();
+                    $image->flip(($param[0]??'v')?Direction::VERTICAL:Direction::HORIZONTAL);
                     break;
 
                 case 'flop':
-                    $image->flop();
+                    $image->flip(Direction::VERTICAL);
                     break;
 
                 case 'brightness':
@@ -850,7 +853,7 @@ class Image extends Entity
                     break;
 
                 case 'rotate':
-                    $image->rotate($param[0], $param[1]??'ffffff');
+                    $image->rotate(-1*$param[0], $param[1]??'ffffff');
                     break;
 
                 case 'text':
@@ -859,7 +862,7 @@ class Image extends Entity
                         $params = $param[3]??[];
 
                         if( isset($params['file']) )
-                            $font->filename(BASE_URI.$params['file']);
+                            $font->filepath(BASE_URI.$params['file']);
 
                         if( isset($params['size']) )
                             $font->size($params['size']);
@@ -871,7 +874,7 @@ class Image extends Entity
                             $font->align($params['align']);
 
                         if( isset($params['valign']) )
-                            $font->valign($params['valign']);
+                            $font->align(null, $params['valign']);
 
                         if( isset($params['angle']) )
                             $font->angle($params['angle']);
@@ -890,42 +893,12 @@ class Image extends Entity
                     break;
 
                 case 'greyscale':
-                    $image->greyscale();
+                    $image->grayscale();
                     break;
-
-                case 'rectangle':
-                case 'drawRectangle':
-                $image->drawRectangle($param[0], $param[1], function (RectangleFactory $draw) use($param) {
-
-                    if( count($param) > 3 )
-                        $draw->size($param[2], $param[3]);
-
-                    if( count($param) > 4 )
-                        $draw->background($param[4]);
-
-                    if( count($param) > 6 )
-                        $draw->border($param[5], $param[6]);
-                });
-                break;
-
-                case 'circle':
-                case 'drawCircle':
-                $image->drawCircle($param[0], $param[1], function (CircleFactory $draw) use($param) {
-
-                    if( count($param) > 2 )
-                        $draw->radius($param[2]);
-
-                    if( count($param) > 3 )
-                        $draw->background($param[3]);
-
-                    if( count($param) > 5 )
-                        $draw->border($param[4], $param[5]);
-                });
-                break;
 
                 case 'limitColors':
                 case 'reduceColors':
-                $image->reduceColors($param[0], $param[1]??'transparent');
+                $image->reduceColors($param[0], $param[1]??(Color::transparent()));
                 break;
             }
         }
@@ -1006,6 +979,7 @@ class Image extends Entity
      * @param string $loading
      * @param array $params
      * @return string
+     * @throws \Exception
      */
     public function picture($w, $h=0, $sources=false, $alt=false, $loading='lazy', $params=[]){
 
@@ -1168,6 +1142,7 @@ class Image extends Entity
      * @param $w
      * @param int $h
      * @return void
+     * @throws AnalyzerException
      */
     protected function crop($image, $w, $h=0){
 
