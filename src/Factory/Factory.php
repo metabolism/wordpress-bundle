@@ -38,7 +38,7 @@ class Factory {
         $key = $id;
 
         if( !empty($args) )
-            $key .= crc32(json_encode($args));
+            $key .= ':'.crc32(json_encode($args));
 
 		return wp_cache_get( $key, $type.'_factory' );
 	}
