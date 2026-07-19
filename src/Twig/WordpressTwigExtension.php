@@ -105,7 +105,11 @@ class WordpressTwigExtension extends AbstractExtension{
      */
     public function nl2p($text) {
 
-        $blocks = explode("\n", str_replace(["\r\n", "\r"], "\n", $text));
+        $text = str_replace("<br />", "\n", $text);
+        $text = str_replace("<br/>", "\n", $text);
+        $text = str_replace("<br>", "\n", $text);
+
+        $blocks = array_filter(explode("\n", str_replace(["\r\n", "\r"], "\n", $text)));
 
         $blocks = array_map(function ($block) {
             return '<p>' . trim($block) . '</p>';
