@@ -14,15 +14,21 @@ class PaginationService
     {
         global $wp_query, $wp_rewrite;
 
-		if( is_null($query) )
-			$query = $wp_query;
+		if( is_null($query) ){
+
+            $query = $wp_query;
+        }
+        elseif( !$query instanceof WP_Query && is_array($query) ){
+
+            $query = new \WP_Query( $query );
+        }
 
 	    $total = apply_filters('paginate_total', $query->max_num_pages ?? 1, $query);
 
 		if( $total <= 1 )
 			return false;
 
-        $pagenum_link = html_entity_decode( get_pagenum_link() );
+        $pagenum_link = html_entity_decode( $args['pagenum_link']??get_pagenum_link() );
         $url_parts    = explode( '?', $pagenum_link );
 
         $current = get_query_var( 'paged' ) ? intval( get_query_var( 'paged' ) ) : 1;

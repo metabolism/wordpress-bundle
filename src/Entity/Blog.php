@@ -31,6 +31,7 @@ class Blog extends Entity
     protected $environment;
     protected $locale;
     protected $charset;
+    protected $name;
     protected $description;
     protected $is_admin;
     protected $language;
@@ -50,6 +51,7 @@ class Blog extends Entity
     protected $breadcrumb;
     protected $pagination;
     protected $version;
+    protected $icon_url;
     protected $home_url;
     protected $network_home_url;
     protected $search_url;
@@ -287,10 +289,25 @@ class Blog extends Entity
     /**
      * @return string
      */
+    public function getIconUrl($size=null): string
+    {
+        if( $size )
+            return get_site_icon_url($size);
+
+        if( is_null($this->icon_url) )
+            $this->icon_url = get_site_icon_url();
+
+        return $this->icon_url;
+    }
+
+
+    /**
+     * @return string
+     */
     public function getCharset(): string
     {
         if( is_null($this->charset) )
-            $this->charset = get_bloginfo('charset');
+            $this->charset = $this->getInfo('charset');
 
         return $this->charset;
     }
@@ -301,9 +318,20 @@ class Blog extends Entity
     public function getDescription(): string
     {
         if( is_null($this->description) )
-            $this->description = get_bloginfo('description');
+            $this->description = $this->getInfo('description');
 
         return $this->description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        if( is_null($this->name) )
+            $this->name = $this->getInfo('name');
+
+        return $this->name;
     }
 
     /**
