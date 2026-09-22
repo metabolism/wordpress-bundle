@@ -63,13 +63,13 @@ class BreadcrumbService
                 }
             }
             elseif( $blog->isTax() ) {
-                
+
                 if( $term = TermFactory::create( $queried_object ) ){
                     
-                    $post_types = $term->getPostTypes();
-                    
-                    if( count($post_types) == 1 && $link = $blog->getArchiveLink( $post_types[0] ) )
-                        $breadcrumb[] = ['title' => $blog->getArchiveTitle( $post_types[0] ), 'link' => $link];
+                    $post_type = get_query_var('post_type');
+
+                    if( $post_type && $link = $blog->getArchiveLink( $post_type ) )
+                        $breadcrumb[] = ['title' => $blog->getArchiveTitle( $post_type ), 'link' => $link];
                     
                     $ancestors = $term->getAncestors();
                     
