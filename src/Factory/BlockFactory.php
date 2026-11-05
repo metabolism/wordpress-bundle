@@ -17,15 +17,25 @@ class BlockFactory {
         if( empty($block['blockName']??'') )
             return false;
 
-        if( substr($block['blockName'], 0, 4) !== 'acf/')
-            return $block;
+        $parent_block = null;
 
-        if( class_exists('ACF') && !empty($block['attrs']) ){
+        $pre_render = apply_filters( 'pre_render_block', null, $block, $parent_block );
 
-            $block['id'] = acf_ensure_block_id_prefix(acf_get_block_id( $block['attrs'] ));
-            $class = substr($block['blockName'], 4).'-block';
+        if ( ! is_null( $pre_render ) )
+            return $pre_render;
 
-            return Factory::create($block, $class, 'block');
+        $source_block = $block;
+        $parsed_block = apply_filters( 'render_block_data', $block, $source_block, $parent_block );
+
+        if( substr($parsed_block['blockName'], 0, 4) !== 'acf/')
+            return $parsed_block;
+
+        if( class_exists('ACF') && !empty($parsed_block['attrs']) ){
+
+            $parsed_block['id'] = acf_ensure_block_id_prefix(acf_get_block_id( $parsed_block['attrs'] ));
+            $class = substr($parsed_block['blockName'], 4).'-block';
+
+            return Factory::create($parsed_block, $class, 'block');
         }
 
         return false;

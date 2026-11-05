@@ -85,7 +85,8 @@ class Post extends Entity
             $this->status = $post->post_status;
             $this->type = $post->post_type;
             $this->title = $post->post_title;
-            
+            $this->guid = $post->guid;
+
             $this->loadMetafields($this->ID, 'post');
         }
     }
@@ -147,6 +148,14 @@ class Post extends Entity
     /**
      * @return int|string
      */
+    public function getGuid()
+    {
+        return $this->guid;
+    }
+
+    /**
+     * @return int|string
+     */
     public function getCommentCount()
     {
         return $this->comment_count;
@@ -203,6 +212,7 @@ class Post extends Entity
         $type = get_post_type_object($this->type);
         return $type->$property??false;
     }
+
     /**
      * @return bool
      */
@@ -277,8 +287,13 @@ class Post extends Entity
                 
                 if( !empty($_block['blockName']) ){
 
-                    $blocks[] = BlockFactory::create($_block);
-                    $blocks_list[] = $_block['blockName'];
+                    $block = BlockFactory::create($_block);
+
+                    if( $block && !empty($block) ){
+
+                        $blocks[] = BlockFactory::create($_block);
+                        $blocks_list[] = $_block['blockName'];
+                    }
                 }
             }
             
