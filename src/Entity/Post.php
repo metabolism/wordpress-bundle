@@ -55,6 +55,7 @@ class Post extends Entity
     protected $current;
     protected $state;
     protected $path;
+    protected $guid;
     protected $parameters;
     protected $original_post;
 
