@@ -22,6 +22,8 @@ class Block extends Entity
 
     protected $block;
 
+    protected $attrs;
+
     protected $inner_blocks;
     protected $inner_blocks_list;
 
@@ -53,6 +55,14 @@ class Block extends Entity
     public function getName(){
 
         return $this->name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAttrs(){
+
+        return $this->block['attrs']??[];
     }
 
     /**
@@ -121,17 +131,20 @@ class Block extends Entity
      */
     private function get($_block){
 
-        $block = $_block;
+        $block = apply_filters( 'render_block_data', $_block, $_block, null );
 
         if( class_exists('ACF') && !empty($block['attrs']) ){
 
-            $attrs = $block['attrs'];
-            $attrs['id'] = acf_ensure_block_id_prefix(acf_get_block_id( $attrs ));
+            $block = $block['attrs'];
+            $block['id'] = $_block['id']??'';
 
-            if( $block = acf_prepare_block($attrs) ){
+            $attrs = array_diff_key($block, array_flip(['name','data','mode','id']));
+
+            if( $block = acf_prepare_block($block) ){
 
                 $block['blockName'] = $block['name'];
                 $block['innerBlocks'] = $_block['innerBlocks']??[];
+                $block['attrs'] = $attrs;
 
                 $data = $block['data']??[];
                 $data = !is_array($data)?[]:$data;

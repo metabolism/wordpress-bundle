@@ -283,7 +283,7 @@ class Post extends Entity
 
             $blocks = [];
             $blocks_list = [];
-            
+
             foreach ($_blocks as $_block){
                 
                 if( !empty($_block['blockName']) ){
