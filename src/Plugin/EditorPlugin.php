@@ -34,7 +34,7 @@ class EditorPlugin {
     {
         // Global init action
         add_action( 'init', [$this, 'checkTheme']);
-
+        
         // When viewing admin
         if( is_admin() ){
 

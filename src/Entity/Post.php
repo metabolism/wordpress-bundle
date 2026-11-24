@@ -10,9 +10,9 @@ use Metabolism\WordpressBundle\Factory\BlockFactory;
 use Metabolism\WordpressBundle\Repository\CommentRepository;
 use Metabolism\WordpressBundle\Repository\PostRepository;
 use Metabolism\WordpressBundle\Repository\TermRepository;
+use Metabolism\WordpressBundle\Helper\TextHelper;
 
 use StopWords\StopWords;
-
 /**
  * Class Post
  *
@@ -566,54 +566,29 @@ class Post extends Entity
      * @param bool $index
      * @return string
      */
-    public function getContent($index=false){
+    public function getContent($format=false){
         
         if( is_null($this->content) ){
-            
+
             if( $this->hasBlocks() ){
-                
-                $this->content = [];
-                
-                $blocks = parse_blocks( $this->post->post_content );
-                
-                foreach ($blocks as $block){
-                    
-                    if( !empty($block['innerContent']??'') ){
 
-                        $this->content = array_merge($this->content, $block['innerContent']);
-                    }
-                    else{
-
-                        $data = $block['attrs']['data']??[];
-                        $data = is_array($data)?$data:[];
-
-                        $content = [];
-
-                        foreach ($data as $key=>$value){
-
-                            if( substr($key, 0,1 ) != '_' && is_string($value) && !is_numeric($value) && $value != 'none' )
-                                $content[] = $value;
-                        }
-
-                        $this->content = array_merge($this->content, $content);
-                    }
-                }
-
-                $this->content = array_unique(array_filter($this->content));
-                $this->content = implode("\n", $this->content);
-                $this->content = preg_replace("/[\r\n]+/", "\n", $this->content);
+                $post_content = do_blocks($this->post->post_content);
             }
             else{
-                
+
                 $post_content = get_the_content(null, false, $this->post);
                 $post_content = apply_filters( 'the_content', $post_content );
                 $post_content = str_replace( ']]>', ']]&gt;', $post_content );
-                
-                $this->content = $post_content;
             }
+
+            $this->content = $post_content;
         }
         
-        if( $index ){
+        if( $format == 'markdown' ){
+
+            return TextHelper::convertHtmlToCleanMarkdown($this->content);
+        }
+        elseif( $format == 'index' ){
 
             // normalize
             $content = html_entity_decode(strip_tags($this->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
